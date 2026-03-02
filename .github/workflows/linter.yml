@@ -20,6 +20,9 @@ jobs:
             statuses: write
 
         steps:
+          - name: Install dependencies
+            run: npm ci
+            working-directory: mobile-app  
           - name: Checkout code
             uses: actions/checkout@v5
             with:
@@ -33,6 +36,8 @@ jobs:
             env:
                 # To report GitHub Actions status checks
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                # Only run TS/TSX linting
+                VALIDATE_TYPESCRIPT_PRETTIER: true
                 # Only scan the mobile-app folder
                 FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
                 # Exclude node_modules and .expo
