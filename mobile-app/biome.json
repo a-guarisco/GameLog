@@ -2,9 +2,8 @@
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "space",
-		"indentSize": 2,
-		"lineWidth": 80,
-		"quote": "single"
+		"indentWidth": 2,
+		"lineWidth": 80
 	},
 	"linter": {
 		"enabled": true

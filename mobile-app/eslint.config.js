@@ -8,4 +8,15 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*'],
   },
+  {
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'n/no-missing-import': 'off',
+    },
+  },
 ]);
