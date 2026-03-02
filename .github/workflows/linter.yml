@@ -16,6 +16,8 @@ jobs:
             packages: read
             # To report GitHub Actions status checks. Omit if you don't need
             # to update commit status
+            issues: write
+            pull-requests: write
             statuses: write
 
         steps:
