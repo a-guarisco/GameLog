@@ -29,6 +29,9 @@ jobs:
                 fetch-depth: 0
                 persist-credentials: false
 
+          - name: Install dependencies
+            run: cd mobile-app && npm install
+
           - name: Super-linter
             uses: super-linter/super-linter@v8.5.0 # x-release-please-version
             env:
