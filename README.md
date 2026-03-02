@@ -1,0 +1,2 @@
+# GameLog
+project init
