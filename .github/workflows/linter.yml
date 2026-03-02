@@ -33,8 +33,6 @@ jobs:
             env:
                 # To report GitHub Actions status checks
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                # Only run TS/TSX linting
-                VALIDATE_TYPESCRIPT_ES: true
                 # Only scan the mobile-app folder
                 FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
                 # Exclude node_modules and .expo
