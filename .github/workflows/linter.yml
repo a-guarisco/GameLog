@@ -37,6 +37,7 @@ jobs:
             env:
                 # To report GitHub Actions status checks
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                DEFAULT_WORKSPACE: mobile-app
                 # Only scan the mobile-app folder
                 FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
                 # Exclude node_modules and .expo
