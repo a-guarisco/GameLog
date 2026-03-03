@@ -9,6 +9,7 @@ module.exports = defineConfig([
     ignores: ['dist/*'],
   },
   {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     settings: {
       react: {
         version: 'detect',

@@ -42,3 +42,4 @@ jobs:
                 FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
                 # Exclude node_modules and .expo
                 FILTER_REGEX_EXCLUDE: .*(node_modules|\.expo).*
+                DISABLE_LINTERS: biome
