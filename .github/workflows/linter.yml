@@ -37,9 +37,11 @@ jobs:
             env:
                 # To report GitHub Actions status checks
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                DEFAULT_WORKSPACE: mobile-app
                 # Only scan the mobile-app folder
                 FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
                 # Exclude node_modules and .expo
                 FILTER_REGEX_EXCLUDE: .*(node_modules|\.expo).*
-                DISABLE_LINTERS: biome
+                DISABLE_LINTERS: biome, biome_format
+                TYPESCRIPT_ES_CONFIG_FILE: eslint.config.js
+                LINTER_RULES_PATH: mobile-app               # ← resolve config relative to this path
+
