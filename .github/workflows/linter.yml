@@ -41,7 +41,7 @@ jobs:
                 FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
                 # Exclude node_modules and .expo
                 FILTER_REGEX_EXCLUDE: .*(node_modules|\.expo).*
-                DISABLE_LINTERS: biome, biome_format
                 TYPESCRIPT_ES_CONFIG_FILE: eslint.config.js
-                LINTER_RULES_PATH: mobile-app               # ← resolve config relative to this path
-
+                LINTER_RULES_PATH: mobile-app
+                VALIDATE_BIOME_FORMAT: false
+                VALIDATE_BIOME_LINT: false
