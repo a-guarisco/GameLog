@@ -40,6 +40,9 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "./jest.setup.ts"
+    ],
     "collectCoverage": true,
     "collectCoverageFrom": [
       "**/*.{ts,tsx,js,jsx}",
