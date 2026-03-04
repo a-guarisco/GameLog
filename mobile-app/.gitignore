@@ -42,3 +42,6 @@ yarn-error.*
 
 #jest
 coverage
+
+#src ignore folder
+/src/_ignore
