@@ -1,0 +1,47 @@
+name: Lint
+
+on: # yamllint disable-line rule:truthy
+  pull_request: null
+
+permissions: {}
+
+jobs:
+    build:
+        name: Lint
+        runs-on: self-hosted
+        
+        permissions:
+            # contents permission to clone the repository
+            contents: read
+            packages: read
+            # To report GitHub Actions status checks. Omit if you don't need
+            # to update commit status
+            issues: write
+            pull-requests: write
+            statuses: write
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v5
+            with:
+                # super-linter needs the full git history to get the
+                # list of files that changed across commits
+                fetch-depth: 0
+                persist-credentials: false
+
+          - name: Install dependencies
+            run: cd mobile-app && npm install
+
+          - name: Super-linter
+            uses: super-linter/super-linter@v8.5.0 # x-release-please-version
+            env:
+                # To report GitHub Actions status checks
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                # Only scan the mobile-app folder
+                FILTER_REGEX_INCLUDE: .*mobile-app/.*\.(ts|tsx)$
+                # Exclude node_modules and .expo
+                FILTER_REGEX_EXCLUDE: .*(node_modules|\.expo).*
+                TYPESCRIPT_ES_CONFIG_FILE: eslint.config.js
+                LINTER_RULES_PATH: mobile-app
+                VALIDATE_BIOME_FORMAT: false
+                VALIDATE_BIOME_LINT: false
