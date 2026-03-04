@@ -7,7 +7,7 @@ interface STextProps {
   size?: 's' | 'm' | 'l';
 }
 
-export const Text = styled.Text<STextProps>`
+export const TextGL = styled.Text<STextProps>`
   color: ${({ theme }) => theme.colors.text};
   font-family: ${({ theme, variant = 'main' }) => theme.fonts[variant]};
   font-size: ${({ size = 'm' }) => {

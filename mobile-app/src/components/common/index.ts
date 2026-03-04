@@ -1,2 +1,2 @@
-export { Text } from './Text';
-export { View } from './View';
+export { TextGL } from './TextGL';
+export { ViewGL } from './ViewGL';
