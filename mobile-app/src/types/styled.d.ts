@@ -1,5 +1,5 @@
 import 'styled-components/native';
-import { lightTheme } from '../theme';
+import { lightTheme } from '../theme/theme';
 
 type CustomTheme = typeof lightTheme;
 
