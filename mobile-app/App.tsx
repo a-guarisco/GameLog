@@ -16,7 +16,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <StatusBar style="auto" />
       <ViewGL>
-        <TextGL testID="welcome-message">Open up App.tsx to start working on your app!</TextGL>
+        <TextGL>Welcome to GameLog!</TextGL>
       </ViewGL>
     </ThemeProvider>
   );

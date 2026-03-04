@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react-native';
 import { useFonts } from '@expo-google-fonts/dm-sans';
 import * as ReactNative from 'react-native';
-import { lightTheme, darkTheme } from '../src/theme';
+import { lightTheme, darkTheme } from '../src/theme/theme';
 import App from '../App';
+
+let initText: RegExp = /GameLog/i;
 
 describe('App Initialization', () => {
   beforeEach(() => {
@@ -19,7 +21,7 @@ describe('App Initialization', () => {
 
   test('renders welcome text after initialization', async () => {
     render(<App />);
-    const welcomeText = await screen.findByTestId('welcome-message');
+    const welcomeText = await screen.findByText(initText);
 
     expect(welcomeText).toBeTruthy();
   });
@@ -40,7 +42,7 @@ describe('Theme Integration', () => {
     themeSpy.mockReturnValue('dark');
 
     render(<App />);
-    const text = await screen.findByTestId('welcome-message');
+    const text = await screen.findByText(initText);
 
     expect(text.props.style).toMatchObject({ color: darkTheme.colors.text });
   });
@@ -49,7 +51,7 @@ describe('Theme Integration', () => {
     themeSpy.mockReturnValue('light');
 
     render(<App />);
-    const text = await screen.findByTestId('welcome-message');
+    const text = await screen.findByText(initText);
 
     expect(text.props.style).toMatchObject({ color: lightTheme.colors.text });
   });
