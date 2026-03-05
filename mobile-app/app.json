@@ -13,11 +13,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ggr.gamelog-mobile",
       "userInterfaceStyle": "automatic"
     },
     "android": {
-      "package": "com.ggr.gamelog-mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
