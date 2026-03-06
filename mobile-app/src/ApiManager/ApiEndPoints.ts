@@ -1,4 +1,5 @@
-﻿const BASE_URL = 'http://api.steampowered.com/';
+﻿//todo: backend should use a https connection since plain http is block from android 9.0
+const BASE_URL = 'https://api.steampowered.com/';
 
 //todo .env file should be used, use react-native-dotenv: https://stackoverflow.com/questions/75186535/how-to-get-env-variables-in-react-native-with-typescript-and-rn-cli
 const API_KEY = '724FF154B1D2A357857A257EA28C6415'
