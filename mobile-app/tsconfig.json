@@ -4,6 +4,7 @@
     "strict": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "target": "ESNext",
-    "module": "ESNext"
+    "module": "ESNext",
+    "typeRoots": ["./node_modules/@types", "./types"]
   }
 }

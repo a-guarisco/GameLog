@@ -1,8 +1,7 @@
-﻿//todo: backend should use a https connection since plain http is block from android 9.0
-const BASE_URL = 'https://api.steampowered.com/';
+﻿import {STEAM_API_KEY} from '@env'
 
-//todo .env file should be used, use react-native-dotenv: https://stackoverflow.com/questions/75186535/how-to-get-env-variables-in-react-native-with-typescript-and-rn-cli
-const API_KEY = '724FF154B1D2A357857A257EA28C6415';
+//todo: backend should use a https connection since plain http is block from android 9.0
+const BASE_URL = 'https://api.steampowered.com/';
 
 export default {
   GET_NEWS_FOR_APP: (appId: number, count: number, maxLength: number) =>
@@ -10,5 +9,5 @@ export default {
   GET_GLOBAL_ACHIEVEMENTS_FOR_APP: (appId: number) =>
     `${BASE_URL}ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${appId}`,
   GET_PLAYER_ACHIEVEMENTS: (appId: number, steamId: string) =>
-    `${BASE_URL}ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appId}&key=${API_KEY}&steamid=${steamId}`,
+    `${BASE_URL}ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appId}&key=${STEAM_API_KEY}&steamid=${steamId}`,
 };
