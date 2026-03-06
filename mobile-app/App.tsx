@@ -6,52 +6,55 @@ import ApiManager from './src/ApiManager/ApiManager';
 
 const App = () => {
   const [result, setResult] = useState<string>('Press buttons to test API');
+  const appId = 236390; // warThunder, I love tanks and big explosions
+  const samSteamId = '76561198077919169';
 
-  const getNews = async () => {
+  const handleApiCall = async (apiFunction: () => Promise<any>, loadingMessage: string) => {
     try {
-      setResult('Loading news...');
-      // Testing with AppId 236390 (War Thunder)
-      const news = await ApiManager.getGameNews(236390, 1, 300);
-      setResult(JSON.stringify(news, null, 2));
-    } catch (error) {
-      setResult(`Error: ${error}`);
-    }
-  };
-
-  const getGlobalAchievement = async () => {
-    try {
-      setResult('Loading Global Achievement...');
-      const globalAchievement = await ApiManager.getGlobalAchievement(236390);
-      setResult(JSON.stringify(globalAchievement, null, 2));
-    } catch (error) {
-      setResult(`Error: ${error}`);
-    }
-  };
-
-  const getPlayerAchievements = async () => {
-    try {
-      setResult('Loading Player Achievements...');
-      // Testing with Sam account (steamId: 76561198077919169)
-      const playerAchievements = await ApiManager.getPlayerAchievements(236390, '76561198077919169');
-      setResult(JSON.stringify(playerAchievements, null, 2));
+      setResult(loadingMessage);
+      const data = await apiFunction();
+      setResult(JSON.stringify(data, null, 2));
     } catch (error) {
       setResult(`Error: ${error}`);
     }
   };
 
   return (
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <Button
+        title="Fetch Steam News"
+        onPress={() =>
+          handleApiCall(
+            () => ApiManager.getGameNews(appId, 1, 300),
+            'Loading news for game ' + appId
+          )
+        }
+      />
+      <Button
+        title="Fetch Global Achievement"
+        onPress={() =>
+          handleApiCall(
+            () => ApiManager.getGlobalAchievement(appId),
+            'Loading global achievement for game ' + appId
+          )
+        }
+      />
+      <Button
+        title="Fetch Player Achievements"
+        onPress={() =>
+          handleApiCall(
+            () => ApiManager.getPlayerAchievements(appId, samSteamId),
+            'Loading global achievement for player ' + samSteamId + ' for game ' + appId
+          )
+        }
+      />
 
-        <Button title="Fetch Steam News" onPress={getNews} />
-        <Button title="Fetch Global Achievement" onPress={getGlobalAchievement} />
-        <Button title="Fetch Player Achievements" onPress={getPlayerAchievements} />
+      <ScrollView style={styles.scrollContainer}>
+        <Text style={styles.resultText}>{result}</Text>
+      </ScrollView>
 
-        <ScrollView style={styles.scrollContainer}>
-          <Text style={styles.resultText}>{result}</Text>
-        </ScrollView>
-
-        <StatusBar style="auto" />
-      </View>
+      <StatusBar style="auto" />
+    </View>
   );
 };
 
@@ -75,5 +78,5 @@ const styles = StyleSheet.create({
   },
   resultText: {
     fontFamily: 'monospace',
-  }
+  },
 });
