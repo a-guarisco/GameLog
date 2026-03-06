@@ -1,0 +1,45 @@
+# IDE-specific files and folders
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.netlify/
+.cache/
+
+# Editor backups
+*.bak
+*.backup
+*.[oa]
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+ENV/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+.yarn
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env.local
+.env.*.local

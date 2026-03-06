@@ -1,2 +1,23 @@
+# Dipendenze e pacchetti
 node_modules
 .expo
+.tamagui
+dist
+
+# Test e Copertura
+coverage
+__tests__/e2e
+
+# Codice di esempio e file ignorati
+**/_nocoverage/**
+**/_ignore/**
+
+# File di sistema e lock
+bun.lockb
+package-lock.json
+yarn.lock
+
+# Asset e binari
+assets/
+android/
+ios/

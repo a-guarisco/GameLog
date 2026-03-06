@@ -3,28 +3,24 @@ name: Jest Tests
 on:
   pull_request: null
 
-permissions: {}
-
 jobs:
   test:
     runs-on: self-hosted
     permissions:
-        contents: read
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: 24
-          cache: "npm"
-          cache-dependency-path: mobile-app/package-lock.json
+          bun-version: latest
 
       - name: Install dependencies
         working-directory: mobile-app
-        run: npm ci
+        run: bun install --frozen-lockfile
 
-      - name: Run Jest tests with coverage
+      - name: Run Jest tests
         working-directory: mobile-app
-        run: npx jest --ci
+        run: bun jest --ci

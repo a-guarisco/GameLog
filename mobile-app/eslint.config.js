@@ -6,7 +6,7 @@ module.exports = defineConfig([
   expoConfig,
   eslintPluginPrettierRecommended,
   {
-    ignores: ['dist/*'],
+    ignores: ['dist/*', '**/_ignore/**, coverage/*'],
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],

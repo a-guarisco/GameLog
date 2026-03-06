@@ -1,2 +1,3 @@
 # GameLog
+
 project init
