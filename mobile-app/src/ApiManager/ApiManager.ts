@@ -1,7 +1,7 @@
 ﻿//https://tinyurl.com/React-Api-Manager
 
 import EndPoints from './ApiEndPoints';
-import { GlobalAchievement, PlayerAchievement, SteamNews } from './ApiResponse';
+import { GlobalAchievement, PlayerAchievement, SteamNews } from './DTO';
 
 class ApiManager {
   private static async fetchData<T>(url: string): Promise<T> {
