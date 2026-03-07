@@ -1,14 +1,18 @@
 ﻿interface PlayerAchievementItem {
-    apiname: string;
+    name: string;
     achieved: number;
-    unlocktime: number;
 }
 
-export interface PlayerAchievement {
+interface PlayerStatItem {
+    name: string;
+    value: number;
+}
+
+export interface PlayerStats {
     playerstats: {
         steamID: string;
         gameName: string;
         achievements: PlayerAchievementItem[];
-        success: boolean;
+        stats: PlayerStatItem[];
     };
 }

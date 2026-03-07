@@ -43,7 +43,7 @@ const App = () => {
         title="Fetch Player Achievements"
         onPress={() =>
           handleApiCall(
-            () => ApiManager.getPlayerAchievements(appId, samSteamId),
+            () => ApiManager.getAllPlayerAchievementsPerApp(appId, samSteamId),
             'Loading global achievement for player ' + samSteamId + ' for game ' + appId
           )
         }
