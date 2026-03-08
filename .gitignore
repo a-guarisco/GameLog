@@ -1,0 +1,24 @@
+# IDE-specific files and folders
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.netlify/
+.cache/
+
+# Editor backups
+*.bak
+*.backup
+*.[oa]
+*~
+
+# ignore folders
+**/__ignore
