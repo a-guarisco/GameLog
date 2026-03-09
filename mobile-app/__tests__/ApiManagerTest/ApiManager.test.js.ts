@@ -1,5 +1,5 @@
-﻿import ApiManager from '../../src/ApiManager/ApiManager';
-import ApiEndPoints from '../../src/ApiManager/ApiEndPoints';
+﻿import ApiManager from '../../src/api-manager/ApiManager';
+import ApiEndPoints from '../../src/api-manager/ApiEndPoints';
 
 global.fetch = jest.fn();
 

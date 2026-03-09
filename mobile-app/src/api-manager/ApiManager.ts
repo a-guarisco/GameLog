@@ -8,7 +8,7 @@ import {
   PlayerStats,
   OwnedGames,
   RecentPlayedGames,
-} from './DTO';
+} from './dto';
 
 class ApiManager {
   private static async fetchData<T>(url: string): Promise<T> {
