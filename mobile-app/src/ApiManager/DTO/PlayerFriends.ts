@@ -1,11 +1,11 @@
-﻿interface PlayerFriendItem {
-    "steamid": string,
-    "relationship": string,
-    "friend_since": number
+interface PlayerFriendItem {
+  steamid: string;
+  relationship: string;
+  friend_since: number;
 }
 
-export interface PlayerFriends{
-    "friendslist": {
-        "friends": PlayerFriendItem[]
-    }
+export interface PlayerFriends {
+  friendslist: {
+    friends: PlayerFriendItem[];
+  };
 }

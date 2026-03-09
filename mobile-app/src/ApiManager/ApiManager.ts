@@ -1,4 +1,4 @@
-﻿//https://tinyurl.com/React-Api-Manager
+//https://tinyurl.com/React-Api-Manager
 
 import EndPoints from './ApiEndPoints';
 import {
@@ -8,14 +8,15 @@ import {
   PlayersInfo,
   PlayerFriends,
   PlayerStats,
-  OwnedGames, RecentPlayedGames
+  OwnedGames,
+  RecentPlayedGames,
 } from './DTO';
 
 class ApiManager {
   private static async fetchData<T>(url: string): Promise<T> {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`HTTP error be like: ${response.status}`);
+      throw new Error(`HTTP error: ${response.status}`);
     }
     return response.json();
   }
@@ -28,11 +29,17 @@ class ApiManager {
     return this.fetchData<GlobalAchievement>(EndPoints.GET_GLOBAL_ACHIEVEMENTS_FOR_APP(appId));
   }
 
-  static async getAllPlayerAchievementsPerApp(appId: number, steamId: string): Promise<PlayerAchievement> {
+  static async getAllPlayerAchievementsPerApp(
+    appId: number,
+    steamId: string
+  ): Promise<PlayerAchievement> {
     return this.fetchData<PlayerAchievement>(EndPoints.GET_PLAYER_ACHIEVEMENTS(appId, steamId));
   }
 
-  static async getCompletedPlayerAchievementsAndStatsPerApp(appId: number, steamId: string): Promise<PlayerStats> {
+  static async getCompletedPlayerAchievementsAndStatsPerApp(
+    appId: number,
+    steamId: string
+  ): Promise<PlayerStats> {
     return this.fetchData<PlayerStats>(EndPoints.GET_PLAYER_STATS(appId, steamId));
   }
 
@@ -40,8 +47,13 @@ class ApiManager {
     return this.fetchData<PlayersInfo>(EndPoints.GET_PLAYERS_INFO(steamIds));
   }
 
-  static async getPlayerFriendsInfo(steamId: string, includePending: boolean): Promise<PlayerFriends> {
-    return this.fetchData<PlayerFriends>(EndPoints.GET_PLAYER_FRIENDS_LIST(steamId, includePending));
+  static async getPlayerFriendsInfo(
+    steamId: string,
+    includePending: boolean
+  ): Promise<PlayerFriends> {
+    return this.fetchData<PlayerFriends>(
+      EndPoints.GET_PLAYER_FRIENDS_LIST(steamId, includePending)
+    );
   }
 
   static async getOwnedGames(steamId: string, includeFreeGame: boolean): Promise<OwnedGames> {
