@@ -1,0 +1,8 @@
+import styled from 'styled-components/native';
+
+export const ViewGL = styled.View`
+  flex: 1;
+  background-color: ${(props) => props.theme.colors.background};
+  align-items: center;
+  justify-content: center;
+`;

@@ -1,4 +1,4 @@
-//https://tinyurl.com/React-Api-Manager
+
 
 import EndPoints from './ApiEndPoints';
 import {

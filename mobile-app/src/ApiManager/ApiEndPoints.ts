@@ -1,6 +1,5 @@
 import { STEAM_API_KEY } from '@env';
 
-//todo: backend should use a https connection since plain http is block from android 9.0
 const BASE_URL = 'https://api.steampowered.com/';
 
 export default {
