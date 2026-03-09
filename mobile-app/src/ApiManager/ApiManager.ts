@@ -1,5 +1,3 @@
-
-
 import EndPoints from './ApiEndPoints';
 import {
   GlobalAchievement,
