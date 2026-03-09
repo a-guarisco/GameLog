@@ -1,22 +1,25 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useColorScheme } from 'react-native';
+import { ThemeProvider } from 'styled-components/native';
+import { darkTheme, lightTheme } from './src//theme/theme';
+import useAppInit from './src/hooks/useAppInit';
+import { ViewGL, TextGL } from './src/common';
 
 const App = () => {
+  const deviceTheme = useColorScheme();
+  const theme = deviceTheme === 'dark' ? darkTheme : lightTheme;
+  const { isReady } = useAppInit();
+  if (!isReady) {
+    return null;
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+    <ThemeProvider theme={theme}>
       <StatusBar style="auto" />
-    </View>
+      <ViewGL>
+        <TextGL>Welcome to GameLog!</TextGL>
+      </ViewGL>
+    </ThemeProvider>
   );
 };
 
 export default App;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
