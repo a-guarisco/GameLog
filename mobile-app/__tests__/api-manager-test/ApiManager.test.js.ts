@@ -1,7 +1,7 @@
 ﻿import ApiManager from '../../src/api-manager/ApiManager';
 import ApiEndPoints from '../../src/api-manager/ApiEndPoints';
 
-global.fetch = jest.fn();
+globalThis.fetch = jest.fn() as jest.Mock;
 
 const appId = 440;
 const steamId = '76561198077919169';
@@ -14,17 +14,17 @@ const testHelper = (
   expectedUrl: string
 ) => {
   it(testNameSuccess, async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
     });
     const result = await apiFunction();
-    expect(global.fetch).toHaveBeenCalledWith(expectedUrl);
+    expect(globalThis.fetch).toHaveBeenCalledWith(expectedUrl);
     expect(result).toEqual(mockResponse);
   });
 
   it(testNameFail, async () => {
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (globalThis.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 404,
     });
