@@ -1,11 +1,11 @@
-import { TextGL, ViewGL } from "../common"
+import { TextGL, ViewGL } from '../common';
 
 const Game = () => {
-    return (
-        <ViewGL>
-            <TextGL>This is the game page!</TextGL>
-        </ViewGL>
-    )
-}
+  return (
+    <ViewGL>
+      <TextGL>This is the game page!</TextGL>
+    </ViewGL>
+  );
+};
 
-export default Game
+export default Game;

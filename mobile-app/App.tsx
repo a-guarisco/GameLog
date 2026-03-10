@@ -13,8 +13,8 @@ const App = () => {
   const theme = deviceTheme === 'dark' ? darkTheme : lightTheme;
   const navTheme = deviceTheme === 'dark' ? DarkTheme : DefaultTheme; // This is a problem that we have to talk about
   const { isReady } = useAppInit();
-  
-  const Navigation = createStaticNavigation(RootTabs)
+
+  const Navigation = createStaticNavigation(RootTabs);
 
   if (!isReady) {
     return null;
@@ -23,8 +23,8 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <ThemeProvider theme={theme}>
-      <StatusBar style="auto" />
-        <Navigation theme={navTheme}/>
+        <StatusBar style="auto" />
+        <Navigation theme={navTheme} />
       </ThemeProvider>
     </SafeAreaProvider>
   );
