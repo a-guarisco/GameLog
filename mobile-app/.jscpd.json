@@ -1,0 +1,5 @@
+{
+    "threshold": 0,
+    "ignore": ["**/__snapshots__/**", "**/node_modules/**"],
+    "minLines": 15
+}

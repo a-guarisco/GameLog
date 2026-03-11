@@ -9,13 +9,17 @@
     "web": "expo start --web",
     "prettier": "prettier --check '**/*.{ts,tsx}'",
     "prettier:fix": "prettier --write '**/*.{ts,tsx}'",
-    "lint": "expo lint",
-    "lint:fix": "expo lint -- --fix",
+    "lint": "expo lint -- --ext .ts,.tsx .",
+    "lint:fix": "expo lint -- --ext .ts,.tsx . --fix",
     "test": "jest --watchAll"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@react-native-vector-icons/ionicons": "^12.4.1",
     "@react-native-vector-icons/material-design-icons": "^12.4.1",
+    "@react-navigation/bottom-tabs": "^7.15.5",
+    "@react-navigation/native": "^7.1.33",
+    "@react-navigation/native-stack": "^7.14.4",
     "expo": "~55.0.4",
     "expo-dev-client": "~55.0.13",
     "expo-font": "~55.0.4",
@@ -60,7 +64,9 @@
       "!index.ts",
       "!**/src/_ignore/**",
       "!**/src/types/**",
-      "!**/src/components/common/index.ts"
+      "!**/src/common/index.ts",
+      "!**/src/routes.tsx",
+      "!**/App.tsx"
     ],
     "coverageThreshold": {
       "global": {
