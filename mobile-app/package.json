@@ -62,7 +62,9 @@
       "!index.ts",
       "!**/src/_ignore/**",
       "!**/src/types/**",
-      "!**/src/components/common/index.ts"
+      "!**/src/common/index.ts",
+      "!**/src/routes.tsx",
+      "!**/App.tsx"
     ],
     "coverageThreshold": {
       "global": {

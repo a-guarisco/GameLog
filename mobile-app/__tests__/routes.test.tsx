@@ -2,17 +2,14 @@ import { render, screen, fireEvent } from '@testing-library/react-native';
 import { createStaticNavigation } from '@react-navigation/native';
 import { RootTabs, GameListStack } from '../src/routes';
 
-
-jest.mock('react-native-safe-area-context', () => require('react-native-safe-area-context/jest/mock'));
+jest.mock('react-native-safe-area-context', () =>
+  require('react-native-safe-area-context/jest/mock')
+);
 jest.mock('@react-native-vector-icons/ionicons', () => 'Ionicons');
 jest.mock('../src/common', () => require('../src/helpers/testHelpers').commonGLMocks);
 
-
 const Navigation = createStaticNavigation(RootTabs);
-const renderApp = () => 
-  render(
-      <Navigation />
-  );
+const renderApp = () => render(<Navigation />);
 
 describe('GameListStack structure', () => {
   it('registers the correct screens', () => {
@@ -36,7 +33,6 @@ describe('GameListStack structure', () => {
   });
 });
 
-
 describe('RootTabs structure', () => {
   it('registers the correct tabs', () => {
     const screens = Object.keys(RootTabs.config.screens);
@@ -57,4 +53,3 @@ describe('RootTabs structure', () => {
     expect(RootTabs.config.screens.Profile.screen).toBe(Profile);
   });
 });
-
