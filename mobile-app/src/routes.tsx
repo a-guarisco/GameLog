@@ -1,18 +1,18 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import GameList from './game-list/GameList';
-import Profile from './profile/Profile';
-import Game from './game/Game';
+import GameListView from './game-list/GameListView';
+import ProfileView from './profile/ProfileView';
+import GameView from './game/GameView';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
     HomePage: {
-      screen: GameList,
+      screen: GameListView,
       options: { headerShown: false },
     },
     Game: {
-      screen: Game,
+      screen: GameView,
       options: { headerShown: false },
     },
   },
@@ -34,7 +34,7 @@ export const RootTabs = createBottomTabNavigator({
       },
     },
     Profile: {
-      screen: Profile,
+      screen: ProfileView,
       options: {
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import Profile from '../../src/profile/Profile';
+import ProfileView from '../../src/profile/ProfileView';
 
 jest.mock(
   '../../src/common',
@@ -8,11 +8,11 @@ jest.mock(
 
 describe('Profile', () => {
   it('renders without crashing', () => {
-    render(<Profile />);
+    render(<ProfileView />);
   });
 
   it('displays the profile text', () => {
-    render(<Profile />);
+    render(<ProfileView />);
     expect(screen.getByText('This is the profile!')).toBeTruthy();
   });
 });

@@ -1,6 +1,6 @@
 import { TextGL, ViewGL } from '../common';
 
-const Profile = () => {
+const ProfileView = () => {
   return (
     <ViewGL>
       <TextGL>This is the profile!</TextGL>
@@ -8,4 +8,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileView;

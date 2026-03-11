@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import Game from '../../src/game/Game';
+import GameView from '../../src/game/GameView';
 
 jest.mock(
   '../../src/common',
@@ -8,11 +8,11 @@ jest.mock(
 
 describe('Game', () => {
   it('renders without crashing', () => {
-    render(<Game />);
+    render(<GameView />);
   });
 
   it('displays the game page text', () => {
-    render(<Game />);
+    render(<GameView />);
     expect(screen.getByText('This is the game page!')).toBeTruthy();
   });
 });

@@ -1,6 +1,6 @@
 import { TextGL, ViewGL } from '../common';
 
-const Game = () => {
+const GameView = () => {
   return (
     <ViewGL>
       <TextGL>This is the game page!</TextGL>
@@ -8,4 +8,4 @@ const Game = () => {
   );
 };
 
-export default Game;
+export default GameView;

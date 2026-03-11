@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TextGL, ViewGL } from '../common';
 import { Button } from 'react-native';
 
-const GameList = () => {
+const GameListView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
@@ -14,4 +14,4 @@ const GameList = () => {
   );
 };
 
-export default GameList;
+export default GameListView;

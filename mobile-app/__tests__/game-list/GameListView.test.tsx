@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import GameList from '../../src/game-list/GameList';
+import GameListView from '../../src/game-list/GameListView';
 
 const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
@@ -13,11 +13,11 @@ jest.mock(
 
 describe('GameList', () => {
   it('renders without crashing', () => {
-    render(<GameList />);
+    render(<GameListView />);
   });
 
   it('displays the game list text', () => {
-    render(<GameList />);
+    render(<GameListView />);
     expect(screen.getByText('This is the game list!')).toBeTruthy();
   });
 });
