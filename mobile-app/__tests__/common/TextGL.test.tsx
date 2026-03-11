@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react-native';
 import { ThemeProvider } from 'styled-components/native';
 import { TextGL } from '../../src/common';
-import { useColorScheme } from 'react-native';
+import { Appearance } from 'react-native';
 import { darkTheme, lightTheme } from '../../src/theme/theme';
 
-const deviceTheme = useColorScheme();
+const deviceTheme = Appearance.getColorScheme();
 const theme = deviceTheme === 'dark' ? darkTheme : lightTheme;
 
 const renderWithTheme = (ui: React.ReactElement) =>
