@@ -9,8 +9,8 @@
     "web": "expo start --web",
     "prettier": "prettier --check '**/*.{ts,tsx}'",
     "prettier:fix": "prettier --write '**/*.{ts,tsx}'",
-    "lint": "expo lint",
-    "lint:fix": "expo lint -- --fix",
+    "lint": "expo lint -- --ext .ts,.tsx .",
+    "lint:fix": "expo lint -- --ext .ts,.tsx . --fix",
     "test": "jest --watchAll"
   },
   "dependencies": {
