@@ -1,4 +1,4 @@
-import EndPoints from './ApiEndPoints';
+import EndPoints from './apiEndsPoints';
 import {
   GlobalAchievement,
   PlayerAchievement,
