@@ -1,5 +1,5 @@
-﻿import ApiManager from '../../src/api-manager/ApiManager';
-import ApiEndPoints from '../../src/api-manager/ApiEndPoints';
+﻿import ApiManager from '../../src/api-manager/api-manager';
+import ApiEndPoints from '../../src/api-manager/api-ends-points';
 
 globalThis.fetch = jest.fn() as jest.Mock;
 
