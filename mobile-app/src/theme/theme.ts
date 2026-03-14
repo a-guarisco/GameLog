@@ -1,3 +1,22 @@
+const sharedFonts = {
+  regular: {
+    fontFamily: 'DMSans-Regular',
+    fontWeight: '400' as const,
+  },
+  medium: {
+    fontFamily: 'DMSans-Medium',
+    fontWeight: '500' as const,
+  },
+  bold: {
+    fontFamily: 'DMSans-Bold',
+    fontWeight: '700' as const,
+  },
+  heavy: {
+    fontFamily: 'DMSans-Bold',
+    fontWeight: '800' as const,
+  },
+};
+
 export const lightTheme = {
   colors: {
     primary: '#6200ee',
@@ -8,11 +27,7 @@ export const lightTheme = {
     border: '#e0e0e0',
     notification: '#ff4081',
   },
-  fonts: {
-    main: 'DMSans-Regular',
-    bold: 'DMSans-Bold',
-    light: 'DMSans-Light',
-  },
+  fonts: sharedFonts,
   spacing: {
     small: 8,
     medium: 16,
@@ -30,11 +45,7 @@ export const darkTheme = {
     border: '#272727',
     notification: '#ff4081',
   },
-  fonts: {
-    main: 'DMSans-Regular',
-    bold: 'DMSans-Bold',
-    light: 'DMSans-Light',
-  },
+  fonts: sharedFonts,
   spacing: {
     small: 8,
     medium: 16,
@@ -59,23 +70,6 @@ export const getNavigationTheme = (isDarkMode: boolean) => {
       border: myTheme.colors.border,
       notification: myTheme.colors.notification,
     },
-    fonts: {
-      regular: {
-        fontFamily: myTheme.fonts.main,
-        fontWeight: '400' as const,
-      },
-      medium: {
-        fontFamily: myTheme.fonts.main,
-        fontWeight: '500' as const,
-      },
-      bold: {
-        fontFamily: myTheme.fonts.bold,
-        fontWeight: '700' as const,
-      },
-      heavy: {
-        fontFamily: myTheme.fonts.bold,
-        fontWeight: '800' as const,
-      },
-    },
+    fonts: myTheme.fonts,
   };
 };
