@@ -2,8 +2,8 @@ import { TextGL, ViewGL } from '../common';
 
 const GameView = () => {
   return (
-    <ViewGL>
-      <TextGL>This is the game page!</TextGL>
+    <ViewGL align="center">
+      <TextGL variant="body">This is the game page!</TextGL>
     </ViewGL>
   );
 };
