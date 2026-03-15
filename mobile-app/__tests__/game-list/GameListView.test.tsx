@@ -6,10 +6,7 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }));
 
-jest.mock(
-  '../../src/common',
-  () => jest.requireActual('../../src/helpers/testHelpers').commonGLMocks
-);
+jest.mock('../../src/common', () => jest.requireActual('../../src/utils/testUtils').commonGLMocks);
 
 describe('GameList', () => {
   it('renders without crashing', () => {
