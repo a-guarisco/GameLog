@@ -56,10 +56,17 @@
     "setupFilesAfterEnv": [
       "./jest.setup.ts"
     ],
+    "moduleNameMapper": {
+      "\\.css$": "./__mocks__/styleMock.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|nativewind|tailwind-variants)"
+    ],
     "collectCoverage": true,
     "collectCoverageFrom": [
       "**/*.{ts,tsx,js,jsx}",
       "!**/coverage/**",
+      "!**/__ignore/**",
       "!**/node_modules/**",
       "!**/babel.config.js",
       "!**/expo-env.d.ts",
@@ -71,7 +78,10 @@
       "!**/src/types/**",
       "!**/src/common/index.ts",
       "!**/src/routes.tsx",
-      "!**/App.tsx"
+      "!**/App.tsx",
+      "!**/metro.config.js",
+      "!**/nativewind-env.d.ts",
+      "!**/tailwind.config.js"
     ],
     "coverageThreshold": {
       "global": {
