@@ -6,7 +6,6 @@ import {
   DMSans_400Regular,
   DMSans_500Medium,
   DMSans_700Bold,
-  DMSans_900Black,
   DMSans_800ExtraBold,
 } from '@expo-google-fonts/dm-sans';
 
