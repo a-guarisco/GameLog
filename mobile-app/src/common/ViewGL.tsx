@@ -1,6 +1,6 @@
 import { View, ViewProps } from 'react-native';
 import { type VariantProps } from 'tailwind-variants';
-import { tv } from '../utils/tv';
+import { tv } from '../utils/tailwindUtils';
 
 const viewStyles = tv({
   base: 'flex-1 bg-background',
