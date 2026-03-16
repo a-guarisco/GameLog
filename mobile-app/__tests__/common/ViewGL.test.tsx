@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { ViewGL } from '../../src/common';
+import { ViewGL } from '@gamelog/common';
 
 describe('ViewGL', () => {
   it('renders correctly', () => {

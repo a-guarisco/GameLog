@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { TextGL } from '../../src/common';
+import { TextGL } from '@gamelog/common';
 
 describe('TextGL', () => {
   it('renders with default props', () => {

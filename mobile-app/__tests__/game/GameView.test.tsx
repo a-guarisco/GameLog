@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
-import GameView from '../../src/game/GameView';
+import GameView from '@gamelog/game/GameView';
 
-jest.mock('../../src/common', () => jest.requireActual('../../src/utils/testUtils').commonGLMocks);
+jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 
 describe('Game', () => {
   it('renders without crashing', () => {

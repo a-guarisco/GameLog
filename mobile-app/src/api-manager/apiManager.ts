@@ -1,4 +1,4 @@
-import EndPoints from './apiEndsPoints';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import {
   GlobalAchievement,
   PlayerAchievement,
@@ -8,7 +8,7 @@ import {
   PlayerStats,
   OwnedGames,
   RecentPlayedGames,
-} from './dto';
+} from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string): Promise<T> {
   const response = await fetch(url);
