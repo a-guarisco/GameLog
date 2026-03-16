@@ -23,6 +23,7 @@ module.exports = defineConfig([
       react: {
         version: 'detect',
       },
+      'import/core-modules': ['@env'],
     },
     rules: {
       'react/react-in-jsx-scope': 'off',
