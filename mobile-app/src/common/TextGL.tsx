@@ -1,6 +1,7 @@
 import { Text, TextProps } from 'react-native';
 import { type VariantProps } from 'tailwind-variants';
-import { tv } from '../utils/tailwindUtils';
+
+import { tv } from '@gamelog/utils/tailwindUtils';
 
 const textStyles = tv({
   base: 'text-text font-regular', // Default alla lettura standard

@@ -1,4 +1,4 @@
-import { lightTheme, darkTheme, getNavigationTheme } from '../../src/theme/theme';
+import { lightTheme, darkTheme, getNavigationTheme } from '@gamelog/theme/theme';
 
 describe('Navigation Theme Selection Logic', () => {
   describe('Dark Mode', () => {

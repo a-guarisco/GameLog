@@ -1,6 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "baseUrl": "",
+    "paths": {
+      "@gamelog/*": ["./src/*"]
+    },
     "types": ["jest", "react-native"],
     "strict": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
