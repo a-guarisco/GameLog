@@ -7,8 +7,8 @@ const GameListView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
-    <ViewGL>
-      <TextGL>This is the game list!</TextGL>
+    <ViewGL align="center" gap="sm">
+      <TextGL variant="body">This is the game list!</TextGL>
       <Button title="Go to Game" onPress={() => navigation.navigate('Game')} />
     </ViewGL>
   );

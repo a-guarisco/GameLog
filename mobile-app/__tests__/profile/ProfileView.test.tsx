@@ -1,10 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 import ProfileView from '../../src/profile/ProfileView';
 
-jest.mock(
-  '../../src/common',
-  () => jest.requireActual('../../src/helpers/testHelpers').commonGLMocks
-);
+jest.mock('../../src/common', () => jest.requireActual('../../src/utils/testUtils').commonGLMocks);
 
 describe('Profile', () => {
   it('renders without crashing', () => {

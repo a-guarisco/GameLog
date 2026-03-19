@@ -1,19 +1,24 @@
+import { useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'react-native';
-import { ThemeProvider } from 'styled-components/native';
-import { darkTheme, lightTheme } from './src//theme/theme';
-import { DefaultTheme, DarkTheme, createStaticNavigation } from '@react-navigation/native';
+import { View } from 'react-native';
+import { createStaticNavigation } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useColorScheme } from 'nativewind';
+
+import './src/theme/global.css';
+
+import { getNavigationTheme } from './src/theme/theme';
 import useAppInit from './src/hooks/useAppInit';
 import { RootTabs } from './src/routes';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+const Navigation = createStaticNavigation(RootTabs);
 
 const App = () => {
-  const deviceTheme = useColorScheme();
-  const theme = deviceTheme === 'dark' ? darkTheme : lightTheme;
-  const navTheme = deviceTheme === 'dark' ? DarkTheme : DefaultTheme; // This is a problem that we have to talk about
   const { isReady } = useAppInit();
+  const { colorScheme } = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
 
-  const Navigation = createStaticNavigation(RootTabs);
+  const navTheme = useMemo(() => getNavigationTheme(isDarkMode), [isDarkMode]);
 
   if (!isReady) {
     return null;
@@ -21,10 +26,10 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider theme={theme}>
-        <StatusBar style="auto" />
+      <View className={`flex-1 ${colorScheme}`} key={colorScheme}>
+        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
         <Navigation theme={navTheme} />
-      </ThemeProvider>
+      </View>
     </SafeAreaProvider>
   );
 };

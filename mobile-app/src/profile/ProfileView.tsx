@@ -2,8 +2,8 @@ import { TextGL, ViewGL } from '../common';
 
 const ProfileView = () => {
   return (
-    <ViewGL>
-      <TextGL>This is the profile!</TextGL>
+    <ViewGL align="center">
+      <TextGL variant="body">This is the profile!</TextGL>
     </ViewGL>
   );
 };
