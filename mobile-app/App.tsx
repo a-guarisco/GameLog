@@ -5,6 +5,7 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 
+import { GluestackUIProvider } from '@gamelog/components/ui/gluestack-ui-provider';
 import '@gamelog/theme/global.css';
 import { getNavigationTheme } from '@gamelog/theme/theme';
 import useAppInit from '@gamelog/hooks/useAppInit';
@@ -25,10 +26,12 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <View className={`flex-1 ${colorScheme}`} key={colorScheme}>
-        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-        <Navigation theme={navTheme} />
-      </View>
+      <GluestackUIProvider>
+        <View className={`flex-1 ${colorScheme}`} key={colorScheme}>
+          <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+          <Navigation theme={navTheme} />
+        </View>
+      </GluestackUIProvider>
     </SafeAreaProvider>
   );
 };
