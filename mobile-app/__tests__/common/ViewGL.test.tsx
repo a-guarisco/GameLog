@@ -1,9 +1,9 @@
+import { render } from '@testing-library/react-native';
 import { ViewGL } from '../../src/common';
-import { renderWithTheme } from '../../src/helpers/testHelpers';
 
 describe('ViewGL', () => {
   it('renders correctly', () => {
-    const { getByTestId } = renderWithTheme(<ViewGL testID="view-gl" />);
+    const { getByTestId } = render(<ViewGL testID="view-gl" />);
     expect(getByTestId('view-gl')).toBeTruthy();
   });
 });

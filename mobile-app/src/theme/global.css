@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #6200ee;
+    --color-background: #ffffff;
+    --color-surface: #f8f8f8; /* Card */
+    --color-text: #000000;
+    --color-border: #e0e0e0;
+  }
+
+  .dark {
+    --color-primary: #bb86fc;
+    --color-background: #121212;
+    --color-surface: #1e1e1e;
+    --color-text: #ffffff;
+    --color-border: #272727;
+  }
+}

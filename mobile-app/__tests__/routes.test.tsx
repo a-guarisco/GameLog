@@ -6,7 +6,7 @@ jest.mock('react-native-safe-area-context', () =>
   jest.requireActual('react-native-safe-area-context/jest/mock')
 );
 jest.mock('@react-native-vector-icons/ionicons', () => 'Ionicons');
-jest.mock('../src/common', () => jest.requireActual('../src/helpers/testHelpers').commonGLMocks);
+jest.mock('../src/common', () => jest.requireActual('../src/utils/testUtils').commonGLMocks);
 
 const Navigation = createStaticNavigation(RootTabs);
 const renderApp = () => render(<Navigation />);
