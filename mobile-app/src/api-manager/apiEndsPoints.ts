@@ -21,4 +21,8 @@ export default {
     `${BASE_URL}IPlayerService/GetOwnedGames/v0001/?key=${STEAM_API_KEY}&steamid=${steamId}&include_appinfo=true&include_played_free_games=${includeFreeGame}`,
   GET_RECENT_PLAYED_GAMES: (steamId: string, count: number) =>
     `${BASE_URL}IPlayerService/GetRecentlyPlayedGames/v0001/?key=${STEAM_API_KEY}&steamid=${steamId}&count=${count}`,
+  GET_GAME_HEADER_IMAGE: (appId: number) =>
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
+  GET_GAME_LOGO_IMAGE: (appId: number, imgIconUrl: string) =>
+    `https://cdn.akamai.steamstatic.com/steamcommunity/public/images/apps/${appId}/${imgIconUrl}.jpg`,
 };

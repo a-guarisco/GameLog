@@ -35,7 +35,7 @@ const getCompletedPlayerAchievementsAndStatsPerApp = async (
   steamId: string
 ): Promise<PlayerStats> => fetchData<PlayerStats>(EndPoints.GET_PLAYER_STATS(appId, steamId));
 
-const getPlayersInfo = async (steamIds: string[]): Promise<any> =>
+const getPlayersInfo = async (steamIds: string[]): Promise<PlayersInfo> =>
   fetchData<PlayersInfo>(EndPoints.GET_PLAYERS_INFO(steamIds));
 
 const getPlayerFriendsInfo = async (
@@ -50,6 +50,14 @@ const getOwnedGames = async (steamId: string, includeFreeGame: boolean): Promise
 const getRecentPlayedGames = async (steamId: string, count: number): Promise<RecentPlayedGames> =>
   fetchData<RecentPlayedGames>(EndPoints.GET_RECENT_PLAYED_GAMES(steamId, count));
 
+const getGameHeaderImage = async (appId: number): Promise<string> => {
+  return EndPoints.GET_GAME_HEADER_IMAGE(appId);
+};
+
+const getGameLogoImage = async (appId: number, imgIconUrl: string): Promise<string> => {
+  return EndPoints.GET_GAME_LOGO_IMAGE(appId, imgIconUrl);
+};
+
 export default {
   getGameNews,
   getGlobalAchievement,
@@ -59,4 +67,6 @@ export default {
   getPlayerFriendsInfo,
   getOwnedGames,
   getRecentPlayedGames,
+  getGameHeaderImage,
+  getGameLogoImage,
 };
