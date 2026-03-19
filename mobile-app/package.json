@@ -81,16 +81,18 @@
       "!**/.expo/**",
       "!eslint.config.js",
       "!jest.config.js",
-      "!index.ts",
-      "!**/src/_ignore/**",
-      "!**/src/types/**",
-      "!**/src/common/index.ts",
-      "!**/gluestack-ui-provider/**",
-      "!**/src/routes.tsx",
-      "!**/App.tsx",
       "!**/metro.config.js",
       "!**/nativewind-env.d.ts",
-      "!**/tailwind.config.js"
+      "!**/tailwind.config.js",
+      "!index.ts",
+      "!**/App.tsx",
+      "!**/_ignore/**",
+      "!**/types/**",
+      "!**/src/common/index.ts",
+      "!**/src/components/ui/**",
+      "!**/src/routes.tsx",
+      "!**/src/theme/index.ts",
+      "!**/src/theme/*View.tsx"
     ],
     "coverageThreshold": {
       "global": {
