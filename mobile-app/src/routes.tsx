@@ -5,6 +5,7 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import GameListView from '@gamelog/game-list/GameListView';
 import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
+import { ThemeView, DevPaletteView } from '@gamelog/theme';
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
@@ -14,6 +15,19 @@ export const GameListStack = createNativeStackNavigator({
     },
     Game: {
       screen: GameView,
+      options: { headerShown: false },
+    },
+  },
+});
+
+export const TestingStack = createNativeStackNavigator({
+  screens: {
+    TestingMain: {
+      screen: ThemeView,
+      options: { headerShown: false },
+    },
+    DevPalette: {
+      screen: DevPaletteView,
       options: { headerShown: false },
     },
   },
@@ -39,6 +53,15 @@ export const RootTabs = createBottomTabNavigator({
       options: {
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
+        ),
+      },
+    },
+    ComponentLibrary: {
+      screen: TestingStack,
+      options: {
+        title: 'Dev',
+        tabBarIcon: ({ color, size, focused }) => (
+          <Ionicons name={focused ? 'construct' : 'construct-outline'} size={size} color={color} />
         ),
       },
     },
