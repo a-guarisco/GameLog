@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react-native';
 import { createStaticNavigation } from '@react-navigation/native';
-import { RootTabs, GameListStack } from '../src/routes';
+import { RootTabs, GameListStack } from '@gamelog/routes';
 
 jest.mock('react-native-safe-area-context', () =>
   jest.requireActual('react-native-safe-area-context/jest/mock')
 );
 jest.mock('@react-native-vector-icons/ionicons', () => 'Ionicons');
-jest.mock('../src/common', () => jest.requireActual('../src/utils/testUtils').commonGLMocks);
+jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 
 const Navigation = createStaticNavigation(RootTabs);
 const renderApp = () => render(<Navigation />);
@@ -23,12 +23,12 @@ describe('GameListStack structure', () => {
   });
 
   it('assigns the correct component to HomePage', () => {
-    const GameList = jest.requireActual('../src/game-list/GameListView').default;
+    const GameList = jest.requireActual('@gamelog/game-list/GameListView').default;
     expect(GameListStack.config.screens.HomePage.screen).toBe(GameList);
   });
 
   it('assigns the correct component to Game', () => {
-    const Game = jest.requireActual('../src/game/GameView').default;
+    const Game = jest.requireActual('@gamelog/game/GameView').default;
     expect(GameListStack.config.screens.Game.screen).toBe(Game);
   });
 });
@@ -49,7 +49,7 @@ describe('RootTabs structure', () => {
   });
 
   it('assigns the correct component to the Profile tab', () => {
-    const Profile = jest.requireActual('../src/profile/ProfileView').default;
+    const Profile = jest.requireActual('@gamelog/profile/ProfileView').default;
     expect(RootTabs.config.screens.Profile.screen).toBe(Profile);
   });
 });

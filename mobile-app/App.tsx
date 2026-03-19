@@ -5,11 +5,10 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 
-import './src/theme/global.css';
-
-import { getNavigationTheme } from './src/theme/theme';
-import useAppInit from './src/hooks/useAppInit';
-import { RootTabs } from './src/routes';
+import '@gamelog/theme/global.css';
+import { getNavigationTheme } from '@gamelog/theme/theme';
+import useAppInit from '@gamelog/hooks/useAppInit';
+import { RootTabs } from '@gamelog/routes';
 
 const Navigation = createStaticNavigation(RootTabs);
 

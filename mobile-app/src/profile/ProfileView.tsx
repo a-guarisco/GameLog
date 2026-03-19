@@ -1,4 +1,4 @@
-import { TextGL, ViewGL } from '../common';
+import { TextGL, ViewGL } from '@gamelog/common';
 
 const ProfileView = () => {
   return (

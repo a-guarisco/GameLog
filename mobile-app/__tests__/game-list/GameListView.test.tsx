@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react-native';
-import GameListView from '../../src/game-list/GameListView';
+import GameListView from '@gamelog/game-list/GameListView';
 
 const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }));
 
-jest.mock('../../src/common', () => jest.requireActual('../../src/utils/testUtils').commonGLMocks);
+jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 
 describe('GameList', () => {
   it('renders without crashing', () => {

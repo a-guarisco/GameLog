@@ -1,9 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import GameListView from './game-list/GameListView';
-import ProfileView from './profile/ProfileView';
-import GameView from './game/GameView';
 import Ionicons from '@react-native-vector-icons/ionicons';
+
+import GameListView from '@gamelog/game-list/GameListView';
+import ProfileView from '@gamelog/profile/ProfileView';
+import GameView from '@gamelog/game/GameView';
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
