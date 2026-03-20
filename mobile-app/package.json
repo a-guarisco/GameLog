@@ -11,7 +11,8 @@
     "prettier:fix": "prettier --write '**/*.{ts,tsx}'",
     "lint": "expo lint -- --ext .ts,.tsx .",
     "lint:fix": "expo lint -- --ext .ts,.tsx . --fix",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "install:components": "npx gluestack-ui add button text"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
