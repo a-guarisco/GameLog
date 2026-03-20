@@ -1,49 +1,51 @@
-import { lightTheme, darkTheme, getNavigationTheme } from '@gamelog/theme/theme';
+import { getNavigationTheme } from '@gamelog/theme/theme';
+import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
 
-describe('Navigation Theme Selection Logic', () => {
-  describe('Dark Mode', () => {
-    const navTheme = getNavigationTheme(true);
+jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
+  rawConfig: {
+    light: {
+      '--color-info-500': '13 166 242',
+      '--color-background-950': '255 255 255',
+      '--color-background-800': '242 241 241',
+      '--color-typography-0': '254 254 255',
+      '--color-outline-800': '65 65 65',
+      '--color-error-500': '230 53 53',
+    },
+    dark: {
+      '--color-info-500': '50 180 244',
+      '--color-background-950': '18 18 18',
+      '--color-background-800': '242 241 241',
+      '--color-typography-0': '23 23 23',
+      '--color-outline-800': '230 230 230',
+      '--color-error-500': '239 68 68',
+    },
+  },
+}));
 
-    it('sets the dark property to true', () => {
-      expect(navTheme.dark).toBe(true);
-    });
+describe('getNavigationTheme', () => {
+  const themeCases = [
+    { isDarkMode: true, name: 'Dark Mode', expectedSource: rawConfig.dark },
+    { isDarkMode: false, name: 'Light Mode', expectedSource: rawConfig.light },
+  ];
 
-    it('maps colors from darkTheme correctly', () => {
-      expect(navTheme.colors).toMatchObject({
-        primary: darkTheme.colors.primary,
-        background: darkTheme.colors.background,
-        card: darkTheme.colors.card,
-        text: darkTheme.colors.text,
-        border: darkTheme.colors.border,
-        notification: darkTheme.colors.notification,
+  test.each(themeCases)(
+    'should correctly map all colors and fonts for $name',
+    ({ isDarkMode, expectedSource }) => {
+      const theme = getNavigationTheme(isDarkMode);
+
+      expect(theme.dark).toBe(isDarkMode);
+
+      expect(theme.colors).toEqual({
+        primary: `rgb(${expectedSource['--color-info-500']})`,
+        background: `rgb(${expectedSource['--color-background-950']})`,
+        card: `rgb(${expectedSource['--color-background-800']})`,
+        text: `rgb(${expectedSource['--color-typography-0']})`,
+        border: `rgb(${expectedSource['--color-outline-800']})`,
+        notification: `rgb(${expectedSource['--color-error-500']})`,
       });
-    });
 
-    it('maps fonts from darkTheme correctly', () => {
-      expect(navTheme.fonts).toEqual(darkTheme.fonts);
-    });
-  });
-
-  describe('Light Mode', () => {
-    const navTheme = getNavigationTheme(false);
-
-    it('sets the dark property to false', () => {
-      expect(navTheme.dark).toBe(false);
-    });
-
-    it('maps colors from lightTheme correctly', () => {
-      expect(navTheme.colors).toMatchObject({
-        primary: lightTheme.colors.primary,
-        background: lightTheme.colors.background,
-        card: lightTheme.colors.card,
-        text: lightTheme.colors.text,
-        border: lightTheme.colors.border,
-        notification: lightTheme.colors.notification,
-      });
-    });
-
-    it('maps fonts from lightTheme correctly', () => {
-      expect(navTheme.fonts).toEqual(lightTheme.fonts);
-    });
-  });
+      expect(theme.fonts.bold.fontFamily).toBe('DMSans-Bold');
+      expect(theme.fonts.regular.fontFamily).toBe('DMSans-Regular');
+    }
+  );
 });

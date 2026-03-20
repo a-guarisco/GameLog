@@ -40,8 +40,8 @@ describe('RootTabs structure', () => {
     expect(screens).toContain('Profile');
   });
 
-  it('registers exactly 2 tabs', () => {
-    expect(Object.keys(RootTabs.config.screens)).toHaveLength(2);
+  it('registers exactly 3 tabs', () => {
+    expect(Object.keys(RootTabs.config.screens)).toHaveLength(3);
   });
 
   it('assigns GameListStack to the GameList tab', () => {
