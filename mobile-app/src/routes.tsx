@@ -5,7 +5,7 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import GameListView from '@gamelog/game-list/GameListView';
 import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
-import { ThemeView, DevPaletteView } from '@gamelog/theme';
+import { DevView, PaletteView } from '@gamelog/dev';
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
@@ -23,11 +23,11 @@ export const GameListStack = createNativeStackNavigator({
 export const TestingStack = createNativeStackNavigator({
   screens: {
     TestingMain: {
-      screen: ThemeView,
+      screen: DevView,
       options: { headerShown: false },
     },
     DevPalette: {
-      screen: DevPaletteView,
+      screen: PaletteView,
       options: { headerShown: false },
     },
   },

@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/core';
 import { ViewGL } from '@gamelog/common';
 import { Button, ButtonText } from '@gamelog/components/ui/button';
 
-export const ThemeView = () => {
+export const DevView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
