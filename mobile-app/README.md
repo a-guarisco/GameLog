@@ -2,6 +2,11 @@
 
 ## Starting the project
 
+### prerequisites
+
+1. After cloning the repository, run `npm install` to install the dependencies.
+2. Then get the gluestack ui components by running `npm run install:components`.
+
 ### expo go on android emulator
 
 1. open android studio
