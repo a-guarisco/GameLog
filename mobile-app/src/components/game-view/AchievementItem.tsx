@@ -23,14 +23,14 @@ const AchievementItem = ({ name, percentage, unlockTime }: AchievementItemProps)
                 <VStack className="flex-1 items-center justify-center">
                     <TextGL
                         variant="h3"
-                        className="text-typography-0 font-bold tracking-widest uppercase italic"
+                        className="text-typography-0 font-bold tracking-widest uppercase italic text-center"
                     >
                         {name}
                     </TextGL>
                     {unlockTime && (
                     <TextGL
                         variant="bodySm"
-                        className="text-typography-0 opacity-70 font-mono"
+                        className="text-typography-0 opacity-70 font-mono text-center"
                     >
                         Achievement unlocked on: {new Date(unlockTime * 1000).toLocaleDateString()}
                     </TextGL>)}
