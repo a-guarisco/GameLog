@@ -1,8 +1,6 @@
 import { Theme } from '@react-navigation/native';
 import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
 
-const toRGB = (colorVar: string) => `rgb(${colorVar})`;
-
 const sharedFonts = {
   regular: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const },
   medium: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const },
