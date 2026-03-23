@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 export const FontsView = () => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <Box className="flex-1 bg-background-950 items-left justify-center px-4">
+      <Box className="flex-1 items-left justify-center px-4">
         <Text className="font-thin">This is the Fonts View! - thin</Text>
         <Text className="font-extralight">This is the Fonts View! - extralight</Text>
         <Text className="font-light">This is the Fonts View! - light</Text>
