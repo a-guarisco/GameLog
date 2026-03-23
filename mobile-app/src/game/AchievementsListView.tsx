@@ -1,81 +1,81 @@
-﻿import {GlobalAchievement, PlayerAchievement} from "@gamelog/api-manager/dto";
-import {useEffect, useState, useMemo} from "react";
-import ApiManager from "@gamelog/api-manager/apiManager";
-import AchievementItem from "@gamelog/components/game-view/AchievementItem";
-import {VStack} from "@gamelog/components/ui/vstack";
-import {ScrollView} from "react-native";
-import {TextGL} from "@gamelog/common";
-import {Spinner} from "@gamelog/components/ui/spinner";
+import { GlobalAchievement, PlayerAchievement } from '@gamelog/api-manager/dto';
+import { useEffect, useState, useMemo } from 'react';
+import ApiManager from '@gamelog/api-manager/apiManager';
+import AchievementItem from '@gamelog/components/game-view/AchievementItem';
+import { VStack } from '@gamelog/components/ui/vstack';
+import { ScrollView } from 'react-native';
+import { TextGL } from '@gamelog/common';
+import { Spinner } from '@gamelog/components/ui/spinner';
 
 type AchievementsListViewProps = {
-    achievements: GlobalAchievement;
-    gameID: number;
-    playerID: string;
+  achievements: GlobalAchievement;
+  gameID: number;
+  playerID: string;
 };
 
-const AchievementsListView = ({route}: any) => {
-    const {achievements, gameID, playerID} = route.params as AchievementsListViewProps;
-    const [personalAchievements, setPersonalAchievements] = useState<PlayerAchievement | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<boolean>(false);
+const AchievementsListView = ({ route }: any) => {
+  const { achievements, gameID, playerID } = route.params as AchievementsListViewProps;
+  const [personalAchievements, setPersonalAchievements] = useState<PlayerAchievement | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<boolean>(false);
 
+  useEffect(() => {
+    setError(false);
+    ApiManager.getAllPlayerAchievementsPerApp(gameID, playerID)
+      .then(setPersonalAchievements)
+      .catch((err) => {
+        console.error('Failed to fetch global achievements:', err);
+        setError(true);
+      })
+      .finally(() => setIsLoading(false));
+  }, [gameID, playerID]);
 
-    useEffect(() => {
-        setError(false);
-        ApiManager.getAllPlayerAchievementsPerApp(gameID, playerID)
-            .then(setPersonalAchievements)
-            .catch(err => {
-                console.error("Failed to fetch global achievements:", err);
-                setError(true);
-            })
-            .finally(() => setIsLoading(false));
-    }, [gameID, playerID]);
+  //todo probably all of this should happen in the backend instead of merge here the 2 api call. The backend getPersonalAchievement should return global percentage along side the timestamp
+  const mergedAchievements = useMemo(() => {
+    if (!achievements?.achievementpercentages?.achievements) {
+      return [];
+    }
+    const personalList = personalAchievements?.playerstats?.achievements || [];
+    const personalMap = new Map(personalList.map((ach) => [ach.apiname, ach]));
 
-    //todo probably all of this should happen in the backend instead of merge here the 2 api call. The backend getPersonalAchievement should return global percentage along side the timestamp
-    const mergedAchievements = useMemo(() => {
-        if (!achievements?.achievementpercentages?.achievements) {
-            return [];
-        }
-        const personalList = personalAchievements?.playerstats?.achievements || [];
-        const personalMap = new Map(personalList.map(ach => [ach.apiname, ach]));
+    return achievements.achievementpercentages.achievements.map((globalAch) => {
+      const personalAch = personalMap.get(globalAch.name);
+      const isUnlocked = personalAch?.achieved === 1;
 
-        return achievements.achievementpercentages.achievements.map(globalAch => {
-            const personalAch = personalMap.get(globalAch.name);
-            const isUnlocked = personalAch?.achieved === 1;
+      return {
+        name: globalAch.name,
+        percent: globalAch.percent,
+        unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
+      };
+    });
+  }, [achievements, personalAchievements]);
 
-            return {
-                name: globalAch.name,
-                percent: globalAch.percent,
-                unlockTime: isUnlocked ? personalAch.unlocktime : undefined
-            };
-        });
-    }, [achievements, personalAchievements]);
-
-    return (
-        isLoading ? (
-            <Spinner size="large" className="mb-4" />
-        ) : error ? (
-            <TextGL className="text-error-500 mb-4 text-center">
-                Failed to load achievements, please try again later.
-            </TextGL>
-        ) : (
-            <ScrollView className="mb-4">
-                <TextGL variant="h2" className="text-typography-0 font-bold tracking-widest uppercase mb-4 text-center">
-                    Achievements for {personalAchievements?.playerstats.gameName || 'Unknown Game'}
-                </TextGL>
-                <VStack className="mb-4">
-                    {mergedAchievements.map((item, index) => (
-                        <AchievementItem
-                            key={index}
-                            name={item.name}
-                            percentage={item.percent}
-                            unlockTime={item.unlockTime}
-                        />
-                    ))}
-                </VStack>
-            </ScrollView>
-        )
-    );
+  return isLoading ? (
+    <Spinner size="large" className="mb-4" />
+  ) : error ? (
+    <TextGL className="text-error-500 mb-4 text-center">
+      Failed to load achievements, please try again later.
+    </TextGL>
+  ) : (
+    <ScrollView className="mb-4">
+      <TextGL
+        variant="h2"
+        className="text-typography-0 font-bold tracking-widest uppercase mb-4 text-center"
+      >
+        Achievements for {personalAchievements?.playerstats?.gameName || 'Unknown Game'}
+      </TextGL>
+      <VStack className="mb-4">
+        {mergedAchievements.map((item, index) => (
+          <AchievementItem
+            key={index}
+            name={item.name}
+            percentage={item.percent}
+            unlockTime={item.unlockTime}
+          />
+        ))}
+      </VStack>
+    </ScrollView>
+  );
 };
 
 export default AchievementsListView;
