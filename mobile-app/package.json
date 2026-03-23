@@ -92,6 +92,7 @@
       "!**/_ignore/**",
       "!**/types/**",
       "!**/src/dev/**",
+      "!**/src/utils/**",
       "!**/src/common/index.ts",
       "!**/src/components/ui/**",
       "!**/src/theme/index.ts",

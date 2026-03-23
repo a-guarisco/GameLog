@@ -1,10 +1,11 @@
-import { TextGL, ViewGL } from '@gamelog/common';
+import { Box } from '@gamelog/components/ui/box';
+import { Text } from '@gamelog/components/ui/text';
 
 const GameView = () => {
   return (
-    <ViewGL align="center">
-      <TextGL variant="body">This is the game page!</TextGL>
-    </ViewGL>
+    <Box className="flex-1 items-center justify-center">
+      <Text className="text-base">This is the game page!</Text>
+    </Box>
   );
 };
 
