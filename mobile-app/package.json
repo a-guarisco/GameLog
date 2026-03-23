@@ -93,11 +93,12 @@
       "!**/App.tsx",
       "!**/_ignore/**",
       "!**/types/**",
+      "!**/src/dev/**",
+      "!**/src/utils/**",
       "!**/src/common/index.ts",
       "!**/src/components/ui/**",
-      "!**/src/routes.tsx",
       "!**/src/theme/index.ts",
-      "!**/src/theme/*View.tsx"
+      "!**/src/routes.tsx"
     ],
     "coverageThreshold": {
       "global": {

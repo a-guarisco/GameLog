@@ -1,4 +1,5 @@
-import { TextGL, ViewGL } from '@gamelog/common';
+import { Box } from '@gamelog/components/ui/box';
+import { Text } from '@gamelog/components/ui/text';
 import { useRoute } from '@react-navigation/native';
 
 const GameView = () => {
@@ -6,9 +7,9 @@ const GameView = () => {
   const { appid } = (route.params as { appid?: string }) ?? {};
 
   return (
-    <ViewGL align="center">
-      <TextGL variant="body">This is the game page! Here is the game ID! {appid}</TextGL>
-    </ViewGL>
+    <Box className="flex-1 items-center justify-center">
+      <Text className="text-base">This is the game page! Here is the game ID! {appid}</Text>
+    </Box>
   );
 };
 
