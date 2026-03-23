@@ -2,7 +2,7 @@ import React from 'react';
 import { Box } from '@gamelog/components/ui/box';
 import { HStack } from '@gamelog/components/ui/hstack';
 import { VStack } from '@gamelog/components/ui/vstack';
-import { TextGL } from '@gamelog/common';
+import { Text } from '@gamelog/components/ui/text';
 
 interface AchievementItemProps {
   name: string;
@@ -21,23 +21,23 @@ const AchievementItem = ({ name, percentage, unlockTime }: AchievementItemProps)
 
       <HStack className="h-full px-5 items-center relative z-10" space="md">
         <VStack className="flex-1 items-center justify-center">
-          <TextGL
-            variant="h3"
-            className="text-typography-0 font-bold tracking-widest uppercase italic text-center"
+          <Text
+            size="xl"
+            className="text-typography-0 font-bold tracking-widest uppercase text-center"
           >
             {name}
-          </TextGL>
+          </Text>
           {unlockTime && (
-            <TextGL variant="bodySm" className="text-typography-0 opacity-70 font-mono text-center">
+            <Text size="sm" className="text-typography-0 opacity-70 font-mono text-center">
               Achievement unlocked on: {new Date(unlockTime * 1000).toLocaleDateString()}
-            </TextGL>
+            </Text>
           )}
         </VStack>
 
         <Box className="border-2 border-primary-0 rounded-xl px-4 py-1 bg-background-900">
-          <TextGL variant="bodySm" className="text-typography-0 font-mono font-bold">
+          <Text size="sm" className="text-typography-0 font-mono font-bold">
             {percentage}%
-          </TextGL>
+          </Text>
         </Box>
       </HStack>
     </Box>

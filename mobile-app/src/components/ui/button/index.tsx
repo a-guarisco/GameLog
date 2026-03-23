@@ -291,7 +291,7 @@ const Button = React.forwardRef<React.ElementRef<typeof UIButton>, IButtonProps>
 type IButtonTextProps = React.ComponentPropsWithoutRef<typeof UIButton.Text> &
   VariantProps<typeof buttonTextStyle> & { className?: string };
 
-const ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IButtonTextProps>(
+ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IButtonTextProps>(
   ({ className, variant, size, action, ...props }, ref) => {
     const {
       variant: parentVariant,

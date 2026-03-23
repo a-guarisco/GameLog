@@ -4,8 +4,8 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 import AchievementItem from '@gamelog/components/game-view/AchievementItem';
 import { VStack } from '@gamelog/components/ui/vstack';
 import { ScrollView } from 'react-native';
-import { TextGL } from '@gamelog/common';
 import { Spinner } from '@gamelog/components/ui/spinner';
+import {Text} from "@gamelog/components/ui/text";
 
 type AchievementsListViewProps = {
   achievements: GlobalAchievement;
@@ -53,17 +53,17 @@ const AchievementsListView = ({ route }: any) => {
   return isLoading ? (
     <Spinner size="large" className="mb-4" />
   ) : error ? (
-    <TextGL className="text-error-500 mb-4 text-center">
+    <Text className="text-error-500 mb-4 text-center">
       Failed to load achievements, please try again later.
-    </TextGL>
+    </Text>
   ) : (
     <ScrollView className="mb-4">
-      <TextGL
-        variant="h2"
+      <Text
+        size="xl"
         className="text-typography-0 font-bold tracking-widest uppercase mb-4 text-center"
       >
         Achievements for {personalAchievements?.playerstats?.gameName || 'Unknown Game'}
-      </TextGL>
+      </Text>
       <VStack className="mb-4">
         {mergedAchievements.map((item, index) => (
           <AchievementItem
