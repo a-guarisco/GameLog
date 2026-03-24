@@ -29,7 +29,8 @@ describe('AchievementsListView', () => {
     render(<AchievementsListView route={mockRoute} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Achievements for Unknown Game')).toBeTruthy();
+      expect(screen.getByText('Achievements for')).toBeTruthy();
+      expect(screen.getByText('Unknown Game')).toBeTruthy();
     });
   });
 
@@ -57,7 +58,8 @@ describe('AchievementsListView', () => {
     render(<AchievementsListView route={mockRoute} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Achievements for game1')).toBeTruthy();
+      expect(screen.getByText('Achievements for')).toBeTruthy();
+      expect(screen.getByText('game1')).toBeTruthy();
     });
   });
 });
