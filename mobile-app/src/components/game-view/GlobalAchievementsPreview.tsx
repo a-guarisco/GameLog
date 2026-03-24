@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Spinner } from '@gamelog/components/ui/spinner';
 import { Text } from '@gamelog/components/ui/text';
-import { useGetGlobalAchievement } from '@gamelog/hooks/useGetGlobalAchievement';
+import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
 
 interface Props {
   gameID: number;

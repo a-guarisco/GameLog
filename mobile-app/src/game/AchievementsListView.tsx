@@ -6,7 +6,7 @@ import { ScrollView } from 'react-native';
 import { Spinner } from '@gamelog/components/ui/spinner';
 import { Text } from '@gamelog/components/ui/text';
 import { Box } from '@gamelog/components/ui/box';
-import { useGetPlayerAchievementsPerApp } from '@gamelog/hooks/useGetPlayerAchievementsPerApp';
+import { useGetPlayerAchievementsPerApp } from '@gamelog/api-manager/useApi';
 
 type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
