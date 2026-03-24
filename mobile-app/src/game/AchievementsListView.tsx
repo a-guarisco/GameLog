@@ -28,7 +28,7 @@ const AchievementsListView = ({ route }: any) => {
     }
     const personalList = personalAchievements?.playerstats?.achievements || [];
     const personalMap = new Map(personalList.map((ach) => [ach.apiname, ach]));
-
+    globalAchievements.achievementpercentages.achievements
     return globalAchievements.achievementpercentages.achievements.map((globalAch) => {
       const personalAch = personalMap.get(globalAch.name);
       const isUnlocked = personalAch?.achieved === 1;

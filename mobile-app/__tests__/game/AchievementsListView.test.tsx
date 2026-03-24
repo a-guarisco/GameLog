@@ -11,7 +11,7 @@ const mockRoute = {
   params: {
     gameID: 123,
     playerID: 'player1',
-    achievements: {
+    globalAchievements: {
       achievementpercentages: {
         achievements: [{ name: 'test1', percent: 50.5 }],
       },
