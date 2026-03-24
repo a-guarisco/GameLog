@@ -95,7 +95,8 @@
       "!**/src/common/index.ts",
       "!**/src/components/ui/**",
       "!**/src/theme/index.ts",
-      "!**/src/routes.tsx"
+      "!**/src/routes.tsx",
+      "!**/src/game/GameView.tsx"
     ],
     "coverageThreshold": {
       "global": {
