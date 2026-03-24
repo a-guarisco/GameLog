@@ -1,6 +1,5 @@
-import { STEAM_API_KEY } from '@env';
-
 const BASE_URL = 'https://api.steampowered.com/';
+const STEAM_API_KEY : string = process.env.EXPO_PUBLIC_STEAM_API_KEY;
 
 export default {
   GET_NEWS_FOR_APP: (appId: number, count: number, maxLength: number) =>
