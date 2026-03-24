@@ -18,8 +18,8 @@ describe('GameListStack structure', () => {
     expect(screens).toContain('Game');
   });
 
-  it('registers exactly 2 screens', () => {
-    expect(Object.keys(GameListStack.config.screens)).toHaveLength(2);
+  it('registers exactly 3 screens', () => {
+    expect(Object.keys(GameListStack.config.screens)).toHaveLength(3);
   });
 
   it('assigns the correct component to HomePage', () => {
