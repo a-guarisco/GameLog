@@ -45,36 +45,43 @@ const getInfoGradient = (
 const TotalHoursChart = () => {
   const [chartWidth, setChartWidth] = useState(0);
   const [userId] = useState('76561198159652025');
+  const [isLoading, setIsLoading] = useState(true);
   const [barData, setBarData] = useState<BarData[]>([]);
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
 
   useEffect(() => {
-    apiManager.getOwnedGames(userId, false).then((response) => {
-      const data = response.response.games.map(
-        (game: { playtime_forever: number; name: string; appid: string }) => ({
-          value: Math.trunc(game.playtime_forever / 60),
-          appid: game.appid,
-          frontColor: '',
-          gradientColor: '',
-          spacing: 12,
-          label: game.name.length > 10 ? game.name.slice(0, 100) + '...' : game.name,
-        })
-      );
+    apiManager
+      .getOwnedGames(userId, false)
+      .then((response) => {
+        const data = response.response.games.map(
+          (game: { playtime_forever: number; name: string; appid: string }) => ({
+            value: Math.trunc(game.playtime_forever / 60),
+            appid: game.appid,
+            frontColor: '',
+            gradientColor: '',
+            spacing: 12,
+            label: game.name.length > 10 ? game.name.slice(0, 100) + '...' : game.name,
+          })
+        );
 
-      const sortedData = data.sort((a, b) => b.value - a.value).slice(0, 100);
+        const sortedData = data.sort((a, b) => b.value - a.value).slice(0, 100);
 
-      const min = Math.min(...sortedData.map((d) => d.value));
-      const max = Math.max(...sortedData.map((d) => d.value));
+        const min = Math.min(...sortedData.map((d) => d.value));
+        const max = Math.max(...sortedData.map((d) => d.value));
 
-      const coloredData = sortedData.map((item) => ({
-        ...item,
-        ...getInfoGradient(item.value, min, max),
-      }));
+        const coloredData = sortedData.map((item) => ({
+          ...item,
+          ...getInfoGradient(item.value, min, max),
+        }));
 
-      setBarData(coloredData);
-    });
+        setBarData(coloredData);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching owned games:', error);
+      });
   }, [userId]);
 
   return (
@@ -84,7 +91,7 @@ const TotalHoursChart = () => {
         className="w-full pr-50 rounded-lg"
         onLayout={(e) => setChartWidth(e.nativeEvent.layout.width)}
       >
-        {chartWidth === 0 ? (
+        {isLoading || chartWidth === 0 ? (
           <Spinner />
         ) : (
           <Box style={{ width: chartWidth - 30, overflow: 'hidden' }}>
