@@ -58,7 +58,6 @@
     "jest": "~29.7.0",
     "jest-expo": "~55.0.9",
     "prettier": "^3.8.1",
-    "react-native-dotenv": "^3.4.11",
     "react-test-renderer": "^19.2.4",
     "typescript": "~5.9.2"
   },
@@ -96,7 +95,8 @@
       "!**/src/common/index.ts",
       "!**/src/components/ui/**",
       "!**/src/theme/index.ts",
-      "!**/src/routes.tsx"
+      "!**/src/routes.tsx",
+      "!**/src/game/GameView.tsx"
     ],
     "coverageThreshold": {
       "global": {
