@@ -6,6 +6,7 @@ import { VStack } from '@gamelog/components/ui/vstack';
 import { ScrollView } from 'react-native';
 import { Spinner } from '@gamelog/components/ui/spinner';
 import {Text} from "@gamelog/components/ui/text";
+import {Box} from "@gamelog/components/ui/box";
 
 type AchievementsListViewProps = {
   achievements: GlobalAchievement;
@@ -58,12 +59,22 @@ const AchievementsListView = ({ route }: any) => {
     </Text>
   ) : (
     <ScrollView className="mb-4">
-      <Text
-        size="xl"
-        className="text-typography-0 font-bold tracking-widest uppercase mb-4 text-center"
-      >
-        Achievements for {personalAchievements?.playerstats?.gameName || 'Unknown Game'}
-      </Text>
+      <Box>
+        <Text
+            size="3xl"
+            className="font-bold uppercase text-center"
+        >
+          Achievements for
+        </Text>
+        <Text
+            size="3xl"
+            className="font-bold uppercase mb-4 text-center"
+        >
+          {personalAchievements?.playerstats?.gameName || 'Unknown Game'}
+        </Text>
+      </Box>
+
+
       <VStack className="mb-4">
         {mergedAchievements.map((item, index) => (
           <AchievementItem

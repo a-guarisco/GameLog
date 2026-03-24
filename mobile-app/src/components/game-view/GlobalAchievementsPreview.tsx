@@ -34,10 +34,10 @@ export default function GlobalAchievementsBox({gameID, playerID}: Props) {
     const topAchievements = achievements?.achievementpercentages.achievements.slice(0, 3) || [];
 
     return (
-        <Box className="border-2 border-outline-0 p-4 rounded-lg w-full">
+        <Box className="border-2 p-4 rounded-lg w-full">
             <Text
-                size="xl"
-                className="text-typography-0 font-bold tracking-widest uppercase mb-4 text-center"
+                size="2xl"
+                className="font-bold tracking-widest uppercase mb-4 text-center"
             >
                 Global Achievements
             </Text>
@@ -58,7 +58,7 @@ export default function GlobalAchievementsBox({gameID, playerID}: Props) {
 
             <Button
                 onPress={() => navigation.navigate('AchievementsList', {achievements, gameID, playerID})}
-                className="w-full bg-background-800 border border-outline-0 py-2"
+                className="w-full py-2"
             >
                 <ButtonText>See More</ButtonText>
             </Button>
