@@ -78,7 +78,7 @@ describe('GlobalAchievementsPreview', () => {
     fireEvent.press(screen.getByText('See More'));
 
     expect(mockNavigate).toHaveBeenCalledWith('AchievementsList', {
-      achievements: mockData,
+      globalAchievements: mockData,
       gameID: 123,
       playerID: 'player1',
     });
