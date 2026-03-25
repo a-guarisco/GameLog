@@ -1,5 +1,5 @@
 interface GameItem {
-  appid: number;
+  appid: string;
   name: string;
   playtime_forever: number;
   img_icon_url: string;
