@@ -26,3 +26,17 @@ export const useGetGlobalAchievement = (gameID: number) => {
     errorGlobalAchievements: error,
   };
 };
+
+export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => {
+  const fetchFunc = useCallback(
+    () => ApiManager.getOwnedGames(playerID, includeFreeGame),
+    [playerID, includeFreeGame]
+  );
+
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return {
+    ownedGames: data,
+    isLoadingOwnedGames: isLoading,
+    errorOwnedGames: error,
+  };
+}
