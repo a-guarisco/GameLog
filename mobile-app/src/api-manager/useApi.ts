@@ -39,4 +39,4 @@ export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => 
     isLoadingOwnedGames: isLoading,
     errorOwnedGames: error,
   };
-}
+};

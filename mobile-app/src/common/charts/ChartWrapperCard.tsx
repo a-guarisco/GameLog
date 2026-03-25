@@ -17,12 +17,12 @@ const ThemeHandling = () => {
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
   return theme;
-}
+};
 
 const ChartWrapperCard = ({ isLoading, children, error, ErrorBehaviour }: ChartCardProps) => {
   const [cardWidth, setCardWidth] = useState(0);
   const theme = ThemeHandling();
- 
+
   return (
     <Box style={{ width: '95%', alignItems: 'center', overflow: 'hidden' }}>
       <Card

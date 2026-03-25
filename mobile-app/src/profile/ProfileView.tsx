@@ -8,7 +8,7 @@ const ProfileView = () => {
   return (
     <Box className="flex-1 items-center justify-center">
       <Text className="text-base">This is the profile!</Text>
-      <TotalHoursChart />
+      <TotalHoursPieChart />
       {/* <OsShareChart /> */}
     </Box>
   );

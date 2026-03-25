@@ -6,13 +6,14 @@ interface ChartErrorHandlingProps {
 }
 
 const ChartErrorHandling = ({ ErrorBehaviour }: ChartErrorHandlingProps) => {
-  
   const FallbackError: React.ComponentType = () => (
-    <Box><Text>Error loading chart</Text></Box>
+    <Box>
+      <Text>Error loading chart</Text>
+    </Box>
   );
 
   const ErrorComponent = ErrorBehaviour || FallbackError;
   return <ErrorComponent />;
-}
+};
 
 export default ChartErrorHandling;
