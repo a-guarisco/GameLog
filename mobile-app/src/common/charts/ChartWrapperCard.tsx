@@ -4,7 +4,7 @@ import { Card } from '@gamelog/components/ui/card';
 import { Box } from '@gamelog/components/ui/box';
 import { Spinner } from '@gamelog/components/ui/spinner';
 import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
-import ChartErrorHandling from './ChartErrorHanlding';
+import ChartErrorHandler from './ChartErrorHandler';
 
 interface ChartCardProps {
   isLoading: boolean;
@@ -33,7 +33,7 @@ const ChartWrapperCard = ({ isLoading, children, error, ErrorBehaviour }: ChartC
         {isLoading ? (
           <Spinner />
         ) : error || cardWidth === 0 ? (
-          <ChartErrorHandling ErrorBehaviour={ErrorBehaviour} />
+          <ChartErrorHandler ErrorBehaviour={ErrorBehaviour} />
         ) : (
           children({ cardWidth, theme })
         )}
