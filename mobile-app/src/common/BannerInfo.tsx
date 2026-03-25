@@ -27,10 +27,7 @@ const BannerInfo = ({
   };
 
   return (
-    <Box
-      className="rounded-lg border-2 border-outline-500 mb-3 w-full p-3 flex justify-center"
-      style={boxStyle}
-    >
+    <Box className="mb-3 w-full p-3 flex justify-center" style={boxStyle}>
       <HStack className="items-center w-full justify-between">
         <Box className="flex-1 flex-row justify-start">
           <Avatar size="md">
