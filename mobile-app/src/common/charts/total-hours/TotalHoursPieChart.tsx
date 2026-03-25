@@ -4,7 +4,7 @@ import { OwnedGames } from '@gamelog/api-manager/dto';
 import { Box } from '@gamelog/components/ui/box';
 import { Text } from '@gamelog/components/ui/text';
 import { brand } from '@gamelog/theme/theme';
-import { INFO_GRADIENT_TIERS } from '../chartsHelpers';
+import { INFO_GRADIENT_TIERS, computePieRadius, computePieInnerRadius } from '../chartsHelpers';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ExternalLabelBox from '../ExternalLabelBox';
@@ -52,8 +52,8 @@ const TotalHoursPieChart = () => {
             sectionAutoFocus
             showTooltip
             tooltipComponent={(index: number) => tooltipComponent(index, theme)}
-            radius={radius(cardWidth)}
-            innerRadius={innerRadius(radius(cardWidth))}
+            radius={computePieRadius(cardWidth)}
+            innerRadius={computePieInnerRadius(computePieRadius(cardWidth))}
             innerCircleColor={`rgb(${theme['--color-background-100']})`}
             centerLabelComponent={() => <Box style={{ alignItems: 'center' }} />}
             isAnimated
@@ -116,6 +116,3 @@ const formatMinutes = (minutes: number) => {
   const m = minutes % 60;
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 };
-
-const radius = (cardWidth: number) => (cardWidth > 0 ? Math.floor(cardWidth * 0.28) : 110);
-const innerRadius = (r: number) => Math.floor(r * 0.64);

@@ -61,3 +61,7 @@ export const getPercentileInfoGradient = (
 
   return INFO_GRADIENT_TIERS[tierIndex];
 };
+
+export const computePieRadius = (cardWidth: number) =>
+  cardWidth > 0 ? Math.floor(cardWidth * 0.28) : 110;
+export const computePieInnerRadius = (r: number) => Math.floor(r * 0.64);

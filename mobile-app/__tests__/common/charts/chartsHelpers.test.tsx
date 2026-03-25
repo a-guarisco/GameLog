@@ -1,4 +1,6 @@
 import {
+  computePieInnerRadius,
+  computePieRadius,
   getPercentileInfoGradient,
   INFO_GRADIENT_TIERS,
   OS_COLORS,
@@ -67,5 +69,24 @@ describe('getPercentileInfoGradient', () => {
   it('returns tier 1 (percentile = 1) when min === max (zero range)', () => {
     const result = getPercentileInfoGradient(50, 50, 50);
     expect(result).toEqual(INFO_GRADIENT_TIERS[9]);
+  });
+});
+
+describe('computePieRadius', () => {
+  it('should return the calculated radius when cardWidth is greater than 0', () => {
+    const cardWidth = 400;
+    expect(computePieRadius(cardWidth)).toBe(112);
+  });
+
+  it('should return 110 when cardWidth is 0 or less', () => {
+    expect(computePieRadius(0)).toBe(110);
+    expect(computePieRadius(-10)).toBe(110);
+  });
+});
+
+describe('computePieInnerRadius', () => {
+  it('should return the calculated inner radius when given r', () => {
+    const r = 200;
+    expect(computePieInnerRadius(r)).toBe(128);
   });
 });
