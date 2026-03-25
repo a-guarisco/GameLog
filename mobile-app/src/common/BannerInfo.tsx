@@ -32,7 +32,7 @@ const BannerInfo = ({
         <Box className="flex-1 flex-row justify-start">
           <Avatar size="md">
             <AvatarFallbackText>{title}</AvatarFallbackText>
-            <AvatarImage source={{ uri: iconUrl }} />
+            <AvatarImage source={{ uri: iconUrl }} alt={`${title} icon`} resizeMode="cover" />
           </Avatar>
         </Box>
 

@@ -6,11 +6,10 @@ import Banner from '@gamelog/common/Banner';
 interface GameBannerProps {
   appid: string;
   title: string;
-  img_icon_url: string;
   streak: number;
 }
 
-export default function GameBanner({ appid, title, img_icon_url, streak }: GameBannerProps) {
+export default function GameBanner({ appid, title, streak }: GameBannerProps) {
   const gameCapsuleImage = apiEndsPoints.GET_GAME_CAPSULE_IMAGE(appid);
   const gameHeaderImage = apiEndsPoints.GET_GAME_HEADER_IMAGE(appid);
 
