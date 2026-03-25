@@ -7,7 +7,7 @@ import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { getPercentileInfoGradient } from '../chartsHelpers';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
-import { BarData } from '../charts';
+import { BarData } from '../charts.type';
 
 const USER_ID = '76561198159652025';
 

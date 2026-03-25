@@ -3,7 +3,7 @@ import { PieChart } from 'react-native-gifted-charts';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { OS_COLORS, computePieInnerRadius, computePieRadius } from '../chartsHelpers';
-import { PieData } from '../charts';
+import { PieData } from '../charts.type';
 import ChartWrapperCard from '../ChartWrapperCard';
 
 const OsShareChart = () => {
