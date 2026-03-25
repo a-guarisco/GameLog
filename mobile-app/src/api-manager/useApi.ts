@@ -33,7 +33,6 @@ const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
   return { data, isLoading, error };
 };
 
-
 export const useGetPlayerAchievementsPerApp = (gameID: number, playerID: string) => {
   const fetchFunc = useCallback(
     () => ApiManager.getAllPlayerAchievementsPerApp(gameID, playerID),

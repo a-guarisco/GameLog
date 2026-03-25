@@ -7,15 +7,7 @@ import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { getPercentileInfoGradient } from '../chartsHelpers';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
-
-interface BarData {
-  value: number;
-  appid: string;
-  frontColor: string;
-  gradientColor: string;
-  spacing: number;
-  label: string;
-}
+import { BarData } from '../charts';
 
 const USER_ID = '76561198159652025';
 

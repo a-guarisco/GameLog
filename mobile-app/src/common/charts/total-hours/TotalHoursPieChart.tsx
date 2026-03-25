@@ -8,6 +8,7 @@ import { INFO_GRADIENT_TIERS } from '../chartsHelpers';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ExternalLabelBox from '../ExternalLabelBox';
+import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
 
 interface PieData {
   value: number;
@@ -15,7 +16,6 @@ interface PieData {
   color: string;
   gradientCenterColor: string;
 }
-
 
 const TotalHoursPieChart = () => {
   const [userId] = useState('76561198159652025');
@@ -32,11 +32,14 @@ const TotalHoursPieChart = () => {
     return `${formatMinutes(value)} · ${Math.round((value / totalMinutes) * 100)}%`;
   };
 
-  const tooltipComponent = (index: any) => {
+  const tooltipComponent = (index: number, theme: typeof rawConfig.light) => {
     const { value, label } = pieData[index];
-    return <Text style={{ color: '#fff', fontSize: 12 }}>{label} | {lamdaFormatLabel(value.toString())}</Text>
-  }
-  
+    return (
+      <Text style={{ color: theme['--color-typography-100'], fontSize: 12 }}>
+        {label} | {lamdaFormatLabel(value.toString())}
+      </Text>
+    );
+  };
 
   return (
     <ChartWrapperCard isLoading={isLoadingOwnedGames} error={!!errorOwnedGames}>
@@ -48,7 +51,7 @@ const TotalHoursPieChart = () => {
             showGradient
             sectionAutoFocus
             showTooltip
-            tooltipComponent={tooltipComponent}
+            tooltipComponent={(index: number) => tooltipComponent(index, theme)}
             radius={radius(cardWidth)}
             innerRadius={innerRadius(radius(cardWidth))}
             innerCircleColor={`rgb(${theme['--color-background-100']})`}
@@ -74,7 +77,6 @@ const TotalHoursPieChart = () => {
 };
 
 export default TotalHoursPieChart;
-
 
 const getPieData = (ownedGames: OwnedGames | null): PieData[] => {
   if (!ownedGames?.response?.games) return [];
