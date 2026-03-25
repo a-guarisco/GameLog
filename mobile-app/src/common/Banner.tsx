@@ -16,8 +16,8 @@ export default function Banner({ heightPercentage, minHeight, fallbackColor, ima
 
     return (
         <Box
-            className="w-full overflow-hidden rounded-t-lg"
-            style={{ height: calculatedHeight, backgroundColor: fallbackColor }}
+            className={`w-full overflow-hidden rounded-t-lg ${fallbackColor}`}
+            style={{ height: calculatedHeight }}
         >
             {imageUrl && (
                 <Image

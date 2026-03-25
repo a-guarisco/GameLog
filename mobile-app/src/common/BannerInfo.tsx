@@ -6,7 +6,7 @@ import { Text } from '@gamelog/components/ui/text';
 interface BannerInfoProps {
   title: string;
   backgroundColor?: string;
-  height?: number;
+  height?: string;
   secondaryText?: string;
   iconUrl?: string;
   textColor?: string;
@@ -20,14 +20,8 @@ const BannerInfo = ({
   textColor,
   height,
 }: BannerInfoProps) => {
-  const textStyle = textColor ? { color: textColor } : undefined;
-  const boxStyle = {
-    ...(backgroundColor ? { backgroundColor } : {}),
-    ...(height !== undefined ? { height } : {}),
-  };
-
   return (
-    <Box className="mb-3 w-full p-3 flex justify-center" style={boxStyle}>
+    <Box className={`mb-3 w-full p-3 flex justify-center ${backgroundColor ?? ''} ${height ?? ''}`}>
       <HStack className="items-center w-full justify-between">
         <Box className="flex-1 flex-row justify-start">
           <Avatar size="md">
@@ -36,7 +30,7 @@ const BannerInfo = ({
           </Avatar>
         </Box>
 
-        <Text size="2xl" className="font-bold uppercase text-center px-2" style={textStyle}>
+        <Text size="2xl" className={`font-bold uppercase text-center px-2 ${textColor ?? ''}`}>
           {title}
         </Text>
 

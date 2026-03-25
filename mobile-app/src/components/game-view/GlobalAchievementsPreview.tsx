@@ -11,9 +11,14 @@ import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
 interface Props {
   gameID: number;
   playerID: string;
+  gameItem?: {
+    appid: number;
+    name: string;
+    streak?: number;
+  };
 }
 
-export default function GlobalAchievementsBox({ gameID, playerID }: Props) {
+export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Props) {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const { globalAchievements, isLoadingGlobalAchievements, errorGlobalAchievements } =
@@ -43,7 +48,12 @@ export default function GlobalAchievementsBox({ gameID, playerID }: Props) {
 
       <Button
         onPress={() =>
-          navigation.navigate('AchievementsList', { globalAchievements, gameID, playerID })
+          navigation.navigate('AchievementsList', {
+            globalAchievements,
+            gameID,
+            playerID,
+            ...(gameItem ? { game: gameItem } : {}),
+          })
         }
         className="w-full py-2"
       >

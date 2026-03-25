@@ -7,20 +7,45 @@ import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import { DevView, PaletteView, FontsView } from '@gamelog/dev';
+import GameBanner from '@gamelog/components/game-view/GameBanner';
+
+const renderGameBannerHeader = (route: any) => {
+  const game = route?.params?.game;
+  const appid = game?.appid ?? route?.params?.gameID;
+
+  if (!appid) {
+    return null;
+  }
+
+  return (
+    <GameBanner
+      appid={appid}
+      title={game?.name ?? 'Game'}
+      streak={game?.streak ?? 2}
+    />
+  );
+};
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
     HomePage: {
       screen: GameListView,
-      options: { headerShown: false },
+      options: {
+        title: 'Game List',
+        headerShown: true,
+      },
     },
     Game: {
       screen: GameView,
-      options: { headerShown: false },
+      options: ({ route }: any) => ({
+        header: () => renderGameBannerHeader(route),
+      }),
     },
     AchievementsList: {
       screen: AchievementsListView,
-      options: { headerShown: false },
+      options: ({ route }: any) => ({
+        header: () => renderGameBannerHeader(route),
+      }),
     },
   },
 });
@@ -47,6 +72,7 @@ export const RootTabs = createBottomTabNavigator({
     GameList: {
       screen: GameListStack,
       options: {
+        headerShown: false,
         title: 'Game List',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
@@ -63,6 +89,7 @@ export const RootTabs = createBottomTabNavigator({
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
         ),
+        headerShown: false,
       },
     },
     ComponentLibrary: {
