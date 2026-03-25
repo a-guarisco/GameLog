@@ -7,9 +7,9 @@ jest.mock('@gamelog/components/ui/box', () => ({
 }));
 
 jest.mock('@gamelog/components/ui/text', () => {
-  const { Text } = require('react-native');
+  const { Text: RNText } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
-    Text: ({ children }: { children?: React.ReactNode }) => <Text>{children}</Text>,
+    Text: ({ children }: { children?: React.ReactNode }) => <RNText>{children}</RNText>,
   };
 });
 

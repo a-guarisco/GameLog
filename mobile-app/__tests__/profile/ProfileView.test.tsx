@@ -6,7 +6,7 @@ jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => () => n
 jest.mock('@gamelog/common/charts/os-share/OsShareChart', () => () => null);
 
 describe('Profile', () => {
-  jest.mock('react-native-gifted-charts')
+  jest.mock('react-native-gifted-charts');
   it('renders without crashing', () => {
     render(<ProfileView />);
   });

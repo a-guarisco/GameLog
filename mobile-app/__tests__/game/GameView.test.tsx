@@ -5,6 +5,9 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: jest.fn(),
   }),
+  useRoute: jest.fn(() => ({
+    params: { appid: '236390' },
+  })),
 }));
 
 describe('Game', () => {
@@ -14,7 +17,7 @@ describe('Game', () => {
 
   it('displays the game page text', () => {
     render(<GameView />);
-    expect(screen.getByText('This is the game page!')).toBeTruthy();
+    expect(screen.getByText(/This is the game page!/i)).toBeTruthy();
   });
 
   it('renders the GlobalAchievementsPreview component', () => {

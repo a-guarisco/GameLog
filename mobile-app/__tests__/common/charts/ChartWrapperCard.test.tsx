@@ -13,12 +13,12 @@ jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
 }));
 
 jest.mock('@gamelog/components/ui/box', () => {
-  const { View } = require('react-native');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
 });
 
 jest.mock('@gamelog/components/ui/card', () => {
-  const { View } = require('react-native');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     Card: ({ children, onLayout, ...props }: any) => (
       <View testID="card" onLayout={onLayout} {...props}>
@@ -29,12 +29,12 @@ jest.mock('@gamelog/components/ui/card', () => {
 });
 
 jest.mock('@gamelog/components/ui/spinner', () => {
-  const { View } = require('react-native');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return { Spinner: () => <View testID="spinner" /> };
 });
 
 jest.mock('@gamelog/common/charts/ChartErrorHandler', () => {
-  const { View } = require('react-native');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     __esModule: true,
     default: ({ ErrorBehaviour }: { ErrorBehaviour?: React.ComponentType }) => {
@@ -45,40 +45,53 @@ jest.mock('@gamelog/common/charts/ChartErrorHandler', () => {
 });
 
 const noop = () => null;
-const defaultProps = { isLoading: false, error: false, children: noop };
+const defaultProps = { isLoading: false, error: false };
 
 describe('ChartWrapperCard', () => {
   it('renders Spinner when isLoading is true', () => {
-    render(<ChartWrapperCard {...defaultProps} isLoading={true} />);
+    render(
+      <ChartWrapperCard {...defaultProps} isLoading={true}>
+        {noop}
+      </ChartWrapperCard>
+    );
     expect(screen.getByTestId('spinner')).toBeTruthy();
   });
 
   it('renders error component when error is true', () => {
-    render(<ChartWrapperCard {...defaultProps} error={true} />);
+    render(
+      <ChartWrapperCard {...defaultProps} error={true}>
+        {noop}
+      </ChartWrapperCard>
+    );
     expect(screen.getByTestId('default-error')).toBeTruthy();
   });
 
   it('renders error component when cardWidth is 0 (before layout)', () => {
-    render(<ChartWrapperCard {...defaultProps} />);
+    render(<ChartWrapperCard {...defaultProps}>{noop}</ChartWrapperCard>);
     expect(screen.getByTestId('default-error')).toBeTruthy();
   });
 
   it('renders children after a layout event provides a width', () => {
     const children = jest.fn(({ cardWidth, theme }) => <View testID="chart-content" />);
-
-    render(<ChartWrapperCard isLoading={false} error={false} children={children} />);
-
+    render(
+      <ChartWrapperCard isLoading={false} error={false}>
+        {children}
+      </ChartWrapperCard>
+    );
     fireEvent(screen.getByTestId('card'), 'layout', {
       nativeEvent: { layout: { width: 300 } },
     });
-
     expect(screen.getByTestId('chart-content')).toBeTruthy();
     expect(children).toHaveBeenCalledWith(expect.objectContaining({ cardWidth: 300 }));
   });
 
   it('passes a custom ErrorBehaviour through to ChartErrorHandling', () => {
     const CustomError = () => <View testID="custom-error" />;
-    render(<ChartWrapperCard {...defaultProps} error={true} ErrorBehaviour={CustomError} />);
+    render(
+      <ChartWrapperCard {...defaultProps} error={true} ErrorBehaviour={CustomError}>
+        {noop}
+      </ChartWrapperCard>
+    );
     expect(screen.getByTestId('custom-error')).toBeTruthy();
   });
 });

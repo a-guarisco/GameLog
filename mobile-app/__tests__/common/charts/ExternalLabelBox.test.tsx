@@ -2,16 +2,13 @@ import { render, screen } from '@testing-library/react-native';
 import ExternalLabelBox from '@gamelog/common/charts/ExternalLabelBox';
 
 jest.mock('@gamelog/components/ui/box/index', () => {
-const { View } = require('react-native');
-  return { Box: ({ children }: any) => <View>{children}</View>}
+  const { View } = jest.requireActual('react-native');
+  return { Box: ({ children }: any) => <View>{children}</View> };
 });
 
 jest.mock('@gamelog/components/ui/text/index', () => {
-  const { Text } = require('react-native');
-
-    return {Text: ({ children, numberOfLines, ...props }: any) => (
-    <Text>{children}</Text>
-  )}
+  const { Text } = jest.requireActual('react-native');
+  return { Text: ({ children, numberOfLines, ...props }: any) => <Text>{children}</Text> };
 });
 
 const mockTheme = {
