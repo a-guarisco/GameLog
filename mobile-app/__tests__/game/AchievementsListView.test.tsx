@@ -20,6 +20,15 @@ const mockRoute = {
 };
 
 describe('AchievementsListView', () => {
+  let consoleSpy: jest.SpyInstance;
+
+  beforeAll(() => {
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    consoleSpy.mockRestore();
+  });
   beforeEach(() => {
     jest.clearAllMocks();
   });
