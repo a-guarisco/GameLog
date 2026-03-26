@@ -1,6 +1,3 @@
-// import '@testing-library/react-native/extend-expect';
-// import 'nativewind/dist/jest-setup';
-
 jest.mock('@expo-google-fonts/dm-sans', () => ({
   useFonts: jest.fn(() => [true]),
   DMSans_100Thin: 'DMSans_100Thin',

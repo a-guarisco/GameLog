@@ -12,6 +12,15 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 describe('GlobalAchievementsPreview', () => {
+  let consoleSpy: jest.SpyInstance;
+
+  beforeAll(() => {
+    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    consoleSpy.mockRestore();
+  });
   const mockNavigate = jest.fn();
 
   beforeEach(() => {
