@@ -1,5 +1,3 @@
-import { render } from '@testing-library/react-native';
-import { createStaticNavigation } from '@react-navigation/native';
 import { RootTabs, GameListStack } from '@gamelog/routes';
 
 jest.mock('react-native-safe-area-context', () =>
@@ -11,9 +9,6 @@ jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils'
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => () => null);
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => () => null);
 jest.mock('@gamelog/common/charts/os-share/OsShareChart', () => () => null);
-
-const Navigation = createStaticNavigation(RootTabs);
-const renderApp = () => render(<Navigation />);
 
 describe('GameListStack structure', () => {
   it('registers the correct screens', () => {

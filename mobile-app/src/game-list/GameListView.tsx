@@ -16,7 +16,7 @@ const GameListView = ({ route }: any) => {
   const playerID = '76561198159652025'; //FIX
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(playerID, true);
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery /*setSearchQuery*/] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'playtime'>('playtime');
   const [isProcessing, setIsProcessing] = useState(false);
 
