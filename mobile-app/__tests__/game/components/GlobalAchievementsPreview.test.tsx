@@ -88,7 +88,7 @@ describe('GlobalAchievementsPreview', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith('AchievementsList', {
       globalAchievements: mockData,
-      gameID: 123,
+      gameID: '123',
       playerID: 'player1',
     });
   });
