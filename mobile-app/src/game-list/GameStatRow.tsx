@@ -14,7 +14,7 @@ export const GameStatRow = ({
   value,
   className = 'w-1/2',
   labelClassName = 'font-extralight text-typography-200',
-  valueClassName = 'text-typography-200',
+  valueClassName = 'font-extralight text-typography-200',
 }: StatRowProps) => (
   <Box className={className}>
     <Text className={labelClassName}>
