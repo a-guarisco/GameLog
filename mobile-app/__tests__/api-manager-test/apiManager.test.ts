@@ -124,4 +124,26 @@ describe('ApiManager', () => {
     () => ApiManager.getRecentPlayedGames(steamId, 5),
     ApiEndPoints.GET_RECENT_PLAYED_GAMES(steamId, 5)
   );
+
+  //Note that image fetch just returns the URL, so the we can set the uri in the Image component
+  it('return header url correctly', () => {
+    const result = ApiManager.getGameHeaderImage(appId);
+    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_HEADER_IMAGE(appId));
+  });
+
+  it('return logo url correctly', () => {
+      const imgIconUrl = 'icon_url';
+      const result = ApiManager.getGameLogoImage(appId, imgIconUrl);
+      expect(result).resolves.toBe(ApiEndPoints.GET_GAME_LOGO_IMAGE(appId, imgIconUrl));
+  });
+
+  it('return capsule url correctly', () => {
+    const result = ApiManager.getGameCapsuleImage(appId);
+    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_CAPSULE_IMAGE(appId));
+  });
+
+  it('return library cover url correctly', () => {
+    const result = ApiManager.getGameLibraryCoverImage(appId);
+    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_LIBRARY_COVER_IMAGE(appId));
+  });
 });
