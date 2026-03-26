@@ -2,58 +2,48 @@ import { Box } from '@gamelog/components/ui/box';
 import { Text } from '@gamelog/components/ui/text';
 import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
+import { formatDate, formatMinutesToHours } from '@gamelog/utils/formatUtils';
+import { GameStatRow } from './GameStatRow';
+import { GameStatDivider } from './GameStatDivider';
 
 type GameOverviewStatsCardProps = {
   gameItem: OwnedGames['response']['games'][0];
   onPress?: () => void;
 };
 
+const PLATFORMS = [
+  { label: 'Windows', key: 'playtime_windows_forever' },
+  { label: 'MacOS', key: 'playtime_mac_forever' },
+  { label: 'Linux', key: 'playtime_linux_forever' },
+  { label: 'Deck', key: 'playtime_deck_forever' },
+] as const;
+
 export const GameOverviewStatsCard = ({ gameItem, onPress }: GameOverviewStatsCardProps) => {
+  const { name, appid, playtime_forever, rtime_last_played } = gameItem;
+
   return (
-    <GameHeaderCard name={gameItem.name} appid={gameItem.appid} onPress={onPress}>
-      <Box className="mt-2 gap-y-0.5">
-        <Box className="flex-row justify-between items-center">
-          <Text className="font-semibold text-typography-0 uppercase">Total:</Text>
-          <Text className="text-typography-0 font-bold">
-            {Math.floor(gameItem.playtime_forever / 60)}h
-          </Text>
-        </Box>
-
-        <Box className="h-[1px] bg-outline-50 my-0" />
-
-        <Box className="flex-row flex-wrap">
-          <Box className="w-1/2">
-            <Text className="font-extralight text-typography-200">
-              Windows: {Math.floor(gameItem.playtime_windows_forever / 60)}h
-            </Text>
-          </Box>
-          <Box className="w-1/2">
-            <Text className="font-extralight text-typography-200">
-              MacOS: {Math.floor(gameItem.playtime_mac_forever / 60)}h
-            </Text>
-          </Box>
-          <Box className="w-1/2">
-            <Text className="font-extralight text-typography-200">
-              Linux: {Math.floor(gameItem.playtime_linux_forever / 60)}h
-            </Text>
-          </Box>
-          <Box className="w-1/2">
-            <Text className="font-extralight text-typography-200">
-              Deck: {Math.floor(gameItem.playtime_deck_forever / 60)}h
-            </Text>
-          </Box>
-          <Box className="w-1/2">
-            <Text className="font-extralight text-typography-200">Last played:</Text>
-          </Box>
-          <Box className="w-1/2">
-            <Text className="font-extralight text-typography-200">
-              {new Date(gameItem.rtime_last_played * 1000).toLocaleDateString()}
-            </Text>
-          </Box>
-        </Box>
-
-        <Text className="text-typography-400">ID: {gameItem.appid}</Text>
+    <GameHeaderCard name={name} appid={appid} onPress={onPress}>
+      <GameStatRow
+        label="Playtime"
+        labelClassName="font-semibold text-typography-100"
+        value={formatMinutesToHours(playtime_forever)}
+        className="w-full"
+      />
+      <GameStatDivider />
+      <Box className="flex-row flex-wrap">
+        {PLATFORMS.map(({ label, key }) => (
+          <GameStatRow key={key} label={label} value={formatMinutesToHours(gameItem[key])} />
+        ))}
       </Box>
+      <GameStatDivider />
+      <GameStatRow
+        label="Last played"
+        labelClassName="font-semibold text-typography-100"
+        value={formatDate(rtime_last_played)}
+        className="flex-wrap"
+      />
+      <GameStatDivider />
+      <Text className="text-typography-400">ID: {appid}</Text>
     </GameHeaderCard>
   );
 };
