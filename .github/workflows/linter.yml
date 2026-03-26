@@ -46,3 +46,4 @@ jobs:
                 VALIDATE_BIOME_FORMAT: false
                 VALIDATE_BIOME_LINT: false
                 ESLINT_USE_FLAT_CONFIG: true
+                SPELL_CODESPELL_ARGS: "-L afterall,afterAll,appid,playtime"
