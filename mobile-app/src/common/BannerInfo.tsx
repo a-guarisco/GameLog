@@ -10,6 +10,7 @@ interface BannerInfoProps {
   secondaryText?: string;
   iconUrl?: string;
   textColor?: string;
+  justifyContent?: string;
 }
 
 const BannerInfo = ({
@@ -19,9 +20,12 @@ const BannerInfo = ({
   backgroundColor,
   textColor,
   height,
+  justifyContent,
 }: BannerInfoProps) => {
   return (
-    <Box className={`mb-3 w-full p-3 flex justify-center ${backgroundColor ?? ''} ${height ?? ''}`}>
+    <Box
+      className={`mb-3 w-full p-3 flex ${justifyContent ?? 'justify-center'} ${backgroundColor ?? ''} ${height ?? ''}`}
+    >
       <HStack className="items-center w-full justify-between">
         <Box className="flex-1 flex-row justify-start">
           <Avatar size="md">

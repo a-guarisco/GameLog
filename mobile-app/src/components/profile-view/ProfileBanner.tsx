@@ -33,7 +33,9 @@ export default function ProfileBanner({userId}: ProfileBannerProps) {
                             title={playersInfo?.response.players[0].personaname ?? 'Unknown User'}
                             secondaryText={secondaryText}
                             iconUrl={playersInfo?.response.players[0]?.avatarfull}
-                            backgroundColor="bg-background-200"
+                            backgroundColor="bg-background-100"
+                            height="h-32"
+                            justifyContent="justify-end"
                         />
                     </Pressable>
                 )
