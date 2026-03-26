@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import GameListView from '@gamelog/game-list/GameListView';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { GameOverviewStatsCard } from '@gamelog/game-list/GameOverviewStatsCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
