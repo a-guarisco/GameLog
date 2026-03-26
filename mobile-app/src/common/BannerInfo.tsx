@@ -2,6 +2,7 @@ import { Box } from '@gamelog/components/ui/box';
 import { HStack } from '@gamelog/components/ui/hstack';
 import { Avatar, AvatarFallbackText, AvatarImage } from '@gamelog/components/ui/avatar';
 import { Text } from '@gamelog/components/ui/text';
+import React from 'react';
 
 interface BannerInfoProps {
   title: string;

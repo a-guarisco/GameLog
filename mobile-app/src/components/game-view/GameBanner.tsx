@@ -1,5 +1,6 @@
-﻿import BannerInfo from '@gamelog/common/BannerInfo';
+import BannerInfo from '@gamelog/common/BannerInfo';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
+import { Spinner } from '@gamelog/components/ui/spinner';
 import { VStack } from '@gamelog/components/ui/vstack';
 import Banner from '@gamelog/common/Banner';
 
@@ -12,7 +13,6 @@ interface GameBannerProps {
 export default function GameBanner({ appid, title, streak }: GameBannerProps) {
   const gameCapsuleImage = apiEndsPoints.GET_GAME_CAPSULE_IMAGE(appid);
   const gameHeaderImage = apiEndsPoints.GET_GAME_HEADER_IMAGE(appid);
-
   const secondaryText = streak !== 0 ? `🔥 ${streak} streak` : `${streak} streak`;
 
   return (

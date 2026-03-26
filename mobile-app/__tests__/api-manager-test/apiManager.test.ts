@@ -132,9 +132,9 @@ describe('ApiManager', () => {
   });
 
   it('return logo url correctly', () => {
-      const imgIconUrl = 'icon_url';
-      const result = ApiManager.getGameLogoImage(appId, imgIconUrl);
-      expect(result).resolves.toBe(ApiEndPoints.GET_GAME_LOGO_IMAGE(appId, imgIconUrl));
+    const imgIconUrl = 'icon_url';
+    const result = ApiManager.getGameLogoImage(appId, imgIconUrl);
+    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_LOGO_IMAGE(appId, imgIconUrl));
   });
 
   it('return capsule url correctly', () => {

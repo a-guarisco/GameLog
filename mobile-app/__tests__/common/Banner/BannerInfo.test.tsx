@@ -1,137 +1,131 @@
-﻿import { render } from '@testing-library/react-native';
-import React from "react";
+import { render } from '@testing-library/react-native';
+import React from 'react';
 import BannerInfo from '@gamelog/common/BannerInfo';
 
 jest.mock('@gamelog/components/ui/box', () => {
-    const { View } = require('react-native');
-    return { Box: (props: any) => <View testID="banner-box" {...props} /> };
+  const { View } = jest.requireActual('react-native');
+  return { Box: (props: any) => <View testID="banner-box" {...props} /> };
 });
 
 jest.mock('@gamelog/components/ui/text', () => {
-    const { Text } = jest.requireActual('react-native');
-    return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
+  const { Text } = jest.requireActual('react-native');
+  return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
 });
 
 jest.mock('@gamelog/components/ui/hstack', () => {
-    const { View } = require('react-native');
-    return {
-        HStack: ({ children, className, ...props }: any) => (
-            <View testID="hstack" {...props}>{children}</View>
-        ),
-    };
+  const { View } = jest.requireActual('react-native');
+  return {
+    HStack: ({ children, className, ...props }: any) => (
+      <View testID="hstack" {...props}>
+        {children}
+      </View>
+    ),
+  };
 });
 
 jest.mock('@gamelog/components/ui/avatar', () => {
-    const { View, Text, Image } = require('react-native');
-    return {
-        Avatar: ({ children, size, ...props }: any) => (
-            <View testID="avatar" {...props}>{children}</View>
-        ),
-        AvatarFallbackText: ({ children }: any) => (
-            <Text testID="avatar-fallback">{children}</Text>
-        ),
-        AvatarImage: ({ source, alt, ...props }: any) => (
-            <Image source={source} accessibilityLabel={alt} testID="avatar-image" {...props} />
-        ),
-    };
-})
+  const { View, Text, Image } = jest.requireActual('react-native');
+  return {
+    Avatar: ({ children, size, ...props }: any) => (
+      <View testID="avatar" {...props}>
+        {children}
+      </View>
+    ),
+    AvatarFallbackText: ({ children }: any) => <Text testID="avatar-fallback">{children}</Text>,
+    AvatarImage: ({ source, alt, ...props }: any) => (
+      <Image source={source} accessibilityLabel={alt} testID="avatar-image" {...props} />
+    ),
+  };
+});
 const url = 'https://ui-avatars.com/api/?name=Sam+G';
 describe('BannerInfo', () => {
-    const defaultProps = {
-        title: 'My Game',
-    };
+  const defaultProps = {
+    title: 'My Game',
+  };
 
-    describe('required props', () => {
-        it('renders without crashing with only title', () => {
-            const { getByTestId } = render(<BannerInfo {...defaultProps} />);
-            expect(getByTestId('hstack')).toBeTruthy();
-        });
-
-        it('displays the title text', () => {
-            const { getAllByText } = render(<BannerInfo title="Zelda" />);
-            expect(getAllByText('Zelda')[0]).toBeTruthy(); // First instance is title, second is fallback text of avatar
-        });
-
-        it('uses title as avatar fallback text', () => {
-            const { getByTestId } = render(<BannerInfo title="Zelda" />);
-            expect(getByTestId('avatar-fallback').props.children).toBe('Zelda');
-        });
+  describe('required props', () => {
+    it('renders without crashing with only title', () => {
+      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
+      expect(getByTestId('hstack')).toBeTruthy();
     });
 
-    describe('optional props', () => {
-        it('renders secondaryText when provided', () => {
-            const { getByText } = render(
-                <BannerInfo {...defaultProps} secondaryText="RPG" />
-            );
-            expect(getByText('RPG')).toBeTruthy();
-        });
-
-        it('renders without secondaryText when not provided', () => {
-            const { getAllByText } = render(<BannerInfo {...defaultProps} />);
-            expect(getAllByText(defaultProps.title)[0]).toBeTruthy();
-        });
-
-        it('renders avatar image with correct source when iconUrl is provided', () => {
-            const { getByTestId } = render(
-                <BannerInfo {...defaultProps} iconUrl={url} />
-            );
-            expect(getByTestId('avatar-image').props.source).toEqual({ uri: url });
-        });
-
-        it('sets correct alt text on avatar image', () => {
-            const { getByTestId } = render(
-                <BannerInfo title="Zelda" iconUrl="https://example.com/icon.png" />
-            );
-            expect(getByTestId('avatar-image').props.accessibilityLabel).toBe('Zelda icon');
-        });
+    it('displays the title text', () => {
+      const { getAllByText } = render(<BannerInfo title="Zelda" />);
+      expect(getAllByText('Zelda')[0]).toBeTruthy(); // First instance is title, second is fallback text of avatar
     });
 
-    describe('default prop fallbacks', () => {
-        it('defaults justifyContent to justify-center when not provided', () => {
-            // Rendered without throwing; className with justify-center is applied
-            const { getByTestId } = render(<BannerInfo {...defaultProps} />);
-            expect(getByTestId('hstack')).toBeTruthy();
-        });
+    it('uses title as avatar fallback text', () => {
+      const { getByTestId } = render(<BannerInfo title="Zelda" />);
+      expect(getByTestId('avatar-fallback').props.children).toBe('Zelda');
+    });
+  });
 
-        it('accepts custom justifyContent override', () => {
-            const { getByTestId } = render(
-                <BannerInfo {...defaultProps} justifyContent="justify-start" />
-            );
-            expect(getByTestId('hstack')).toBeTruthy();
-        });
-
-        it('renders without backgroundColor when not provided', () => {
-            expect(() => render(<BannerInfo {...defaultProps} />)).not.toThrow();
-        });
-
-        it('accepts backgroundColor prop', () => {
-            expect(() =>
-                render(<BannerInfo {...defaultProps} backgroundColor="bg-blue-900" />)
-            ).not.toThrow();
-        });
-
-        it('accepts textColor prop', () => {
-            expect(() =>
-                render(<BannerInfo {...defaultProps} textColor="text-white" />)
-            ).not.toThrow();
-        });
-
-        it('accepts height prop', () => {
-            expect(() =>
-                render(<BannerInfo {...defaultProps} height="h-20" />)
-            ).not.toThrow();
-        });
+  describe('optional props', () => {
+    it('renders secondaryText when provided', () => {
+      const { getByText } = render(<BannerInfo {...defaultProps} secondaryText="RPG" />);
+      expect(getByText('RPG')).toBeTruthy();
     });
 
-    describe('avatar', () => {
-        it('renders the Avatar component', () => {
-            const { getByTestId } = render(<BannerInfo {...defaultProps} />);
-            expect(getByTestId('avatar')).toBeTruthy();
-        });
-
-        it('renders AvatarImage with undefined uri when iconUrl is not provided', () => {
-            const { getByTestId } = render(<BannerInfo {...defaultProps} />);
-            expect(getByTestId('avatar-image').props.source).toEqual({ uri: undefined });
-        });
+    it('renders without secondaryText when not provided', () => {
+      const { getAllByText } = render(<BannerInfo {...defaultProps} />);
+      expect(getAllByText(defaultProps.title)[0]).toBeTruthy();
     });
+
+    it('renders avatar image with correct source when iconUrl is provided', () => {
+      const { getByTestId } = render(<BannerInfo {...defaultProps} iconUrl={url} />);
+      expect(getByTestId('avatar-image').props.source).toEqual({ uri: url });
+    });
+
+    it('sets correct alt text on avatar image', () => {
+      const { getByTestId } = render(
+        <BannerInfo title="Zelda" iconUrl="https://example.com/icon.png" />
+      );
+      expect(getByTestId('avatar-image').props.accessibilityLabel).toBe('Zelda icon');
+    });
+  });
+
+  describe('default prop fallbacks', () => {
+    it('defaults justifyContent to justify-center when not provided', () => {
+      // Rendered without throwing; className with justify-center is applied
+      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
+      expect(getByTestId('hstack')).toBeTruthy();
+    });
+
+    it('accepts custom justifyContent override', () => {
+      const { getByTestId } = render(
+        <BannerInfo {...defaultProps} justifyContent="justify-start" />
+      );
+      expect(getByTestId('hstack')).toBeTruthy();
+    });
+
+    it('renders without backgroundColor when not provided', () => {
+      expect(() => render(<BannerInfo {...defaultProps} />)).not.toThrow();
+    });
+
+    it('accepts backgroundColor prop', () => {
+      expect(() =>
+        render(<BannerInfo {...defaultProps} backgroundColor="bg-blue-900" />)
+      ).not.toThrow();
+    });
+
+    it('accepts textColor prop', () => {
+      expect(() => render(<BannerInfo {...defaultProps} textColor="text-white" />)).not.toThrow();
+    });
+
+    it('accepts height prop', () => {
+      expect(() => render(<BannerInfo {...defaultProps} height="h-20" />)).not.toThrow();
+    });
+  });
+
+  describe('avatar', () => {
+    it('renders the Avatar component', () => {
+      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
+      expect(getByTestId('avatar')).toBeTruthy();
+    });
+
+    it('renders AvatarImage with undefined uri when iconUrl is not provided', () => {
+      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
+      expect(getByTestId('avatar-image').props.source).toEqual({ uri: undefined });
+    });
+  });
 });

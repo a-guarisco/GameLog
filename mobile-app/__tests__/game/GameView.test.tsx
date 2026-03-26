@@ -8,7 +8,7 @@ jest.mock('@react-navigation/native', () => ({
   }),
   useRoute: jest.fn(() => ({
     params: {
-      game : {
+      game: {
         appid: '123',
         name: 'Test Game',
         playtime_forever: 100,
@@ -19,8 +19,8 @@ jest.mock('@react-navigation/native', () => ({
         playtime_linux_forever: 20,
         playtime_deck_forever: 0,
         rtime_last_played: 1620000000,
-      }
-    }
+      },
+    },
   })),
 }));
 

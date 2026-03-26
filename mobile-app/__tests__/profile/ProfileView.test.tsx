@@ -1,4 +1,4 @@
-import { render} from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import ProfileView from '@gamelog/profile/ProfileView';
 
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => () => null);

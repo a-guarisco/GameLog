@@ -1,6 +1,6 @@
 import GlobalAchievementsPreview from '@gamelog/components/game-view/GlobalAchievementsPreview';
 import { Box } from '@gamelog/components/ui/box';
-import {useRoute} from "@react-navigation/native";
+import { useRoute } from '@react-navigation/native';
 
 const GameView = () => {
   const route = useRoute<any>();
