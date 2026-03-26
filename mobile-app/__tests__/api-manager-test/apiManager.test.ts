@@ -3,7 +3,7 @@ import ApiEndPoints from '@gamelog/api-manager/apiEndsPoints';
 
 globalThis.fetch = jest.fn() as jest.Mock;
 
-const appId = 440;
+const appId = '440';
 const steamId = '76561198077919169';
 
 const testHelper = (

@@ -9,10 +9,10 @@ import { Text } from '@gamelog/components/ui/text';
 import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
 
 interface Props {
-  gameID: number;
+  gameID: string;
   playerID: string;
   gameItem?: {
-    appid: number;
+    appid: string;
     name: string;
     streak?: number;
   };

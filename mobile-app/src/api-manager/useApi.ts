@@ -43,12 +43,12 @@ export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => 
 };
 
 export const useGetPlayersInfo = (steamIds: string[]) => {
-    const fetchFunc = useCallback(() => ApiManager.getPlayersInfo(steamIds), [steamIds]);
+  const fetchFunc = useCallback(() => ApiManager.getPlayersInfo(steamIds), [steamIds]);
 
-    const { data, isLoading, error } = useAsyncFetch(fetchFunc);
-    return {
-        playersInfo: data,
-        isLoadingPlayersInfo: isLoading,
-        errorPlayersInfo: error,
-    };
-}
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return {
+    playersInfo: data,
+    isLoadingPlayersInfo: isLoading,
+    errorPlayersInfo: error,
+  };
+};
