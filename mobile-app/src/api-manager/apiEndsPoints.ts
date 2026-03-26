@@ -24,4 +24,8 @@ export default {
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
   GET_GAME_LOGO_IMAGE: (appId: string, imgIconUrl: string) =>
     `https://cdn.akamai.steamstatic.com/steamcommunity/public/images/apps/${appId}/${imgIconUrl}.jpg`,
+  GET_GAME_CAPSULE_IMAGE: (appId: string) =>
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/capsule_231x87.jpg`,
+  GET_GAME_LIBRARY_COVER_IMAGE: (appId: string) =>
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`,
 };
