@@ -2,7 +2,7 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/hooks/useAsyncFetch';
 import { useCallback } from 'react';
 
-export const useGetPlayerAchievementsPerApp = (gameID: number, playerID: string) => {
+export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
     () => ApiManager.getAllPlayerAchievementsPerApp(gameID, playerID),
     [gameID, playerID]
@@ -16,7 +16,7 @@ export const useGetPlayerAchievementsPerApp = (gameID: number, playerID: string)
   };
 };
 
-export const useGetGlobalAchievement = (gameID: number) => {
+export const useGetGlobalAchievement = (gameID: string) => {
   const fetchFunc = useCallback(() => ApiManager.getGlobalAchievement(gameID), [gameID]);
 
   const { data, isLoading, error } = useAsyncFetch(fetchFunc);
