@@ -1,4 +1,4 @@
-import { getNavigationTheme } from '@gamelog/theme/theme';
+import { getNavigationTheme } from '@gamelog/theme/themeHelpers';
 import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
 
 jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
