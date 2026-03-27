@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react';
 export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
-    setError(false);
+    setErrorMessage(null);
 
     asyncFunction()
       .then((result) => {
@@ -17,7 +17,7 @@ export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
       .catch((err) => {
         if (isMounted) {
           console.error('Error fetching data:', err);
-          setError(true);
+          setErrorMessage(err.message || 'An error occurred while fetching data.');
         }
       })
       .finally(() => {
@@ -29,5 +29,5 @@ export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
     };
   }, [asyncFunction]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error: !!errorMessage, errorMessage: errorMessage };
 };
