@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
-import { OwnedGames, GameItem } from '@gamelog/api-manager/dto';
+import { GameItem } from '@gamelog/api-manager/dto';
 
 export type SortBy = 'name' | 'playtime';
 
