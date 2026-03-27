@@ -1,123 +1,103 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import GameListView from '@gamelog/game-list/GameListView';
+import { useGameList } from '@gamelog/game-list/useGameList';
 
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
+jest.mock('@gamelog/game-list/useGameList');
+
+jest.mock('@gamelog/components/ui/spinner', () => ({
+  Spinner: 'Spinner',
+}));
 
 const mockNavigate = jest.fn();
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: mockNavigate }),
-}));
 
-jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetOwnedGames: jest.fn(),
-}));
-
-describe('GameListView', () => {
-  const mockGames = {
-    response: {
-      games: [
-        { appid: 1, name: 'Counter-Strike', playtime_forever: 1000 },
-        { appid: 2, name: 'Portal', playtime_forever: 500 },
-      ],
-    },
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
   };
+});
+jest.mock('@react-navigation/native-stack', () => ({
+  NativeStackNavigationProp: jest.fn(),
+}));
 
+const mockUseGameList = useGameList as jest.Mock;
+
+describe('GameListView Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('shows the loading spinner during loading', () => {
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      isLoadingOwnedGames: true,
+  it('shows LoadingBox when isLoading is true', () => {
+    mockUseGameList.mockReturnValue({
+      isLoading: true,
+      processedGames: [],
     });
 
-    render(<GameListView />);
-    expect(screen.getByText(/Loading.../i)).toBeTruthy();
+    const { getByText } = render(<GameListView route={{}} />);
+    expect(getByText('Loading games...')).toBeTruthy();
   });
 
-  it('displays the list of games after loading', async () => {
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      ownedGames: mockGames,
-      isLoadingOwnedGames: false,
+  it('shows ErrorBox when there is an error', () => {
+    const errorMsg = 'Network Error';
+    mockUseGameList.mockReturnValue({
+      isLoading: false,
+      error: true,
+      errorMessage: errorMsg,
+      processedGames: [],
     });
 
-    render(<GameListView />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Counter-Strike')).toBeTruthy();
-      expect(screen.getByText('Portal')).toBeTruthy();
-    });
+    const { getByText } = render(<GameListView route={{}} />);
+    expect(getByText('Error')).toBeTruthy();
+    expect(getByText(errorMsg)).toBeTruthy();
   });
 
-  it('changes the sorting criterion when the button is pressed', async () => {
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      ownedGames: mockGames,
-      isLoadingOwnedGames: false,
+  it('shows InfoBox when the search does not produce results', () => {
+    mockUseGameList.mockReturnValue({
+      isLoading: false,
+      noResults: true,
+      searchQuery: 'Elden Ring',
+      processedGames: [],
     });
 
-    render(<GameListView />);
-
-    const sortButton = screen.getByText(/Sort by: playtime/i);
-
-    fireEvent.press(sortButton);
-
-    expect(screen.getByText(/Loading.../i)).toBeTruthy();
-
-    await waitFor(
-      () => {
-        expect(screen.getByText(/Sort by: name/i)).toBeTruthy();
-      },
-      { timeout: 1000 }
-    );
+    const { getByText } = render(<GameListView route={{}} />);
+    expect(getByText(/No results found for "Elden Ring"/i)).toBeTruthy();
   });
 
-  it('shows an error message if the API call fails', () => {
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      errorOwnedGames: true,
-      isLoadingOwnedGames: false,
+  it('shows WarningBox when there are no games', () => {
+    mockUseGameList.mockReturnValue({
+      isLoading: false,
+      isEmpty: true,
+      processedGames: [],
     });
 
-    render(<GameListView />);
-    expect(screen.getByText(/Failed to load games/i)).toBeTruthy();
+    const { getByText } = render(<GameListView route={{}} />);
+    expect(getByText('No games found.')).toBeTruthy();
   });
 
-  it('shows a message when the list is null or empty', () => {
-    // Testiamo il caso null (copre !ownedGames)
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: false,
+  it('renders the list of games correctly', () => {
+    mockUseGameList.mockReturnValue({
+      isLoading: false,
+      processedGames: [{ appid: 1, name: 'Portal', playtime_forever: 10 }],
     });
 
-    const { rerender } = render(<GameListView />);
-    expect(screen.getByText(/No games found in your library/i)).toBeTruthy();
-
-    // Testiamo il caso array vuoto (copre games.length === 0) nello stesso test usando rerender
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      ownedGames: { response: { games: [] } },
-      isLoadingOwnedGames: false,
-    });
-
-    rerender(<GameListView />);
-    expect(screen.getByText(/No games found in your library/i)).toBeTruthy();
+    const { getByText } = render(<GameListView route={{}} />);
+    expect(getByText('Portal')).toBeTruthy();
   });
 
-  it('navigates to Game details with correct params when a card is pressed', async () => {
-    (useGetOwnedGames as jest.Mock).mockReturnValue({
-      ownedGames: mockGames,
-      isLoadingOwnedGames: false,
+  it('navigates to Game screen on game press', () => {
+    mockUseGameList.mockReturnValue({
+      isLoading: false,
+      processedGames: [{ appid: 1, name: 'Portal', playtime_forever: 10 }],
     });
 
-    render(<GameListView />);
-
-    const gameCard = await screen.findByText('Counter-Strike');
-
-    fireEvent.press(gameCard);
+    const { getByText } = render(<GameListView route={{}} />);
+    fireEvent.press(getByText('Portal'));
 
     expect(mockNavigate).toHaveBeenCalledWith('Game', {
-      gameItem: expect.objectContaining({
-        name: 'Counter-Strike',
-        appid: 1,
-      }),
+      gameItem: { appid: 1, name: 'Portal', playtime_forever: 10 },
     });
   });
 });
