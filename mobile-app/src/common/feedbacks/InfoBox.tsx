@@ -1,0 +1,19 @@
+import { Box } from '@gamelog/components/ui/box';
+import { HStack } from '@gamelog/components/ui/hstack';
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { brand } from '@gamelog/theme/theme';
+import { toHex } from '@gamelog/theme/themeHelpers';
+import { InfoHeading } from './InfoHeading';
+import { InfoText } from './InfoText';
+
+export const InfoBox = ({ message, classname }: { message: string; classname?: string }) => (
+  <Box className={`items-center justify-center ${classname}`}>
+    <HStack className="self-center items-center bg-info-900 px-4 py-3 gap-x-3 rounded-lg border border-info-800 max-w-[90%]">
+      <Ionicons name="information-circle-outline" size={22} color={toHex(brand.info['600'])} />
+      <Box className="flex-shrink">
+        <InfoHeading message="Info" />
+        {message && <InfoText message={message} />}
+      </Box>
+    </HStack>
+  </Box>
+);
