@@ -5,15 +5,15 @@ import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 import { ErrorText } from './ErrorText';
 import { ErrorHeading } from './ErrorHeading';
+import { ViewProps } from 'react-native';
 
-export const ErrorBox = ({
-  errorMessage,
-  className,
-}: {
+interface ErrorBoxProps extends ViewProps {
   errorMessage: string | null;
   className?: string;
-}) => (
-  <Box className={`items-center justify-center ${className}`}>
+}
+
+export const ErrorBox = ({ errorMessage, className, ...props }: ErrorBoxProps) => (
+  <Box {...props} className={`items-center justify-center ${className}`}>
     <HStack className="self-center items-center bg-error-900 px-4 py-3 gap-x-3 rounded-lg border border-error-800 max-w-[90%]">
       <Ionicons name="alert-circle-outline" size={22} color={toHex(brand.error['600'])} />
       <Box className="flex-shrink">
