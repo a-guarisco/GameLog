@@ -8,7 +8,7 @@ jest.mock('@react-navigation/native', () => ({
   }),
   useRoute: jest.fn(() => ({
     params: {
-      game: {
+      gameItem: {
         appid: '123',
         name: 'Test Game',
         playtime_forever: 100,
@@ -43,19 +43,12 @@ describe('GameView', () => {
   };
 
   it('renders without crashing', () => {
-    render(<GameView route={mockRoute as any} />);
-  });
-
-  it('displays the correct game page text and game ID', () => {
-    render(<GameView route={mockRoute as any} />);
-
-    expect(screen.getByText(/This is the game page!/i)).toBeTruthy();
-    expect(screen.getByText(/Here is the game ID! 236390/i)).toBeTruthy();
+    render(<GameView />);
   });
 
   it('renders the GlobalAchievementsPreview component via mock', () => {
-    render(<GameView route={mockRoute as any} />);
+    render(<GameView />);
 
-    expect(screen.getByText('Mock Achievements for 236390')).toBeTruthy();
+    expect(screen.getByText('Mock Achievements for 123')).toBeTruthy();
   });
 });

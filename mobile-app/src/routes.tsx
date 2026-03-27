@@ -11,15 +11,15 @@ import GameBanner from '@gamelog/components/game-view/GameBanner';
 import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
 
 const renderGameBannerHeader = (route: any) => {
-  const game = route?.params?.game;
-  const appid = game?.appid;
+  const gameItem = route?.params?.gameItem;
+  const appId = gameItem.appid;
 
-  if (!appid) {
+  if (!appId) {
     console.log('No game data found in route params:', route?.params);
     return null;
   }
 
-  return <GameBanner appid={appid} title={game?.name ?? 'Game'} streak={game?.streak ?? 2} />;
+  return <GameBanner appid={appId} title={gameItem?.name ?? 'Game'} streak={gameItem?.streak ?? 2} />;
 };
 
 const renderProfileBannerHeader = (route: any) => {

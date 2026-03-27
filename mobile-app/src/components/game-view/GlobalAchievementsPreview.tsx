@@ -52,7 +52,7 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
             globalAchievements,
             gameID,
             playerID,
-            ...(gameItem ? { game: gameItem } : {}),
+            gameItem,
           })
         }
         className="w-full py-2"

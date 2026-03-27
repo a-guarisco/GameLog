@@ -4,7 +4,7 @@ import { useRoute } from '@react-navigation/native';
 
 const GameView = () => {
   const route = useRoute<any>();
-  const { game: gameItem } = route.params;
+  const { gameItem } = route.params;
   const playerID = '76561198077919169'; //FIX
 
   return (
