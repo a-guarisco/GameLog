@@ -9,7 +9,6 @@ import {
   useGetGameHeaderImage,
   useGetGameCapsuleImage,
   useGetGameLibraryCoverImage,
-  useGetPlayersInfo,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 

@@ -19,7 +19,9 @@ const renderGameBannerHeader = (route: any) => {
     return null;
   }
 
-  return <GameBanner appid={appId} title={gameItem?.name ?? 'Game'} streak={gameItem?.streak ?? 2} />;
+  return (
+    <GameBanner appid={appId} title={gameItem?.name ?? 'Game'} streak={gameItem?.streak ?? 2} />
+  );
 };
 
 const renderProfileBannerHeader = (route: any) => {

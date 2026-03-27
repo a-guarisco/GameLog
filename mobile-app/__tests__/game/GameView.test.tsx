@@ -32,16 +32,7 @@ jest.mock('@gamelog/components/game-view/GlobalAchievementsPreview', () => {
   return GlobalAchievementsPreview;
 });
 
-const mockGameItem = {
-  appid: 236390,
-  name: 'Portal 2',
-};
-
 describe('GameView', () => {
-  const mockRoute = {
-    params: { gameItem: mockGameItem },
-  };
-
   it('renders without crashing', () => {
     render(<GameView />);
   });
