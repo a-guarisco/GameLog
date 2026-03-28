@@ -1,7 +1,4 @@
-import { Theme } from '@react-navigation/native';
-import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
-
-const sharedFonts = {
+export const navigationFonts = {
   regular: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const },
   medium: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const },
   bold: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const },
@@ -462,32 +459,4 @@ export const tailwindColors = {
   },
   white: '255 255 255',
   black: '0 0 0',
-};
-
-export const getNavigationTheme = (isDarkMode: boolean): Theme => {
-  const themeVars = isDarkMode ? rawConfig.dark : rawConfig.light;
-
-  return {
-    dark: isDarkMode,
-    colors: {
-      primary: `rgb(${themeVars['--color-primary-500']})`,
-
-      background: isDarkMode
-        ? `rgb(${themeVars['--color-background-0']})`
-        : `rgb(${themeVars['--color-background-50']})`,
-
-      card: isDarkMode
-        ? `rgb(${themeVars['--color-background-50']})`
-        : `rgb(${themeVars['--color-background-0']})`,
-
-      text: `rgb(${themeVars['--color-typography-0']})`,
-
-      border: isDarkMode
-        ? `rgb(${themeVars['--color-outline-100']})`
-        : `rgb(${themeVars['--color-outline-50']})`,
-
-      notification: `rgb(${themeVars['--color-info-500']})`,
-    },
-    fonts: sharedFonts,
-  };
 };

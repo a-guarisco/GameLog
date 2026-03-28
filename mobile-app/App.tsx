@@ -6,7 +6,7 @@ import { useColorScheme } from 'nativewind';
 
 import '@gamelog/theme/global.css';
 import { GluestackUIProvider } from '@gamelog/components/ui/gluestack-ui-provider';
-import { getNavigationTheme } from '@gamelog/theme/theme';
+import { getNavigationTheme } from '@gamelog/theme/themeHelpers';
 import useAppInit from '@gamelog/hooks/useAppInit';
 import { RootTabs } from '@gamelog/routes';
 
