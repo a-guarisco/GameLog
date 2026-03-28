@@ -3,6 +3,8 @@ import { useNavigation } from '@react-navigation/core';
 import { Button, ButtonText } from '@gamelog/components/ui/button';
 import { Box } from '@gamelog/components/ui/box';
 import { useColorScheme } from 'nativewind';
+import { ErrorBox } from '@gamelog/common/feedbacks/ErrorBox';
+import { InfoBox, LoadingBox, WarningBox } from '@gamelog/common/feedbacks';
 
 export const DevView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -34,6 +36,10 @@ export const DevView = () => {
         >
           <ButtonText>Go to Fonts</ButtonText>
         </Button>
+        <ErrorBox errorMessage="test error message" />
+        <InfoBox message="test info message" />
+        <WarningBox message="test warning message" />
+        <LoadingBox message="test loading message" />
       </Box>
     </>
   );
