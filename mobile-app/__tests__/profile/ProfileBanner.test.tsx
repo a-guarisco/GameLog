@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
