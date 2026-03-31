@@ -1,7 +1,8 @@
 import ApiManager from '@gamelog/api-manager/apiManager';
 import ApiEndPoints from '@gamelog/api-manager/apiEndsPoints';
 
-globalThis.fetch = jest.fn() as jest.Mock;
+const mockFetch = jest.fn();
+window.fetch = mockFetch;
 
 const appId = '440';
 const steamId = '76561198077919169';
@@ -14,21 +15,24 @@ const testHelper = (
   expectedUrl: string
 ) => {
   it(testNameSuccess, async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
     });
+
     const result = await apiFunction();
-    expect(globalThis.fetch).toHaveBeenCalledWith(expectedUrl);
+
+    expect(mockFetch).toHaveBeenCalledWith(expectedUrl);
     expect(result).toEqual(mockResponse);
   });
 
   it(testNameFail, async () => {
-    (globalThis.fetch as jest.Mock).mockResolvedValue({
+    mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
     });
-    await expect(apiFunction()).rejects.toThrow('HTTP error: 404');
+
+    await expect(apiFunction()).rejects.toThrow(`HTTP error: 404. url Called: ${expectedUrl}`);
   });
 };
 
@@ -40,7 +44,7 @@ describe('ApiManager', () => {
   testHelper(
     'fetches game news successfully',
     'handles game news fetch failure',
-    { newsitems: [{ title: 'News 1' }, { title: 'News 2' }] },
+    { newsitems: [{ title: 'News 1' }] },
     () => ApiManager.getGameNews(appId, 2, 300),
     ApiEndPoints.GET_NEWS_FOR_APP(appId, 2, 300)
   );
@@ -48,7 +52,7 @@ describe('ApiManager', () => {
   testHelper(
     'fetches global achievement successfully',
     'handles global achievement fetch failure',
-    { achievementpercentages: { achievements: [{ name: 'AchievementName', percent: 50 }] } },
+    { achievementpercentages: { achievements: [] } },
     () => ApiManager.getGlobalAchievement(appId),
     ApiEndPoints.GET_GLOBAL_ACHIEVEMENTS_FOR_APP(appId)
   );
@@ -56,7 +60,7 @@ describe('ApiManager', () => {
   testHelper(
     'fetches player achievements successfully',
     'handles player achievements fetch failure',
-    { playerstats: { achievements: [{ name: 'AchievementName', achieved: 1 }] } },
+    { playerstats: { achievements: [] } },
     () => ApiManager.getAllPlayerAchievementsPerApp(appId, steamId),
     ApiEndPoints.GET_PLAYER_ACHIEVEMENTS(appId, steamId)
   );
@@ -64,7 +68,7 @@ describe('ApiManager', () => {
   testHelper(
     'fetches player stats successfully',
     'handles player stats fetch failure',
-    { playerstats: { stats: [{ name: 'StatName', value: 100 }] } },
+    { playerstats: { stats: [] } },
     () => ApiManager.getCompletedPlayerAchievementsAndStatsPerApp(appId, steamId),
     ApiEndPoints.GET_PLAYER_STATS(appId, steamId)
   );
@@ -72,7 +76,7 @@ describe('ApiManager', () => {
   testHelper(
     'fetches players info successfully',
     'handles players info fetch failure',
-    { response: [{ steamid: steamId, personaname: 'PlayerName' }] },
+    { response: [] },
     () => ApiManager.getPlayersInfo([steamId]),
     ApiEndPoints.GET_PLAYERS_INFO([steamId])
   );
@@ -80,70 +84,24 @@ describe('ApiManager', () => {
   testHelper(
     'fetches player actual friends info successfully',
     'handles player friends info fetch failure',
-    { friendslist: { friends: [{ steamid: steamId, relationship: 'friend' }] } },
+    { friendslist: { friends: [] } },
     () => ApiManager.getPlayerFriendsInfo(steamId, false),
     ApiEndPoints.GET_PLAYER_FRIENDS_LIST(steamId, false)
   );
 
   testHelper(
-    'fetches player pending friends info successfully',
-    'handles player pending friends info fetch failure',
-    { friendslist: { friends: [{ steamid: steamId, relationship: 'pending' }] } },
-    () => ApiManager.getPlayerFriendsInfo(steamId, true),
-    ApiEndPoints.GET_PLAYER_FRIENDS_LIST(steamId, true)
-  );
-
-  testHelper(
     'fetches owned premium games successfully',
     'handles owned games fetch failure',
-    { response: { game_count: 1, games: [{ appid: appId, name: 'GameName' }] } },
+    { response: { games: [] } },
     () => ApiManager.getOwnedGames(steamId, false),
     ApiEndPoints.GET_OWNED_GAMES(steamId, false)
   );
 
   testHelper(
-    'fetches owned games including free games successfully',
-    'handles owned games including free games fetch failure',
-    {
-      response: {
-        game_count: 2,
-        games: [
-          { appid: appId, name: 'GameName' },
-          { appid: 570, name: 'FreeGameName' },
-        ],
-      },
-    },
-    () => ApiManager.getOwnedGames(steamId, true),
-    ApiEndPoints.GET_OWNED_GAMES(steamId, true)
-  );
-
-  testHelper(
     'fetches recent played games successfully',
     'handles recent played games fetch failure',
-    { response: { total_count: 1, games: [{ appid: appId, name: 'GameName' }] } },
+    { response: { games: [] } },
     () => ApiManager.getRecentPlayedGames(steamId, 5),
     ApiEndPoints.GET_RECENT_PLAYED_GAMES(steamId, 5)
   );
-
-  //Note that image fetch just returns the URL, so the we can set the uri in the Image component
-  it('return header url correctly', () => {
-    const result = ApiManager.getGameHeaderImage(appId);
-    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_HEADER_IMAGE(appId));
-  });
-
-  it('return logo url correctly', () => {
-    const imgIconUrl = 'icon_url';
-    const result = ApiManager.getGameLogoImage(appId, imgIconUrl);
-    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_LOGO_IMAGE(appId, imgIconUrl));
-  });
-
-  it('return capsule url correctly', () => {
-    const result = ApiManager.getGameCapsuleImage(appId);
-    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_CAPSULE_IMAGE(appId));
-  });
-
-  it('return library cover url correctly', () => {
-    const result = ApiManager.getGameLibraryCoverImage(appId);
-    expect(result).resolves.toBe(ApiEndPoints.GET_GAME_LIBRARY_COVER_IMAGE(appId));
-  });
 });

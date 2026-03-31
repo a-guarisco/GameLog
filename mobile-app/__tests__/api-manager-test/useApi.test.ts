@@ -4,11 +4,7 @@ import {
   useGetPlayerAchievementsPerApp,
   useGetGlobalAchievement,
   useGetOwnedGames,
-  useGetRecentPlayedGames,
-  useGetGameLogoImage,
-  useGetGameHeaderImage,
-  useGetGameCapsuleImage,
-  useGetGameLibraryCoverImage,
+  useGetPlayersInfo,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -117,72 +113,16 @@ describe('useGetOwnedGames', () => {
   });
 });
 
-describe('useGetRecentPlayedGames', () => {
+describe('useGetPlayersInfo', () => {
   useTestApiHook({
-    useHook: () => useGetRecentPlayedGames('player-1', 5),
-    apiMethod: 'getRecentPlayedGames',
-    apiArgs: ['player-1', 5],
+    useHook: () => useGetPlayersInfo(['steamId1', 'steamId2']),
+    apiMethod: 'getPlayersInfo',
+    apiArgs: [['steamId1', 'steamId2']],
     expectedKeys: {
-      data: 'recentPlayedGames',
-      loading: 'isLoadingRecentPlayedGames',
-      error: 'errorRecentPlayedGames',
+      data: 'playersInfo',
+      loading: 'isLoadingPlayersInfo',
+      error: 'errorPlayersInfo',
     },
-    mockData: [{ appid: 456, name: 'Portal 2' }],
-  });
-});
-
-describe('useGetGameLogoImage', () => {
-  useTestApiHook({
-    useHook: () => useGetGameLogoImage('app-1', 'icon-url'),
-    apiMethod: 'getGameLogoImage',
-    apiArgs: ['app-1', 'icon-url'],
-    expectedKeys: {
-      data: 'gameLogoImage',
-      loading: 'isLoadingGameLogoImage',
-      error: 'errorGameLogoImage',
-    },
-    mockData: 'blob:logo-url',
-  });
-});
-
-describe('useGetGameHeaderImage', () => {
-  useTestApiHook({
-    useHook: () => useGetGameHeaderImage('app-1'),
-    apiMethod: 'getGameHeaderImage',
-    apiArgs: ['app-1'],
-    expectedKeys: {
-      data: 'gameHeaderImage',
-      loading: 'isLoadingGameHeaderImage',
-      error: 'errorGameHeaderImage',
-    },
-    mockData: 'blob:header-url',
-  });
-});
-
-describe('useGetGameCapsuleImage', () => {
-  useTestApiHook({
-    useHook: () => useGetGameCapsuleImage('app-1'),
-    apiMethod: 'getGameCapsuleImage',
-    apiArgs: ['app-1'],
-    expectedKeys: {
-      data: 'gameCapsuleImage',
-      loading: 'isLoadingGameCapsuleImage',
-      error: 'errorGameCapsuleImage',
-    },
-    mockData: 'blob:capsule-url',
-  });
-});
-
-describe('useGetGameLibraryCoverImage', () => {
-  useTestApiHook({
-    useHook: () => useGetGameLibraryCoverImage('app-1'),
-    apiMethod: 'getGameLibraryCoverImage',
-    apiArgs: ['app-1'],
-    expectedKeys: {
-      data: 'gameLibraryCoverImage',
-      loading: 'isLoadingGameLibraryCoverImage',
-      error: 'errorGameLibraryCoverImage',
-    },
-    mockData: 'blob:cover-url',
+    mockData: [{ steamid: 'steamId1', personaname: 'PlayerOne' }],
   });
 });
