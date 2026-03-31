@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';

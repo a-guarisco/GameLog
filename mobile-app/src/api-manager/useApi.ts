@@ -33,10 +33,11 @@ export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => 
     [playerID, includeFreeGame]
   );
 
-  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
   return {
     ownedGames: data,
     isLoadingOwnedGames: isLoading,
     errorOwnedGames: error,
+    errorMessageOwnedGames: errorMessage,
   };
 };
