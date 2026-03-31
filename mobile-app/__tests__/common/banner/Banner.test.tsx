@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import Banner from '@gamelog/common/Banner';
 
@@ -18,7 +17,6 @@ describe('Banner', () => {
   const defaultProps = {
     heightPercentage: 20,
     minHeight: 150,
-    fallbackColor: 'bg-gray-800',
   };
 
   describe('image rendering', () => {
@@ -34,6 +32,24 @@ describe('Banner', () => {
     it('does not render image when imageUrl is not provided', () => {
       const { queryByTestId } = render(<Banner {...defaultProps} />);
       expect(queryByTestId('banner-image')).toBeNull();
+    });
+  });
+
+  describe('style and layout', () => {
+    it('applies the calculated height through style prop', () => {
+      const { getByTestId } = render(<Banner {...defaultProps} />);
+      const box = getByTestId('banner-box');
+
+      // calculatedHeight = max((screenHeight * 20) / 100, 150)
+      // In jest-environment screenHeight default is usually 1334 or 768
+      expect(box.props.style).toHaveProperty('height');
+      expect(box.props.style.height).toBeGreaterThanOrEqual(defaultProps.minHeight);
+    });
+
+    it('accepts custom className override', () => {
+      const { getByTestId } = render(<Banner {...defaultProps} className="bg-red-500" />);
+      const box = getByTestId('banner-box');
+      expect(box.props.className).toContain('bg-red-500');
     });
   });
 });

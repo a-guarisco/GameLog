@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react-native';
 import React from 'react';
+import { render } from '@testing-library/react-native';
 import BannerInfo from '@gamelog/common/BannerInfo';
 
 jest.mock('@gamelog/components/ui/box', () => {
@@ -37,7 +37,9 @@ jest.mock('@gamelog/components/ui/avatar', () => {
     ),
   };
 });
+
 const url = 'https://ui-avatars.com/api/?name=Sam+G';
+
 describe('BannerInfo', () => {
   const defaultProps = {
     title: 'My Game',
@@ -51,7 +53,8 @@ describe('BannerInfo', () => {
 
     it('displays the title text', () => {
       const { getAllByText } = render(<BannerInfo title="Zelda" />);
-      expect(getAllByText('Zelda')[0]).toBeTruthy(); // First instance is title, second is fallback text of avatar
+      // getAllByText[0] seleziona il titolo principale nel centro
+      expect(getAllByText('Zelda')[0]).toBeTruthy();
     });
 
     it('uses title as avatar fallback text', () => {
@@ -84,36 +87,15 @@ describe('BannerInfo', () => {
     });
   });
 
-  describe('default prop fallbacks', () => {
-    it('defaults justifyContent to justify-center when not provided', () => {
-      // Rendered without throwing; className with justify-center is applied
-      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
-      expect(getByTestId('hstack')).toBeTruthy();
+  describe('className props', () => {
+    it('accepts custom className override', () => {
+      const { getAllByTestId } = render(<BannerInfo {...defaultProps} className="bg-red-500" />);
+      expect(getAllByTestId('banner-box')[0]).toBeTruthy();
     });
 
-    it('accepts custom justifyContent override', () => {
-      const { getByTestId } = render(
-        <BannerInfo {...defaultProps} justifyContent="justify-start" />
-      );
-      expect(getByTestId('hstack')).toBeTruthy();
-    });
-
-    it('renders without backgroundColor when not provided', () => {
-      expect(() => render(<BannerInfo {...defaultProps} />)).not.toThrow();
-    });
-
-    it('accepts backgroundColor prop', () => {
-      expect(() =>
-        render(<BannerInfo {...defaultProps} backgroundColor="bg-blue-900" />)
-      ).not.toThrow();
-    });
-
-    it('accepts textColor prop', () => {
-      expect(() => render(<BannerInfo {...defaultProps} textColor="text-white" />)).not.toThrow();
-    });
-
-    it('accepts height prop', () => {
-      expect(() => render(<BannerInfo {...defaultProps} height="h-20" />)).not.toThrow();
+    it('accepts textClassName prop', () => {
+      const { getAllByText } = render(<BannerInfo {...defaultProps} textClassName="text-white" />);
+      expect(getAllByText(defaultProps.title)[0]).toBeTruthy();
     });
   });
 
