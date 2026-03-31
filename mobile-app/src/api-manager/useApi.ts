@@ -41,3 +41,18 @@ export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => 
     errorMessageOwnedGames: errorMessage,
   };
 };
+
+export const useGameGenres = (appId: string) => {
+  const fetchFunc = useCallback(
+    () =>ApiManager.getGameGenres(appId),
+    [appId]
+  );
+  
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return{
+    gameGenres: data,
+    isLoadingGenres: isLoading, 
+    errorGenres: error
+  }
+
+};
