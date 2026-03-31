@@ -17,17 +17,8 @@ export default function GameBanner({ appid, title, streak }: GameBannerProps) {
 
   return (
     <VStack className="w-full">
-      <Banner
-        fallbackColor="#333"
-        imageUrl={gameHeaderImage ?? undefined}
-        minHeight={150}
-        heightPercentage={20}
-      />
-      <BannerInfo
-        title={title}
-        iconUrl={gameCapsuleImage ?? undefined}
-        secondaryText={secondaryText}
-      />
+      <Banner imageUrl={gameHeaderImage} minHeight={150} heightPercentage={20} />
+      <BannerInfo title={title} iconUrl={gameCapsuleImage} secondaryText={secondaryText} />
     </VStack>
   );
 }

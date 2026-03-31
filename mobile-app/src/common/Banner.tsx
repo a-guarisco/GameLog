@@ -1,4 +1,3 @@
-// Banner.tsx
 import { useWindowDimensions } from 'react-native';
 import { Box } from '@gamelog/components/ui/box';
 import { Image } from '@gamelog/components/ui/image';
@@ -6,22 +5,17 @@ import { Image } from '@gamelog/components/ui/image';
 interface BannerProps {
   heightPercentage: number;
   minHeight: number;
-  fallbackColor: string;
+  className?: string;
   imageUrl?: string;
 }
 
-export default function Banner({
-  heightPercentage,
-  minHeight,
-  fallbackColor,
-  imageUrl,
-}: BannerProps) {
+export default function Banner({ heightPercentage, minHeight, className, imageUrl }: BannerProps) {
   const { height: screenHeight } = useWindowDimensions();
   const calculatedHeight = Math.max((screenHeight * heightPercentage) / 100, minHeight);
 
   return (
     <Box
-      className={`w-full overflow-hidden rounded-t-lg ${fallbackColor}`}
+      className={`w-full overflow-hidden rounded-t-lg ${className ?? ''}`}
       style={{ height: calculatedHeight }}
     >
       {imageUrl && (

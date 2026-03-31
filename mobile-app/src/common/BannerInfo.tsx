@@ -2,31 +2,24 @@ import { Box } from '@gamelog/components/ui/box';
 import { HStack } from '@gamelog/components/ui/hstack';
 import { Avatar, AvatarFallbackText, AvatarImage } from '@gamelog/components/ui/avatar';
 import { Text } from '@gamelog/components/ui/text';
-import React from 'react';
 
 interface BannerInfoProps {
   title: string;
-  backgroundColor?: string;
-  height?: string;
   secondaryText?: string;
   iconUrl?: string;
-  textColor?: string;
-  justifyContent?: string;
+  textClassName?: string;
+  className?: string;
 }
 
 const BannerInfo = ({
   title,
   secondaryText,
   iconUrl,
-  backgroundColor,
-  textColor,
-  height,
-  justifyContent,
+  textClassName,
+  className,
 }: BannerInfoProps) => {
   return (
-    <Box
-      className={`mb-3 w-full p-3 flex ${justifyContent ?? 'justify-center'} ${backgroundColor ?? ''} ${height ?? ''}`}
-    >
+    <Box className={`mb-3 w-full p-3 flex justify-center ${className ?? ''}`}>
       <HStack className="items-center w-full justify-between">
         <Box className="flex-1 flex-row justify-start">
           <Avatar size="md">
@@ -35,7 +28,7 @@ const BannerInfo = ({
           </Avatar>
         </Box>
 
-        <Text size="2xl" className={`font-bold uppercase text-center px-2 ${textColor ?? ''}`}>
+        <Text size="2xl" className={`font-bold uppercase text-center px-2 ${textClassName ?? ''}`}>
           {title}
         </Text>
 
