@@ -1,4 +1,4 @@
-interface GameItem {
+export interface GameItem {
   appid: string;
   name: string;
   playtime_forever: number;

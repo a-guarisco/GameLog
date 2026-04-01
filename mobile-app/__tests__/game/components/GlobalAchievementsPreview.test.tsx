@@ -32,7 +32,7 @@ describe('GlobalAchievementsPreview', () => {
     (ApiManager.getGlobalAchievement as jest.Mock).mockRejectedValueOnce(
       new Error('Network Error')
     );
-    render(<GlobalAchievementsPreview gameID={123} playerID="player1" />);
+    render(<GlobalAchievementsPreview gameID={'123'} playerID="player1" />);
 
     await waitFor(() => {
       expect(
@@ -54,7 +54,7 @@ describe('GlobalAchievementsPreview', () => {
     };
     (ApiManager.getGlobalAchievement as jest.Mock).mockResolvedValueOnce(mockData);
 
-    render(<GlobalAchievementsPreview gameID={123} playerID="player1" />);
+    render(<GlobalAchievementsPreview gameID={'123'} playerID="player1" />);
 
     await waitFor(() => {
       expect(screen.getByText('Ach 1')).toBeTruthy();
@@ -78,7 +78,7 @@ describe('GlobalAchievementsPreview', () => {
     };
     (ApiManager.getGlobalAchievement as jest.Mock).mockResolvedValueOnce(mockData);
 
-    render(<GlobalAchievementsPreview gameID={123} playerID="player1" />);
+    render(<GlobalAchievementsPreview gameID={'123'} playerID="player1" />);
 
     await waitFor(() => {
       expect(screen.getByText('See More')).toBeTruthy();
@@ -88,7 +88,7 @@ describe('GlobalAchievementsPreview', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith('AchievementsList', {
       globalAchievements: mockData,
-      gameID: 123,
+      gameID: '123',
       playerID: 'player1',
     });
   });

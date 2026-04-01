@@ -10,7 +10,7 @@ import { useGetPlayerAchievementsPerApp } from '@gamelog/api-manager/useApi';
 
 type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
-  gameID: number;
+  gameID: string;
   playerID: string;
 };
 
