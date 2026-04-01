@@ -9,7 +9,7 @@ import ChartWrapperCard from '../ChartWrapperCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import { BarData } from '../charts.type';
 
-const USER_ID = '76561198159652025';
+const USER_ID = '76561198077919169';
 
 const TotalHoursChart = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();

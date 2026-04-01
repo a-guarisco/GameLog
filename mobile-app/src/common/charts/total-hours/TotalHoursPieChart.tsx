@@ -18,7 +18,7 @@ interface PieData {
 }
 
 const TotalHoursPieChart = () => {
-  const [userId] = useState('76561198159652025');
+  const [userId] = useState('76561198077919169');
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(userId, false);
 
   const pieData: PieData[] = useMemo(() => {
