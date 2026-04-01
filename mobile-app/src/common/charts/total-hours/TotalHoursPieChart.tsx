@@ -7,7 +7,7 @@ import ChartWrapperCard from '../ChartWrapperCard';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ExternalLabelBox from '../ExternalLabelBox';
 import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
-import { getPieData } from './getPieData';
+import { buildTotalHoursPieData } from './buildTotalHoursPieData';
 import { PieData } from '../charts.type';
 
 const GAME_TO_REPRESENT = 5;
@@ -17,7 +17,7 @@ const TotalHoursPieChart = () => {
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(userId, false);
 
   const pieData: PieData[] = useMemo(() => {
-    return getPieData(ownedGames, GAME_TO_REPRESENT);
+    return buildTotalHoursPieData(ownedGames, GAME_TO_REPRESENT);
   }, [ownedGames]);
 
   const totalMinutes = pieData.reduce((sum, d) => sum + d.value, 0);

@@ -3,7 +3,7 @@ import { getTopGames, INFO_GRADIENT_TIERS } from "../chartsHelpers";
 import { brand } from "@gamelog/theme/theme";
 import { PieData } from "../charts.type";
 
-export const getPieData = (ownedGames: OwnedGames | null, gameToRepresent : number): PieData[] => {
+export const buildTotalHoursPieData = (ownedGames: OwnedGames | null, gameToRepresent : number): PieData[] => {
   if (!ownedGames?.response?.games) return [];
 
   const games = ownedGames.response.games;
