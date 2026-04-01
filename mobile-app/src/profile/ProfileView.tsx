@@ -3,6 +3,7 @@ import { Box } from '@gamelog/components/ui/box';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
+import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
 
 const chartComponents = [
   <TotalHoursChart key="TotalHoursChart" />,
@@ -12,13 +13,16 @@ const chartComponents = [
 
 const ProfileView = () => {
   return (
-    <FlatList
-      data={chartComponents}
-      renderItem={({ item }) => (
-        <Box style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>{item}</Box>
-      )}
-      keyExtractor={(item, index) => item.key ?? `${index}`}
-    />
+    <>
+      <ProfileBanner userId={'76561198077919169'} />
+      <FlatList
+        data={chartComponents}
+        renderItem={({ item }) => (
+          <Box style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>{item}</Box>
+        )}
+        keyExtractor={(item, index) => item.key ?? `${index}`}
+      />
+    </>
   );
 };
 
