@@ -1,14 +1,17 @@
-import { OwnedGames } from "@gamelog/api-manager/dto";
-import { getTopGames, INFO_GRADIENT_TIERS } from "../chartsHelpers";
-import { brand } from "@gamelog/theme/theme";
-import { PieData } from "../charts.type";
+import { OwnedGames } from '@gamelog/api-manager/dto';
+import { getTopGames, INFO_GRADIENT_TIERS } from '../chartsHelpers';
+import { brand } from '@gamelog/theme/theme';
+import { PieData } from '../charts.type';
 
-export const buildTotalHoursPieData = (ownedGames: OwnedGames | null, gameToRepresent : number): PieData[] => {
+const buildTotalHoursPieData = (
+  ownedGames: OwnedGames | null,
+  gameToRepresent: number
+): PieData[] => {
   if (!ownedGames?.response?.games) return [];
 
   const games = ownedGames.response.games;
 
-  const top = getTopGames(games, gameToRepresent)
+  const top = getTopGames(games, gameToRepresent) ?? [];
 
   const otherMinutes = top.slice(gameToRepresent).reduce((sum, g) => sum + g.playtime_forever, 0);
 
@@ -30,3 +33,5 @@ export const buildTotalHoursPieData = (ownedGames: OwnedGames | null, gameToRepr
 
   return slices;
 };
+
+export default buildTotalHoursPieData;

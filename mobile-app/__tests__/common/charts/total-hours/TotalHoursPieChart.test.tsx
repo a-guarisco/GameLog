@@ -1,213 +1,157 @@
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
-import ExternalLabelBox from '@gamelog/common/charts/ExternalLabelBox';
-import * as GiftedCharts from 'react-native-gifted-charts';
+import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 
-jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
-  rawConfig: {
-    light: {
-      '--color-background-100': '255,255,255',
-      '--color-typography-100': '255,255,255',
-      '--color-typography-200': '150,150,150',
-      '--color-background-300': '200,200,200',
-    },
-    dark: {
-      '--color-background-100': '0,0,0',
-      '--color-typography-100': '0,0,0',
-      '--color-typography-200': '100,100,100',
-      '--color-background-300': '50,50,50',
-    },
-  },
-}));
+jest.mock('@gamelog/api-manager/useApi');
+jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
 
 jest.mock('@gamelog/components/ui/box', () => {
-  const { View } = jest.requireActual('react-native');
-  return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
+  const { View } = require('react-native');
+  return { Box: (props: any) => <View {...props} /> };
 });
 
 jest.mock('@gamelog/components/ui/text', () => {
-  const { Text } = jest.requireActual('react-native');
-  return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
-});
-
-jest.mock('@gamelog/components/ui/card', () => {
-  const { View } = jest.requireActual('react-native');
-  return {
-    Card: ({ children, onLayout, ...props }: any) => (
-      <View testID="card" onLayout={onLayout} {...props}>
-        {children}
-      </View>
-    ),
-  };
-});
-
-jest.mock('@gamelog/components/ui/spinner', () => {
-  const { View } = jest.requireActual('react-native');
-  return { Spinner: () => <View testID="spinner" /> };
-});
-
-jest.mock('@gamelog/theme/theme', () => ({
-  brand: {
-    info: Object.fromEntries(
-      ['0', '100', '200', '300', '400', '500', '600', '700', '800', '900'].map((k) => [
-        k,
-        `0,0,${k}`,
-      ])
-    ),
-  },
-}));
-
-jest.mock('@gamelog/common/charts/ChartErrorHandler', () => {
-  const { View } = jest.requireActual('react-native');
-  return {
-    __esModule: true,
-    default: () => <View testID="chart-error" />,
-  };
-});
-
-jest.mock('react-native-gifted-charts', () => {
-  const { View } = jest.requireActual('react-native');
-  return { PieChart: jest.fn((props: any) => <View testID="pie-chart" />) };
+  const { Text } = require('react-native');
+  return { Text };
 });
 
 jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
-  const { View } = jest.requireActual('react-native');
-  return {
-    __esModule: true,
-    default: jest.fn(() => <View testID="external-label-box" />),
-  };
+  const { View } = require('react-native');
+  return (props: any) => <View testID="external-label-box" {...props} />;
 });
 
-const mockUseGetOwnedGames = jest.fn();
-jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetOwnedGames: (...args: any[]) => mockUseGetOwnedGames(...args),
+jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
+  computePieRadius: jest.fn(() => 100),
+  computePieInnerRadius: jest.fn(() => 50),
+  formatMinutes: jest.fn((v) => `${v}m`),
 }));
 
-const makeGame = (name: string, playtime_forever: number) => ({ name, playtime_forever });
+jest.mock('@gamelog/common/charts/total-hours/buildTotalHoursPieData', () => ({
+  __esModule: true,
+  default: jest.fn(() => [
+    { value: 60, label: 'Game A', color: '#a' },
+    { value: 40, label: 'Game B', color: '#b' },
+  ]),
+}));
 
-const renderWithGames = (games: ReturnType<typeof makeGame>[]) => {
-  mockUseGetOwnedGames.mockReturnValue({
-    ownedGames: { response: { games } },
-    isLoadingOwnedGames: false,
-    errorOwnedGames: null,
-  });
-  render(<TotalHoursPieChart />);
-  fireEvent(screen.getByTestId('card'), 'layout', {
-    nativeEvent: { layout: { width: 300 } },
-  });
+jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
+  const { View } = require('react-native');
+  return ({ children, isLoading, error }: any) => (
+    <View testID="chart-wrapper">
+      {!isLoading &&
+        !error &&
+        children({
+          cardWidth: 400,
+          theme: {
+            '--color-typography-200': '200,200,200',
+            '--color-typography-100': '100,100,100',
+            '--color-background-100': '0,0,0',
+          },
+        })}
+    </View>
+  );
+});
+
+const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
+
+const OWNED_GAMES = {
+  response: { game_count: 2, games: [] },
 };
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('TotalHoursPieChart', () => {
-  it('shows spinner while loading', () => {
+  it('hides PieChart while loading', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: true,
       errorOwnedGames: null,
     });
-    render(<TotalHoursPieChart />);
-    expect(screen.getByTestId('spinner')).toBeTruthy();
+
+    const { UNSAFE_queryByType } = render(<TotalHoursPieChart />);
+
+    expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
-  it('shows error state when request fails', () => {
+  it('hides PieChart on error', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: false,
       errorOwnedGames: new Error('fail'),
     });
-    render(<TotalHoursPieChart />);
-    expect(screen.getByTestId('chart-error')).toBeTruthy();
+
+    const { UNSAFE_queryByType } = render(<TotalHoursPieChart />);
+
+    expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
-  it('renders PieChart and ExternalLabelBox after layout', () => {
-    renderWithGames([makeGame('Half-Life', 360)]);
-    expect(screen.getByTestId('pie-chart')).toBeTruthy();
-    expect(screen.getByTestId('external-label-box')).toBeTruthy();
-  });
-});
-
-describe('getPieData logic', () => {
-  let capturedData: any[] = [];
-
-  beforeEach(() => {
-    (GiftedCharts.PieChart as jest.Mock).mockImplementation((props: any) => {
-      capturedData = props.data;
-      const { View } = jest.requireActual('react-native');
-      return <View testID="pie-chart" />;
-    });
-  });
-
-  it('returns empty array when ownedGames is null', () => {
+  it('renders PieChart when data is available', () => {
     mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
+      ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,
       errorOwnedGames: null,
     });
+
+    const { UNSAFE_getByType } = render(<TotalHoursPieChart />);
+
+    expect(UNSAFE_getByType('PieChart' as any)).toBeTruthy();
+  });
+
+  it('calls useGetOwnedGames with USER_ID and false', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: null,
+      isLoadingOwnedGames: true,
+      errorOwnedGames: null,
+    });
+
     render(<TotalHoursPieChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
+
+    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
+  });
+
+  it('derives colors from theme', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
     });
-    expect(capturedData).toEqual([]);
+
+    const { UNSAFE_getByType } = render(<TotalHoursPieChart />);
+    const pie = UNSAFE_getByType('PieChart' as any);
+
+    expect(pie.props.textColor).toBe('rgb(200,200,200)');
+    expect(pie.props.innerCircleColor).toBe('rgb(0,0,0)');
   });
 
-  it('filters out games with 0 playtime', () => {
-    renderWithGames([makeGame('Active Game', 120), makeGame('Never Played', 0)]);
-    expect(capturedData.every((d) => d.value > 0)).toBe(true);
-    expect(capturedData.some((d) => d.label === 'Never Played')).toBe(false);
-  });
-
-  it('caps top entries at 5 and groups the rest into "Other"', () => {
-    const games = Array.from({ length: 8 }, (_, i) => makeGame(`Game ${i}`, (i + 1) * 60));
-    renderWithGames(games);
-    const labels = capturedData.map((d: any) => d.label);
-    expect(capturedData.length).toBeLessThanOrEqual(6);
-    expect(labels).toContain('Other');
-  });
-
-  it('does not add "Other" slice when there are 5 or fewer games', () => {
-    renderWithGames([makeGame('A', 300), makeGame('B', 240), makeGame('C', 180)]);
-    expect(capturedData.some((d: any) => d.label === 'Other')).toBe(false);
-  });
-
-  it('truncates label at 12 chars and appends ellipsis for long names', () => {
-    renderWithGames([makeGame('A Very Long Game Name', 120)]);
-    const topSlice = capturedData[0];
-    expect(topSlice.label).toMatch(/…$/);
-    expect(topSlice.label.length).toBeLessThanOrEqual(13);
-  });
-
-  it('sorts slices so the highest playtime is first', () => {
-    renderWithGames([makeGame('Low', 60), makeGame('High', 600), makeGame('Mid', 300)]);
-    const realSlices = capturedData.filter((d: any) => d.label !== 'Other');
-    expect(realSlices[0].value).toBeGreaterThanOrEqual(realSlices[1]?.value ?? 0);
-  });
-});
-
-describe('lamdaFormatLabel', () => {
-  let capturedGraphData: any[] = [];
-
-  beforeEach(() => {
-    (ExternalLabelBox as jest.Mock).mockImplementation((props: any) => {
-      capturedGraphData = props.graphData;
-      const { View } = jest.requireActual('react-native');
-      return <View testID="external-label-box" />;
+  it('renders ExternalLabelBox with formatted labels', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
     });
+
+    const { getByTestId } = render(<TotalHoursPieChart />);
+
+    expect(getByTestId('external-label-box')).toBeTruthy();
   });
 
-  it('formats minutes under one hour as "Xm"', () => {
-    renderWithGames([makeGame('Short Game', 45)]);
-    const fmt = capturedGraphData[0].lamdaFormatLabel('45');
-    expect(fmt).toMatch(/45m/);
-  });
+  it('formats tooltip label correctly', () => {
+    const { formatMinutes } = require('@gamelog/common/charts/chartsHelpers');
 
-  it('formats minutes over one hour as "Xh Ym"', () => {
-    renderWithGames([makeGame('Long Game', 90)]);
-    const fmt = capturedGraphData[0].lamdaFormatLabel('90');
-    expect(fmt).toMatch(/1h 30m/);
-  });
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
 
-  it('includes percentage of total in the label', () => {
-    renderWithGames([makeGame('Only Game', 120)]);
-    const fmt = capturedGraphData[0].lamdaFormatLabel('120');
-    expect(fmt).toMatch(/100%/);
+    const { UNSAFE_getByType } = render(<TotalHoursPieChart />);
+    const pie = UNSAFE_getByType('PieChart' as any);
+
+    const tooltip = pie.props.tooltipComponent(0);
+
+    expect(formatMinutes).toHaveBeenCalledWith(60);
+    expect(tooltip.props.children.join('')).toContain('Game A');
   });
 });

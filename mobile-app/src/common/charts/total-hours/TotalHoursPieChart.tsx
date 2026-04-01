@@ -7,7 +7,7 @@ import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
 import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
-import { buildTotalHoursPieData } from './buildTotalHoursPieData';
+import buildTotalHoursPieData from './buildTotalHoursPieData';
 import { PieData } from '../charts.type';
 
 const GAME_TO_REPRESENT = 5;

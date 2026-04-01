@@ -1,6 +1,6 @@
-import { OwnedGames } from "@gamelog/api-manager/dto";
-import { BarData } from "../charts.type";
-import { getPercentileInfoGradient } from "../chartsHelpers";
+import { OwnedGames } from '@gamelog/api-manager/dto';
+import { BarData } from '../charts.type';
+import { getPercentileInfoGradient } from '../chartsHelpers';
 
 const buildTotalHoursBarData = (ownedGames: OwnedGames | null): BarData[] => {
   if (!ownedGames?.response?.games) return [];

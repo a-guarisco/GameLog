@@ -1,6 +1,6 @@
-import { OwnedGames } from "@gamelog/api-manager/dto";
-import { OsPieData } from "../charts.type";
-import { OS_COLORS } from "../chartsHelpers";
+import { OwnedGames } from '@gamelog/api-manager/dto';
+import { OsPieData } from '../charts.type';
+import { OS_COLORS } from '../chartsHelpers';
 
 const buildOsShareData = (games: OwnedGames['response']['games']): OsPieData[] => {
   const totals = games.reduce(

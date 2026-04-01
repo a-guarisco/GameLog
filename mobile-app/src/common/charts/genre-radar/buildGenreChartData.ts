@@ -6,7 +6,6 @@ import { GenreChartItem } from '../charts.type';
 export const TOP_GAMES_TO_FETCH = 8;
 export const TOP_GENRES_TO_SHOW = 8;
 
-
 export const buildGenreChartData = async (
   games: OwnedGames['response']['games']
 ): Promise<GenreChartItem[]> => {
@@ -39,6 +38,3 @@ export const buildGenreChartData = async (
       color: INFO_GRADIENT_TIERS[i % INFO_GRADIENT_TIERS.length].frontColor,
     }));
 };
-
-
-

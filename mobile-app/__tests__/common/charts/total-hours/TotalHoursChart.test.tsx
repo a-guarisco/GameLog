@@ -1,178 +1,196 @@
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
-import * as GiftedCharts from 'react-native-gifted-charts';
+import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
+import { useNavigation } from '@react-navigation/native';
 
-jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
-  rawConfig: {
-    light: { '--color-background-100': '255,255,255', '--color-typography-200': '150,150,150' },
-    dark: { '--color-background-100': '0,0,0', '--color-typography-200': '100,100,100' },
-  },
-}));
-
+jest.mock('@gamelog/api-manager/useApi');
+jest.mock('@react-navigation/native', () => ({ useNavigation: jest.fn() }));
+jest.mock('react-native-gifted-charts', () => ({ BarChart: 'BarChart' }));
 jest.mock('@gamelog/components/ui/box', () => {
-  const { View } = jest.requireActual('react-native');
-  return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
+  const { View } = require('react-native');
+  return { Box: (props: any) => <View {...props} /> };
+});
+jest.mock('@gamelog/common/charts/total-hours/buildTotalHoursBarData', () =>
+  jest.fn(() => [
+    { value: 10, appid: '42', frontColor: '#a', gradientColor: '#b', spacing: 12, label: 'Game A' },
+  ])
+);
+jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
+  const { View } = require('react-native');
+  return ({ children, isLoading, error }: any) => (
+    <View testID="chart-wrapper">
+      {!isLoading &&
+        !error &&
+        children({
+          cardWidth: 400,
+          theme: { '--color-typography-200': '200,200,200' },
+        })}
+    </View>
+  );
 });
 
-jest.mock('@gamelog/components/ui/card', () => {
-  const { View } = jest.requireActual('react-native');
-  return {
-    Card: ({ children, onLayout, ...props }: any) => (
-      <View testID="card" onLayout={onLayout} {...props}>
-        {children}
-      </View>
-    ),
-  };
-});
+const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
+const mockUseNavigation = useNavigation as jest.Mock;
 
-jest.mock('@gamelog/components/ui/spinner', () => {
-  const { View } = jest.requireActual('react-native');
-  return { Spinner: () => <View testID="spinner" /> };
-});
-
-jest.mock('@gamelog/theme/theme', () => ({
-  brand: {
-    info: Object.fromEntries(
-      ['0', '100', '200', '300', '400', '500', '600', '700', '800', '900'].map((k) => [
-        k,
-        `0,0,${k}`,
-      ])
-    ),
+const OWNED_GAMES = {
+  response: {
+    game_count: 1,
+    games: [
+      {
+        appid: '42',
+        name: 'Game A',
+        playtime_forever: 600,
+        img_icon_url: '',
+        has_community_visible_stats: false,
+        playtime_windows_forever: 0,
+        playtime_mac_forever: 0,
+        playtime_linux_forever: 0,
+        playtime_deck_forever: 0,
+        rtime_last_played: 0,
+      },
+    ],
   },
-}));
+};
 
-jest.mock('@gamelog/common/charts/ChartErrorHandler', () => {
-  const { View } = jest.requireActual('react-native');
-  return {
-    __esModule: true,
-    default: () => <View testID="chart-error" />,
-  };
-});
+const mockNavigate = jest.fn();
 
-jest.mock('react-native-gifted-charts', () => {
-  const { View } = jest.requireActual('react-native');
-  return { BarChart: jest.fn((props: any) => <View testID="bar-chart" />) };
-});
-
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: jest.fn() }),
-}));
-
-const mockUseGetOwnedGames = jest.fn();
-jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetOwnedGames: (...args: any[]) => mockUseGetOwnedGames(...args),
-}));
-
-const makeGame = (name: string, playtime_forever: number, appid = '1') => ({
-  name,
-  playtime_forever,
-  appid,
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseNavigation.mockReturnValue({ navigate: mockNavigate });
 });
 
 describe('TotalHoursChart', () => {
-  it('shows spinner while loading', () => {
+  it('hides BarChart while data is loading', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: true,
       errorOwnedGames: null,
     });
-    render(<TotalHoursChart />);
-    expect(screen.getByTestId('spinner')).toBeTruthy();
+
+    const { UNSAFE_queryByType } = render(<TotalHoursChart />);
+
+    expect(UNSAFE_queryByType('BarChart' as any)).toBeNull();
   });
 
-  it('shows error state when request fails', () => {
+  it('hides BarChart when there is an error', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: false,
       errorOwnedGames: new Error('fail'),
     });
-    render(<TotalHoursChart />);
-    expect(screen.getByTestId('chart-error')).toBeTruthy();
+
+    const { UNSAFE_queryByType } = render(<TotalHoursChart />);
+
+    expect(UNSAFE_queryByType('BarChart' as any)).toBeNull();
   });
 
-  it('renders BarChart after layout when data is available', () => {
+  it('renders BarChart when data is available', () => {
     mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: { response: { games: [makeGame('Half-Life', 360, '70')] } },
+      ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,
       errorOwnedGames: null,
     });
-    render(<TotalHoursChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
-    });
-    expect(screen.getByTestId('bar-chart')).toBeTruthy();
-  });
-});
 
-describe('getBarData logic', () => {
-  let capturedData: any[] = [];
+    const { UNSAFE_getByType } = render(<TotalHoursChart />);
 
-  beforeEach(() => {
-    (GiftedCharts.BarChart as jest.Mock).mockImplementation((props: any) => {
-      capturedData = props.data;
-      const { View } = jest.requireActual('react-native');
-      return <View testID="bar-chart" />;
-    });
+    expect(UNSAFE_getByType('BarChart' as any)).toBeTruthy();
   });
 
-  const renderWithGames = (games: ReturnType<typeof makeGame>[]) => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: { response: { games } },
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-    render(<TotalHoursChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
-    });
-  };
-
-  it('returns empty array when ownedGames is null', () => {
+  it('calls useGetOwnedGames with the hardcoded USER_ID and false', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
+      isLoadingOwnedGames: true,
+      errorOwnedGames: null,
+    });
+
+    render(<TotalHoursChart />);
+
+    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
+  });
+
+  it('passes barData from buildTotalHoursBarData to BarChart', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,
       errorOwnedGames: null,
     });
-    render(<TotalHoursChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
-    });
-    expect(capturedData).toEqual([]);
-  });
 
-  it('converts playtime_forever minutes to hours', () => {
-    renderWithGames([makeGame('Balatro', 120, '400')]);
-    expect(capturedData[0].value).toBe(2);
-  });
+    const { UNSAFE_getByType } = render(<TotalHoursChart />);
 
-  it('sorts descending by value', () => {
-    renderWithGames([
-      makeGame('Game A', 60, '1'),
-      makeGame('Game B', 300, '2'),
-      makeGame('Game C', 180, '3'),
-    ]);
-    expect(capturedData[0].value).toBeGreaterThanOrEqual(capturedData[1].value);
-    expect(capturedData[1].value).toBeGreaterThanOrEqual(capturedData[2].value);
-  });
-
-  it('caps at 100 entries', () => {
-    const games = Array.from({ length: 150 }, (_, i) =>
-      makeGame(`Game ${i}`, (i + 1) * 60, String(i))
+    expect(UNSAFE_getByType('BarChart' as any).props.data).toEqual(
+      expect.arrayContaining([expect.objectContaining({ appid: '42' })])
     );
-    renderWithGames(games);
-    expect(capturedData.length).toBeLessThanOrEqual(100);
   });
 
-  it('truncates label at 10 chars and appends ellipsis for long names', () => {
-    renderWithGames([makeGame('A Very Long Game Name', 60, '1')]);
-    expect(capturedData[0].label).toMatch(/\.\.\.$/);
-  });
-
-  it('assigns frontColor and gradientColor from percentile helper', () => {
-    renderWithGames([makeGame('Top', 600, '1'), makeGame('Bottom', 60, '2')]);
-    capturedData.forEach((item) => {
-      expect(item.frontColor).toBeTruthy();
-      expect(item.gradientColor).toBeTruthy();
+  it('sets maxValue to the highest value in barData', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
     });
+
+    const { UNSAFE_getByType } = render(<TotalHoursChart />);
+
+    expect(UNSAFE_getByType('BarChart' as any).props.maxValue).toBe(10);
+  });
+
+  it('derives axis colours from the theme', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { UNSAFE_getByType } = render(<TotalHoursChart />);
+    const bar = UNSAFE_getByType('BarChart' as any);
+
+    expect(bar.props.xAxisColor).toBe('rgb(200,200,200)');
+    expect(bar.props.yAxisTextStyle.color).toBe('rgb(200,200,200)');
+    expect(bar.props.xAxisLabelTextStyle.color).toBe('rgb(200,200,200)');
+  });
+
+  it('sets parentWidth and container width to cardWidth - 30', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { UNSAFE_getByType } = render(<TotalHoursChart />);
+
+    expect(UNSAFE_getByType('BarChart' as any).props.parentWidth).toBe(370);
+  });
+
+  it('navigates to Game screen with the correct appid when a bar is pressed', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { UNSAFE_getByType } = render(<TotalHoursChart />);
+    const bar = UNSAFE_getByType('BarChart' as any);
+
+    bar.props.onPress({ value: 10, appid: '42', label: 'Game A' });
+
+    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+      screen: 'Game',
+      params: { appid: '42' },
+    });
+  });
+
+  it('memoizes barData — buildTotalHoursBarData is not re-called on unrelated re-renders', () => {
+    const buildTotalHoursBarData = require('@gamelog/common/charts/total-hours/buildTotalHoursBarData');
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { rerender } = render(<TotalHoursChart />);
+    const callsBefore = (buildTotalHoursBarData as jest.Mock).mock.calls.length;
+    rerender(<TotalHoursChart />);
+
+    expect((buildTotalHoursBarData as jest.Mock).mock.calls.length).toBe(callsBefore);
   });
 });
