@@ -1,4 +1,5 @@
 import { brand } from '@gamelog/theme/theme';
+import { OwnedGames } from '@gamelog/api-manager/dto';
 
 export const INFO_GRADIENT_TIERS: { frontColor: string; gradientColor: string }[] = [
   { frontColor: `rgb(${brand.info['0']})`, gradientColor: `rgb(${brand.info['500']})` },
@@ -65,3 +66,16 @@ export const getPercentileInfoGradient = (
 export const computePieRadius = (cardWidth: number) =>
   cardWidth > 0 ? Math.floor(cardWidth * 0.28) : 110;
 export const computePieInnerRadius = (r: number) => Math.floor(r * 0.64);
+
+export const formatMinutes = (minutes: number): string => {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+};
+
+export const getTopGames = (games: OwnedGames['response']['games'], gamesToFetch: number) => {
+  return [...games]
+    .filter((g) => g.playtime_forever > 0)
+    .sort((a, b) => b.playtime_forever - a.playtime_forever)
+    .slice(0, gamesToFetch);
+};

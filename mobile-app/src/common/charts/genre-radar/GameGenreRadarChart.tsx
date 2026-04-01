@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { RadarChart } from 'react-native-gifted-charts';
 import { useGetGameGenreChartData } from '@gamelog/api-manager/useApi';
+import { formatMinutes } from '../chartsHelpers';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
-import { formatMinutes } from './genreRadarHelpers';
 
 const USER_ID = '76561198077919169';
 

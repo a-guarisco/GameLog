@@ -3,7 +3,7 @@ import { PieChart } from 'react-native-gifted-charts';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { OS_COLORS, computePieInnerRadius, computePieRadius } from '../chartsHelpers';
-import { PieData } from '../charts.type';
+import { OsPieData } from '../charts.type';
 import ChartWrapperCard from '../ChartWrapperCard';
 
 const OsShareChart = () => {
@@ -41,7 +41,7 @@ const OsShareChart = () => {
   );
 };
 
-const buildPieData = (games: OwnedGames['response']['games']): PieData[] => {
+const buildPieData = (games: OwnedGames['response']['games']): OsPieData[] => {
   const totals = games.reduce(
     (acc, game) => {
       acc.Windows += game.playtime_windows_forever ?? 0;
