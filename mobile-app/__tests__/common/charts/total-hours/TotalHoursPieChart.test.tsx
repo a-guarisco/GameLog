@@ -1,23 +1,27 @@
 import { render } from '@testing-library/react-native';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
+import { formatMinutes } from '@gamelog/common/charts/chartsHelpers';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
 
 jest.mock('@gamelog/components/ui/box', () => {
-  const { View } = require('react-native');
+  const { View } = jest.requireActual('react-native');
   return { Box: (props: any) => <View {...props} /> };
 });
 
 jest.mock('@gamelog/components/ui/text', () => {
-  const { Text } = require('react-native');
+  const { Text } = jest.requireActual('react-native');
   return { Text };
 });
 
 jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
-  const { View } = require('react-native');
-  return (props: any) => <View testID="external-label-box" {...props} />;
+  const { View } = jest.requireActual('react-native');
+  const MockExternalLabelBox = (props: any) => <View testID="external-label-box" />;
+
+  MockExternalLabelBox.displayName = 'MockExternalLabelBox';
+  return MockExternalLabelBox;
 });
 
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
@@ -35,8 +39,8 @@ jest.mock('@gamelog/common/charts/total-hours/buildTotalHoursPieData', () => ({
 }));
 
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
-  const { View } = require('react-native');
-  return ({ children, isLoading, error }: any) => (
+  const { View } = jest.requireActual('react-native');
+  const MockChartWrapperCard = ({ children, isLoading, error }: any) => (
     <View testID="chart-wrapper">
       {!isLoading &&
         !error &&
@@ -50,6 +54,9 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
         })}
     </View>
   );
+
+  MockChartWrapperCard.displayName = 'MockChartWrapperCard';
+  return MockChartWrapperCard;
 });
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
@@ -138,8 +145,6 @@ describe('TotalHoursPieChart', () => {
   });
 
   it('formats tooltip label correctly', () => {
-    const { formatMinutes } = require('@gamelog/common/charts/chartsHelpers');
-
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,

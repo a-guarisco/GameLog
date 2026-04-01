@@ -7,15 +7,23 @@ jest.mock('react-native-gifted-charts', () => ({ RadarChart: 'RadarChart' }));
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
   formatMinutes: jest.fn((m) => `${m}m`),
 }));
+
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
-  const { View } = require('react-native');
-  return ({ children, isLoading, error }: any) => (
+  const { View } = jest.requireActual('react-native');
+  const MockChartWrapperCard = ({ children, isLoading, error }: any) => (
     <View testID="chart-wrapper">{!isLoading && !error && children({ theme: 'dark' })}</View>
   );
+
+  MockChartWrapperCard.displayName = 'MockChartWrapperCard';
+  return MockChartWrapperCard;
 });
+
 jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
-  const { View } = require('react-native');
-  return (props: any) => <View testID="external-label-box" />;
+  const { View } = jest.requireActual('react-native');
+  const MockExternalLabelBox = (props: any) => <View testID="external-label-box" />;
+
+  MockExternalLabelBox.displayName = 'MockExternalLabelBox';
+  return MockExternalLabelBox;
 });
 
 const mockUseGetGameGenreChartData = useGetGameGenreChartData as jest.Mock;

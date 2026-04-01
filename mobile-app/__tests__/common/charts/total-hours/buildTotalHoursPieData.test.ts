@@ -1,5 +1,5 @@
 import buildTotalHoursPieData from '@gamelog/common/charts/total-hours/buildTotalHoursPieData';
-import { getTopGames, INFO_GRADIENT_TIERS } from '@gamelog/common/charts/chartsHelpers';
+import { getTopGames } from '@gamelog/common/charts/chartsHelpers';
 import { brand } from '@gamelog/theme/theme';
 
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({

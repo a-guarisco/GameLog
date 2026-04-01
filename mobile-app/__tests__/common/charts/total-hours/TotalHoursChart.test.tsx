@@ -2,12 +2,13 @@ import { render } from '@testing-library/react-native';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { useNavigation } from '@react-navigation/native';
+import buildTotalHoursBarData from '@gamelog/common/charts/total-hours/buildTotalHoursBarData';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('@react-navigation/native', () => ({ useNavigation: jest.fn() }));
 jest.mock('react-native-gifted-charts', () => ({ BarChart: 'BarChart' }));
 jest.mock('@gamelog/components/ui/box', () => {
-  const { View } = require('react-native');
+  const { View } = jest.requireActual('react-native');
   return { Box: (props: any) => <View {...props} /> };
 });
 jest.mock('@gamelog/common/charts/total-hours/buildTotalHoursBarData', () =>
@@ -16,8 +17,8 @@ jest.mock('@gamelog/common/charts/total-hours/buildTotalHoursBarData', () =>
   ])
 );
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
-  const { View } = require('react-native');
-  return ({ children, isLoading, error }: any) => (
+  const { View } = jest.requireActual('react-native');
+  const MockChartWrapperCard = ({ children, isLoading, error }: any) => (
     <View testID="chart-wrapper">
       {!isLoading &&
         !error &&
@@ -27,6 +28,9 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
         })}
     </View>
   );
+
+  MockChartWrapperCard.displayName = 'MockChartWrapperCard';
+  return MockChartWrapperCard;
 });
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
@@ -180,7 +184,6 @@ describe('TotalHoursChart', () => {
   });
 
   it('memoizes barData — buildTotalHoursBarData is not re-called on unrelated re-renders', () => {
-    const buildTotalHoursBarData = require('@gamelog/common/charts/total-hours/buildTotalHoursBarData');
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,

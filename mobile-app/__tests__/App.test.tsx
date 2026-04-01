@@ -5,6 +5,7 @@ import App from '../App';
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => () => null);
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => () => null);
 jest.mock('@gamelog/common/charts/os-share/OsShareChart', () => () => null);
+jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => () => null);
 
 describe('App Initialization', () => {
   beforeEach(() => {

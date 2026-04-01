@@ -1,10 +1,10 @@
-import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
-import apiManager from '@gamelog/api-manager/apiManager';
-import { getTopGames, INFO_GRADIENT_TIERS } from '@gamelog/common/charts/chartsHelpers';
 import {
+  buildGenreChartData,
   TOP_GAMES_TO_FETCH,
   TOP_GENRES_TO_SHOW,
 } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
+import apiManager from '@gamelog/api-manager/apiManager';
+import { getTopGames, INFO_GRADIENT_TIERS } from '@gamelog/common/charts/chartsHelpers';
 import { GameItem } from '@gamelog/api-manager/dto';
 
 jest.mock('@gamelog/api-manager/apiManager');

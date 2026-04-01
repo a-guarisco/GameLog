@@ -3,6 +3,7 @@ import { render } from '@testing-library/react-native';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { computePieRadius, computePieInnerRadius } from '@gamelog/common/charts/chartsHelpers';
+import buildOsShareData from '@gamelog/common/charts/os-share/buildOsShareData';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
@@ -14,17 +15,22 @@ jest.mock('@gamelog/common/charts/os-share/buildOsShareData', () =>
   jest.fn(() => [{ value: 2, text: 'Windows: 2h', color: '#win' }])
 );
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
-  const { View } = require('react-native');
-  return ({ children, isLoading, error }: any) => (
+  const { View } = jest.requireActual('react-native');
+
+  const MockChartWrapperCard = ({ children, isLoading, error }: any) => (
     <View testID="chart-wrapper">
       {!isLoading &&
         !error &&
         children({
           cardWidth: 300,
-          theme: { '--color-background-100': '30,30,30', '--color-typography-200': '255,255,255' },
+          theme: { '--color-typography-200': '255,255,255', '--color-background-100': '30,30,30' },
         })}
     </View>
   );
+
+  MockChartWrapperCard.displayName = 'MockChartWrapperCard';
+
+  return MockChartWrapperCard;
 });
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
@@ -157,7 +163,6 @@ describe('OsShareChart', () => {
   });
 
   it('memoizes pieData — buildOsShareData is not re-called on unrelated re-renders', () => {
-    const buildOsShareData = require('@gamelog/common/charts/os-share/buildOsShareData');
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,
