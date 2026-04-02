@@ -18,13 +18,13 @@ const chartComponents = [
 const ProfileView = () => {
   return (
     <Box>
-      <ProfileBanner userId={'76561198077919169'} />
       <FlatList
         data={chartComponents}
         renderItem={({ item }) => (
           <Box style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>{item}</Box>
         )}
         keyExtractor={(item, index) => item.key ?? `${index}`}
+        ListHeaderComponent={<ProfileBanner userId={'76561198077919169'} />}
       />
     </Box>
   );
