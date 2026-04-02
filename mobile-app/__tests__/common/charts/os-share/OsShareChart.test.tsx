@@ -1,168 +1,177 @@
-import { render, screen, fireEvent } from '@testing-library/react-native';
-import * as GiftedCharts from 'react-native-gifted-charts';
+import { render } from '@testing-library/react-native';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
+import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
+import { computePieRadius, computePieInnerRadius } from '@gamelog/common/charts/chartsHelpers';
+import buildOsShareData from '@gamelog/common/charts/os-share/buildOsShareData';
 
-jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
-  rawConfig: {
-    light: { '--color-background-100': '255,255,255', '--color-typography-200': '150,150,150' },
-    dark: { '--color-background-100': '0,0,0', '--color-typography-200': '100,100,100' },
+jest.mock('@gamelog/api-manager/useApi');
+jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
+jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
+  computePieRadius: jest.fn(() => 100),
+  computePieInnerRadius: jest.fn(() => 60),
+}));
+jest.mock('@gamelog/common/charts/os-share/buildOsShareData', () =>
+  jest.fn(() => [{ value: 2, text: 'Windows: 2h', color: '#win' }])
+);
+jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
+  const { View } = jest.requireActual('react-native');
+
+  const MockChartWrapperCard = ({ children, isLoading, error }: any) => (
+    <View testID="chart-wrapper">
+      {!isLoading &&
+        !error &&
+        children({
+          cardWidth: 300,
+          theme: { '--color-typography-200': '255,255,255', '--color-background-100': '30,30,30' },
+        })}
+    </View>
+  );
+
+  MockChartWrapperCard.displayName = 'MockChartWrapperCard';
+
+  return MockChartWrapperCard;
+});
+
+const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
+
+const OWNED_GAMES = {
+  response: {
+    game_count: 1,
+    games: [
+      {
+        appid: '1',
+        name: 'Game',
+        playtime_windows_forever: 120,
+        playtime_forever: 120,
+        img_icon_url: '',
+        has_community_visible_stats: false,
+        playtime_mac_forever: 0,
+        playtime_linux_forever: 0,
+        playtime_deck_forever: 0,
+        rtime_last_played: 0,
+      },
+    ],
   },
-}));
+};
 
-jest.mock('@gamelog/components/ui/box', () => {
-  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-  return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
-});
-
-jest.mock('@gamelog/components/ui/card', () => {
-  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-  return {
-    Card: ({ children, onLayout, ...props }: any) => (
-      <View testID="card" onLayout={onLayout} {...props}>
-        {children}
-      </View>
-    ),
-  };
-});
-
-jest.mock('@gamelog/components/ui/spinner', () => {
-  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-  return { Spinner: () => <View testID="spinner" /> };
-});
-
-jest.mock('@gamelog/theme/theme', () => ({
-  brand: {
-    info: Object.fromEntries(
-      ['0', '100', '200', '300', '400', '500', '600', '700', '800', '900'].map((k) => [
-        k,
-        `0,0,${k}`,
-      ])
-    ),
-  },
-}));
-
-jest.mock('@gamelog/common/charts/ChartErrorHandler', () => {
-  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-  return {
-    __esModule: true,
-    default: () => <View testID="chart-error" />,
-  };
-});
-
-jest.mock('react-native-gifted-charts', () => {
-  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-  return { PieChart: jest.fn((props: any) => <View testID="pie-chart" />) };
-});
-
-const mockUseGetOwnedGames = jest.fn();
-jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetOwnedGames: (...args: any[]) => mockUseGetOwnedGames(...args),
-}));
-
-const makeGames = (overrides: object[] = []) =>
-  overrides.map((o) => ({
-    playtime_windows_forever: 0,
-    playtime_mac_forever: 0,
-    playtime_linux_forever: 0,
-    playtime_deck_forever: 0,
-    ...o,
-  }));
+beforeEach(() => jest.clearAllMocks());
 
 describe('OsShareChart', () => {
-  it('shows spinner while loading', () => {
+  it('passes isLoading=true to ChartWrapperCard while data is loading', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: true,
       errorOwnedGames: null,
     });
-    render(<OsShareChart />);
-    expect(screen.getByTestId('spinner')).toBeTruthy();
+
+    const { getByTestId, UNSAFE_queryByType } = render(<OsShareChart />);
+
+    expect(getByTestId('chart-wrapper')).toBeTruthy();
+    expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
-  it('shows error state when request fails', () => {
+  it('passes error=true to ChartWrapperCard when there is an error', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: false,
       errorOwnedGames: new Error('fail'),
     });
-    render(<OsShareChart />);
-    expect(screen.getByTestId('chart-error')).toBeTruthy();
+
+    const { UNSAFE_queryByType } = render(<OsShareChart />);
+
+    expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
-  it('renders the PieChart after layout when data is available', () => {
+  it('renders PieChart when data is available', () => {
     mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: {
-        response: {
-          games: makeGames([{ playtime_windows_forever: 120, playtime_mac_forever: 60 }]),
-        },
-      },
+      ownedGames: OWNED_GAMES,
       isLoadingOwnedGames: false,
       errorOwnedGames: null,
     });
-    render(<OsShareChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
-    });
-    expect(screen.getByTestId('pie-chart')).toBeTruthy();
-  });
-});
 
-describe('buildPieData logic', () => {
-  beforeEach(() => {
+    const { UNSAFE_getByType } = render(<OsShareChart />);
+
+    expect(UNSAFE_getByType('PieChart' as any)).toBeTruthy();
+  });
+
+  it('calls useGetOwnedGames with the hardcoded userId and false', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-  });
-
-  it('filters out platforms with 0 minutes', () => {
-    let capturedData: any[] = [];
-    const { View } = jest.requireActual('react-native');
-    (GiftedCharts.PieChart as jest.Mock).mockImplementation((props: any) => {
-      capturedData = props.data;
-      return <View testID="pie-chart" />;
-    });
-
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: {
-        response: {
-          games: makeGames([{ playtime_windows_forever: 120 }]),
-        },
-      },
-      isLoadingOwnedGames: false,
+      isLoadingOwnedGames: true,
       errorOwnedGames: null,
     });
 
     render(<OsShareChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
-    });
 
-    expect(capturedData).toHaveLength(1);
-    expect(capturedData[0].value).toBe(2);
+    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
   });
 
-  it('returns empty array when ownedGames is null', () => {
-    let capturedData: any[] | null = null;
-    const { View } = jest.requireActual<typeof import('react-native')>('react-native');
-
-    (GiftedCharts.PieChart as jest.Mock).mockImplementation((props: any) => {
-      capturedData = props.data;
-      return <View testID="pie-chart" />;
-    });
-
+  it('passes an empty pieData array when ownedGames is null', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: false,
       errorOwnedGames: null,
     });
 
-    render(<OsShareChart />);
-    fireEvent(screen.getByTestId('card'), 'layout', {
-      nativeEvent: { layout: { width: 300 } },
+    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const pie = UNSAFE_getByType('PieChart' as any);
+
+    expect(pie.props.data).toEqual([]);
+  });
+
+  it('passes an empty pieData array when ownedGames.response is missing', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: {},
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
     });
 
-    expect(capturedData).toEqual([]);
+    const { UNSAFE_getByType } = render(<OsShareChart />);
+
+    expect(UNSAFE_getByType('PieChart' as any).props.data).toEqual([]);
+  });
+
+  it('derives radius and innerRadius from cardWidth via helpers', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const pie = UNSAFE_getByType('PieChart' as any);
+
+    expect(computePieRadius).toHaveBeenCalledWith(300);
+    expect(computePieInnerRadius).toHaveBeenCalledWith(100);
+    expect(pie.props.radius).toBe(100);
+    expect(pie.props.innerRadius).toBe(60);
+  });
+
+  it('sets innerCircleColor and textColor from the theme', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const pie = UNSAFE_getByType('PieChart' as any);
+
+    expect(pie.props.innerCircleColor).toBe('rgb(30,30,30)');
+    expect(pie.props.textColor).toBe('rgb(255,255,255)');
+  });
+
+  it('memoizes pieData — buildOsShareData is not re-called on unrelated re-renders', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: OWNED_GAMES,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: null,
+    });
+
+    const { rerender } = render(<OsShareChart />);
+    const callsBefore = (buildOsShareData as jest.Mock).mock.calls.length;
+    rerender(<OsShareChart />);
+
+    expect((buildOsShareData as jest.Mock).mock.calls.length).toBe(callsBefore);
   });
 });

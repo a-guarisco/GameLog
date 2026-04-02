@@ -8,6 +8,7 @@ import {
   PlayerStats,
   OwnedGames,
   RecentPlayedGames,
+  GameGenres,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string): Promise<T> {
@@ -50,6 +51,9 @@ const getOwnedGames = async (steamId: string, includeFreeGame: boolean): Promise
 const getRecentPlayedGames = async (steamId: string, count: number): Promise<RecentPlayedGames> =>
   fetchData<RecentPlayedGames>(EndPoints.GET_RECENT_PLAYED_GAMES(steamId, count));
 
+const getGameGenres = async (appId: string): Promise<GameGenres> =>
+  fetchData<GameGenres>(EndPoints.GET_GAME_GENRES(appId));
+
 export default {
   getGameNews,
   getGlobalAchievement,
@@ -59,4 +63,5 @@ export default {
   getPlayerFriendsInfo,
   getOwnedGames,
   getRecentPlayedGames,
+  getGameGenres,
 };

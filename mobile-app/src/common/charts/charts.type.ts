@@ -1,4 +1,4 @@
-export interface PieData {
+export interface OsPieData {
   value: number;
   color: string;
   gradientCenterColor: string;
@@ -11,5 +11,18 @@ export interface BarData {
   frontColor: string;
   gradientColor: string;
   spacing: number;
+  label: string;
+}
+
+export interface GenreChartItem {
+  label: string;
+  value: number;
+  color: string;
+}
+
+export interface PieData {
+  value: number;
+  color: string;
+  gradientCenterColor: string;
   label: string;
 }

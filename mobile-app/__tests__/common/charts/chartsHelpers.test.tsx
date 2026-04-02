@@ -2,6 +2,7 @@ import {
   computePieInnerRadius,
   computePieRadius,
   getPercentileInfoGradient,
+  getTopGames,
   INFO_GRADIENT_TIERS,
   OS_COLORS,
 } from '@gamelog/common/charts/chartsHelpers';
@@ -22,6 +23,11 @@ jest.mock('@gamelog/theme/theme', () => ({
     },
   },
 }));
+
+const makeGame = (name: string, minutes: number) => ({
+  name,
+  playtime_forever: minutes,
+});
 
 describe('INFO_GRADIENT_TIERS', () => {
   it('has 10 tiers', () => {
@@ -88,5 +94,55 @@ describe('computePieInnerRadius', () => {
   it('should return the calculated inner radius when given r', () => {
     const r = 200;
     expect(computePieInnerRadius(r)).toBe(128);
+  });
+});
+
+describe('getTopGames', () => {
+  it('returns empty array when no games', () => {
+    expect(getTopGames([], 5)).toEqual([]);
+  });
+
+  it('filters out games with zero playtime', () => {
+    const games = [makeGame('A', 0), makeGame('B', 10)];
+
+    const result = getTopGames(games as any, 5);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('B');
+  });
+
+  it('sorts games by playtime descending', () => {
+    const games = [makeGame('A', 10), makeGame('B', 30), makeGame('C', 20)];
+
+    const result = getTopGames(games as any, 5);
+
+    expect(result.map((g) => g.name)).toEqual(['B', 'C', 'A']);
+  });
+
+  it('limits results to gamesToFetch', () => {
+    const games = [makeGame('A', 10), makeGame('B', 30), makeGame('C', 20)];
+
+    const result = getTopGames(games as any, 2);
+
+    expect(result).toHaveLength(2);
+    expect(result.map((g) => g.name)).toEqual(['B', 'C']);
+  });
+
+  it('returns fewer items if not enough valid games', () => {
+    const games = [makeGame('A', 10)];
+
+    const result = getTopGames(games as any, 5);
+
+    expect(result).toHaveLength(1);
+  });
+
+  it('does not mutate the original array', () => {
+    const games = [makeGame('A', 10), makeGame('B', 20)];
+
+    const original = [...games];
+
+    getTopGames(games as any, 1);
+
+    expect(games).toEqual(original);
   });
 });
