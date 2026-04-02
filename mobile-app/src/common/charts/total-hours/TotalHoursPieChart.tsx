@@ -1,35 +1,31 @@
 import { useMemo, useState } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
-import { OwnedGames } from '@gamelog/api-manager/dto';
 import { Box } from '@gamelog/components/ui/box';
 import { Text } from '@gamelog/components/ui/text';
-import { brand } from '@gamelog/theme/theme';
-import { INFO_GRADIENT_TIERS, computePieRadius, computePieInnerRadius } from '../chartsHelpers';
-import ChartWrapperCard from '../ChartWrapperCard';
+import { computePieRadius, computePieInnerRadius } from '../chartsHelpers';
+import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
+import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
 import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
+import buildTotalHoursPieData from './buildTotalHoursPieData';
+import { PieData } from '../charts.type';
 
-interface PieData {
-  value: number;
-  label: string;
-  color: string;
-  gradientCenterColor: string;
-}
+const GAME_TO_REPRESENT = 5;
 
 const TotalHoursPieChart = () => {
-  const [userId] = useState('76561198159652025');
+  const [userId] = useState('76561198077919169');
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(userId, false);
 
   const pieData: PieData[] = useMemo(() => {
-    return getPieData(ownedGames);
+    return buildTotalHoursPieData(ownedGames, GAME_TO_REPRESENT);
   }, [ownedGames]);
 
   const totalMinutes = pieData.reduce((sum, d) => sum + d.value, 0);
 
   const lamdaFormatLabel = (text: string) => {
     const value = parseInt(text);
-    return `${formatMinutes(value)} · ${Math.round((value / totalMinutes) * 100)}%`;
+    return `${formatMinutesToHours(value)} · ${Math.round((value / totalMinutes) * 100)}%`;
   };
 
   const tooltipComponent = (index: number, theme: typeof rawConfig.light) => {
@@ -77,42 +73,3 @@ const TotalHoursPieChart = () => {
 };
 
 export default TotalHoursPieChart;
-
-const getPieData = (ownedGames: OwnedGames | null): PieData[] => {
-  if (!ownedGames?.response?.games) return [];
-
-  const games = ownedGames.response.games;
-
-  const sorted = [...games]
-    .filter((g) => g.playtime_forever > 0)
-    .sort((a, b) => b.playtime_forever - a.playtime_forever);
-
-  const topN = 5;
-  const top = sorted.slice(0, topN);
-
-  const otherMinutes = sorted.slice(topN).reduce((sum, g) => sum + g.playtime_forever, 0);
-
-  const slices: PieData[] = top.map((game, i) => ({
-    value: game.playtime_forever,
-    label: game.name.length > 12 ? game.name.slice(0, 12) + '…' : game.name,
-    color: INFO_GRADIENT_TIERS[i % INFO_GRADIENT_TIERS.length].frontColor,
-    gradientCenterColor: INFO_GRADIENT_TIERS[i % INFO_GRADIENT_TIERS.length].gradientColor,
-  }));
-
-  if (otherMinutes > 0) {
-    slices.push({
-      value: otherMinutes,
-      label: 'Other',
-      color: `rgb(${brand.info['200']})`,
-      gradientCenterColor: `rgb(${brand.info['400']})`,
-    });
-  }
-
-  return slices;
-};
-
-const formatMinutes = (minutes: number) => {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-};

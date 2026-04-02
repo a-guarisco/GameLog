@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box } from '@gamelog/components/ui/box';
 import { HStack } from '@gamelog/components/ui/hstack';
 import { VStack } from '@gamelog/components/ui/vstack';

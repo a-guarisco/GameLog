@@ -1,6 +1,7 @@
+import { useCallback } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/hooks/useAsyncFetch';
-import { useCallback } from 'react';
+import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
@@ -50,5 +51,19 @@ export const useGetPlayersInfo = (steamIds: string[]) => {
     playersInfo: data,
     isLoadingPlayersInfo: isLoading,
     errorPlayersInfo: error,
+  };
+};
+
+export const useGetGameGenreChartData = (userId: string) => {
+  const fetchFunc = useCallback(async () => {
+    const ownedGames = await ApiManager.getOwnedGames(userId, false);
+    return buildGenreChartData(ownedGames.response.games);
+  }, [userId]);
+
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return {
+    genreChartData: data ?? [],
+    isLoadingGenreChart: isLoading,
+    errorGenreChart: error,
   };
 };

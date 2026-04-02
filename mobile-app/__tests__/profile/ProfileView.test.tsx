@@ -4,6 +4,7 @@ import ProfileView from '@gamelog/profile/ProfileView';
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => () => null);
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => () => null);
 jest.mock('@gamelog/common/charts/os-share/OsShareChart', () => () => null);
+jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => () => null);
 
 describe('Profile', () => {
   jest.mock('react-native-gifted-charts');

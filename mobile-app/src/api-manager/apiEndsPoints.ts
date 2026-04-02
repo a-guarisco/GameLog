@@ -28,4 +28,6 @@ export default {
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/capsule_231x87.jpg`,
   GET_GAME_LIBRARY_COVER_IMAGE: (appId: string) =>
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`,
+  GET_GAME_GENRES: (appId: string) =>
+    `https://store.steampowered.com/api/appdetails?appids=${appId}&filters=genres`,
 };
