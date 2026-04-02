@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';

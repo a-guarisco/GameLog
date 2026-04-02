@@ -1,7 +1,6 @@
 import {
   computePieInnerRadius,
   computePieRadius,
-  formatMinutes,
   getPercentileInfoGradient,
   getTopGames,
   INFO_GRADIENT_TIERS,
@@ -95,28 +94,6 @@ describe('computePieInnerRadius', () => {
   it('should return the calculated inner radius when given r', () => {
     const r = 200;
     expect(computePieInnerRadius(r)).toBe(128);
-  });
-});
-
-describe('formatMinutes', () => {
-  it('formats minutes under 60 as Xm', () => {
-    expect(formatMinutes(45)).toBe('45m');
-  });
-
-  it('formats exact hours correctly', () => {
-    expect(formatMinutes(120)).toBe('2h 0m');
-  });
-
-  it('formats hours and minutes correctly', () => {
-    expect(formatMinutes(135)).toBe('2h 15m');
-  });
-
-  it('formats zero minutes', () => {
-    expect(formatMinutes(0)).toBe('0m');
-  });
-
-  it('handles large values', () => {
-    expect(formatMinutes(600)).toBe('10h 0m');
   });
 });
 

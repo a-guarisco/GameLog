@@ -4,8 +4,8 @@ import { useGetGameGenreChartData } from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ RadarChart: 'RadarChart' }));
-jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
-  formatMinutes: jest.fn((m) => `${m}m`),
+jest.mock('@gamelog/utils/formatUtils', () => ({
+  formatMinutesToHours: jest.fn((m) => `${m}m`),
 }));
 
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {

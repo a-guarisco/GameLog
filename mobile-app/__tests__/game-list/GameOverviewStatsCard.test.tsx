@@ -34,7 +34,7 @@ describe('GameOverviewStatsCard', () => {
     );
 
     expect(getByText('Test Game')).toBeTruthy();
-    expect(getByText('2h')).toBeTruthy();
+    expect(getByText('2h 0m')).toBeTruthy();
   });
 
   it('shows correctly the playtime for each platform', () => {

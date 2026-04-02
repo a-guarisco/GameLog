@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { RadarChart } from 'react-native-gifted-charts';
 import { useGetGameGenreChartData } from '@gamelog/api-manager/useApi';
-import { formatMinutes } from '../chartsHelpers';
+import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
 
@@ -30,7 +30,7 @@ const GameGenreRadarChart = () => {
           <ExternalLabelBox
             graphData={genreChartData.map((item) => ({
               ...item,
-              lamdaFormatLabel: (text: string) => formatMinutes(parseInt(text)),
+              lamdaFormatLabel: (text: string) => formatMinutesToHours(parseInt(text)),
             }))}
             theme={theme}
           />

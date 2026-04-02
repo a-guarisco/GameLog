@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react-native';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
-import { formatMinutes } from '@gamelog/common/charts/chartsHelpers';
+import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
@@ -27,7 +27,10 @@ jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
   computePieRadius: jest.fn(() => 100),
   computePieInnerRadius: jest.fn(() => 50),
-  formatMinutes: jest.fn((v) => `${v}m`),
+}));
+
+jest.mock('@gamelog/utils/formatUtils', () => ({
+  formatMinutesToHours: jest.fn((m) => `${m}m`),
 }));
 
 jest.mock('@gamelog/common/charts/total-hours/buildTotalHoursPieData', () => ({
@@ -156,7 +159,7 @@ describe('TotalHoursPieChart', () => {
 
     const tooltip = pie.props.tooltipComponent(0);
 
-    expect(formatMinutes).toHaveBeenCalledWith(60);
+    expect(formatMinutesToHours).toHaveBeenCalledWith(60);
     expect(tooltip.props.children.join('')).toContain('Game A');
   });
 });

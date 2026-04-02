@@ -2,7 +2,11 @@ import { Box } from '@gamelog/components/ui/box';
 import { Text } from '@gamelog/components/ui/text';
 import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
-import { formatDate, formatMinutesToHours } from '@gamelog/utils/formatUtils';
+import {
+  formatDate,
+  formatMinutesToHours,
+  formatMinutesToHoursShort,
+} from '@gamelog/utils/formatUtils';
 import { GameStatRow } from './GameStatRow';
 import { GameStatDivider } from './GameStatDivider';
 
@@ -32,7 +36,7 @@ export const GameOverviewStatsCard = ({ gameItem, onPress }: GameOverviewStatsCa
       <GameStatDivider />
       <Box className="flex-row flex-wrap">
         {PLATFORMS.map(({ label, key }) => (
-          <GameStatRow key={key} label={label} value={formatMinutesToHours(gameItem[key])} />
+          <GameStatRow key={key} label={label} value={formatMinutesToHoursShort(gameItem[key])} />
         ))}
       </Box>
       <GameStatDivider />

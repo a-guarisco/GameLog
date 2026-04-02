@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
 import { Box } from '@gamelog/components/ui/box';
 import { Text } from '@gamelog/components/ui/text';
-import { computePieRadius, computePieInnerRadius, formatMinutes } from '../chartsHelpers';
+import { computePieRadius, computePieInnerRadius } from '../chartsHelpers';
+import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
@@ -24,7 +25,7 @@ const TotalHoursPieChart = () => {
 
   const lamdaFormatLabel = (text: string) => {
     const value = parseInt(text);
-    return `${formatMinutes(value)} · ${Math.round((value / totalMinutes) * 100)}%`;
+    return `${formatMinutesToHours(value)} · ${Math.round((value / totalMinutes) * 100)}%`;
   };
 
   const tooltipComponent = (index: number, theme: typeof rawConfig.light) => {
