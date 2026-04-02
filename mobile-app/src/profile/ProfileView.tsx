@@ -7,18 +7,17 @@ import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
 import ProfileStats from './ProfileStats';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 
-
 const chartComponents = [
-  <ProfileStats key="ProfileStats"/>,
+  <ProfileStats key="ProfileStats" />,
   <TotalHoursChart key="TotalHoursChart" />,
   <TotalHoursPieChart key="TotalHoursPieChart" />,
-  <GameGenreRadarChart key="GameGenreRadarChart"/>,
+  <GameGenreRadarChart key="GameGenreRadarChart" />,
   <OsShareChart key="OsShareChart" />,
 ];
 
 const ProfileView = () => {
   return (
-    <>
+    <Box>
       <ProfileBanner userId={'76561198077919169'} />
       <FlatList
         data={chartComponents}
@@ -27,7 +26,7 @@ const ProfileView = () => {
         )}
         keyExtractor={(item, index) => item.key ?? `${index}`}
       />
-    </>
+    </Box>
   );
 };
 

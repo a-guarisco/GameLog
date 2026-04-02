@@ -1,5 +1,5 @@
-import { Box } from "@gamelog/components/ui/box";
-import { StatTile } from "../common/StatTile";
+import { Box } from '@gamelog/components/ui/box';
+import { StatTile } from '../common/StatTile';
 
 const statsTiles = [
   <StatTile
@@ -8,6 +8,7 @@ const statsTiles = [
     className="bg-background-200"
     valueClassName="text-typography-900"
     labelClassName="text-typography-300"
+    key="GamesOwned"
   />,
   <StatTile
     value="18"
@@ -15,6 +16,7 @@ const statsTiles = [
     className="bg-primary-500"
     valueClassName="text-typography-200"
     labelClassName="text-secondary-100"
+    key="PlayedLast2Weeks"
   />,
   <StatTile
     value="10"
@@ -22,19 +24,20 @@ const statsTiles = [
     className="bg-secondary-500"
     valueClassName="text-typography-100"
     labelClassName="text-tertiary-100"
+    key="GamesCompleted"
   />,
 ];
 
 const ProfileStats = () => {
-    return (
-        <Box className="flex-row flex-wrap">
-    {statsTiles.map((tile, i) => (
-      <Box key={i} className="w-1/3 p-2">
-        {tile}
-      </Box>
-    ))}
-  </Box>
-    )
-}
+  return (
+    <Box className="flex-row flex-wrap">
+      {statsTiles.map((tile, i) => (
+        <Box key={i} className="w-1/3 p-2">
+          {tile}
+        </Box>
+      ))}
+    </Box>
+  );
+};
 
 export default ProfileStats;

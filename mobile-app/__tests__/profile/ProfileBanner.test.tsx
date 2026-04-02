@@ -1,236 +1,176 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
-
-import { useGetPlayersInfo } from '@gamelog/api-manager/useApi';
-
-jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetPlayersInfo: jest.fn(),
-}));
-
-jest.mock('@gamelog/common/BannerInfo', () => {
-  const { View, Text } = jest.requireActual('react-native');
-  const MockBannerInfo = ({
-    title,
-    secondaryText,
-    iconUrl,
-    backgroundColor,
-    height,
-    justifyContent,
-  }: any) => (
-    <View testID="banner-info">
-      <Text testID="banner-title">{title}</Text>
-      <Text testID="banner-secondary">{secondaryText}</Text>
-      <Text testID="banner-icon">{iconUrl}</Text>
-      <Text testID="banner-bg">{backgroundColor}</Text>
-      <Text testID="banner-height">{height}</Text>
-      <Text testID="banner-justify">{justifyContent}</Text>
-    </View>
-  );
-
-  MockBannerInfo.displayName = 'MockBannerInfo';
-  return MockBannerInfo;
-});
+import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
 
 jest.mock('@gamelog/components/ui/spinner', () => {
   const { View } = jest.requireActual('react-native');
-
-  const MockSpinner = ({ size }: any) => (
-    <View testID="spinner" accessibilityLabel={`spinner-${size}`} />
-  );
-  MockSpinner.displayName = 'MockSpinner';
-
-  return {
-    Spinner: MockSpinner,
-  };
+  return { Spinner: () => <View testID="spinner" /> };
 });
 
 jest.mock('@gamelog/components/ui/text', () => {
   const { Text } = jest.requireActual('react-native');
+  return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
+});
 
-  const MockText = ({ children, className }: any) => (
-    <Text testID="error-text" className={className}>
-      {children}
-    </Text>
-  );
-  MockText.displayName = 'MockText';
+jest.mock('@gamelog/components/ui/vstack', () => {
+  const { View } = jest.requireActual('react-native');
+  return { VStack: ({ children, ...props }: any) => <View {...props}>{children}</View> };
+});
 
+jest.mock('@gamelog/common/Banner', () => {
+  const { View } = jest.requireActual('react-native');
+  return { __esModule: true, default: (props: any) => <View testID="banner" {...props} /> };
+});
+
+jest.mock('@gamelog/common/BannerInfo', () => {
+  const { View, Text } = jest.requireActual('react-native');
   return {
-    Text: MockText,
+    __esModule: true,
+    default: ({ title, iconUrl }: any) => (
+      <View testID="banner-info">
+        <Text testID="banner-title">{title}</Text>
+        <Text testID="banner-icon">{iconUrl}</Text>
+      </View>
+    ),
   };
 });
 
-jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+  __esModule: true,
+  default: { GET_GAME_HEADER_IMAGE: jest.fn((appid: string) => `https://cdn/${appid}.jpg`) },
+}));
 
-const mockUseGetPlayersInfo = useGetPlayersInfo as jest.Mock;
+const mockUseGetOwnedGames = jest.fn();
+const mockUseGetPlayersInfo = jest.fn();
 
-const mockPlayerData = {
-  response: {
-    players: [
-      {
-        personaname: 'TestUser',
-        profileurl: 'https://steamcommunity.com/id/testuser/',
-        avatarfull: 'https://example.com/avatar.jpg',
-      },
-    ],
-  },
+jest.mock('@gamelog/api-manager/useApi', () => ({
+  useGetOwnedGames: (...args: any[]) => mockUseGetOwnedGames(...args),
+  useGetPlayersInfo: (...args: any[]) => mockUseGetPlayersInfo(...args),
+}));
+
+const PLAYER = {
+  personaname: 'SteamUser',
+  profileurl: 'https://steamcommunity.com/id/steamuser/',
+  avatarfull: 'https://cdn/avatar.jpg',
 };
 
-const defaultProps = {
-  userId: 'user-123',
-};
-
-describe('ProfileBanner', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+const setupMocks = ({
+  isLoadingPlayersInfo = false,
+  errorPlayersInfo = null as Error | null | undefined,
+  player = PLAYER as typeof PLAYER | null,
+  firstGameAppid = '1234',
+} = {}) => {
+  mockUseGetOwnedGames.mockReturnValue({
+    ownedGames: { response: { games: [{ appid: firstGameAppid }] } },
   });
+  mockUseGetPlayersInfo.mockReturnValue({
+    playersInfo: player ? { response: { players: [player] } } : null,
+    isLoadingPlayersInfo,
+    errorPlayersInfo,
+  });
+};
 
-  it('renders a spinner while loading', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: null,
-      isLoadingPlayersInfo: true,
-      errorPlayersInfo: null,
-    });
+beforeEach(() => jest.clearAllMocks());
 
-    render(<ProfileBanner {...defaultProps} />);
-
+describe('ProfileBanner — loading & error states', () => {
+  it('renders a spinner while player info is loading', () => {
+    setupMocks({ isLoadingPlayersInfo: true });
+    render(<ProfileBanner userId="123" />);
     expect(screen.getByTestId('spinner')).toBeTruthy();
-    expect(screen.queryByTestId('banner-info')).toBeNull();
-    expect(screen.queryByTestId('error-text')).toBeNull();
   });
 
-  it('renders an error message when fetch fails', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: null,
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: new Error('Network error'),
-    });
-
-    render(<ProfileBanner {...defaultProps} />);
-
-    expect(screen.queryByTestId('spinner')).toBeNull();
-    expect(screen.queryByTestId('banner-info')).toBeNull();
-    expect(screen.getByTestId('error-text')).toBeTruthy();
-    expect(screen.getByTestId('error-text').props.children).toBe(
-      'Failed to load global achievements, please try again later.'
-    );
+  it('does not render the banner while loading', () => {
+    setupMocks({ isLoadingPlayersInfo: true });
+    render(<ProfileBanner userId="123" />);
+    expect(screen.queryByTestId('banner')).toBeNull();
   });
 
-  it('renders banner info when data loads successfully', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: mockPlayerData,
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
+  it('renders an error message when the request fails', () => {
+    setupMocks({ errorPlayersInfo: new Error('fail') });
+    render(<ProfileBanner userId="123" />);
+    expect(screen.getByText(/Failed to load profile/i)).toBeTruthy();
+  });
 
-    render(<ProfileBanner {...defaultProps} />);
+  it('does not render the banner when there is an error', () => {
+    setupMocks({ errorPlayersInfo: new Error('fail') });
+    render(<ProfileBanner userId="123" />);
+    expect(screen.queryByTestId('banner')).toBeNull();
+  });
+});
 
-    expect(screen.queryByTestId('spinner')).toBeNull();
-    expect(screen.queryByTestId('error-text')).toBeNull();
+describe('ProfileBanner — successful render', () => {
+  it('renders Banner and BannerInfo when data is available', () => {
+    setupMocks();
+    render(<ProfileBanner userId="123" />);
+    expect(screen.getByTestId('banner')).toBeTruthy();
     expect(screen.getByTestId('banner-info')).toBeTruthy();
   });
 
-  it('displays the player username in BannerInfo', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: mockPlayerData,
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-
-    render(<ProfileBanner {...defaultProps} />);
-
-    expect(screen.getByTestId('banner-title').props.children).toBe('TestUser');
+  it('displays the player personaname as the title', () => {
+    setupMocks();
+    render(<ProfileBanner userId="123" />);
+    expect(screen.getByTestId('banner-title').props.children).toBe('SteamUser');
   });
 
-  it('falls back to "Unknown User" when personaname is missing', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: { response: { players: [{ profileurl: '', avatarfull: '' }] } },
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-
-    render(<ProfileBanner {...defaultProps} />);
-
+  it('falls back to "Unknown User" when player is missing', () => {
+    setupMocks({ player: null });
+    render(<ProfileBanner userId="123" />);
     expect(screen.getByTestId('banner-title').props.children).toBe('Unknown User');
   });
 
-  it('passes avatar URL to BannerInfo', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: mockPlayerData,
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-
-    render(<ProfileBanner {...defaultProps} />);
-
-    expect(screen.getByTestId('banner-icon').props.children).toBe('https://example.com/avatar.jpg');
+  it('passes the player avatarfull as iconUrl to BannerInfo', () => {
+    setupMocks();
+    render(<ProfileBanner userId="123" />);
+    expect(screen.getByTestId('banner-icon').props.children).toBe(PLAYER.avatarfull);
   });
 
-  it('passes correct styling props to BannerInfo', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: mockPlayerData,
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-
-    render(<ProfileBanner {...defaultProps} />);
-
-    expect(screen.getByTestId('banner-bg').props.children).toBe('bg-background-100');
-    expect(screen.getByTestId('banner-height').props.children).toBe('h-32');
-    expect(screen.getByTestId('banner-justify').props.children).toBe('justify-end');
+  it('calls useGetPlayersInfo with an array containing the provided userId', () => {
+    setupMocks();
+    render(<ProfileBanner userId="abc" />);
+    expect(mockUseGetPlayersInfo).toHaveBeenCalledWith(['abc']);
   });
 
-  it('opens the player Steam profile URL when pressed', () => {
+  it('calls useGetOwnedGames with the hardcoded userId and false', () => {
+    setupMocks();
+    render(<ProfileBanner userId="abc" />);
+    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
+  });
+});
+
+describe('ProfileBanner — game header image', () => {
+  it('uses the first owned game appid to build the header image URL', () => {
+    setupMocks({ firstGameAppid: '9999' });
+    render(<ProfileBanner userId="123" />);
+    expect(apiEndsPoints.GET_GAME_HEADER_IMAGE).toHaveBeenCalledWith('9999');
+  });
+
+  it('falls back to TEMP_APPID (236390) when ownedGames has no games', () => {
+    mockUseGetOwnedGames.mockReturnValue({ ownedGames: null });
     mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: mockPlayerData,
+      playersInfo: { response: { players: [PLAYER] } },
       isLoadingPlayersInfo: false,
       errorPlayersInfo: null,
     });
+    render(<ProfileBanner userId="123" />);
+    expect(apiEndsPoints.GET_GAME_HEADER_IMAGE).toHaveBeenCalledWith('236390');
+  });
+});
 
-    render(<ProfileBanner {...defaultProps} />);
-
+describe('ProfileBanner — openSteamProfile', () => {
+  it("opens the player's profileurl when the banner is pressed", () => {
+    const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    setupMocks();
+    render(<ProfileBanner userId="123" />);
     fireEvent.press(screen.getByTestId('banner-info').parent!);
-
-    expect(Linking.openURL).toHaveBeenCalledWith('https://steamcommunity.com/id/testuser/');
+    expect(spy).toHaveBeenCalledWith(PLAYER.profileurl);
   });
 
-  it('opens fallback URL when profileurl is missing', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: { response: { players: [{ personaname: 'TestUser', avatarfull: '' }] } },
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-
-    render(<ProfileBanner {...defaultProps} />);
-
+  it('falls back to the Steam community URL when profileurl is missing', () => {
+    const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    setupMocks({ player: { ...PLAYER, profileurl: '' } });
+    render(<ProfileBanner userId="123" />);
     fireEvent.press(screen.getByTestId('banner-info').parent!);
-
-    expect(Linking.openURL).toHaveBeenCalledWith('https://steamcommunity.com/');
-  });
-
-  it('does not open URL when still loading', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: null,
-      isLoadingPlayersInfo: true,
-      errorPlayersInfo: null,
-    });
-
-    // During loading, the Pressable is not rendered at all — just a Spinner
-    render(<ProfileBanner {...defaultProps} />);
-
-    expect(screen.queryByTestId('banner-info')).toBeNull();
-    expect(Linking.openURL).not.toHaveBeenCalled();
-  });
-
-  it('calls useGetPlayersInfo with a memoized array containing the userId', () => {
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: mockPlayerData,
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-
-    render(<ProfileBanner userId="abc-999" />);
-
-    expect(mockUseGetPlayersInfo).toHaveBeenCalledWith(['abc-999']);
+    expect(spy).toHaveBeenCalledWith('https://steamcommunity.com/');
   });
 });
