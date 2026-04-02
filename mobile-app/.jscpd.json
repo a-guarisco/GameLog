@@ -1,5 +1,5 @@
 {
     "threshold": 0,
-    "ignore": ["**/__snapshots__/**", "**/node_modules/**", "**/src/components/**", "**/__tests__/**"],
+    "ignore": ["**/__snapshots__/**", "**/node_modules/**", "**/src/common/gluestack/**", "**/__tests__/**"],
     "minLines": 15
 }
