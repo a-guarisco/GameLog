@@ -7,7 +7,7 @@ import { useColorScheme } from 'nativewind';
 import '@gamelog/theme/global.css';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 import { getNavigationTheme } from '@gamelog/theme/themeHelpers';
-import useAppInit from '@gamelog/hooks/useAppInit';
+import useAppInit from '@gamelog/common/useAppInit';
 import { RootTabs } from '@gamelog/routes';
 
 const Navigation = createStaticNavigation(RootTabs);

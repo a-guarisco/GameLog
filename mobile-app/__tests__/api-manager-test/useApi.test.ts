@@ -1,5 +1,5 @@
 import ApiManager from '@gamelog/api-manager/apiManager';
-import { useAsyncFetch } from '@gamelog/hooks/useAsyncFetch';
+import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import {
   useGetPlayerAchievementsPerApp,
   useGetGlobalAchievement,
@@ -9,7 +9,7 @@ import {
 import { renderHook } from '@testing-library/react-native';
 
 jest.mock('@gamelog/api-manager/apiManager');
-jest.mock('@gamelog/hooks/useAsyncFetch');
+jest.mock('@gamelog/common/useAsyncFetch');
 
 const mockUseAsyncFetch = useAsyncFetch as jest.Mock;
 const mockApiManager = ApiManager as jest.Mocked<typeof ApiManager>;

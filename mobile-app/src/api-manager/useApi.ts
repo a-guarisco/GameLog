@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
-import { useAsyncFetch } from '@gamelog/hooks/useAsyncFetch';
+import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
