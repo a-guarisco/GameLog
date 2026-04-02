@@ -1,5 +1,5 @@
-import { Button, ButtonText } from '@gamelog/components/ui/button';
-import { Box } from '@gamelog/components/ui/box';
+import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Box } from '@gamelog/common/gluestack/box';
 import { SortBy } from './useGameList';
 
 interface GameListControlsProps {

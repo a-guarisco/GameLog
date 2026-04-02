@@ -1,7 +1,7 @@
-import { Box } from '@gamelog/components/ui/box';
-import { HStack } from '@gamelog/components/ui/hstack';
-import { VStack } from '@gamelog/components/ui/vstack';
-import { Text } from '@gamelog/components/ui/text';
+import { Box } from '@gamelog/common/gluestack/box';
+import { HStack } from '@gamelog/common/gluestack/hstack';
+import { VStack } from '@gamelog/common/gluestack/vstack';
+import { Text } from '@gamelog/common/gluestack/text';
 
 interface AchievementItemProps {
   name: string;

@@ -5,19 +5,19 @@ import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 
 jest.spyOn(ReactNative, 'useColorScheme').mockReturnValue('light');
 
-jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
+jest.mock('@gamelog/common/gluestack/gluestack-ui-provider/config', () => ({
   rawConfig: {
     light: { '--color-background-100': '255,255,255' },
     dark: { '--color-background-100': '0,0,0' },
   },
 }));
 
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
 });
 
-jest.mock('@gamelog/components/ui/card', () => {
+jest.mock('@gamelog/common/gluestack/card', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     Card: ({ children, onLayout, ...props }: any) => (
@@ -28,7 +28,7 @@ jest.mock('@gamelog/components/ui/card', () => {
   };
 });
 
-jest.mock('@gamelog/components/ui/spinner', () => {
+jest.mock('@gamelog/common/gluestack/spinner', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return { Spinner: () => <View testID="spinner" /> };
 });

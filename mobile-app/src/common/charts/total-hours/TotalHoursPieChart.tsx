@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
-import { Box } from '@gamelog/components/ui/box';
-import { Text } from '@gamelog/components/ui/text';
+import { Box } from '@gamelog/common/gluestack/box';
+import { Text } from '@gamelog/common/gluestack/text';
 import { computePieRadius, computePieInnerRadius } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
-import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
+import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import buildTotalHoursPieData from './buildTotalHoursPieData';
 import { PieData } from '../charts.type';
 

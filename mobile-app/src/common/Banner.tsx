@@ -1,6 +1,6 @@
 import { useWindowDimensions } from 'react-native';
-import { Box } from '@gamelog/components/ui/box';
-import { Image } from '@gamelog/components/ui/image';
+import { Box } from '@gamelog/common/gluestack/box';
+import { Image } from '@gamelog/common/gluestack/image';
 
 interface BannerProps {
   heightPercentage: number;

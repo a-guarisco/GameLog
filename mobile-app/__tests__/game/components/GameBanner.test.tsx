@@ -26,7 +26,7 @@ jest.mock('@gamelog/common/BannerInfo', () => {
   return MockBannerInfo;
 });
 
-jest.mock('@gamelog/components/ui/vstack', () => {
+jest.mock('@gamelog/common/gluestack/vstack', () => {
   const { View } = jest.requireActual('react-native');
   const MockVStack = ({ children, className }: any) => (
     <View testID="vstack" className={className}>

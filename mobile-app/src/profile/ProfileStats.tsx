@@ -1,4 +1,4 @@
-import { Box } from '@gamelog/components/ui/box';
+import { Box } from '@gamelog/common/gluestack/box';
 import { StatTile } from '../common/StatTile';
 
 const statsTiles = [

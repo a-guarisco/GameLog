@@ -6,12 +6,12 @@ import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
 
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual('react-native');
   return { Box: (props: any) => <View {...props} /> };
 });
 
-jest.mock('@gamelog/components/ui/text', () => {
+jest.mock('@gamelog/common/gluestack/text', () => {
   const { Text } = jest.requireActual('react-native');
   return { Text };
 });

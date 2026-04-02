@@ -1,17 +1,17 @@
 import { render } from '@testing-library/react-native';
 import BannerInfo from '@gamelog/common/BannerInfo';
 
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual('react-native');
   return { Box: (props: any) => <View testID="banner-box" {...props} /> };
 });
 
-jest.mock('@gamelog/components/ui/text', () => {
+jest.mock('@gamelog/common/gluestack/text', () => {
   const { Text } = jest.requireActual('react-native');
   return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
 });
 
-jest.mock('@gamelog/components/ui/hstack', () => {
+jest.mock('@gamelog/common/gluestack/hstack', () => {
   const { View } = jest.requireActual('react-native');
   return {
     HStack: ({ children, className, ...props }: any) => (
@@ -22,7 +22,7 @@ jest.mock('@gamelog/components/ui/hstack', () => {
   };
 });
 
-jest.mock('@gamelog/components/ui/avatar', () => {
+jest.mock('@gamelog/common/gluestack/avatar', () => {
   const { View, Text, Image } = jest.requireActual('react-native');
   return {
     Avatar: ({ children, size, ...props }: any) => (

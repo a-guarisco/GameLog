@@ -1,6 +1,6 @@
 import { ViewProps } from 'react-native';
-import { Box } from '@gamelog/components/ui/box';
-import { HStack } from '@gamelog/components/ui/hstack';
+import { Box } from '@gamelog/common/gluestack/box';
+import { HStack } from '@gamelog/common/gluestack/hstack';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';

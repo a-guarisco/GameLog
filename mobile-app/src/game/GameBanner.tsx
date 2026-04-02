@@ -1,6 +1,6 @@
 import BannerInfo from '@gamelog/common/BannerInfo';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
-import { VStack } from '@gamelog/components/ui/vstack';
+import { VStack } from '@gamelog/common/gluestack/vstack';
 import Banner from '@gamelog/common/Banner';
 
 interface GameBannerProps {

@@ -4,7 +4,7 @@ import { useGameList } from '@gamelog/game-list/useGameList';
 
 jest.mock('@gamelog/game-list/useGameList');
 
-jest.mock('@gamelog/components/ui/spinner', () => ({
+jest.mock('@gamelog/common/gluestack/spinner', () => ({
   Spinner: 'Spinner',
 }));
 

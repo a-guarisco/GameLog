@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react-native';
-import { Text } from '@gamelog/components/ui/text';
+import { Text } from '@gamelog/common/gluestack/text';
 import ChartErrorHandler from '@gamelog/common/charts/ChartErrorHandler';
 
-jest.mock('@gamelog/components/ui/box', () => ({
+jest.mock('@gamelog/common/gluestack/box', () => ({
   Box: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@gamelog/components/ui/text', () => {
+jest.mock('@gamelog/common/gluestack/text', () => {
   const { Text: RNText } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     Text: ({ children }: { children?: React.ReactNode }) => <RNText>{children}</RNText>,

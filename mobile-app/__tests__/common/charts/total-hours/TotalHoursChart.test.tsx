@@ -7,7 +7,7 @@ import buildTotalHoursBarData from '@gamelog/common/charts/total-hours/buildTota
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('@react-navigation/native', () => ({ useNavigation: jest.fn() }));
 jest.mock('react-native-gifted-charts', () => ({ BarChart: 'BarChart' }));
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual('react-native');
   return { Box: (props: any) => <View {...props} /> };
 });

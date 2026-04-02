@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
-import { Box } from '@gamelog/components/ui/box';
-import { Text } from '@gamelog/components/ui/text';
+import { Box } from '@gamelog/common/gluestack/box';
+import { Text } from '@gamelog/common/gluestack/text';
 
 interface StatTileProps {
   value: string | number;

@@ -1,11 +1,11 @@
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import { useMemo } from 'react';
 import AchievementItem from '@gamelog/game/AchievementItem';
-import { VStack } from '@gamelog/components/ui/vstack';
+import { VStack } from '@gamelog/common/gluestack/vstack';
 import { ScrollView } from 'react-native';
-import { Spinner } from '@gamelog/components/ui/spinner';
-import { Text } from '@gamelog/components/ui/text';
-import { Box } from '@gamelog/components/ui/box';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { Text } from '@gamelog/common/gluestack/text';
+import { Box } from '@gamelog/common/gluestack/box';
 import { useGetPlayerAchievementsPerApp } from '@gamelog/api-manager/useApi';
 
 type AchievementsListViewProps = {

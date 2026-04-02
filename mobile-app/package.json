@@ -98,7 +98,7 @@
       "!**/src/dev/**",
       "!**/src/utils/**",
       "!**/src/common/index.ts",
-      "!**/src/components/ui/**",
+      "!**/src/common/gluestack/**",
       "!**/src/theme/index.ts",
       "!**/src/routes.tsx"
     ],
