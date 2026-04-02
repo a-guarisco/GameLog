@@ -5,12 +5,14 @@ import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
 import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
 import ProfileStats from './ProfileStats';
+import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 
 
 const chartComponents = [
-  <ProfileStats/>,
+  <ProfileStats key="ProfileStats"/>,
   <TotalHoursChart key="TotalHoursChart" />,
   <TotalHoursPieChart key="TotalHoursPieChart" />,
+  <GameGenreRadarChart key="GameGenreRadarChart"/>,
   <OsShareChart key="OsShareChart" />,
 ];
 
