@@ -45,11 +45,16 @@ export default function ProfileBanner({ userId }: ProfileBannerProps) {
       </Text>
     );
   }
-  
+
   return (
     <Pressable onPress={openSteamProfile} className="w-full">
       <VStack className="w-full">
-        <Banner imageUrl={gameHeaderImage} minHeight={150} heightPercentage={20} className='opacity-50' />
+        <Banner
+          imageUrl={gameHeaderImage}
+          minHeight={150}
+          heightPercentage={20}
+          className="opacity-50"
+        />
 
         <BannerInfo
           title={player?.personaname ?? 'Unknown User'}
