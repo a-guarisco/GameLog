@@ -1,6 +1,6 @@
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import { useMemo } from 'react';
-import AchievementItem from '@gamelog/components/game-view/AchievementItem';
+import AchievementItem from '@gamelog/game/AchievementItem';
 import { VStack } from '@gamelog/components/ui/vstack';
 import { ScrollView } from 'react-native';
 import { Spinner } from '@gamelog/components/ui/spinner';

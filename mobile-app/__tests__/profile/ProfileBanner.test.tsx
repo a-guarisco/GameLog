@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
-import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
+import ProfileBanner from '@gamelog/profile/ProfileBanner';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
 
 jest.mock('@gamelog/components/ui/spinner', () => {

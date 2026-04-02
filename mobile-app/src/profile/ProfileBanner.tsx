@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { Linking, Pressable } from 'react-native';
-import { VStack } from '../ui/vstack';
+import { VStack } from '../components/ui/vstack';
 import { useGetOwnedGames, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
 import { Spinner } from '@gamelog/components/ui/spinner';

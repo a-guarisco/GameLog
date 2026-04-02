@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import AchievementItem from '@gamelog/components/game-view/AchievementItem';
+import AchievementItem from '@gamelog/game/AchievementItem';
 
 jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 

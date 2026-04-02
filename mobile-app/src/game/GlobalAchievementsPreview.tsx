@@ -1,5 +1,5 @@
 import { VStack } from '@gamelog/components/ui/vstack';
-import AchievementItem from '@gamelog/components/game-view/AchievementItem';
+import AchievementItem from '@gamelog/game/AchievementItem';
 import { Button, ButtonText } from '@gamelog/components/ui/button';
 import { Box } from '@gamelog/components/ui/box';
 import { useNavigation } from '@react-navigation/native';
