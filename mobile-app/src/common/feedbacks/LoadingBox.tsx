@@ -1,6 +1,6 @@
-import { Box } from '@gamelog/components/ui/box';
-import { Spinner } from '@gamelog/components/ui/spinner';
-import { Text } from '@gamelog/components/ui/text';
+import { Box } from '@gamelog/common/gluestack/box';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { Text } from '@gamelog/common/gluestack/text';
 import { ViewProps } from 'react-native';
 
 interface LoadingBoxProps extends ViewProps {

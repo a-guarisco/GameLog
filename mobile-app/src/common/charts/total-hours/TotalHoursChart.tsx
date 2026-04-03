@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { BarChart } from 'react-native-gifted-charts';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Box } from '@gamelog/components/ui/box';
+import { Box } from '@gamelog/common/gluestack/box';
 import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { BarData } from '../charts.type';

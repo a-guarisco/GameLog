@@ -9,21 +9,21 @@ jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
   ),
 }));
 
-jest.mock('@gamelog/components/ui/card', () => {
+jest.mock('@gamelog/common/gluestack/card', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     Card: ({ children }: any) => <View>{children}</View>,
   };
 });
 
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     Box: ({ children }: any) => <View>{children}</View>,
   };
 });
 
-jest.mock('@gamelog/components/ui/image', () => {
+jest.mock('@gamelog/common/gluestack/image', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     Image: (props: any) => <View {...props} testID="mock-image" />,

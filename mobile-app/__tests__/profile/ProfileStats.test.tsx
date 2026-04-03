@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 import ProfileStats from '@gamelog/profile/ProfileStats';
 
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual('react-native');
   return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
 });

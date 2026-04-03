@@ -1,5 +1,5 @@
-import { Box } from '@gamelog/components/ui/box';
-import { Text } from '@gamelog/components/ui/text';
+import { Box } from '@gamelog/common/gluestack/box';
+import { Text } from '@gamelog/common/gluestack/text';
 
 type StatRowProps = {
   label: string;

@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react-native';
 import Banner from '@gamelog/common/Banner';
 
-jest.mock('@gamelog/components/ui/box', () => {
+jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual('react-native');
   return { Box: (props: any) => <View testID="banner-box" {...props} /> };
 });
 
-jest.mock('@gamelog/components/ui/image', () => {
+jest.mock('@gamelog/common/gluestack/image', () => {
   const { Image: RNImage } = jest.requireActual('react-native');
   return {
     Image: (props: any) => <RNImage testID="banner-image" {...props} />,

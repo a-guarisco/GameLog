@@ -1,6 +1,6 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { Box } from '@gamelog/components/ui/box';
+import { Box } from '@gamelog/common/gluestack/box';
 import { FlatList } from 'react-native';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import { GameOverviewStatsCard } from './GameOverviewStatsCard';

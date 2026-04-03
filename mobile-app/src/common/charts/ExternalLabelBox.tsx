@@ -1,5 +1,5 @@
-import { Box } from '@gamelog/components/ui/box/index';
-import { Text } from '@gamelog/components/ui/text/index';
+import { Box } from '@gamelog/common/gluestack/box/index';
+import { Text } from '@gamelog/common/gluestack/text/index';
 
 interface GraphData {
   value: number;

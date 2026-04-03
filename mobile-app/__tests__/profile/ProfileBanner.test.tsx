@@ -1,19 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
-import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
+import ProfileBanner from '@gamelog/profile/ProfileBanner';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
 
-jest.mock('@gamelog/components/ui/spinner', () => {
+jest.mock('@gamelog/common/gluestack/spinner', () => {
   const { View } = jest.requireActual('react-native');
   return { Spinner: () => <View testID="spinner" /> };
 });
 
-jest.mock('@gamelog/components/ui/text', () => {
+jest.mock('@gamelog/common/gluestack/text', () => {
   const { Text } = jest.requireActual('react-native');
   return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
 });
 
-jest.mock('@gamelog/components/ui/vstack', () => {
+jest.mock('@gamelog/common/gluestack/vstack', () => {
   const { View } = jest.requireActual('react-native');
   return { VStack: ({ children, ...props }: any) => <View {...props}>{children}</View> };
 });

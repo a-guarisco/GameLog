@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import GlobalAchievementsPreview from '@gamelog/components/game-view/GlobalAchievementsPreview';
+import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useNavigation } from '@react-navigation/native';
 

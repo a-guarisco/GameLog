@@ -1,11 +1,11 @@
-import { VStack } from '@gamelog/components/ui/vstack';
-import AchievementItem from '@gamelog/components/game-view/AchievementItem';
-import { Button, ButtonText } from '@gamelog/components/ui/button';
-import { Box } from '@gamelog/components/ui/box';
+import { VStack } from '@gamelog/common/gluestack/vstack';
+import AchievementItem from '@gamelog/game/AchievementItem';
+import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Box } from '@gamelog/common/gluestack/box';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Spinner } from '@gamelog/components/ui/spinner';
-import { Text } from '@gamelog/components/ui/text';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { Text } from '@gamelog/common/gluestack/text';
 import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
 
 interface Props {

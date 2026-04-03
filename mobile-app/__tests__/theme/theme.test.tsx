@@ -1,7 +1,7 @@
 import { getNavigationTheme } from '@gamelog/theme/themeHelpers';
-import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
+import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 
-jest.mock('@gamelog/components/ui/gluestack-ui-provider/config', () => ({
+jest.mock('@gamelog/common/gluestack/gluestack-ui-provider/config', () => ({
   rawConfig: {
     light: {
       '--color-primary-500': '13 166 242',

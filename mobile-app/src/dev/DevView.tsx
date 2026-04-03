@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from 'node_modules/@react-navigation/native-stack/lib/typescript/src/types';
 import { useNavigation } from '@react-navigation/core';
-import { Button, ButtonText } from '@gamelog/components/ui/button';
-import { Box } from '@gamelog/components/ui/box';
+import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Box } from '@gamelog/common/gluestack/box';
 import { useColorScheme } from 'nativewind';
 import { ErrorBox } from '@gamelog/common/feedbacks/ErrorBox';
 import { InfoBox, LoadingBox, WarningBox } from '@gamelog/common/feedbacks';

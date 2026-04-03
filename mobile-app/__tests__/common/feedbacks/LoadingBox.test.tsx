@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react-native';
 import { LoadingBox } from '@gamelog/common/feedbacks/LoadingBox';
 
-jest.mock('@gamelog/components/ui/spinner', () => ({
+jest.mock('@gamelog/common/gluestack/spinner', () => ({
   Spinner: 'Spinner',
 }));
 

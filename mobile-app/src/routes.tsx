@@ -7,7 +7,7 @@ import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import { DevView, PaletteView, FontsView } from '@gamelog/dev';
-import GameBanner from '@gamelog/components/game-view/GameBanner';
+import GameBanner from '@gamelog/game/GameBanner';
 
 const renderGameBannerHeader = (route: any) => {
   const gameItem = route?.params?.gameItem;

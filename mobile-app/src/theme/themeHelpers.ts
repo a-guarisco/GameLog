@@ -1,5 +1,5 @@
 import { Theme } from '@react-navigation/native';
-import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
+import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { navigationFonts } from './theme';
 
 export const toHex = (rgb: string) => {

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import GameBanner from '@gamelog/components/game-view/GameBanner';
+import GameBanner from '@gamelog/game/GameBanner';
 
 jest.mock('@gamelog/common/Banner', () => {
   const { View } = jest.requireActual('react-native');
@@ -26,7 +26,7 @@ jest.mock('@gamelog/common/BannerInfo', () => {
   return MockBannerInfo;
 });
 
-jest.mock('@gamelog/components/ui/vstack', () => {
+jest.mock('@gamelog/common/gluestack/vstack', () => {
   const { View } = jest.requireActual('react-native');
   const MockVStack = ({ children, className }: any) => (
     <View testID="vstack" className={className}>

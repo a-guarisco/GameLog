@@ -3,9 +3,9 @@ import {
   darkconfig,
   commonColors,
   rawConfig,
-} from '@gamelog/components/ui/gluestack-ui-provider/config';
+} from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { View, ScrollView } from 'react-native';
-import { Text } from '@gamelog/components/ui/text';
+import { Text } from '@gamelog/common/gluestack/text';
 import { useColorScheme } from 'nativewind';
 
 export const PaletteView = () => {

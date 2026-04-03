@@ -1,5 +1,5 @@
-import GlobalAchievementsPreview from '@gamelog/components/game-view/GlobalAchievementsPreview';
-import { Box } from '@gamelog/components/ui/box';
+import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';
+import { Box } from '@gamelog/common/gluestack/box';
 import { useRoute } from '@react-navigation/native';
 
 const GameView = () => {

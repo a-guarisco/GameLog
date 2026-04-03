@@ -24,7 +24,7 @@ jest.mock('@react-navigation/native', () => ({
   })),
 }));
 
-jest.mock('@gamelog/components/game-view/GlobalAchievementsPreview', () => {
+jest.mock('@gamelog/game/GlobalAchievementsPreview', () => {
   const { Text } = jest.requireActual<typeof import('react-native')>('react-native');
   const GlobalAchievementsPreview = ({ gameID }: any) => (
     <Text>Mock Achievements for {gameID}</Text>

@@ -1,10 +1,10 @@
 import { useMemo, useCallback } from 'react';
 import { Linking, Pressable } from 'react-native';
-import { VStack } from '../ui/vstack';
+import { VStack } from '../common/gluestack/vstack';
 import { useGetOwnedGames, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
 import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
-import { Spinner } from '@gamelog/components/ui/spinner';
-import { Text } from '@gamelog/components/ui/text';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { Text } from '@gamelog/common/gluestack/text';
 import Banner from '@gamelog/common/Banner';
 import BannerInfo from '@gamelog/common/BannerInfo';
 interface ProfileBannerProps {

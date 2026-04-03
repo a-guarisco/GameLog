@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useColorScheme } from 'react-native';
-import { Card } from '@gamelog/components/ui/card';
-import { Box } from '@gamelog/components/ui/box';
-import { Spinner } from '@gamelog/components/ui/spinner';
-import { rawConfig } from '@gamelog/components/ui/gluestack-ui-provider/config';
+import { Card } from '@gamelog/common/gluestack/card';
+import { Box } from '@gamelog/common/gluestack/box';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import ChartErrorHandler from './ChartErrorHandler';
 
 interface ChartCardProps {

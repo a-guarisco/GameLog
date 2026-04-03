@@ -1,9 +1,9 @@
 import { FlatList } from 'react-native';
-import { Box } from '@gamelog/components/ui/box';
+import { Box } from '@gamelog/common/gluestack/box';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
-import ProfileBanner from '@gamelog/components/profile-view/ProfileBanner';
+import ProfileBanner from '@gamelog/profile/ProfileBanner';
 import ProfileStats from './ProfileStats';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 
