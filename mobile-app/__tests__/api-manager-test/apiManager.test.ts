@@ -1,5 +1,4 @@
-import ApiManager from '@gamelog/api-manager/apiManager';
-import { setApiProvider } from '@gamelog/api-manager/apiManager';
+import ApiManager, { setApiProvider } from '@gamelog/api-manager/apiManager';
 import { steamApiEndpoints } from '@gamelog/api-manager/providers/steamProvider';
 
 const mockFetch = jest.fn();

@@ -1,9 +1,10 @@
 import { fetchData } from '@gamelog/api-manager/providers/fetchData';
 import { ApiClient } from '@gamelog/api-manager/providers/types';
 
-const BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL ?? 'http://localhost:8000';
+const getBackendBaseUrl = (): string =>
+  process.env.EXPO_PUBLIC_BACKEND_BASE_URL ?? 'http://localhost:8000';
 
-const buildUrl = (path: string): string => `${BACKEND_BASE_URL}${path}`;
+const buildUrl = (path: string): string => `${getBackendBaseUrl()}${path}`;
 
 export const backendApiClient: ApiClient = {
   getGameNews: (appId, count, maxLength) =>
