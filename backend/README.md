@@ -2,13 +2,13 @@
 We use [`uv`](https://docs.astral.sh/uv/) to manage the Python environment and dependencies. No `pip`  or no `requirements.txt` is necessary as everything is handled through `pyproject.toml` and `uv.lock`.
 
 ## Quick Reference
-| Task | Command |
-|---|---|
-| Start dev server | `make run` |
-| Run tests | `make test` |
-| Run linter| `make lint` |
-| Add a package | `uv add <package>` |
-| Sync after a pull | `uv sync` |
+| Task | Command                             |
+|---|-------------------------------------|
+| Start dev server | `make run`                          |
+| Run tests | `make test`                         |
+| Run linter| `make lint`                         |
+| Add a package | `uv add <package>`                  |
+| Sync after a pull | `uv sync`                           |
 | Run a specific script | `uv run python <path-to-script.py>` |
 ---
 

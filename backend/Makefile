@@ -4,7 +4,7 @@ lint:
 	uvx ruff check . --fix
 	uvx ruff format .
 
-tests:
+test:
 	uv run pytest
 
 run:
