@@ -73,7 +73,7 @@ describe('GameBanner', () => {
     expect(screen.getByTestId('banner-secondary').props.children).toBe('0 streak');
   });
 
-  it('passes the correct image URLs from apiEndsPoints', () => {
+  it('passes the correct image URLs from steam asset helpers', () => {
     render(<GameBanner {...defaultProps} appid="123" />);
 
     const banner = screen.getByTestId('banner');

@@ -2,7 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { Linking, Pressable } from 'react-native';
 import { VStack } from '../common/gluestack/vstack';
 import { useGetOwnedGames, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
-import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
+import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { Text } from '@gamelog/common/gluestack/text';
 import Banner from '@gamelog/common/Banner';
@@ -22,7 +22,7 @@ export default function ProfileBanner({ userId }: ProfileBannerProps) {
 
   const gameHeaderImage = useMemo(() => {
     const appId = ownedGames?.response?.games?.[0]?.appid ?? TEMP_APPID;
-    return apiEndsPoints.GET_GAME_HEADER_IMAGE(appId);
+    return steamAssetUrls.getGameHeaderImage(appId);
   }, [ownedGames]);
 
   const openSteamProfile = useCallback(() => {
