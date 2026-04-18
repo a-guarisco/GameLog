@@ -4,13 +4,12 @@ We use [`uv`](https://docs.astral.sh/uv/) to manage the Python environment and d
 ## Quick Reference
 | Task | Command |
 |---|---|
-| First setup | `uv sync` |
 | Start dev server | `make run` |
-| Add a package | `uv add <package>` |
-| Sync after a pull | `uv sync` |
-| Run a specific script | `uv run python <script.py>` |
 | Run tests | `make test` |
 | Run linter| `make lint` |
+| Add a package | `uv add <package>` |
+| Sync after a pull | `uv sync` |
+| Run a specific script | `uv run python <path-to-script.py>` |
 ---
 
 ## Prerequisites — Install `uv`:
