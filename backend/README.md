@@ -5,7 +5,7 @@ We use [`uv`](https://docs.astral.sh/uv/) to manage the Python environment and d
 | Task | Command |
 |---|---|
 | First setup | `uv sync` |
-| Start dev server | `uv run uvicorn main:app --reload` |
+| Start dev server | `make run` |
 | Add a package | `uv add <package>` |
 | Sync after a pull | `uv sync` |
 | Run a specific script | `uv run python <script.py>` |
@@ -43,10 +43,10 @@ uv sync
 You **do not** need to activate the virtual environment manually. Just use `uv run` to prefix your commands:
 ```bash
 # Start the dev server
-uv run uvicorn main:app --reload
+make run
 
 # Run a specific script
-uv run python my_script.py
+uv run python <path-to-script.py>
 ```
 > `uv run` automatically uses the local `.venv` without you needing to activate it.
 ---
