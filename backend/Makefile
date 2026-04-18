@@ -1,4 +1,4 @@
-﻿.PHONY: lint tests
+﻿.PHONY: lint tests run
 
 lint:
 	uvx ruff check . --fix
@@ -6,3 +6,6 @@ lint:
 
 tests:
 	uv run pytest
+
+run:
+	uv run uvicorn main:app --app-dir src --reload
