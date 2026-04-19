@@ -1,4 +1,4 @@
-import { fetchData } from '@gamelog/api-manager/providers/fetchData';
+import { fetchData } from '@gamelog/api-manager/fetchData';
 
 describe('fetchData', () => {
   const mockFetch = jest.fn();
