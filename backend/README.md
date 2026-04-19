@@ -20,15 +20,13 @@ This folder contains:
 
 ## Required .env file
 
-`backend/.env` is required to start Docker services.
+Copy the example file and adjust it for your local setup:
 
-Required variables (with example values):
-
-```env
-POSTGRES_USER=user
-POSTGRES_PASSWORD=password
-POSTGRES_DB=steam_db
+```bash
+cp .env.example .env
 ```
+
+`backend/.env` is required to start Docker services.
 
 Notes:
 

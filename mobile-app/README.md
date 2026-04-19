@@ -80,6 +80,22 @@ settings for prettier in `.prettierrc`.
 
 Every command in this document is to be run inside the mobile-app folder.
 
+## Environment Variables (.env)
+
+Create your local environment file from the example:
+
+```zsh
+cp .env.example .env
+```
+
+Set these variables in `.env`:
+
+- `EXPO_PUBLIC_STEAM_API_KEY`: required when using Steam provider endpoints.
+- `EXPO_PUBLIC_BACKEND_BASE_URL`: backend base URL used by backend provider (example: `http://192.168.1.11:8000` for Waydroid/device, `http://localhost:8000` for web).
+- `EXPO_PUBLIC_API_PROVIDER` (optional): default provider if you run `npm run start` directly (`steam` or `backend`).
+
+After changing any `EXPO_PUBLIC_*` variable, stop Expo and start it again.
+
 ## API Provider Switch
 
 Use these scripts to choose the backend implementation:
@@ -99,5 +115,14 @@ If you need to override the backend URL:
 ```zsh
 EXPO_PUBLIC_BACKEND_BASE_URL=http://localhost:9000 npm run start:backend
 ```
+
+For Android emulators/devices (including Waydroid), use your host LAN IP instead of `localhost`.
+Example:
+
+```zsh
+EXPO_PUBLIC_BACKEND_BASE_URL=http://192.168.1.11:8000 npm run android:backend
+```
+
+Note: if Expo is already running, stop and restart it after changing `EXPO_PUBLIC_BACKEND_BASE_URL`.
 
 The provider is selected with `EXPO_PUBLIC_API_PROVIDER` and defaults to `steam`.
