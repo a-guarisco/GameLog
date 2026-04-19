@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import ProfileBanner from '@gamelog/profile/ProfileBanner';
-import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
+import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 
 jest.mock('@gamelog/common/gluestack/spinner', () => {
   const { View } = jest.requireActual('react-native');
@@ -36,9 +36,8 @@ jest.mock('@gamelog/common/BannerInfo', () => {
   };
 });
 
-jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
-  __esModule: true,
-  default: { GET_GAME_HEADER_IMAGE: jest.fn((appid: string) => `https://cdn/${appid}.jpg`) },
+jest.mock('@gamelog/api-manager/steamAssets', () => ({
+  steamAssetUrls: { getGameHeaderImage: jest.fn((appid: string) => `https://cdn/${appid}.jpg`) },
 }));
 
 const mockUseGetOwnedGames = jest.fn();
@@ -142,7 +141,7 @@ describe('ProfileBanner — game header image', () => {
   it('uses the first owned game appid to build the header image URL', () => {
     setupMocks({ firstGameAppid: '9999' });
     render(<ProfileBanner userId="123" />);
-    expect(apiEndsPoints.GET_GAME_HEADER_IMAGE).toHaveBeenCalledWith('9999');
+    expect(steamAssetUrls.getGameHeaderImage).toHaveBeenCalledWith('9999');
   });
 
   it('falls back to TEMP_APPID (236390) when ownedGames has no games', () => {
@@ -153,7 +152,7 @@ describe('ProfileBanner — game header image', () => {
       errorPlayersInfo: null,
     });
     render(<ProfileBanner userId="123" />);
-    expect(apiEndsPoints.GET_GAME_HEADER_IMAGE).toHaveBeenCalledWith('236390');
+    expect(steamAssetUrls.getGameHeaderImage).toHaveBeenCalledWith('236390');
   });
 });
 

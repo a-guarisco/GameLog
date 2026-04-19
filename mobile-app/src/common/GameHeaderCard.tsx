@@ -4,7 +4,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Image } from '@gamelog/common/gluestack/image';
 import { Card } from '@gamelog/common/gluestack/card';
 import { Pressable } from 'react-native';
-import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
+import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 
 interface GameHeaderCardProps {
   name: string;
@@ -14,7 +14,7 @@ interface GameHeaderCardProps {
 }
 
 export const GameHeaderCard = ({ name, appid, onPress, children }: GameHeaderCardProps) => {
-  const imageUrl = apiEndsPoints.GET_GAME_HEADER_IMAGE(appid);
+  const imageUrl = steamAssetUrls.getGameHeaderImage(appid);
 
   return (
     <Pressable

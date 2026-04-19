@@ -1,15 +1,5 @@
-import EndPoints from '@gamelog/api-manager/apiEndsPoints';
-import {
-  GlobalAchievement,
-  PlayerAchievement,
-  SteamNews,
-  PlayersInfo,
-  PlayerFriends,
-  PlayerStats,
-  OwnedGames,
-  RecentPlayedGames,
-  GameGenres,
-} from '@gamelog/api-manager/dto';
+import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
+import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
 
 async function fetchData<T>(url: string): Promise<T> {
   const response = await fetch(url);
@@ -19,49 +9,21 @@ async function fetchData<T>(url: string): Promise<T> {
   return response.json();
 }
 
-const getGameNews = async (appId: string, count: number, maxLength: number): Promise<SteamNews> =>
-  fetchData<SteamNews>(EndPoints.GET_NEWS_FOR_APP(appId, count, maxLength));
-
-const getGlobalAchievement = async (appId: string): Promise<GlobalAchievement> =>
-  fetchData<GlobalAchievement>(EndPoints.GET_GLOBAL_ACHIEVEMENTS_FOR_APP(appId));
-
-const getAllPlayerAchievementsPerApp = async (
-  appId: string,
-  steamId: string
-): Promise<PlayerAchievement> =>
-  fetchData<PlayerAchievement>(EndPoints.GET_PLAYER_ACHIEVEMENTS(appId, steamId));
-
-const getCompletedPlayerAchievementsAndStatsPerApp = async (
-  appId: string,
-  steamId: string
-): Promise<PlayerStats> => fetchData<PlayerStats>(EndPoints.GET_PLAYER_STATS(appId, steamId));
-
-const getPlayersInfo = async (steamIds: string[]): Promise<PlayersInfo> =>
-  fetchData<PlayersInfo>(EndPoints.GET_PLAYERS_INFO(steamIds));
-
-const getPlayerFriendsInfo = async (
-  steamId: string,
-  includePending: boolean
-): Promise<PlayerFriends> =>
-  fetchData<PlayerFriends>(EndPoints.GET_PLAYER_FRIENDS_LIST(steamId, includePending));
-
-const getOwnedGames = async (steamId: string, includeFreeGame: boolean): Promise<OwnedGames> =>
-  fetchData<OwnedGames>(EndPoints.GET_OWNED_GAMES(steamId, includeFreeGame));
-
-const getRecentPlayedGames = async (steamId: string, count: number): Promise<RecentPlayedGames> =>
-  fetchData<RecentPlayedGames>(EndPoints.GET_RECENT_PLAYED_GAMES(steamId, count));
-
-const getGameGenres = async (appId: string): Promise<GameGenres> =>
-  fetchData<GameGenres>(EndPoints.GET_GAME_GENRES(appId));
-
+export { getApiProvider, setApiProvider, isBackendProvider, fetchData };
 export default {
-  getGameNews,
-  getGlobalAchievement,
-  getAllPlayerAchievementsPerApp,
-  getCompletedPlayerAchievementsAndStatsPerApp,
-  getPlayersInfo,
-  getPlayerFriendsInfo,
-  getOwnedGames,
-  getRecentPlayedGames,
-  getGameGenres,
+  getGameNews: (appId: string, count: number, maxLength: number) =>
+    fetchData(EndPoints.getNewsForApp(appId, count, maxLength)),
+  getGlobalAchievement: (appId: string) => fetchData(EndPoints.getGlobalAchievementsForApp(appId)),
+  getAllPlayerAchievementsPerApp: (appId: string, steamId: string) =>
+    fetchData(EndPoints.getPlayerAchievements(appId, steamId)),
+  getCompletedPlayerAchievementsAndStatsPerApp: (appId: string, steamId: string) =>
+    fetchData(EndPoints.getPlayerStats(appId, steamId)),
+  getPlayersInfo: (steamIds: string[]) => fetchData(EndPoints.getPlayersInfo(steamIds)),
+  getPlayerFriendsInfo: (steamId: string, includePending: boolean) =>
+    fetchData(EndPoints.getPlayerFriendsList(steamId, includePending)),
+  getOwnedGames: (steamId: string, includeFreeGame: boolean) =>
+    fetchData(EndPoints.getOwnedGames(steamId, includeFreeGame)),
+  getRecentPlayedGames: (steamId: string, count: number) =>
+    fetchData(EndPoints.getRecentPlayedGames(steamId, count)),
+  getGameGenres: (appId: string) => fetchData(EndPoints.getGameGenres(appId)),
 };

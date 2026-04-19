@@ -79,3 +79,25 @@ settings for prettier in `.prettierrc`.
 ### Note
 
 Every command in this document is to be run inside the mobile-app folder.
+
+## API Provider Switch
+
+Use these scripts to choose the backend implementation:
+
+```zsh
+npm run start:steam
+npm run start:backend
+```
+
+```zsh
+npm run android:steam
+npm run android:backend
+```
+
+If you need to override the backend URL:
+
+```zsh
+EXPO_PUBLIC_BACKEND_BASE_URL=http://localhost:9000 npm run start:backend
+```
+
+The provider is selected with `EXPO_PUBLIC_API_PROVIDER` and defaults to `steam`.

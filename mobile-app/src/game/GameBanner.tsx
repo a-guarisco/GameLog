@@ -1,5 +1,5 @@
 import BannerInfo from '@gamelog/common/BannerInfo';
-import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
+import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import Banner from '@gamelog/common/Banner';
 
@@ -10,8 +10,8 @@ interface GameBannerProps {
 }
 
 export default function GameBanner({ appid, title, streak }: GameBannerProps) {
-  const gameCapsuleImage = apiEndsPoints.GET_GAME_CAPSULE_IMAGE(appid);
-  const gameHeaderImage = apiEndsPoints.GET_GAME_HEADER_IMAGE(appid);
+  const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(appid);
+  const gameHeaderImage = steamAssetUrls.getGameHeaderImage(appid);
   const secondaryText = streak !== 0 ? `🔥 ${streak} streak` : `${streak} streak`;
 
   return (

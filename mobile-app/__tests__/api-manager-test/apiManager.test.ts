@@ -1,5 +1,5 @@
-import ApiManager from '@gamelog/api-manager/apiManager';
-import ApiEndPoints from '@gamelog/api-manager/apiEndsPoints';
+import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
+import EndPoints, { getSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
 
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
@@ -39,6 +39,7 @@ const testHelper = (
 describe('ApiManager', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    setApiProvider('steam');
   });
 
   testHelper(
@@ -46,7 +47,7 @@ describe('ApiManager', () => {
     'handles game news fetch failure',
     { newsitems: [{ title: 'News 1' }] },
     () => ApiManager.getGameNews(appId, 2, 300),
-    ApiEndPoints.GET_NEWS_FOR_APP(appId, 2, 300)
+    EndPoints.getNewsForApp(appId, 2, 300)
   );
 
   testHelper(
@@ -54,7 +55,7 @@ describe('ApiManager', () => {
     'handles global achievement fetch failure',
     { achievementpercentages: { achievements: [] } },
     () => ApiManager.getGlobalAchievement(appId),
-    ApiEndPoints.GET_GLOBAL_ACHIEVEMENTS_FOR_APP(appId)
+    EndPoints.getGlobalAchievementsForApp(appId)
   );
 
   testHelper(
@@ -62,7 +63,7 @@ describe('ApiManager', () => {
     'handles player achievements fetch failure',
     { playerstats: { achievements: [] } },
     () => ApiManager.getAllPlayerAchievementsPerApp(appId, steamId),
-    ApiEndPoints.GET_PLAYER_ACHIEVEMENTS(appId, steamId)
+    EndPoints.getPlayerAchievements(appId, steamId)
   );
 
   testHelper(
@@ -70,7 +71,7 @@ describe('ApiManager', () => {
     'handles player stats fetch failure',
     { playerstats: { stats: [] } },
     () => ApiManager.getCompletedPlayerAchievementsAndStatsPerApp(appId, steamId),
-    ApiEndPoints.GET_PLAYER_STATS(appId, steamId)
+    EndPoints.getPlayerStats(appId, steamId)
   );
 
   testHelper(
@@ -78,7 +79,7 @@ describe('ApiManager', () => {
     'handles players info fetch failure',
     { response: [] },
     () => ApiManager.getPlayersInfo([steamId]),
-    ApiEndPoints.GET_PLAYERS_INFO([steamId])
+    EndPoints.getPlayersInfo([steamId])
   );
 
   testHelper(
@@ -86,7 +87,7 @@ describe('ApiManager', () => {
     'handles player friends info fetch failure',
     { friendslist: { friends: [] } },
     () => ApiManager.getPlayerFriendsInfo(steamId, false),
-    ApiEndPoints.GET_PLAYER_FRIENDS_LIST(steamId, false)
+    EndPoints.getPlayerFriendsList(steamId, false)
   );
 
   testHelper(
@@ -94,7 +95,7 @@ describe('ApiManager', () => {
     'handles owned games fetch failure',
     { response: { games: [] } },
     () => ApiManager.getOwnedGames(steamId, false),
-    ApiEndPoints.GET_OWNED_GAMES(steamId, false)
+    EndPoints.getOwnedGames(steamId, false)
   );
 
   testHelper(
@@ -102,6 +103,71 @@ describe('ApiManager', () => {
     'handles recent played games fetch failure',
     { response: { games: [] } },
     () => ApiManager.getRecentPlayedGames(steamId, 5),
-    ApiEndPoints.GET_RECENT_PLAYED_GAMES(steamId, 5)
+    EndPoints.getRecentPlayedGames(steamId, 5)
   );
+
+  testHelper(
+    'fetches game genres successfully',
+    'handles game genres fetch failure',
+    { ['440']: { data: { genres: [] } } },
+    () => ApiManager.getGameGenres(appId),
+    EndPoints.getGameGenres(appId)
+  );
+
+  it('allows provider switching at runtime (currently all endpoints use steam)', async () => {
+    setApiProvider('backend');
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ response: { games: [] } }),
+    });
+
+    await ApiManager.getOwnedGames(steamId, false);
+
+    // For now, all endpoints use Steam regardless of provider selection
+    // Backend-specific endpoints will be implemented gradually as needed
+    expect(mockFetch).toHaveBeenCalledWith(
+      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_played_free_games=false`
+    );
+  });
+});
+
+describe('fetchData', () => {
+  const mockFetch = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+  });
+
+  it('returns parsed JSON when response is ok', async () => {
+    const payload = { value: 42 };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => payload,
+    });
+
+    const result = await fetchData<typeof payload>('https://example.dev/test');
+
+    expect(mockFetch).toHaveBeenCalledWith('https://example.dev/test');
+    expect(result).toEqual(payload);
+  });
+
+  it('throws descriptive error when response is not ok', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+    });
+
+    await expect(fetchData('https://example.dev/missing')).rejects.toThrow(
+      'HTTP error: 404. url Called: https://example.dev/missing'
+    );
+  });
+
+  it('propagates fetch rejection errors', async () => {
+    const networkError = new Error('Network down');
+    mockFetch.mockRejectedValueOnce(networkError);
+
+    await expect(fetchData('https://example.dev/error')).rejects.toThrow('Network down');
+  });
 });

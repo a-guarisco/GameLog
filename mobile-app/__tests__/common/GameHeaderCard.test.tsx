@@ -1,12 +1,14 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
-import apiEndsPoints from '@gamelog/api-manager/apiEndsPoints';
+import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { Text } from 'react-native';
 
-jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
-  GET_GAME_HEADER_IMAGE: jest.fn(
-    (appid) => `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/header.jpg`
-  ),
+jest.mock('@gamelog/api-manager/steamAssets', () => ({
+  steamAssetUrls: {
+    getGameHeaderImage: jest.fn(
+      (appid) => `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/header.jpg`
+    ),
+  },
 }));
 
 jest.mock('@gamelog/common/gluestack/card', () => {
@@ -42,9 +44,9 @@ describe('GameHeaderCard', () => {
     expect(getByText('Portal 2')).toBeTruthy();
   });
 
-  it('calls the apiEndsPoints utility with the correct appid', () => {
+  it('calls the steam asset utility with the correct appid', () => {
     render(<GameHeaderCard {...mockProps} />);
-    expect(apiEndsPoints.GET_GAME_HEADER_IMAGE).toHaveBeenCalledWith('620');
+    expect(steamAssetUrls.getGameHeaderImage).toHaveBeenCalledWith('620');
   });
 
   it('passes the correct image URL to the Image component', () => {
