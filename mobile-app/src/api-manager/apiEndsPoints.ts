@@ -3,7 +3,14 @@ import { getApiProvider } from '@gamelog/api-manager/apiProvider';
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
-const getSteamApiKey = (): string => process.env.EXPO_PUBLIC_STEAM_API_KEY ?? '';
+const getSteamApiKey = (): string => {
+  if (process.env.EXPO_PUBLIC_STEAM_API_KEY) {
+    return process.env.EXPO_PUBLIC_STEAM_API_KEY;
+  } else {
+    console.warn('STEAM API key is not set.');
+    return '';
+  }
+};
 
 const getRelationship = (includePending: boolean): string => (includePending ? 'all' : 'friend');
 
@@ -62,5 +69,5 @@ const EndPoints = {
   },
 };
 
-export { isBackendProvider };
+export { isBackendProvider, getSteamApiKey };
 export default EndPoints;

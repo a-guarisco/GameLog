@@ -1,9 +1,15 @@
 import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
 import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
-import { fetchData } from '@gamelog/api-manager/fetchData';
 
-export { getApiProvider, setApiProvider, isBackendProvider };
+async function fetchData<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error: ${response.status}. url Called: ${url}`);
+  }
+  return response.json();
+}
 
+export { getApiProvider, setApiProvider, isBackendProvider, fetchData };
 export default {
   getGameNews: (appId: string, count: number, maxLength: number) =>
     fetchData(EndPoints.getNewsForApp(appId, count, maxLength)),

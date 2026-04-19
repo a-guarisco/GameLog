@@ -1,5 +1,5 @@
-import ApiManager, { setApiProvider } from '@gamelog/api-manager/apiManager';
-import EndPoints from '@gamelog/api-manager/apiEndsPoints';
+import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
+import EndPoints, { getSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
 
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
@@ -126,7 +126,48 @@ describe('ApiManager', () => {
     // For now, all endpoints use Steam regardless of provider selection
     // Backend-specific endpoints will be implemented gradually as needed
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=&steamid=${steamId}&include_appinfo=true&include_played_free_games=false`
+      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_played_free_games=false`
     );
+  });
+});
+
+describe('fetchData', () => {
+  const mockFetch = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
+  });
+
+  it('returns parsed JSON when response is ok', async () => {
+    const payload = { value: 42 };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => payload,
+    });
+
+    const result = await fetchData<typeof payload>('https://example.dev/test');
+
+    expect(mockFetch).toHaveBeenCalledWith('https://example.dev/test');
+    expect(result).toEqual(payload);
+  });
+
+  it('throws descriptive error when response is not ok', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+    });
+
+    await expect(fetchData('https://example.dev/missing')).rejects.toThrow(
+      'HTTP error: 404. url Called: https://example.dev/missing'
+    );
+  });
+
+  it('propagates fetch rejection errors', async () => {
+    const networkError = new Error('Network down');
+    mockFetch.mockRejectedValueOnce(networkError);
+
+    await expect(fetchData('https://example.dev/error')).rejects.toThrow('Network down');
   });
 });

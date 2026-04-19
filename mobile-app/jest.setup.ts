@@ -14,3 +14,7 @@ jest.mock('expo-font', () => ({
   isLoaded: jest.fn(() => true),
   loadAsync: jest.fn(() => Promise.resolve()),
 }));
+
+if (!process.env.EXPO_PUBLIC_STEAM_API_KEY) {
+  process.env.EXPO_PUBLIC_STEAM_API_KEY = 'test-steam-api-key';
+}
