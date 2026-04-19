@@ -1,89 +1,76 @@
-# Backend Setup Guide
-We use [`uv`](https://docs.astral.sh/uv/) to manage the Python environment and dependencies. No `pip`  or no `requirements.txt` is necessary as everything is handled through `pyproject.toml` and `uv.lock`.
+# Backend Guide
 
-## Quick Reference
-| Task | Command                             |
-|---|-------------------------------------|
-| Start dev server | `make run`                          |
-| Run tests | `make test`                         |
-| Run linter| `make lint`                         |
-| Add a package | `uv add <package>`                  |
-| Sync after a pull | `uv sync`                           |
-| Run a specific script | `uv run python <path-to-script.py>` |
----
+This folder contains:
 
-## Prerequisites — Install `uv`:
+- Docker orchestration for the backend and database
+- the FastAPI application in `gamelog/`
 
-**macOS / Linux:**
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+## Structure
+
+- `compose.yml`: Docker services (`gamelog`, `db`, `adminer`)
+- `compose.override.yml`: local overrides (ports, Adminer CSS)
+- `.env`: variables used by Docker Compose
+- `Makefile`: Docker commands
+- `gamelog/`: FastAPI code, Python dependencies, tests, and app Makefile
+
+## Prerequisites
+
+- Docker + Docker Compose plugin
+- `uv` (only if you want to run FastAPI outside Docker)
+
+## Required .env file
+
+`backend/.env` is required to start Docker services.
+
+Required variables (with example values):
+
+```env
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=steam_db
 ```
 
-**Windows (PowerShell):**
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-> You only need to do this once. Restart your terminal after installing.
+Notes:
 
-Check that `uv` is installed correctly:
+- Do not commit real credentials.
+- `DATABASE_URL` is built in `compose.yml` from these variables.
+
+## Makefile in `backend/` (Docker)
+
+From the `backend/` folder:
+
+| What it does                                                       | Command                         |
+| ------------------------------------------------------------------ | ------------------------------- |
+| Start containers in background                                     | `make up`                       |
+| Stop and remove containers                                         | `make down`                     |
+| Restart containers                                                 | `make restart`                  |
+| Stream logs                                                        | `make logs`                     |
+| Rebuild images and recreate containers                             | `make rebuild`                  |
+| Rebuild and recreate only the backend service                      | `make rebuild-backend`          |
+| Rebuild all images without cache, then recreate containers         | `make rebuild-no-cache`         |
+| Rebuild backend image without cache, then recreate backend service | `make rebuild-backend-no-cache` |
+| Open a psql shell in the postgres container                        | `make db-shell`                 |
+
+## Makefile in `backend/gamelog/` (Local FastAPI)
+
+If you want to run the app without Docker:
+
+Setup:
+
 ```bash
-uv --version
-```
-If so navigate to the backend folder and run `uv sync` to install dependencies.
-Starting from the root of the project:
-```bash
-cd backend
+cd backend/gamelog
 uv sync
 ```
 
----
+| What it does                      | Command              |
+| --------------------------------- | -------------------- |
+| Start FastAPI on port 8000        | `make run`           |
+| Start FastAPI on a different port | `make run PORT=8001` |
+| Run tests                         | `make test`          |
+| Run lint and formatting checks    | `make lint`          |
 
-## Minimal starting flow:
-You **do not** need to activate the virtual environment manually. Just use `uv run` to prefix your commands:
-```bash
-# Start the dev server
-make run
+## Typical URLs:
 
-# Run a specific script
-uv run python <path-to-script.py>
-```
-> `uv run` automatically uses the local `.venv` without you needing to activate it.
----
-
-## Minimal commit flow:
-Run tests:
-```bash
-make test
-```
-Run linter:
-```bash
-make lint
-```
-Commit your changes:
-```bash
-git add .
-git commit -m "Your commit message"
-git push
-```
----
-
-## Adding a New Dependency
-If you need to add a new package:
-```bash
-uv add <package-name>
-```
-This updates both `pyproject.toml` and `uv.lock`. **Commit both files** so everyone gets the new dependency automatically on their next `uv sync`.
----
-
-## After Pulling Changes from the Repo
-If someone else added or updated a dependency, run:
-```bash
-uv sync
-```
-This keeps your local environment in sync with `uv.lock`.
----
-
-## Automatic Documentation
-FastAPI automatically generates interactive API docs. Once your dev server is running, you can access them at:
+- API: `http://localhost:8000`
 - Swagger UI: `http://localhost:8000/docs`
-
+- Adminer: `http://localhost:8080`
