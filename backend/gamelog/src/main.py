@@ -14,5 +14,3 @@ def hello_world():
 @app.get("/health")
 def healthcheck():
     return {"status": "ok"}
-
-

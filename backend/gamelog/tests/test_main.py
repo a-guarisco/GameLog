@@ -4,8 +4,7 @@ from fastapi.testclient import TestClient
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_main.db")
 
-# Assuming your FastAPI app is inside a file named 'main.py'
-from backend.gamelog.src.main import app
+from src.main import app
 
 client = TestClient(app)
 

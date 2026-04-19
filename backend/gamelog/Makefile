@@ -22,11 +22,11 @@ help:
 	@echo ""
 
 lint:
-	uv run ruff check . --fix
-	uv run ruff format .
+	uv run --group dev ruff check . --fix
+	uv run --group dev ruff format .
 
 test:
-	uv run pytest
+	uv run --group dev python -m pytest
 
 run:
 	uv run python -m uvicorn main:app --app-dir src --reload --port $(PORT)

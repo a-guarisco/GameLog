@@ -4,20 +4,21 @@ We use [`uv`](https://docs.astral.sh/uv/) to manage the Python environment and d
 
 ## Quick Reference
 
-| Task                    | Command                             |
-| ----------------------- | ----------------------------------- |
-| Add a package           | `uv add <package>`                  |
-| Sync after a pull       | `uv sync`                           |
-| Run a specific script   | `uv run python <path-to-script.py>` |
-| Start dev server        | `make run`                          |
-| Start on custom port    | `make run PORT=9000`                |
-| Run tests               | `make test`                         |
-| Run linter              | `make lint`                         |
-| Load demo data          | `make seed`                         |
-| Apply DB migrations     | `make migrate`                      |
-| Create a migration      | `make revision m="revision name"`   |
-| Rollback one migration  | `make downgrade`                    |
-| Rollback all migrations | `make downgrade-all`                |
+| Task                     | Command                             |
+| ------------------------ | ----------------------------------- |
+| Add a package            | `uv add <package>`                  |
+| Sync runtime deps only   | `uv sync`                           |
+| Sync including dev tools | `uv sync --group dev`               |
+| Run a specific script    | `uv run python <path-to-script.py>` |
+| Start dev server         | `make run`                          |
+| Start on custom port     | `make run PORT=9000`                |
+| Run tests                | `make test`                         |
+| Run linter               | `make lint`                         |
+| Load demo data           | `make seed`                         |
+| Apply DB migrations      | `make migrate`                      |
+| Create a migration       | `make revision m="revision name"`   |
+| Rollback one migration   | `make downgrade`                    |
+| Rollback all migrations  | `make downgrade-all`                |
 
 ---
 
@@ -43,12 +44,12 @@ Check that `uv` is installed correctly:
 uv --version
 ```
 
-If so navigate to the backend folder and run `uv sync` to install dependencies.
+If so navigate to the backend folder and run `uv sync --group dev` to install dependencies, including development tools (`ruff`, `pytest`).
 Starting from the root of the project:
 
 ```bash
 cd backend
-uv sync
+uv sync --group dev
 ```
 
 ---
@@ -120,6 +121,12 @@ uv sync
 
 > [!IMPORTANT]  
 > This keeps your local environment in sync with `uv.lock`.
+
+If you need lint/test tooling as well, run:
+
+```bash
+uv sync --group dev
+```
 
 ## Automatic Documentation
 

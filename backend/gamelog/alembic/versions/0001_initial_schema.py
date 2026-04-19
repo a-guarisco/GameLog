@@ -62,7 +62,13 @@ def upgrade() -> None:
             "shelving",
             sa.Column("owner_id", postgresql.UUID(as_uuid=True), nullable=False),
             sa.Column("game_id", postgresql.UUID(as_uuid=True), nullable=False),
-            sa.Column("status", postgresql.ENUM("shelved", "to_be_played", "playing", "played", "platinato", name="game_status"), nullable=False),
+            sa.Column(
+                "status",
+                postgresql.ENUM(
+                    "shelved", "to_be_played", "playing", "played", "platinato", name="game_status"
+                ),
+                nullable=False,
+            ),
             sa.ForeignKeyConstraint(["game_id"], ["games.id"]),
             sa.ForeignKeyConstraint(["owner_id"], ["users.id"]),
             sa.PrimaryKeyConstraint("owner_id", "game_id"),
@@ -105,13 +111,9 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     # Drop tables in reverse order of dependencies
-    op.drop_index(
-        op.f("ix_steam_rolling_time_steam_app_id"), table_name="steam_rolling_time"
-    )
+    op.drop_index(op.f("ix_steam_rolling_time_steam_app_id"), table_name="steam_rolling_time")
     op.drop_index(op.f("ix_steam_rolling_time_user_id"), table_name="steam_rolling_time")
-    op.drop_index(
-        op.f("ix_steam_rolling_time_created_at"), table_name="steam_rolling_time"
-    )
+    op.drop_index(op.f("ix_steam_rolling_time_created_at"), table_name="steam_rolling_time")
     op.drop_table("steam_rolling_time")
 
     op.drop_table("shelving")
@@ -125,5 +127,7 @@ def downgrade() -> None:
     op.drop_table("users")
 
     # Drop enum type
-    game_status_enum = postgresql.ENUM("shelved", "to_be_played", "playing", "played", "platinato", name="game_status")
+    game_status_enum = postgresql.ENUM(
+        "shelved", "to_be_played", "playing", "played", "platinato", name="game_status"
+    )
     game_status_enum.drop(op.get_bind())

@@ -28,7 +28,8 @@ class Shelving(Base):
         UUID(as_uuid=True), ForeignKey("games.id"), primary_key=True
     )
     status: Mapped[GameStatus] = mapped_column(
-        SQLEnum(GameStatus, values_callable=lambda x: [e.value for e in x]), default=GameStatus.SHELVED
+        SQLEnum(GameStatus, values_callable=lambda x: [e.value for e in x]),
+        default=GameStatus.SHELVED,
     )
 
     # Relationships
