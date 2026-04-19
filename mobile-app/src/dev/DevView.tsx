@@ -5,6 +5,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { useColorScheme } from 'nativewind';
 import { ErrorBox } from '@gamelog/common/feedbacks/ErrorBox';
 import { InfoBox, LoadingBox, WarningBox } from '@gamelog/common/feedbacks';
+import { BackendHealthCheck } from './BackendHealthCheck';
 
 export const DevView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -36,6 +37,7 @@ export const DevView = () => {
         >
           <ButtonText>Go to Fonts</ButtonText>
         </Button>
+        <BackendHealthCheck />
         <ErrorBox errorMessage="test error message" />
         <InfoBox message="test info message" />
         <WarningBox message="test warning message" />
