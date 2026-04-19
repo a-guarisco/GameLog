@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { Platform } from 'react-native';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
-import { ErrorBox, InfoBox, LoadingBox } from '@gamelog/common/feedbacks';
+import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
+
+interface BackendHealthCheckProps {
+  className?: string;
+}
 
 const getDefaultBackendBaseUrl = () =>
   Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
 
 const HEALTHCHECK_TIMEOUT_MS = 8000;
 
-export const BackendHealthCheck = () => {
+export const BackendHealthCheck = ({ className }: BackendHealthCheckProps) => {
   const [isHealthLoading, setIsHealthLoading] = useState(false);
   const [healthStatus, setHealthStatus] = useState<string | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
@@ -54,12 +58,14 @@ export const BackendHealthCheck = () => {
 
   return (
     <>
-      <Button onPress={checkBackendHealth} isDisabled={isHealthLoading}>
+      <Button onPress={checkBackendHealth} isDisabled={isHealthLoading} className={className}>
         <ButtonText>Check Backend Health</ButtonText>
       </Button>
       {isHealthLoading ? <LoadingBox message="Checking backend health..." /> : null}
       {healthStatus ? (
-        <InfoBox message={`Backend health: ${healthStatus}${healthUrl ? ` (${healthUrl})` : ''}`} />
+        <SuccessBox
+          message={`Backend health: ${healthStatus}${healthUrl ? ` (${healthUrl})` : ''}`}
+        />
       ) : null}
       {healthError ? (
         <ErrorBox
