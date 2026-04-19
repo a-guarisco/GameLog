@@ -1,5 +1,5 @@
 import ApiManager, { setApiProvider } from '@gamelog/api-manager/apiManager';
-import { steamApiEndpoints } from '@gamelog/api-manager/providers/steamProvider';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
@@ -47,7 +47,7 @@ describe('ApiManager', () => {
     'handles game news fetch failure',
     { newsitems: [{ title: 'News 1' }] },
     () => ApiManager.getGameNews(appId, 2, 300),
-    steamApiEndpoints.getNewsForApp(appId, 2, 300)
+    EndPoints.getNewsForApp(appId, 2, 300)
   );
 
   testHelper(
@@ -55,7 +55,7 @@ describe('ApiManager', () => {
     'handles global achievement fetch failure',
     { achievementpercentages: { achievements: [] } },
     () => ApiManager.getGlobalAchievement(appId),
-    steamApiEndpoints.getGlobalAchievementsForApp(appId)
+    EndPoints.getGlobalAchievementsForApp(appId)
   );
 
   testHelper(
@@ -63,7 +63,7 @@ describe('ApiManager', () => {
     'handles player achievements fetch failure',
     { playerstats: { achievements: [] } },
     () => ApiManager.getAllPlayerAchievementsPerApp(appId, steamId),
-    steamApiEndpoints.getPlayerAchievements(appId, steamId)
+    EndPoints.getPlayerAchievements(appId, steamId)
   );
 
   testHelper(
@@ -71,7 +71,7 @@ describe('ApiManager', () => {
     'handles player stats fetch failure',
     { playerstats: { stats: [] } },
     () => ApiManager.getCompletedPlayerAchievementsAndStatsPerApp(appId, steamId),
-    steamApiEndpoints.getPlayerStats(appId, steamId)
+    EndPoints.getPlayerStats(appId, steamId)
   );
 
   testHelper(
@@ -79,7 +79,7 @@ describe('ApiManager', () => {
     'handles players info fetch failure',
     { response: [] },
     () => ApiManager.getPlayersInfo([steamId]),
-    steamApiEndpoints.getPlayersInfo([steamId])
+    EndPoints.getPlayersInfo([steamId])
   );
 
   testHelper(
@@ -87,7 +87,7 @@ describe('ApiManager', () => {
     'handles player friends info fetch failure',
     { friendslist: { friends: [] } },
     () => ApiManager.getPlayerFriendsInfo(steamId, false),
-    steamApiEndpoints.getPlayerFriendsList(steamId, false)
+    EndPoints.getPlayerFriendsList(steamId, false)
   );
 
   testHelper(
@@ -95,7 +95,7 @@ describe('ApiManager', () => {
     'handles owned games fetch failure',
     { response: { games: [] } },
     () => ApiManager.getOwnedGames(steamId, false),
-    steamApiEndpoints.getOwnedGames(steamId, false)
+    EndPoints.getOwnedGames(steamId, false)
   );
 
   testHelper(
@@ -103,10 +103,18 @@ describe('ApiManager', () => {
     'handles recent played games fetch failure',
     { response: { games: [] } },
     () => ApiManager.getRecentPlayedGames(steamId, 5),
-    steamApiEndpoints.getRecentPlayedGames(steamId, 5)
+    EndPoints.getRecentPlayedGames(steamId, 5)
   );
 
-  it('switches to backend provider at runtime', async () => {
+  testHelper(
+    'fetches game genres successfully',
+    'handles game genres fetch failure',
+    { ['440']: { data: { genres: [] } } },
+    () => ApiManager.getGameGenres(appId),
+    EndPoints.getGameGenres(appId)
+  );
+
+  it('allows provider switching at runtime (currently all endpoints use steam)', async () => {
     setApiProvider('backend');
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -115,8 +123,10 @@ describe('ApiManager', () => {
 
     await ApiManager.getOwnedGames(steamId, false);
 
+    // For now, all endpoints use Steam regardless of provider selection
+    // Backend-specific endpoints will be implemented gradually as needed
     expect(mockFetch).toHaveBeenCalledWith(
-      `http://localhost:8000/steam/players/${steamId}/games/owned?includeFreeGame=false`
+      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=&steamid=${steamId}&include_appinfo=true&include_played_free_games=false`
     );
   });
 });
