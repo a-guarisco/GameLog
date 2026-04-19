@@ -1,0 +1,9 @@
+# env
+.env
+
+# docker
+compose.override.yml
+docker-compose.override.yml
+
+# Adminer 
+**/adminer
