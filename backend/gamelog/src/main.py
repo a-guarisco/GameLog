@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 
-from src.settings import get_settings
+from src.core.settings import get_settings
+from src.achievements.router import router as achievements_router
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version=settings.app_version)
-
+app.include_router(achievements_router)
 
 @app.get("/hello")
 def hello_world():

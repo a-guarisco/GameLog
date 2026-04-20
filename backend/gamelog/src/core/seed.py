@@ -88,7 +88,6 @@ SEED_STEAM_ROLLING_TIME = [
     },
 ]
 
-
 def seed_database() -> None:
     """Reset demo data and insert a small, consistent sample dataset."""
     session = SessionLocal()
