@@ -1,37 +1,32 @@
 import uuid
-from enum import Enum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum as SQLEnum, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Column, Enum as SAEnum
+from sqlmodel import Field, Relationship, SQLModel
 
-from src.core.database import Base
+from src.models.game import GameStatus
 
-
-class GameStatus(str, Enum):
-    """Game status enumeration (like MyAnimeList)"""
-
-    SHELVED = "shelved"
-    TO_BE_PLAYED = "to_be_played"
-    PLAYING = "playing"
-    PLAYED = "played"
-    PLATINATO = "platinato"
+if TYPE_CHECKING:
+    from src.models.game import Game
+    from src.models.user import User
 
 
-class Shelving(Base):
-    __tablename__ = "shelving"
-
-    owner_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True
-    )
-    game_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("games.id"), primary_key=True
-    )
-    status: Mapped[GameStatus] = mapped_column(
-        SQLEnum(GameStatus, values_callable=lambda x: [e.value for e in x]),
-        default=GameStatus.SHELVED,
+class ShelvingBase(SQLModel):
+    status: GameStatus = Field(
+        sa_column=Column(
+            SAEnum(
+                GameStatus,
+                name="game_status",
+                values_callable=lambda values: [item.value for item in values],
+            ),
+            nullable=False,
+        )
     )
 
-    # Relationships
-    owner = relationship("User", back_populates="shelving")
-    game = relationship("Game", back_populates="shelving")
+
+class Shelving(ShelvingBase, table=True):
+    owner_id: uuid.UUID = Field(primary_key=True, foreign_key="user.id")
+    game_id: uuid.UUID = Field(primary_key=True, foreign_key="game.id")
+
+    user: "User" = Relationship(back_populates="game_shelvings")
+    game: "Game" = Relationship(back_populates="user_shelvings")

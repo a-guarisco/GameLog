@@ -7,6 +7,7 @@ settings = get_settings()
 app = FastAPI(title=settings.app_name, version=settings.app_version)
 app.include_router(achievements_router)
 
+
 @app.get("/hello")
 def hello_world():
     return {"message": "Hello, World!"}

@@ -49,7 +49,7 @@ revision:
 
 seed:
 	@echo "🌱 Loading demo data..."
-	(cd .. && docker compose -f compose.yml exec gamelog uv run python -m src.seed)
+	(cd .. && docker compose -f compose.yml exec gamelog uv run python -m src.core.seed)
 	@echo "✅ Done! Demo data is ready for Adminer"
 
 stamp:

@@ -1,18 +1,30 @@
 import uuid
-from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from enum import Enum
+from typing import TYPE_CHECKING
 
-from src.core.database import Base
+from sqlalchemy import UniqueConstraint
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from src.models.shelving import Shelving
 
 
-class Game(Base):
-    __tablename__ = "games"
+class GameStatus(str, Enum):
+    SHELVED = "shelved"
+    TO_BE_PLAYED = "to_be_played"
+    PLAYING = "playing"
+    PLAYED = "played"
+    PLATINATO = "platinato"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    steam_app_id: Mapped[str] = mapped_column(String(32), unique=True, index=True)
-    logo_url: Mapped[str] = mapped_column(String(500), nullable=True)
-    banner_url: Mapped[str] = mapped_column(String(500), nullable=True)
 
-    # Relationships
-    shelving = relationship("Shelving", back_populates="game", cascade="all, delete-orphan")
+class GameBase(SQLModel):
+    steam_app_id: str = Field(max_length=32, index=True)
+    logo_url: str | None = Field(default=None, max_length=500)
+    banner_url: str | None = Field(default=None, max_length=500)
+
+
+class Game(GameBase, table=True):
+    __table_args__ = (UniqueConstraint("steam_app_id"),)
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_shelvings: list["Shelving"] = Relationship(back_populates="game")

@@ -1,6 +1,12 @@
-from .game import Game
-from .shelving import GameStatus, Shelving
+from .game import Game, GameStatus
+from .shelving import Shelving
 from .steam_rolling_time import SteamRollingTime
 from .user import User
 
-__all__ = ["User", "Game", "Shelving", "GameStatus", "SteamRollingTime"]
+__all__ = [
+    "Game",
+    "GameStatus",
+    "Shelving",
+    "SteamRollingTime",
+    "User",
+]

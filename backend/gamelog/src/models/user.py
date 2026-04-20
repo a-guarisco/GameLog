@@ -1,25 +1,28 @@
 import uuid
+from typing import TYPE_CHECKING
 
-from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import UniqueConstraint
+from sqlmodel import Field, Relationship, SQLModel
 
-from src.core.database import Base
+if TYPE_CHECKING:
+    from src.models.shelving import Shelving
+    from src.models.steam_rolling_time import SteamRollingTime
 
 
-class User(Base):
-    __tablename__ = "users"
+class UserBase(SQLModel):
+    firebase_uid: str = Field(max_length=255, index=True)
+    username: str = Field(max_length=100, index=True)
+    steam_id: str = Field(max_length=32, index=True)
+    steam_api_key: str = Field(max_length=255)
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    firebase_uid: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    username: Mapped[str] = mapped_column(String(100), unique=True, index=True)
-    steam_id: Mapped[str] = mapped_column(String(32), unique=True, index=True)
-    steam_api_key: Mapped[str] = mapped_column(
-        String(255)
-    )  # simple encryption + hash in production
 
-    # Relationships
-    shelving = relationship("Shelving", back_populates="owner", cascade="all, delete-orphan")
-    steam_rolling_time = relationship(
-        "SteamRollingTime", back_populates="user", cascade="all, delete-orphan"
+class User(UserBase, table=True):
+    __table_args__ = (
+        UniqueConstraint("firebase_uid"),
+        UniqueConstraint("username"),
+        UniqueConstraint("steam_id"),
     )
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    game_shelvings: list["Shelving"] = Relationship(back_populates="user")
+    steam_rolling_time: list["SteamRollingTime"] = Relationship(back_populates="user")
