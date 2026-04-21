@@ -4,14 +4,21 @@ We use [`uv`](https://docs.astral.sh/uv/) to manage the Python environment and d
 
 ## Quick Reference
 
-| Task                  | Command                             |
-| --------------------- | ----------------------------------- |
-| Start dev server      | `make run`                          |
-| Run tests             | `make test`                         |
-| Run linter            | `make lint`                         |
-| Add a package         | `uv add <package>`                  |
-| Sync after a pull     | `uv sync`                           |
-| Run a specific script | `uv run python <path-to-script.py>` |
+| Task                     | Command                             |
+| ------------------------ | ----------------------------------- |
+| Add a package            | `uv add <package>`                  |
+| Sync runtime deps only   | `uv sync`                           |
+| Sync including dev tools | `uv sync --group dev`               |
+| Run a specific script    | `uv run python <path-to-script.py>` |
+| Start dev server         | `make run`                          |
+| Start on custom port     | `make run PORT=9000`                |
+| Run tests                | `make test`                         |
+| Run linter               | `make lint`                         |
+| Load demo data           | `make seed`                         |
+| Apply DB migrations      | `make migrate`                      |
+| Create a migration       | `make revision m="revision name"`   |
+| Rollback one migration   | `make downgrade`                    |
+| Rollback all migrations  | `make downgrade-all`                |
 
 ---
 
@@ -37,12 +44,12 @@ Check that `uv` is installed correctly:
 uv --version
 ```
 
-If so navigate to the backend folder and run `uv sync` to install dependencies.
+If so navigate to the backend folder and run `uv sync --group dev` to install dependencies, including development tools (`ruff`, `pytest`).
 Starting from the root of the project:
 
 ```bash
 cd backend
-uv sync
+uv sync --group dev
 ```
 
 ---
@@ -54,6 +61,12 @@ You **do not** need to activate the virtual environment manually. Just use `uv r
 ```bash
 # Start the dev server
 make run
+
+# Apply migrations
+make migrate
+
+# Load demo data into db
+make seed
 
 # Run a specific script
 uv run python <path-to-script.py>
@@ -95,7 +108,8 @@ If you need to add a new package:
 uv add <package-name>
 ```
 
-## This updates both `pyproject.toml` and `uv.lock`. **Commit both files** so everyone gets the new dependency automatically on their next `uv sync`.
+> [!IMPORTANT]  
+> This updates both `pyproject.toml` and `uv.lock`. **Commit both files** so everyone gets the new dependency automatically on their next `uv sync`.
 
 ## After Pulling Changes from the Repo
 
@@ -105,7 +119,14 @@ If someone else added or updated a dependency, run:
 uv sync
 ```
 
-## This keeps your local environment in sync with `uv.lock`.
+> [!IMPORTANT]  
+> This keeps your local environment in sync with `uv.lock`.
+
+If you need lint/test tooling as well, run:
+
+```bash
+uv sync --group dev
+```
 
 ## Automatic Documentation
 

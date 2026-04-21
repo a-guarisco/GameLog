@@ -20,15 +20,13 @@ This folder contains:
 
 ## Required .env file
 
-`backend/.env` is required to start Docker services.
+Copy the example file and adjust it for your local setup:
 
-Required variables (with example values):
-
-```env
-POSTGRES_USER=user
-POSTGRES_PASSWORD=password
-POSTGRES_DB=steam_db
+```bash
+cp .env.example .env
 ```
+
+`backend/.env` is required to start Docker services.
 
 Notes:
 
@@ -37,39 +35,29 @@ Notes:
 
 ## Makefile in `backend/` (Docker)
 
-From the `backend/` folder:
+Quick reference for Docker commands:
 
-| What it does                                                       | Command                         |
-| ------------------------------------------------------------------ | ------------------------------- |
-| Start containers in background                                     | `make up`                       |
-| Stop and remove containers                                         | `make down`                     |
-| Restart containers                                                 | `make restart`                  |
-| Stream logs                                                        | `make logs`                     |
-| Rebuild images and recreate containers                             | `make rebuild`                  |
-| Rebuild and recreate only the backend service                      | `make rebuild-backend`          |
-| Rebuild all images without cache, then recreate containers         | `make rebuild-no-cache`         |
-| Rebuild backend image without cache, then recreate backend service | `make rebuild-backend-no-cache` |
-| Open a psql shell in the postgres container                        | `make db-shell`                 |
+| Task                                | Command                         |
+| ----------------------------------- | ------------------------------- |
+| Start all services                  | `make up`                       |
+| Stop and remove containers          | `make down`                     |
+| Restart all running services        | `make restart`                  |
+| Follow all service logs             | `make logs`                     |
+| Follow logs for one service         | `make logs SERVICE=db`          |
+| Rebuild and recreate all services   | `make rebuild`                  |
+| Rebuild only the API                | `make rebuild-gamelog`          |
+| Rebuild all without cache           | `make rebuild-no-cache`         |
+| Rebuild only API without cache      | `make rebuild-gamelog-no-cache` |
+| Open psql shell in DB container     | `make db-shell`                 |
+| Create SQL dump of current DB state | `make db-snapshot`              |
+| Restore DB from latest snapshot     | `make db-restore`               |
+| Clean DB volume and recreate schema | `make db-clean`                 |
 
-## Makefile in `backend/gamelog/` (Local FastAPI)
+Database snapshots are stored in `postgres/snapshots`.
 
-If you want to run the app without Docker:
+For local development commands (without Docker), see [gamelog/README.md](gamelog/README.md).
 
-Setup:
-
-```bash
-cd backend/gamelog
-uv sync
-```
-
-| What it does                      | Command              |
-| --------------------------------- | -------------------- |
-| Start FastAPI on port 8000        | `make run`           |
-| Start FastAPI on a different port | `make run PORT=8001` |
-| Run tests                         | `make test`          |
-| Run lint and formatting checks    | `make lint`          |
-
-## Typical URLs:
+## Typical URLs
 
 - API: `http://localhost:8000`
 - Swagger UI: `http://localhost:8000/docs`
