@@ -93,6 +93,13 @@ Set these variables in `.env`:
 - `EXPO_PUBLIC_STEAM_API_KEY`: required when using Steam provider endpoints.
 - `EXPO_PUBLIC_BACKEND_BASE_URL`: backend base URL used by backend provider (example: `http://192.168.1.11:8000` for Waydroid/device, `http://localhost:8000` for web).
 - `EXPO_PUBLIC_API_PROVIDER` (optional): default provider if you run `npm run start` directly (`steam` or `backend`).
+- `EXPO_PUBLIC_FIREBASE_API_KEY`: Firebase client API key.
+- `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN`: Firebase auth domain.
+- `EXPO_PUBLIC_FIREBASE_PROJECT_ID`: Firebase project id.
+- `EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET`: Firebase storage bucket.
+- `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`: Firebase messaging sender id.
+- `EXPO_PUBLIC_FIREBASE_APP_ID`: Firebase app id.
+- `EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID` (optional): Firebase measurement id.
 - `EXPO_PUBLIC_TOKEN_GEN_EMAIL`: test Firebase user email used by the Dev View token generator.
 - `EXPO_PUBLIC_TOKEN_GEN_PASSWORD`: password for the test Firebase user.
 - `EXPO_PUBLIC_TEST_BEARER_TOKEN`: Firebase ID token copied from the Dev View console after generating it.

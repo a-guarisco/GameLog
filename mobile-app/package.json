@@ -103,6 +103,7 @@
       "!**/_ignore/**",
       "!**/types/**",
       "!**/src/dev/**",
+      "!**/src/auth/firebaseClient.ts",
       "!**/src/utils/**",
       "!**/src/common/index.ts",
       "!**/src/common/gluestack/**",

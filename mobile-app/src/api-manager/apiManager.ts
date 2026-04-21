@@ -13,7 +13,7 @@ import type {
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
+  const response = init ? await fetch(url, init) : await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP error: ${response.status}. url Called: ${url}`);
   }
