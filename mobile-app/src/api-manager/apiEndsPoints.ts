@@ -3,6 +3,8 @@ import { getApiProvider } from '@gamelog/api-manager/apiProvider';
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
+const BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
+
 const getSteamApiKey = (): string => {
   if (process.env.EXPO_PUBLIC_STEAM_API_KEY) {
     return process.env.EXPO_PUBLIC_STEAM_API_KEY;
@@ -66,6 +68,14 @@ const EndPoints = {
   getGameGenres: (appId: string) => {
     // TODO: use isBackendProvider() if backend endpoint differs
     return `${STORE_BASE_URL}/api/appdetails?appids=${appId}&filters=genres`;
+  },
+
+  getAuthOutcome: () => {
+    return `${BACKEND_BASE_URL}/me`;
+  },
+
+  getBackendHealth: () => {
+    return `${BACKEND_BASE_URL}/health`;
   },
 };
 
