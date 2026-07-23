@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { FlatList } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
-import { Spinner } from '@gamelog/common/gluestack/spinner';
-import { useGetOwnedGames, useGetGameGenreChartData } from '@gamelog/api-manager/useApi';
+import { LoadingBox } from '@gamelog/common/feedbacks/LoadingBox';
+import { useGetOwnedGames, useGetGameGenreChartData, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
@@ -16,22 +16,12 @@ const ProfileView = () => {
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(USER_ID, false);
   const { genreChartData, isLoadingGenreChart, errorGenreChart } =
     useGetGameGenreChartData(USER_ID);
+  const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
 
-  const isLoadingContent = isLoadingOwnedGames || isLoadingGenreChart;
+  const isLoading = isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo;
 
-  const chartComponents = useMemo(() => {
-    if (isLoadingContent) {
-      return [
-        <Box
-          key="content-spinner"
-          style={{ width: '100%', alignItems: 'center', paddingVertical: 40 }}
-        >
-          <Spinner size="large" testID="content-spinner" />
-        </Box>,
-      ];
-    }
-
-    return [
+  const chartComponents = useMemo(
+    () => [
       <ProfileStats key="ProfileStats" />,
       <TotalHoursChart
         key="TotalHoursChart"
@@ -57,8 +47,19 @@ const ProfileView = () => {
         isLoadingOwnedGames={false}
         errorOwnedGames={errorOwnedGames}
       />,
-    ];
-  }, [isLoadingContent, ownedGames, genreChartData, errorOwnedGames, errorGenreChart]);
+    ],
+    [ownedGames, genreChartData, errorOwnedGames, errorGenreChart]
+  );
+
+  if (isLoading) {
+    return (
+      <LoadingBox
+        message="Loading Profile"
+        testID="profile-loading-box"
+        style={{ flex: 1, paddingVertical: 60 }}
+      />
+    );
+  }
 
   return (
     <Box>
@@ -68,7 +69,13 @@ const ProfileView = () => {
           <Box style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>{item}</Box>
         )}
         keyExtractor={(item, index) => item.key ?? `${index}`}
-        ListHeaderComponent={<ProfileBanner userId={USER_ID} ownedGames={ownedGames} />}
+        ListHeaderComponent={
+          <ProfileBanner
+            userId={USER_ID}
+            ownedGames={ownedGames}
+            playersInfo={playersInfo}
+          />
+        }
       />
     </Box>
   );

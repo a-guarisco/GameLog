@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import ProfileView from '@gamelog/profile/ProfileView';
-import { useGetOwnedGames, useGetGameGenreChartData } from '@gamelog/api-manager/useApi';
+import { useGetOwnedGames, useGetGameGenreChartData, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('@gamelog/profile/ProfileBanner', () => {
@@ -8,9 +8,15 @@ jest.mock('@gamelog/profile/ProfileBanner', () => {
   return { __esModule: true, default: (props: any) => <View testID="profile-banner" {...props} /> };
 });
 
-jest.mock('@gamelog/common/gluestack/spinner', () => {
-  const { View } = jest.requireActual('react-native');
-  return { Spinner: (props: any) => <View testID={props.testID ?? 'spinner'} /> };
+jest.mock('@gamelog/common/feedbacks/LoadingBox', () => {
+  const { View, Text } = jest.requireActual('react-native');
+  return {
+    LoadingBox: ({ message, ...props }: any) => (
+      <View testID={props.testID ?? 'loading-box'}>
+        <Text>{message}</Text>
+      </View>
+    ),
+  };
 });
 
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => {
@@ -32,13 +38,32 @@ jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
 const mockUseGetGameGenreChartData = useGetGameGenreChartData as jest.Mock;
+const mockUseGetPlayersInfo = useGetPlayersInfo as jest.Mock;
+
+const setupLoadedMocks = () => {
+  mockUseGetOwnedGames.mockReturnValue({
+    ownedGames: { response: { games: [] } },
+    isLoadingOwnedGames: false,
+    errorOwnedGames: null,
+  });
+  mockUseGetGameGenreChartData.mockReturnValue({
+    genreChartData: [{ label: 'Action', value: 10 }],
+    isLoadingGenreChart: false,
+    errorGenreChart: null,
+  });
+  mockUseGetPlayersInfo.mockReturnValue({
+    playersInfo: { response: { players: [{ personaname: 'User' }] } },
+    isLoadingPlayersInfo: false,
+    errorPlayersInfo: null,
+  });
+};
 
 describe('ProfileView', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders ProfileBanner first and shows content spinner while content is loading', () => {
+  it('shows LoadingBox with "Loading Profile" while owned games are loading', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: null,
       isLoadingOwnedGames: true,
@@ -49,30 +74,49 @@ describe('ProfileView', () => {
       isLoadingGenreChart: false,
       errorGenreChart: null,
     });
+    mockUseGetPlayersInfo.mockReturnValue({
+      playersInfo: null,
+      isLoadingPlayersInfo: false,
+      errorPlayersInfo: null,
+    });
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-banner')).toBeTruthy();
-    expect(screen.getByTestId('content-spinner')).toBeTruthy();
-    expect(screen.queryByTestId('total-hours-chart')).toBeNull();
+    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+    expect(screen.getByText('Loading Profile')).toBeTruthy();
+    expect(screen.queryByTestId('profile-banner')).toBeNull();
   });
 
-  it('renders all page content components at once when data finishes loading', () => {
+  it('shows LoadingBox while player info is loading', () => {
     mockUseGetOwnedGames.mockReturnValue({
       ownedGames: { response: { games: [] } },
       isLoadingOwnedGames: false,
       errorOwnedGames: null,
     });
     mockUseGetGameGenreChartData.mockReturnValue({
-      genreChartData: [{ label: 'Action', value: 10 }],
+      genreChartData: [],
       isLoadingGenreChart: false,
       errorGenreChart: null,
+    });
+    mockUseGetPlayersInfo.mockReturnValue({
+      playersInfo: null,
+      isLoadingPlayersInfo: true,
+      errorPlayersInfo: null,
     });
 
     render(<ProfileView />);
 
+    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+    expect(screen.queryByTestId('profile-banner')).toBeNull();
+  });
+
+  it('renders banner and all page content at once when all data finishes loading', () => {
+    setupLoadedMocks();
+
+    render(<ProfileView />);
+
+    expect(screen.queryByTestId('profile-loading-box')).toBeNull();
     expect(screen.getByTestId('profile-banner')).toBeTruthy();
-    expect(screen.queryByTestId('content-spinner')).toBeNull();
     expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
     expect(screen.getByTestId('genre-radar-chart')).toBeTruthy();
