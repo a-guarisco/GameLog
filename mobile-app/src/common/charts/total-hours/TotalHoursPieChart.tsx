@@ -1,21 +1,27 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { computePieRadius, computePieInnerRadius } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import buildTotalHoursPieData from './buildTotalHoursPieData';
 import { PieData } from '../charts.type';
+interface TotalHoursPieChartProps {
+  ownedGames?: any;
+  isLoadingOwnedGames?: boolean;
+  errorOwnedGames?: any;
+}
 
 const GAME_TO_REPRESENT = 5;
 
-const TotalHoursPieChart = () => {
-  const [userId] = useState('76561198077919169');
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(userId, false);
+const TotalHoursPieChart = ({
+  ownedGames,
+  isLoadingOwnedGames = false,
+  errorOwnedGames,
+}: TotalHoursPieChartProps) => {
 
   const pieData: PieData[] = useMemo(() => {
     return buildTotalHoursPieData(ownedGames, GAME_TO_REPRESENT);

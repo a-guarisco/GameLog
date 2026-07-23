@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { Linking, Pressable } from 'react-native';
 import { VStack } from '../common/gluestack/vstack';
-import { useGetOwnedGames, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
+import { useGetPlayersInfo } from '@gamelog/api-manager/useApi';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -9,14 +9,14 @@ import Banner from '@gamelog/common/Banner';
 import BannerInfo from '@gamelog/common/BannerInfo';
 interface ProfileBannerProps {
   userId: string;
+  ownedGames?: any;
 }
 
 const TEMP_APPID = '236390';
 const FALLBACK_URL = 'https://steamcommunity.com/';
 
-export default function ProfileBanner({ userId }: ProfileBannerProps) {
+export default function ProfileBanner({ userId, ownedGames }: ProfileBannerProps) {
   const userIds = useMemo(() => [userId], [userId]);
-  const { ownedGames } = useGetOwnedGames('76561198077919169', false);
   const { playersInfo, isLoadingPlayersInfo, errorPlayersInfo } = useGetPlayersInfo(userIds);
   const player = playersInfo?.response?.players?.[0];
 

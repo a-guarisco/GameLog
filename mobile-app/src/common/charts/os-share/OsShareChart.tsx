@@ -1,13 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { computePieInnerRadius, computePieRadius } from '../chartsHelpers';
 import ChartWrapperCard from '../ChartWrapperCard';
 import buildOsShareData from './buildOsShareData';
 
-const OsShareChart = () => {
-  const [userId] = useState('76561198077919169');
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(userId, false);
+interface OsShareChartProps {
+  ownedGames?: any;
+  isLoadingOwnedGames?: boolean;
+  errorOwnedGames?: any;
+}
+
+const OsShareChart = ({
+  ownedGames,
+  isLoadingOwnedGames = false,
+  errorOwnedGames,
+}: OsShareChartProps) => {
 
   const pieData = useMemo(() => {
     if (!ownedGames || !ownedGames.response) return [];
