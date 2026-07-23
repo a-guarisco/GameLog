@@ -29,3 +29,6 @@ firebase-debug.log
 
 # Firebase Emulator
 emulator-data/*
+
+# Documentation
+docs/
