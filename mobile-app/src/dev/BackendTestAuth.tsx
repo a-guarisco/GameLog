@@ -1,3 +1,4 @@
+import { auth } from '@gamelog/auth/firebaseClient';
 import { useState } from 'react';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
@@ -30,9 +31,13 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
       setStatusMessage(null);
       setErrorMessage(null);
 
-      const token = process.env.EXPO_PUBLIC_TEST_BEARER_TOKEN ?? '';
+      // Try fetching live token from active user session first, fallback to env token
+      const currentUser = auth.currentUser;
+      const liveToken = currentUser ? await currentUser.getIdToken() : null;
+      const token = liveToken || (process.env.EXPO_PUBLIC_TEST_BEARER_TOKEN ?? '');
+
       if (!token) {
-        throw new Error('Missing EXPO_PUBLIC_TEST_BEARER_TOKEN');
+        throw new Error('No active user token or EXPO_PUBLIC_TEST_BEARER_TOKEN');
       }
 
       const nextUrl = EndPoints.getAuthOutcome();
@@ -83,7 +88,8 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
       ) : null}
       {errorMessage ? <ErrorBox errorMessage={errorMessage} /> : null}
       <Text className="text-xs text-typography-300">
-        Uses EXPO_PUBLIC_TEST_BEARER_TOKEN and expects 200=ok or 401=unauthorized.
+        Uses active logged in Firebase session (persisted via AsyncStorage) or
+        EXPO_PUBLIC_TEST_BEARER_TOKEN.
       </Text>
     </Box>
   );
