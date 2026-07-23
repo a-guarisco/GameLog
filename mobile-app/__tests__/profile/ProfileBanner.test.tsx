@@ -40,11 +40,9 @@ jest.mock('@gamelog/api-manager/steamAssets', () => ({
   steamAssetUrls: { getGameHeaderImage: jest.fn((appid: string) => `https://cdn/${appid}.jpg`) },
 }));
 
-const mockUseGetOwnedGames = jest.fn();
 const mockUseGetPlayersInfo = jest.fn();
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetOwnedGames: (...args: any[]) => mockUseGetOwnedGames(...args),
   useGetPlayersInfo: (...args: any[]) => mockUseGetPlayersInfo(...args),
 }));
 
@@ -58,11 +56,7 @@ const setupMocks = ({
   isLoadingPlayersInfo = false,
   errorPlayersInfo = null as Error | null | undefined,
   player = PLAYER as typeof PLAYER | null,
-  firstGameAppid = '1234',
 } = {}) => {
-  mockUseGetOwnedGames.mockReturnValue({
-    ownedGames: { response: { games: [{ appid: firstGameAppid }] } },
-  });
   mockUseGetPlayersInfo.mockReturnValue({
     playersInfo: player ? { response: { players: [player] } } : null,
     isLoadingPlayersInfo,
@@ -129,29 +123,19 @@ describe('ProfileBanner — successful render', () => {
     render(<ProfileBanner userId="abc" />);
     expect(mockUseGetPlayersInfo).toHaveBeenCalledWith(['abc']);
   });
-
-  it('calls useGetOwnedGames with the hardcoded userId and false', () => {
-    setupMocks();
-    render(<ProfileBanner userId="abc" />);
-    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
-  });
 });
 
 describe('ProfileBanner — game header image', () => {
-  it('uses the first owned game appid to build the header image URL', () => {
-    setupMocks({ firstGameAppid: '9999' });
-    render(<ProfileBanner userId="123" />);
+  it('uses the first owned game appid from props to build the header image URL', () => {
+    setupMocks();
+    const ownedGames = { response: { games: [{ appid: '9999' }] } };
+    render(<ProfileBanner userId="123" ownedGames={ownedGames} />);
     expect(steamAssetUrls.getGameHeaderImage).toHaveBeenCalledWith('9999');
   });
 
   it('falls back to TEMP_APPID (236390) when ownedGames has no games', () => {
-    mockUseGetOwnedGames.mockReturnValue({ ownedGames: null });
-    mockUseGetPlayersInfo.mockReturnValue({
-      playersInfo: { response: { players: [PLAYER] } },
-      isLoadingPlayersInfo: false,
-      errorPlayersInfo: null,
-    });
-    render(<ProfileBanner userId="123" />);
+    setupMocks();
+    render(<ProfileBanner userId="123" ownedGames={null} />);
     expect(steamAssetUrls.getGameHeaderImage).toHaveBeenCalledWith('236390');
   });
 });
