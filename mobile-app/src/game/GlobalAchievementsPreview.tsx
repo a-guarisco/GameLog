@@ -1,12 +1,14 @@
 import { VStack } from '@gamelog/common/gluestack/vstack';
+import { HStack } from '@gamelog/common/gluestack/hstack';
 import AchievementItem from '@gamelog/game/AchievementItem';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { Box } from '@gamelog/common/gluestack/box';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { Text } from '@gamelog/common/gluestack/text';
+import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
+import { Key } from 'react';
 
 interface Props {
   gameID: string;
@@ -24,25 +26,33 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
   const { globalAchievements, isLoadingGlobalAchievements, errorGlobalAchievements } =
     useGetGlobalAchievement(gameID);
 
-  const topAchievements = globalAchievements?.achievementpercentages.achievements.slice(0, 3) || [];
+  const achievements = globalAchievements?.achievementpercentages.achievements || [];
+  const topAchievements = achievements.slice(0, 3);
+  const totalCount = achievements.length;
 
   return (
-    <Box className="border-2 p-4 rounded-lg w-full">
-      <Text size="2xl" className="font-bold tracking-widest uppercase mb-4 text-center">
-        Global Achievements
-      </Text>
+    <Box className="border-2 border-outline-200 rounded-2xl bg-background-50 p-5 w-full">
+      <HStack className="items-center justify-center mb-4" space="sm">
+        <Text size="2xl">🏆</Text>
+        <Text size="2xl" className="font-bold tracking-widest uppercase text-center">
+          Global Achievements
+        </Text>
+      </HStack>
 
       {isLoadingGlobalAchievements ? (
-        <Spinner size="large" className="mb-4" />
+        <LoadingBox className="mb-4" message="Loading achievements..." />
       ) : errorGlobalAchievements ? (
-        <Text className="text-error-500 mb-4 text-center">
-          Failed to load global achievements, please try again later.
-        </Text>
+        <ErrorBox
+          className="mb-4"
+          errorMessage="Failed to load global achievements, please try again later."
+        />
       ) : (
         <VStack className="mb-4">
-          {topAchievements.map((item, index) => (
-            <AchievementItem key={index} name={item.name} percentage={item.percent} />
-          ))}
+          {topAchievements.map(
+            (item: { name: string; percent: number }, index: Key | null | undefined) => (
+              <AchievementItem key={index} name={item.name} percentage={item.percent} />
+            )
+          )}
         </VStack>
       )}
 
@@ -55,9 +65,11 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
             gameItem,
           })
         }
-        className="w-full py-2"
+        className="w-full py-2 rounded-xl"
       >
-        <ButtonText>See More</ButtonText>
+        <ButtonText>
+          {totalCount > 3 ? `See all ${totalCount} achievements →` : 'See more →'}
+        </ButtonText>
       </Button>
     </Box>
   );

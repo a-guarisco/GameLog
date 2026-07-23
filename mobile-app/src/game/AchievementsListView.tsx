@@ -2,10 +2,11 @@ import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import { useMemo } from 'react';
 import AchievementItem from '@gamelog/game/AchievementItem';
 import { VStack } from '@gamelog/common/gluestack/vstack';
+import { HStack } from '@gamelog/common/gluestack/hstack';
 import { ScrollView } from 'react-native';
-import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
+import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 import { useGetPlayerAchievementsPerApp } from '@gamelog/api-manager/useApi';
 
 type AchievementsListViewProps = {
@@ -20,41 +21,63 @@ const AchievementsListView = ({ route }: any) => {
   const { personalAchievements, isLoadingPlayerAchievement, errorPlayerAchievement } =
     useGetPlayerAchievementsPerApp(gameID, playerID);
 
-  //todo all of this should happen in the backend instead of merge here the 2 api call. The backend getPersonalAchievement should return global percentage along side the timestamp
   const mergedAchievements = useMemo(() => {
     if (!isLoadingPlayerAchievement && !globalAchievements?.achievementpercentages?.achievements) {
-      console.log('No global achievements data available to merge with personal achievements.');
       return [];
     }
     const personalList = personalAchievements?.playerstats?.achievements || [];
     const personalMap = new Map(personalList.map((ach) => [ach.apiname, ach]));
-    return globalAchievements.achievementpercentages.achievements.map((globalAch) => {
-      const personalAch = personalMap.get(globalAch.name);
-      const isUnlocked = personalAch?.achieved === 1;
 
-      return {
-        name: globalAch.name,
-        percent: globalAch.percent,
-        unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
-      };
-    });
+    return globalAchievements.achievementpercentages.achievements
+      .map((globalAch) => {
+        const personalAch = personalMap.get(globalAch.name);
+        const isUnlocked = personalAch?.achieved === 1;
+
+        return {
+          name: globalAch.name,
+          percent: globalAch.percent,
+          unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
+        };
+      })
+      .sort((a, b) => {
+        // unlocked first, then rarest-first within each group
+        if (!!a.unlockTime !== !!b.unlockTime) return a.unlockTime ? -1 : 1;
+        return a.percent - b.percent;
+      });
   }, [globalAchievements, personalAchievements, isLoadingPlayerAchievement]);
 
+  const unlockedCount = mergedAchievements.filter((a) => a.unlockTime).length;
+  const totalCount = mergedAchievements.length;
+  const completionPercent = totalCount ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
   return isLoadingPlayerAchievement ? (
-    <Spinner size="large" className="mb-4" />
+    <LoadingBox className="flex-1" message="Loading achievements..." />
   ) : errorPlayerAchievement ? (
-    <Text className="text-error-500 mb-4 text-center">
-      Failed to load achievements, please try again later.
-    </Text>
+    <ErrorBox
+      className="flex-1"
+      errorMessage="Failed to load achievements, please try again later."
+    />
   ) : (
-    <ScrollView className="mb-4">
-      <Box>
-        <Text size="3xl" className="font-bold uppercase text-center">
-          Achievements for
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+    >
+      <Box className="mb-5">
+        <Text size="3xl" className="font-bold uppercase text-center mb-3">
+          Achievements
         </Text>
-        <Text size="3xl" className="font-bold uppercase mb-4 text-center">
-          {personalAchievements?.playerstats?.gameName || 'Unknown Game'}
-        </Text>
+      
+        <Box className="relative overflow-hidden border-2 border-outline-300 h-8 bg-background-100">
+          <Box
+            className="absolute top-0 left-0 h-full bg-success-500"
+            style={{ width: `${completionPercent}%` }}
+          />
+          <HStack className="h-full items-center justify-center relative z-10">
+            <Text size="sm" className="font-bold">
+              {unlockedCount} / {totalCount} unlocked · {completionPercent}%
+            </Text>
+          </HStack>
+        </Box>
       </Box>
 
       <VStack className="mb-4">
