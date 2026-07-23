@@ -22,3 +22,10 @@
 
 # ignore folders
 **/__ignore
+
+# Firebase debug logs
+firebase-debug.log
+*-debug.log
+
+# Firebase Emulator
+emulator-data/*
