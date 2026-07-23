@@ -60,4 +60,3 @@ export default function ProfileBanner({ userId, ownedGames, playersInfo }: Profi
     </Pressable>
   );
 }
-

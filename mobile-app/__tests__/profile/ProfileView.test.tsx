@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react-native';
 import ProfileView from '@gamelog/profile/ProfileView';
-import { useGetOwnedGames, useGetGameGenreChartData, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
+import {
+  useGetOwnedGames,
+  useGetGameGenreChartData,
+  useGetPlayersInfo,
+} from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('@gamelog/profile/ProfileBanner', () => {

@@ -2,7 +2,11 @@ import { useMemo } from 'react';
 import { FlatList } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox } from '@gamelog/common/feedbacks/LoadingBox';
-import { useGetOwnedGames, useGetGameGenreChartData, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
+import {
+  useGetOwnedGames,
+  useGetGameGenreChartData,
+  useGetPlayersInfo,
+} from '@gamelog/api-manager/useApi';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
@@ -70,11 +74,7 @@ const ProfileView = () => {
         )}
         keyExtractor={(item, index) => item.key ?? `${index}`}
         ListHeaderComponent={
-          <ProfileBanner
-            userId={USER_ID}
-            ownedGames={ownedGames}
-            playersInfo={playersInfo}
-          />
+          <ProfileBanner userId={USER_ID} ownedGames={ownedGames} playersInfo={playersInfo} />
         }
       />
     </Box>
