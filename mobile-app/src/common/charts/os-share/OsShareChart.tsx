@@ -15,7 +15,6 @@ const OsShareChart = ({
   isLoadingOwnedGames = false,
   errorOwnedGames,
 }: OsShareChartProps) => {
-
   const pieData = useMemo(() => {
     if (!ownedGames || !ownedGames.response) return [];
     return buildOsShareData(ownedGames.response.games);

@@ -22,7 +22,6 @@ const TotalHoursPieChart = ({
   isLoadingOwnedGames = false,
   errorOwnedGames,
 }: TotalHoursPieChartProps) => {
-
   const pieData: PieData[] = useMemo(() => {
     return buildTotalHoursPieData(ownedGames, GAME_TO_REPRESENT);
   }, [ownedGames]);

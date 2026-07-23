@@ -22,7 +22,10 @@ const ProfileView = () => {
   const chartComponents = useMemo(() => {
     if (isLoadingContent) {
       return [
-        <Box key="content-spinner" style={{ width: '100%', alignItems: 'center', paddingVertical: 40 }}>
+        <Box
+          key="content-spinner"
+          style={{ width: '100%', alignItems: 'center', paddingVertical: 40 }}
+        >
           <Spinner size="large" testID="content-spinner" />
         </Box>,
       ];

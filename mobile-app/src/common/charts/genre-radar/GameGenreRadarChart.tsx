@@ -14,7 +14,6 @@ const GameGenreRadarChart = ({
   isLoadingGenreChart = false,
   errorGenreChart,
 }: GameGenreRadarChartProps) => {
-
   const values = useMemo(() => genreChartData.map((d) => Number(d.value) || 0), [genreChartData]);
 
   const labels = useMemo(() => genreChartData.map((d) => d.label), [genreChartData]);
