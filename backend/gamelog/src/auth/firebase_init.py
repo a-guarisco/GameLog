@@ -22,6 +22,13 @@ def initialize_firebase_app(settings: Settings) -> None:
     credentials_path = settings.firebase_service_account_key_path
     credential_file = Path(credentials_path).expanduser()
     if not credential_file.is_file():
+        if settings.use_firebase_emulator:
+            firebase_admin.initialize_app(options={"projectId": "gamelog-40e10"})
+            print(
+                f"[Firebase Admin] 🛠️ Mode: EMULATOR (Mock Creds) | Project: gamelog-40e10 | Host: {settings.firebase_auth_emulator_host}",
+                flush=True,
+            )
+            return
         raise FileNotFoundError(f"Firebase service account key not found: {credential_file}")
 
     cred = credentials.Certificate(str(credential_file))
