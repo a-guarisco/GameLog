@@ -5,7 +5,7 @@ COMPOSE ?= docker compose
 SERVICE ?=
 SNAPSHOT_DIR ?= postgres/snapshots
 
-.PHONY: help up down restart logs seed db-shell db-clean db-snapshot db-restore rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache
+.PHONY: help up down restart logs seed db-shell db-clean db-snapshot db-restore rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache revision migrate downgrade setup db-reset db-fresh-baseline
 
 help:
 	@echo "GameLog backend Docker commands"
@@ -23,7 +23,13 @@ help:
 	@echo "  make rebuild-no-cache    - Rebuild all services without cache"
 	@echo "  make rebuild-gamelog-no-cache - Rebuild only the API without cache"
 	@echo ""
-	@echo "Database:"
+	@echo "Database & Migrations:"
+	@echo "  make setup               - Initial setup: start services, migrate DB, insert seed data"
+	@echo "  make db-reset            - Reset DB volume, apply migrations and seed data in one step"
+	@echo "  make db-fresh-baseline   - Wipe old migration files, clean DB, create fresh baseline revision & seed"
+	@echo "  make revision m=\"...\"    - Autogenerate an Alembic migration script"
+	@echo "  make migrate             - Apply pending Alembic migrations to DB"
+	@echo "  make downgrade           - Roll back the last Alembic migration"
 	@echo "  make db-shell            - Open a psql shell in the database container"
 	@echo "  make db-clean            - Clean DB volume and recreate empty schema"
 	@echo "  make db-snapshot         - Create a SQL dump of current DB state"
@@ -40,9 +46,6 @@ restart:
 
 logs:
 	$(COMPOSE) logs -f $(SERVICE)
-
-seed:
-	$(COMPOSE) exec gamelog uv run python -m src.seed
 
 db-shell:
 	$(COMPOSE) exec db psql -U $(POSTGRES_USER) -d $(POSTGRES_DB)
@@ -84,3 +87,39 @@ rebuild-gamelog-no-cache:
 	$(COMPOSE) up -d --force-recreate gamelog
 
 rebuild-backend-no-cache: rebuild-gamelog-no-cache
+
+seed:
+	$(COMPOSE) run --rm -e UV_CACHE_DIR=/tmp/.uv_cache --user "$$(id -u):$$(id -g)" gamelog uv run python -m src.core.seed
+
+revision:
+	$(COMPOSE) run --rm -e UV_CACHE_DIR=/tmp/.uv_cache --user "$$(id -u):$$(id -g)" gamelog uv run alembic revision --autogenerate -m "$(m)"
+
+migrate:
+	$(COMPOSE) run --rm -e UV_CACHE_DIR=/tmp/.uv_cache --user "$$(id -u):$$(id -g)" gamelog uv run alembic upgrade head
+
+downgrade:
+	$(COMPOSE) run --rm -e UV_CACHE_DIR=/tmp/.uv_cache --user "$$(id -u):$$(id -g)" gamelog uv run alembic downgrade -1
+
+setup: up migrate seed
+
+db-reset: db-clean migrate seed
+
+db-fresh-baseline:
+	@echo "⚠️  ATTENZIONE: Questo comando eliminerà TUTTE le migrazioni in alembic/versions/ e resetterà il DB!"
+	@read -p "Sei sicuro di voler proseguire? [y/N] " ans; \
+	case "$$ans" in \
+		[yY][eE][sS]|[yY]) \
+			echo "🗑️  Eliminazione vecchie migrazioni in alembic/versions/..."; \
+			rm -f gamelog/alembic/versions/*.py; \
+			$(MAKE) db-clean; \
+			$(MAKE) revision m="$(if $(m),$(m),initial_schema)"; \
+			$(MAKE) migrate; \
+			$(MAKE) seed; \
+			echo "✅ Nuova migrazione baseline creata e DB azzerato/popolato con successo!"; \
+			;; \
+		*) \
+			echo "❌ Operazione annullata."; \
+			exit 1; \
+			;; \
+	esac
+
