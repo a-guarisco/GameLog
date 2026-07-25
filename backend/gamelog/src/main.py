@@ -5,6 +5,7 @@ from src.core.settings import get_settings
 from src.achievements.router import router as achievements_router
 
 from src.auth.auth import get_current_user
+from src.auth.schemas import AuthenticatedUser
 
 
 settings = get_settings()
@@ -24,16 +25,16 @@ def healthcheck():
 
 
 @app.get("/me")
-def me(current_user=Depends(get_current_user)):
+def me(current_user: AuthenticatedUser = Depends(get_current_user)):
     return {
-        "uid": current_user["uid"],
-        "email": current_user["email"],
+        "uid": current_user.uid,
+        "email": current_user.email,
     }
 
 
 @app.get("/protected")
-def protected(current_user=Depends(get_current_user)):
+def protected(current_user: AuthenticatedUser = Depends(get_current_user)):
     return {
         "message": "Accesso autorizzato",
-        "uid": current_user["uid"],
+        "uid": current_user.uid,
     }
