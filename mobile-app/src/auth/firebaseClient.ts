@@ -1,8 +1,7 @@
 import { Platform } from 'react-native';
 import { getApps, initializeApp, type FirebaseOptions } from 'firebase/app';
-import { initializeAuth, getAuth, connectAuthEmulator } from 'firebase/auth';
 // @ts-expect-error getReactNativePersistence exists in React Native build of firebase/auth
-import { getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth, getAuth, connectAuthEmulator, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getRequiredEnv = (value: string | undefined, name: string): string => {
