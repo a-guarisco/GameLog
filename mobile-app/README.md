@@ -102,7 +102,6 @@ Set these variables in `.env`:
 - `EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID` (optional): Firebase measurement id.
 - `EXPO_PUBLIC_TOKEN_GEN_EMAIL`: test Firebase user email used by the Dev View token generator.
 - `EXPO_PUBLIC_TOKEN_GEN_PASSWORD`: password for the test Firebase user.
-- `EXPO_PUBLIC_TEST_BEARER_TOKEN`: Firebase ID token copied from the Dev View console after generating it.
 
 After changing any `EXPO_PUBLIC_*` variable, stop Expo and start it again.
 
@@ -110,10 +109,8 @@ The Firebase token flow works like this:
 
 1. Start the backend and the Expo app.
 2. Open the Dev View in the app.
-3. Generate a Firebase ID token with the token generator button.
-4. Copy the token from the console and paste it into `EXPO_PUBLIC_TEST_BEARER_TOKEN`.
-5. Restart Expo so the new token is loaded.
-6. Press the final auth test button in Dev View.
+3. Press **Generate Firebase Token** to log in as the test user. The session token is stored automatically via `AsyncStorage`.
+4. Press **Test Backend Auth**. The component automatically reads the active session token and sends it in the `Authorization: Bearer <token>` header to `GET /me`.
 
 The auth test component reads the backend endpoint from `src/api-manager/apiEndsPoints.ts` and sends the token using the `Authorization: Bearer <token>` header.
 

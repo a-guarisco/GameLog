@@ -46,9 +46,6 @@ For the auth flow, set these variables in `mobile-app/.env`:
 - `EXPO_PUBLIC_BACKEND_BASE_URL`: backend URL reachable from the emulator or device.
 - `EXPO_PUBLIC_TOKEN_GEN_EMAIL`: test Firebase user email.
 - `EXPO_PUBLIC_TOKEN_GEN_PASSWORD`: test Firebase user password.
-- `EXPO_PUBLIC_TEST_BEARER_TOKEN`: temporary bearer token copied from the app after generating it.
-
-The token cannot be filled in advance during the first login step. Generate it from the app, copy it from the console, and paste it into the env file for the next request.
 
 ### 5. Start Docker
 
@@ -74,22 +71,15 @@ npm run start:backend
 
 If you are testing on Android emulator, make sure `EXPO_PUBLIC_BACKEND_BASE_URL` points to your host LAN IP or to the emulator-compatible host.
 
-### 7. Open Dev View and generate the token
+### 7. Open Dev View and test authentication
 
-In the app, open the Dev tab and use the Firebase token generator.
+In the app, open the Dev tab:
+1. Press **Generate Firebase Token** to log in as the test user. The session token is saved automatically on the device via `AsyncStorage`.
+2. Press **Test Backend Auth**. The component automatically attaches the live session token in the `Authorization: Bearer <token>` header to `GET /me`.
 
-The token generation button signs in with the test Firebase user and prints the ID token in the console. Copy that token and paste it into `EXPO_PUBLIC_TEST_BEARER_TOKEN`.
-
-### 8. Test the protected endpoint
-
-After updating the env file with the token, restart Expo so the new environment variables are loaded.
-
-Then go back to Dev View and press the final auth test button.
-
-The auth test currently expects a simple result from the protected backend endpoint:
-
-- `ok` if the token is accepted
-- `unauthorized` if the token is rejected
+The backend validates the token and returns:
+- `Authorized (200 OK)` with your Firebase `uid` if the token is accepted.
+- `Unauthorized (401)` if the token is invalid or rejected.
 
 ## Useful references
 
