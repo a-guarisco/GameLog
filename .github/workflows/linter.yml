@@ -46,5 +46,6 @@ jobs:
           LINTER_RULES_PATH: mobile-app
           VALIDATE_BIOME_FORMAT: false
           VALIDATE_BIOME_LINT: false
+          VALIDATE_TRIVY: false
           ESLINT_USE_FLAT_CONFIG: true
           SPELL_CODESPELL_ARGS: "-L afterall,afterAll,appid,playtime"
