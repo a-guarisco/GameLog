@@ -3,12 +3,17 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { Text } from '@gamelog/common/gluestack/text';
-import { ErrorBox } from '@gamelog/common/feedbacks/ErrorBox';
+import { Box } from '@gamelog/common/gluestack/box';
+import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
+
+interface FirebaseTokenGeneratorProps {
+  className?: string;
+}
 
 const email = process.env.EXPO_PUBLIC_TOKEN_GEN_EMAIL || '';
 const pwd = process.env.EXPO_PUBLIC_TOKEN_GEN_PASSWORD || '';
 
-export const FirebaseTokenGenerator = () => {
+export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProps) => {
   const [idToken, setIdToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,35 +25,47 @@ export const FirebaseTokenGenerator = () => {
     }
     setIsLoading(true);
     setError(null);
+    setIdToken(null);
     try {
+      if (!email || !pwd) {
+        throw new Error(
+          'EXPO_PUBLIC_TOKEN_GEN_EMAIL or EXPO_PUBLIC_TOKEN_GEN_PASSWORD missing in .env'
+        );
+      }
+
       const credential = await signInWithEmailAndPassword(auth, email, pwd);
       const token = await credential.user.getIdToken(true);
       setIdToken(token);
       console.log('Generated Firebase ID Token:', token);
-    } catch (error: unknown) {
-      console.error('Login failed:', error);
-      setError(error instanceof Error ? error.message : 'Failed to generate token');
+    } catch (err: unknown) {
+      console.error('Login failed:', err);
+      setError(err instanceof Error ? err.message : 'Failed to generate token');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <Button onPress={generateToken} disabled={isLoading}>
-        {isLoading ? (
-          <ButtonText>Generating...</ButtonText>
-        ) : (
-          <ButtonText>Generate Firebase Token</ButtonText>
-        )}
+    <Box className={`w-full max-w-[320px] gap-2 self-center ${className ?? ''}`}>
+      <Button onPress={generateToken} isDisabled={isLoading}>
+        <ButtonText>Generate Firebase Token</ButtonText>
       </Button>
-      {idToken && (
-        <Button onPress={() => setShowToken(!showToken)} className="mt-2">
-          <ButtonText>Show Token</ButtonText>
-        </Button>
-      )}
-      {showToken && idToken && <Text className="mt-2 break-all text-sm">{idToken}</Text>}
-      {error && <ErrorBox className="mt-2" errorMessage={error} />}
-    </>
+
+      {isLoading ? <LoadingBox message="Generating Firebase token..." /> : null}
+
+      {idToken ? (
+        <>
+          <SuccessBox message="Firebase token generated successfully!" />
+          <Button onPress={() => setShowToken(!showToken)}>
+            <ButtonText>{showToken ? 'Hide Token' : 'Show Token'}</ButtonText>
+          </Button>
+          {showToken ? (
+            <Text className="break-all text-xs text-typography-500">{idToken}</Text>
+          ) : null}
+        </>
+      ) : null}
+
+      {error ? <ErrorBox errorMessage={error} /> : null}
+    </Box>
   );
 };

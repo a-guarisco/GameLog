@@ -46,7 +46,7 @@ export const DevView = () => {
             <ButtonText>Go to Fonts</ButtonText>
           </Button>
           <BackendHealthCheck className="w-full max-w-[320px] self-center" />
-          <FirebaseTokenGenerator />
+          <FirebaseTokenGenerator className="w-full max-w-[320px] self-center" />
           <BackendTestAuth className="w-full max-w-[320px] self-center" />
           <Box className="w-full max-w-[640px] flex-row flex-wrap justify-between gap-2">
             <ErrorBox className="w-[48%]" errorMessage="test error message" />

@@ -31,13 +31,12 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
       setStatusMessage(null);
       setErrorMessage(null);
 
-      // Try fetching live token from active user session first, fallback to env token
+      // Fetch live token from active user session
       const currentUser = auth.currentUser;
-      const liveToken = currentUser ? await currentUser.getIdToken() : null;
-      const token = liveToken || (process.env.EXPO_PUBLIC_TEST_BEARER_TOKEN ?? '');
+      const token = currentUser ? await currentUser.getIdToken() : null;
 
       if (!token) {
-        throw new Error('No active user token or EXPO_PUBLIC_TEST_BEARER_TOKEN');
+        throw new Error('No active user session. Click "Generate Firebase Token" first.');
       }
 
       const nextUrl = EndPoints.getAuthOutcome();
@@ -51,15 +50,13 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
         },
       });
 
-      // Template status handling for the current backend behavior.
       if (response.status === 200) {
-        setStatusMessage('ok');
+        setStatusMessage('Authorized (200 OK)');
         return;
       }
 
       if (response.status === 401) {
-        setStatusMessage('unauthorized');
-        return;
+        throw new Error('Unauthorized (401) - Token rejected by backend');
       }
 
       throw new Error(`Unexpected HTTP status: ${response.status}`);
@@ -86,10 +83,13 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
           message={`Auth test result: ${statusMessage}${requestUrl ? ` (${requestUrl})` : ''}`}
         />
       ) : null}
-      {errorMessage ? <ErrorBox errorMessage={errorMessage} /> : null}
+      {errorMessage ? (
+        <ErrorBox
+          errorMessage={`Auth test failed: ${errorMessage}${requestUrl ? ` (${requestUrl})` : ''}`}
+        />
+      ) : null}
       <Text className="text-xs text-typography-300">
-        Uses active logged in Firebase session (persisted via AsyncStorage) or
-        EXPO_PUBLIC_TEST_BEARER_TOKEN.
+        Uses active logged in Firebase session (persisted via AsyncStorage).
       </Text>
     </Box>
   );
