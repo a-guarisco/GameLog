@@ -1,12 +1,8 @@
 import { Platform } from 'react-native';
 import { getApps, initializeApp, type FirebaseOptions } from 'firebase/app';
+import { initializeAuth, getAuth, connectAuthEmulator } from 'firebase/auth';
 // @ts-expect-error getReactNativePersistence exists in React Native build of firebase/auth
-import {
-  initializeAuth,
-  getAuth,
-  getReactNativePersistence,
-  connectAuthEmulator,
-} from 'firebase/auth';
+import { getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getRequiredEnv = (value: string | undefined, name: string): string => {
@@ -40,17 +36,27 @@ const firebaseConfig: FirebaseOptions = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
+const useEmulator = process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR !== 'false';
+const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || 'unknown-project';
+
 let auth: ReturnType<typeof getAuth>;
 try {
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage),
   });
 
-  const authEmulatorHost =
-    process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST ||
-    (Platform.OS === 'android' ? 'http://192.168.240.1:9099' : 'http://127.0.0.1:9099');
+  if (useEmulator) {
+    const authEmulatorHost =
+      process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST ||
+      (Platform.OS === 'android' ? 'http://192.168.240.1:9099' : 'http://127.0.0.1:9099');
 
-  connectAuthEmulator(auth, authEmulatorHost);
+    connectAuthEmulator(auth, authEmulatorHost);
+    console.log(
+      `[Firebase Auth] 🛠️ Mode: EMULATOR | Project: ${projectId} | Host: ${authEmulatorHost}`
+    );
+  } else {
+    console.log(`[Firebase Auth] ☁️ Mode: LIVE (Cloud) | Project: ${projectId}`);
+  }
 } catch {
   auth = getAuth(app);
 }
