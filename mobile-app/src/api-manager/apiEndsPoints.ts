@@ -55,9 +55,9 @@ const EndPoints = {
     return `${STEAM_BASE_URL}ISteamUser/GetFriendList/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&relationship=${getRelationship(includePending)}`;
   },
 
-  getOwnedGames: (steamId: string, includeFreeGame: boolean) => {
+  getOwnedGames: (steamId: string, include_stub: boolean, includeFreeGame: boolean) => {
     // TODO: use isBackendProvider() if backend endpoint differs
-    return `${STEAM_BASE_URL}IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_played_free_games=${includeFreeGame}`;
+    return `${STEAM_BASE_URL}IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=${include_stub}&include_played_free_games=${includeFreeGame}`;
   },
 
   getRecentPlayedGames: (steamId: string, count: number) => {

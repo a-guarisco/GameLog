@@ -51,9 +51,8 @@ export default {
   getPlayerFriendsInfo: (steamId: string, includePending: boolean) =>
     fetchData<PlayerFriends>(EndPoints.getPlayerFriendsList(steamId, includePending)),
 
-  getOwnedGames: (steamId: string, includeFreeGame: boolean) =>
-    fetchData<OwnedGames>(EndPoints.getOwnedGames(steamId, includeFreeGame)),
-
+  getOwnedGames: (steamId: string, includeStub: boolean, includeFreeGame: boolean) =>
+    fetchData<OwnedGames>(EndPoints.getOwnedGames(steamId, includeStub, includeFreeGame)),
   getRecentPlayedGames: (steamId: string, count: number) =>
     fetchData<RecentPlayedGames>(EndPoints.getRecentPlayedGames(steamId, count)),
 

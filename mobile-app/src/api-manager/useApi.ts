@@ -54,9 +54,13 @@ export const useGetPlayersInfo = (steamIds: string[]) => {
   };
 };
 
-export const useGetGameGenreChartData = (userId: string) => {
+export const useGetGameGenreChartData = (
+  userId: string,
+  includeStub: boolean,
+  includeFreeGame: boolean
+) => {
   const fetchFunc = useCallback(async () => {
-    const ownedGames = await ApiManager.getOwnedGames(userId, false);
+    const ownedGames = await ApiManager.getOwnedGames(userId, includeStub, includeFreeGame);
     return buildGenreChartData(ownedGames.response.games);
   }, [userId]);
 
