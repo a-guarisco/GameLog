@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "expo start",
-    "start:steam": "EXPO_PUBLIC_API_PROVIDER=steam expo start",
-    "start:backend": "EXPO_PUBLIC_API_PROVIDER=backend expo start",
+    "start": "expo start --go",
+    "start:steam": "EXPO_PUBLIC_API_PROVIDER=steam expo start --go",
+    "start:backend": "EXPO_PUBLIC_API_PROVIDER=backend expo start --go",
     "android": "expo run:android",
     "android:steam": "EXPO_PUBLIC_API_PROVIDER=steam expo run:android",
     "android:backend": "EXPO_PUBLIC_API_PROVIDER=backend expo run:android",
