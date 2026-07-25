@@ -3,16 +3,21 @@ import { BarChart } from 'react-native-gifted-charts';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { BarData } from '../charts.type';
 import buildTotalHoursBarData from './buildTotalHoursBarData';
+interface TotalHoursChartProps {
+  ownedGames?: any;
+  isLoadingOwnedGames?: boolean;
+  errorOwnedGames?: any;
+}
 
-const USER_ID = '76561198077919169';
-
-const TotalHoursChart = () => {
+const TotalHoursChart = ({
+  ownedGames,
+  isLoadingOwnedGames = false,
+  errorOwnedGames,
+}: TotalHoursChartProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(USER_ID, false);
 
   const barData: BarData[] = useMemo(() => {
     return buildTotalHoursBarData(ownedGames);

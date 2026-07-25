@@ -1,23 +1,21 @@
 import { useMemo, useCallback } from 'react';
 import { Linking, Pressable } from 'react-native';
 import { VStack } from '../common/gluestack/vstack';
-import { useGetOwnedGames, useGetPlayersInfo } from '@gamelog/api-manager/useApi';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
-import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { Text } from '@gamelog/common/gluestack/text';
 import Banner from '@gamelog/common/Banner';
 import BannerInfo from '@gamelog/common/BannerInfo';
+
 interface ProfileBannerProps {
   userId: string;
+  ownedGames?: any;
+  playersInfo?: any;
 }
 
 const TEMP_APPID = '236390';
 const FALLBACK_URL = 'https://steamcommunity.com/';
 
-export default function ProfileBanner({ userId }: ProfileBannerProps) {
-  const userIds = useMemo(() => [userId], [userId]);
-  const { ownedGames } = useGetOwnedGames('76561198077919169', false);
-  const { playersInfo, isLoadingPlayersInfo, errorPlayersInfo } = useGetPlayersInfo(userIds);
+export default function ProfileBanner({ userId, ownedGames, playersInfo }: ProfileBannerProps) {
   const player = playersInfo?.response?.players?.[0];
 
   const gameHeaderImage = useMemo(() => {
@@ -34,11 +32,7 @@ export default function ProfileBanner({ userId }: ProfileBannerProps) {
     Linking.openURL(player.profileurl);
   }, [player?.profileurl]);
 
-  if (isLoadingPlayersInfo) {
-    return <Spinner size="large" />;
-  }
-
-  if (errorPlayersInfo) {
+  if (!playersInfo) {
     return (
       <Text className="text-error-500 mb-4 text-center">
         Failed to load profile, please try again later.

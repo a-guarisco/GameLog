@@ -1,16 +1,19 @@
 import { useMemo } from 'react';
 import { RadarChart } from 'react-native-gifted-charts';
-import { useGetGameGenreChartData } from '@gamelog/api-manager/useApi';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
+interface GameGenreRadarChartProps {
+  genreChartData?: any[];
+  isLoadingGenreChart?: boolean;
+  errorGenreChart?: any;
+}
 
-const USER_ID = '76561198077919169';
-
-const GameGenreRadarChart = () => {
-  const { genreChartData, isLoadingGenreChart, errorGenreChart } =
-    useGetGameGenreChartData(USER_ID);
-
+const GameGenreRadarChart = ({
+  genreChartData = [],
+  isLoadingGenreChart = false,
+  errorGenreChart,
+}: GameGenreRadarChartProps) => {
   const values = useMemo(() => genreChartData.map((d) => Number(d.value) || 0), [genreChartData]);
 
   const labels = useMemo(() => genreChartData.map((d) => d.label), [genreChartData]);

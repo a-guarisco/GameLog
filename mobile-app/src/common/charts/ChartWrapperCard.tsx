@@ -30,9 +30,9 @@ const ChartWrapperCard = ({ isLoading, children, error, ErrorBehaviour }: ChartC
         className="w-full rounded-lg items-center py-4"
         onLayout={(e) => setCardWidth(e.nativeEvent.layout.width)}
       >
-        {isLoading ? (
+        {isLoading || (!error && cardWidth === 0) ? (
           <Spinner />
-        ) : error || cardWidth === 0 ? (
+        ) : error ? (
           <ChartErrorHandler ErrorBehaviour={ErrorBehaviour} />
         ) : (
           children({ cardWidth, theme })

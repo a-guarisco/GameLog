@@ -1,9 +1,7 @@
 import { render } from '@testing-library/react-native';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 
-jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
 
 jest.mock('@gamelog/common/gluestack/box', () => {
@@ -62,8 +60,6 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   return MockChartWrapperCard;
 });
 
-const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
-
 const OWNED_GAMES = {
   response: { game_count: 2, games: [] },
 };
@@ -74,61 +70,29 @@ beforeEach(() => {
 
 describe('TotalHoursPieChart', () => {
   it('hides PieChart while loading', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: true,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_queryByType } = render(<TotalHoursPieChart />);
+    const { UNSAFE_queryByType } = render(
+      <TotalHoursPieChart ownedGames={null} isLoadingOwnedGames={true} />
+    );
 
     expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
   it('hides PieChart on error', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: new Error('fail'),
-    });
-
-    const { UNSAFE_queryByType } = render(<TotalHoursPieChart />);
+    const { UNSAFE_queryByType } = render(
+      <TotalHoursPieChart ownedGames={null} errorOwnedGames={new Error('fail')} />
+    );
 
     expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
   it('renders PieChart when data is available', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<TotalHoursPieChart />);
+    const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
 
     expect(UNSAFE_getByType('PieChart' as any)).toBeTruthy();
   });
 
-  it('calls useGetOwnedGames with USER_ID and false', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: true,
-      errorOwnedGames: null,
-    });
-
-    render(<TotalHoursPieChart />);
-
-    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
-  });
-
   it('derives colors from theme', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<TotalHoursPieChart />);
+    const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
     expect(pie.props.textColor).toBe('rgb(200,200,200)');
@@ -136,25 +100,13 @@ describe('TotalHoursPieChart', () => {
   });
 
   it('renders ExternalLabelBox with formatted labels', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { getByTestId } = render(<TotalHoursPieChart />);
+    const { getByTestId } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
 
     expect(getByTestId('external-label-box')).toBeTruthy();
   });
 
   it('formats tooltip label correctly', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<TotalHoursPieChart />);
+    const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
     const tooltip = pie.props.tooltipComponent(0);
