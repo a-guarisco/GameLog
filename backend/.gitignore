@@ -5,6 +5,10 @@
 compose.override.yml
 docker-compose.override.yml
 
+# Firebase Service Account Credentials
+serviceAccountKey.json
+*serviceAccountKey*.json
+
 # Adminer 
 **/adminer
 
