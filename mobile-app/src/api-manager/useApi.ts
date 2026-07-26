@@ -28,9 +28,13 @@ export const useGetGlobalAchievement = (gameID: string) => {
   };
 };
 
-export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => {
+export const useGetOwnedGames = (
+  playerID: string,
+  includeStub: boolean,
+  includeFreeGame: boolean
+) => {
   const fetchFunc = useCallback(
-    () => ApiManager.getOwnedGames(playerID, includeFreeGame),
+    () => ApiManager.getOwnedGames(playerID, includeStub, includeFreeGame),
     [playerID, includeFreeGame]
   );
 
