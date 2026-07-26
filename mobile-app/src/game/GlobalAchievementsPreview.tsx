@@ -41,7 +41,12 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
       ) : (
         <VStack className="mb-4">
           {topAchievements.map((item, index) => (
-            <AchievementItem key={index} name={item.name} percentage={item.percent} />
+            <AchievementItem
+              key={index}
+              name={item.name}
+              displayName={item.displayName}
+              percentage={item.percent}
+            />
           ))}
         </VStack>
       )}
