@@ -1,6 +1,7 @@
 import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
 import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
 import { GlobalAchievement, GameSchema } from '@gamelog/api-manager/dto';
+import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 
 async function fetchData<T>(url: string): Promise<T> {
   const response = await fetch(url);
@@ -10,42 +11,7 @@ async function fetchData<T>(url: string): Promise<T> {
   return response.json();
 }
 
-function mergeGlobalAchievementsWithSchema(
-  globalAchievements: GlobalAchievement,
-  gameSchema?: GameSchema | null
-): GlobalAchievement {
-  if (
-    !globalAchievements?.achievementpercentages?.achievements ||
-    !gameSchema?.game?.availableGameStats?.achievements
-  ) {
-    return globalAchievements;
-  }
-
-  const schemaMap = new Map(
-    gameSchema.game.availableGameStats.achievements.map((item) => [item.name, item])
-  );
-
-  const enrichedAchievements = globalAchievements.achievementpercentages.achievements.map(
-    (globalAch) => {
-      const schemaAch = schemaMap.get(globalAch.name);
-      return {
-        ...globalAch,
-        ...(schemaAch?.displayName !== undefined ? { displayName: schemaAch.displayName } : {}),
-        ...(schemaAch?.description !== undefined ? { description: schemaAch.description } : {}),
-      };
-    }
-  );
-
-  return {
-    ...globalAchievements,
-    achievementpercentages: {
-      ...globalAchievements.achievementpercentages,
-      achievements: enrichedAchievements,
-    },
-  };
-}
-
-export { getApiProvider, setApiProvider, isBackendProvider, fetchData, mergeGlobalAchievementsWithSchema };
+export { getApiProvider, setApiProvider, isBackendProvider, fetchData };
 export default {
   getGameNews: (appId: string, count: number, maxLength: number) =>
     fetchData(EndPoints.getNewsForApp(appId, count, maxLength)),

@@ -1,5 +1,6 @@
-import ApiManager, { setApiProvider, fetchData, mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/apiManager';
+import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
 import EndPoints, { getSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
+import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
