@@ -1,3 +1,4 @@
+/* global __dirname */
 const path = require('path');
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
