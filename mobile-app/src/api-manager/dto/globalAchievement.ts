@@ -1,6 +1,8 @@
-interface GlobalAchievementItem {
+export interface GlobalAchievementItem {
   name: string;
   percent: number;
+  displayName?: string;
+  description?: string;
 }
 
 export interface GlobalAchievement {
@@ -8,3 +10,4 @@ export interface GlobalAchievement {
     achievements: GlobalAchievementItem[];
   };
 }
+

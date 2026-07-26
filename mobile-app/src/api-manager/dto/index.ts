@@ -8,3 +8,4 @@ export * from './playerStats';
 export * from './ownedGames';
 export * from './recentPlayedGames';
 export * from './gameGenres';
+export * from './gameSchema';
