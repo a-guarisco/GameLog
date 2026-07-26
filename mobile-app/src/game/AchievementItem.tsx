@@ -10,12 +10,7 @@ interface AchievementItemProps {
   unlockTime?: number;
 }
 
-const AchievementItem = ({
-  name,
-  displayName,
-  percentage,
-  unlockTime,
-}: AchievementItemProps) => {
+const AchievementItem = ({ name, displayName, percentage, unlockTime }: AchievementItemProps) => {
   return (
     <Box className="relative overflow-hidden rounded-2xl border-2 border-outline-500 mb-3 h-20">
       <Box

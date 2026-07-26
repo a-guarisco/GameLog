@@ -24,10 +24,7 @@ export default {
       () => null
     );
 
-    const [globalData, schemaData] = await Promise.all([
-      globalAchievementsPromise,
-      schemaPromise,
-    ]);
+    const [globalData, schemaData] = await Promise.all([globalAchievementsPromise, schemaPromise]);
 
     return mergeGlobalAchievementsWithSchema(globalData, schemaData);
   },
@@ -44,4 +41,3 @@ export default {
     fetchData(EndPoints.getRecentPlayedGames(steamId, count)),
   getGameGenres: (appId: string) => fetchData(EndPoints.getGameGenres(appId)),
 };
-

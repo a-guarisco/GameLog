@@ -35,7 +35,11 @@ describe('mergeGlobalAchievementsWithSchema', () => {
         gameVersion: '1',
         availableGameStats: {
           achievements: [
-            { name: 'PLAY_CS2', displayName: 'A New Beginning', description: 'Played first CS2 match' },
+            {
+              name: 'PLAY_CS2',
+              displayName: 'A New Beginning',
+              description: 'Played first CS2 match',
+            },
             { name: 'WIN_MATCH', displayName: 'Winner Winner', description: 'Won a match' },
           ],
         },
@@ -47,8 +51,18 @@ describe('mergeGlobalAchievementsWithSchema', () => {
     expect(result).toEqual({
       achievementpercentages: {
         achievements: [
-          { name: 'PLAY_CS2', percent: 85.5, displayName: 'A New Beginning', description: 'Played first CS2 match' },
-          { name: 'WIN_MATCH', percent: 12.3, displayName: 'Winner Winner', description: 'Won a match' },
+          {
+            name: 'PLAY_CS2',
+            percent: 85.5,
+            displayName: 'A New Beginning',
+            description: 'Played first CS2 match',
+          },
+          {
+            name: 'WIN_MATCH',
+            percent: 12.3,
+            displayName: 'Winner Winner',
+            description: 'Won a match',
+          },
         ],
       },
     });
