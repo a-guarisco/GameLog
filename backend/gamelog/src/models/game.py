@@ -19,8 +19,6 @@ class GameStatus(str, Enum):
 
 class GameBase(SQLModel):
     steam_app_id: str = Field(max_length=32, index=True)
-    logo_url: str | None = Field(default=None, max_length=500)
-    banner_url: str | None = Field(default=None, max_length=500)
 
 
 class Game(GameBase, table=True):

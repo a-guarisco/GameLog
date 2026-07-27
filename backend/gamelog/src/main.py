@@ -1,14 +1,11 @@
-from fastapi import FastAPI, Depends
-
-from src.auth.firebase_init import initialize_firebase_app
-from src.core.settings import get_settings
+from fastapi import Depends, FastAPI
 
 from src.achievements.router import router as achievements_router
-from src.games.games_router import router as games_router
-
 from src.auth.auth import get_current_user
+from src.auth.firebase_init import initialize_firebase_app
 from src.auth.schemas import AuthenticatedUser
-
+from src.core.settings import get_settings
+from src.games.games_router import router as games_router
 
 settings = get_settings()
 initialize_firebase_app(settings)

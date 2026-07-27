@@ -41,20 +41,14 @@ def _games() -> list[Game]:
         Game(
             id=DEMO_GAME_CS2_ID,
             steam_app_id="730",
-            logo_url="https://cdn.example.com/games/cs2-logo.png",
-            banner_url="https://cdn.example.com/games/cs2-banner.png",
         ),
         Game(
             id=DEMO_GAME_DOTA_ID,
             steam_app_id="570",
-            logo_url="https://cdn.example.com/games/dota2-logo.png",
-            banner_url="https://cdn.example.com/games/dota2-banner.png",
         ),
         Game(
             id=DEMO_GAME_RDR2_ID,
             steam_app_id="1174180",
-            logo_url="https://cdn.example.com/games/rdr2-logo.png",
-            banner_url="https://cdn.example.com/games/rdr2-banner.png",
         ),
     ]
 
@@ -75,6 +69,7 @@ def _rolling_times() -> list[SteamRollingTime]:
             steam_app_id="730",
             last_day_playtime=120,
             created_at=date(2026, 4, 17),
+            is_baseline=False,
         ),
         SteamRollingTime(
             id=uuid4(),
@@ -82,6 +77,7 @@ def _rolling_times() -> list[SteamRollingTime]:
             steam_app_id="1174180",
             last_day_playtime=45,
             created_at=date(2026, 4, 18),
+            is_baseline=False,
         ),
         SteamRollingTime(
             id=uuid4(),
@@ -89,6 +85,7 @@ def _rolling_times() -> list[SteamRollingTime]:
             steam_app_id="570",
             last_day_playtime=300,
             created_at=date(2026, 4, 18),
+            is_baseline=False,
         ),
     ]
 
