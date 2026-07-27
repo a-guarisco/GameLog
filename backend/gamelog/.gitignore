@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 .env
 serviceAccountKey.json
+last_cron.txt
+
