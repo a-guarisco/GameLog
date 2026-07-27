@@ -5,7 +5,7 @@
 ### expo go on android emulator
 
 1. open android studio
-2. click on virtual device manager and start the VM <img src="assets/docs-image.png" alt="drawing" width="400"/>
+2. click on virtual device manager and start the VM ![drawing](assets/docs-image.png)
 
 3. run: `npm run start`
 4. check the current expo mode is Expo Go (in blue)
@@ -93,8 +93,26 @@ Set these variables in `.env`:
 - `EXPO_PUBLIC_STEAM_API_KEY`: required when using Steam provider endpoints.
 - `EXPO_PUBLIC_BACKEND_BASE_URL`: backend base URL used by backend provider (example: `http://192.168.1.11:8000` for Waydroid/device, `http://localhost:8000` for web).
 - `EXPO_PUBLIC_API_PROVIDER` (optional): default provider if you run `npm run start` directly (`steam` or `backend`).
+- `EXPO_PUBLIC_FIREBASE_API_KEY`: Firebase client API key.
+- `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN`: Firebase auth domain.
+- `EXPO_PUBLIC_FIREBASE_PROJECT_ID`: Firebase project id.
+- `EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET`: Firebase storage bucket.
+- `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`: Firebase messaging sender id.
+- `EXPO_PUBLIC_FIREBASE_APP_ID`: Firebase app id.
+- `EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID` (optional): Firebase measurement id.
+- `EXPO_PUBLIC_TOKEN_GEN_EMAIL`: test Firebase user email used by the Dev View token generator.
+- `EXPO_PUBLIC_TOKEN_GEN_PASSWORD`: password for the test Firebase user.
 
 After changing any `EXPO_PUBLIC_*` variable, stop Expo and start it again.
+
+The Firebase token flow works like this:
+
+1. Start the backend and the Expo app.
+2. Open the Dev View in the app.
+3. Press **Generate Firebase Token** to log in as the test user. The session token is stored automatically via `AsyncStorage`.
+4. Press **Test Backend Auth**. The component automatically reads the active session token and sends it in the `Authorization: Bearer <token>` header to `GET /me`.
+
+The auth test component reads the backend endpoint from `src/api-manager/apiEndsPoints.ts` and sends the token using the `Authorization: Bearer <token>` header.
 
 ## API Provider Switch
 
@@ -126,3 +144,12 @@ EXPO_PUBLIC_BACKEND_BASE_URL=http://192.168.1.11:8000 npm run android:backend
 Note: if Expo is already running, stop and restart it after changing `EXPO_PUBLIC_BACKEND_BASE_URL`.
 
 The provider is selected with `EXPO_PUBLIC_API_PROVIDER` and defaults to `steam`.
+
+## Dev View auth tools
+
+The Dev View contains two auth-related helpers:
+
+- `FirebaseTokenGenerator`: signs in with the test Firebase user and prints the ID token to the console.
+- `BackendTestAuth`: calls the protected backend endpoint directly and shows `ok` or `unauthorized`.
+
+Both components are for local testing only.
