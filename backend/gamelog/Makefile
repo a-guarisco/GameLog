@@ -38,11 +38,9 @@ migrate:
 	@echo "✅ Done!"
 
 revision:
-	@if [ -z "$(m)" ]; then \
-		echo "❌ Error: Please provide migration message"; \
-		echo "   Usage: make revision m=\"Create users table\""; \
-		exit 1; \
-	fi
+ifndef m
+	$(error ❌ Error: Please provide migration message. Usage: make revision m="Create users table")
+endif
 	@echo "🆕 Creating migration: $(m)"
 	(cd .. && docker compose -f compose.yml exec gamelog uv run alembic revision --autogenerate -m "$(m)")
 	@echo "✅ Done! Run 'make migrate' to apply"
@@ -53,11 +51,9 @@ seed:
 	@echo "✅ Done! Demo data is ready for Adminer"
 
 stamp:
-	@if [ -z "$(r)" ]; then \
-		echo "❌ Error: Please provide a revision id"; \
-		echo "   Usage: make stamp r=0001_initial_schema"; \
-		exit 1; \
-	fi
+ifndef r
+	$(error ❌ Error: Please provide a revision id. Usage: make stamp r=0001_initial_schema)
+endif
 	@echo "⚠️  Stamping database to revision: $(r)"
 	uv run alembic stamp $(r)
 	@echo "✅ Done! Alembic version table updated without running schema changes"
@@ -68,12 +64,6 @@ downgrade:
 	@echo "✅ Done!"
 
 downgrade-all:
-	@echo "⚠️  WARNING: Rolling back ALL migrations!"
-	@read -p "Are you sure? (y/N) " -n 1 -r; \
-	echo; \
-	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		uv run alembic downgrade base; \
-		echo "✅ Done!"; \
-	else \
-		echo "Cancelled"; \
-	fi
+	@echo "⚠️  Rolling back ALL migrations to base..."
+	uv run alembic downgrade base
+	@echo "✅ Done!"

@@ -67,3 +67,25 @@ export const useGetGameGenreChartData = (userId: string) => {
     errorGenreChart: error,
   };
 };
+
+// export const useGetBackendHealth = () => {
+//   const fetchFunc = useCallback(() => ApiManager.getBackendHealth(), []);
+
+//   const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+//   return {
+//     backendHealth: data,
+//     isLoadingBackendHealth: isLoading,
+//     errorBackendHealth: error,
+//   };
+// };
+
+// export const useGetAuthOutcome = (token: string) => {
+//   const fetchFunc = useCallback(() => ApiManager.getAuthOutcome(token), [token]);
+
+//   const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+//   return {
+//     authOutcome: data,
+//     isLoadingAuthOutcome: isLoading,
+//     errorAuthOutcome: error,
+//   };
+// };

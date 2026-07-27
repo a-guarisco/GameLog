@@ -1,6 +1,5 @@
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { InfoBox } from '@gamelog/common/feedbacks';
 
 const getStableHash = (value: string | undefined): string => {
   if (!value) {

@@ -1,14 +1,11 @@
 import { useState } from 'react';
-import { Platform } from 'react-native';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 
 interface BackendHealthCheckProps {
   className?: string;
 }
-
-const getDefaultBackendBaseUrl = () =>
-  Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
 
 const HEALTHCHECK_TIMEOUT_MS = 8000;
 
@@ -31,11 +28,10 @@ export const BackendHealthCheck = ({ className }: BackendHealthCheckProps) => {
       setHealthError(null);
       setHealthStatus(null);
 
-      const baseUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL ?? getDefaultBackendBaseUrl();
-      const nextHealthUrl = `${baseUrl.replace(/\/$/, '')}/health`;
+      const nextHealthUrl = EndPoints.getBackendHealth();
       setHealthUrl(nextHealthUrl);
-      const response = await fetch(nextHealthUrl, { signal: controller.signal });
 
+      const response = await fetch(nextHealthUrl, { signal: controller.signal });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }

@@ -14,10 +14,12 @@ export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
       .then((result) => {
         if (isMounted) setData(result);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         if (isMounted) {
           console.error('Error fetching data:', err);
-          setErrorMessage(err.message || 'An error occurred while fetching data.');
+          const nextErrorMessage =
+            err instanceof Error ? err.message : 'An error occurred while fetching data.';
+          setErrorMessage(nextErrorMessage);
         }
       })
       .finally(() => {

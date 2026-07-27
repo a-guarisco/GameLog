@@ -32,6 +32,50 @@ Notes:
 
 - Do not commit real credentials.
 - `DATABASE_URL` is built in `compose.yml` from these variables.
+- `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH` points to the Firebase service account key on host; Compose mounts it as a read-only secret inside the API container.
+
+### Firebase auth prerequisites
+
+The backend verifies Firebase ID tokens using the Firebase Admin SDK.
+
+To make that work:
+
+1. Request access to the Firebase project or ask for a test user to be created.
+2. Download the Firebase service account JSON file from the Firebase console.
+3. Keep the file outside the repository.
+4. Set `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH` in `backend/.env` to the absolute host path of that file.
+
+Example:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH=/absolute/path/to/serviceAccountKey.json
+```
+
+The container receives the file as `/run/secrets/firebase-service-account.json` and uses it to validate bearer tokens sent by the mobile app.
+
+### Firebase Key (Docker)
+
+Add this variable in `backend/.env` (absolute path outside the repository):
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH=/absolute/path/to/serviceAccountKey.json
+```
+
+Suggested local setup:
+
+```bash
+mkdir -p ~/.config/gamelog
+cp /path/where/you/downloaded/serviceAccountKey.json ~/.config/gamelog/serviceAccountKey.json
+chmod 600 ~/.config/gamelog/serviceAccountKey.json
+```
+
+At runtime, the API container reads the key from `/run/secrets/firebase-service-account.json`.
+
+### Auth test endpoint
+
+The backend exposes a protected auth test endpoint used by the mobile Dev View.
+
+The mobile app sends a Firebase ID token through the `Authorization: Bearer <token>` header and the backend returns a simple outcome that can be checked from the UI.
 
 ## Makefile in `backend/` (Docker)
 
