@@ -1,7 +1,7 @@
 import uuid
 
 from sqlmodel import Field, SQLModel
-
+from pydantic import BaseModel
 from src.models.steam_rolling_time import SteamRollingTimeBase
 from src.models.user import UserBase
 

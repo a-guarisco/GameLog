@@ -21,17 +21,17 @@ def _users() -> list[User]:
     return [
         User(
             id=DEMO_USER_A_ID,
-            firebase_uid="firebase-demo-001",
+            firebase_uid="f4vGO3YdnJDyo8HZ3kfZqW5Ao6fJ",
             username="alice",
-            steam_id="76561198000000001",
-            steam_api_key="demo-key-alice",
+            steam_id="76561198077919169",
+            steam_api_key="724FF154B1D2A357857A257EA28C6415",
         ),
         User(
             id=DEMO_USER_B_ID,
             firebase_uid="firebase-demo-002",
             username="bob",
             steam_id="76561198000000002",
-            steam_api_key="demo-key-bob",
+            steam_api_key="",
         ),
     ]
 
