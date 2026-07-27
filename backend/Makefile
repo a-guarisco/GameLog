@@ -92,6 +92,9 @@ seed:
 	$(COMPOSE) run --rm -e UV_CACHE_DIR=/tmp/.uv_cache --user "$$(id -u):$$(id -g)" gamelog uv run python -m src.core.seed
 
 revision:
+ifndef m
+	$(error ❌ Error: Please provide migration message. Usage: make revision m="Create users table")
+endif
 	$(COMPOSE) run --rm -e UV_CACHE_DIR=/tmp/.uv_cache --user "$$(id -u):$$(id -g)" gamelog uv run alembic revision --autogenerate -m "$(m)"
 
 migrate:
@@ -105,21 +108,11 @@ setup: up migrate seed
 db-reset: db-clean migrate seed
 
 db-fresh-baseline:
-	@echo "⚠️  ATTENZIONE: Questo comando eliminerà TUTTE le migrazioni in alembic/versions/ e resetterà il DB!"
-	@read -p "Sei sicuro di voler proseguire? [y/N] " ans; \
-	case "$$ans" in \
-		[yY][eE][sS]|[yY]) \
-			echo "🗑️  Eliminazione vecchie migrazioni in alembic/versions/..."; \
-			rm -f gamelog/alembic/versions/*.py; \
-			$(MAKE) db-clean; \
-			$(MAKE) revision m="$(if $(m),$(m),initial_schema)"; \
-			$(MAKE) migrate; \
-			$(MAKE) seed; \
-			echo "✅ Nuova migrazione baseline creata e DB azzerato/popolato con successo!"; \
-			;; \
-		*) \
-			echo "❌ Operazione annullata."; \
-			exit 1; \
-			;; \
-	esac
-
+	@python3 -c "import sys; ans = input('⚠️  ATTENZIONE: Questo comando eliminerà TUTTE le migrazioni in alembic/versions/ e resetterà il DB! Continuare? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operazione annullata." && exit 1)
+	@echo "🗑️ Eliminazione vecchie migrazioni in alembic/versions/..."
+	rm -f gamelog/alembic/versions/*.py
+	$(MAKE) db-clean
+	$(MAKE) revision m="$(if $(m),$(m),initial_schema)"
+	$(MAKE) migrate
+	$(MAKE) seed
+	@echo "✅ Nuova migrazione baseline creata e DB azzerato/popolato con successo!"
