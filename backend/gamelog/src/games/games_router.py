@@ -13,5 +13,5 @@ def get_weekly_playtime(auth_user: AuthenticatedUser = Depends(get_current_user)
     return game_service.get_last_two_weeks_playtime_by_user(db, auth_user.uid)
     
 @router.get("/weekly_playtime_by_game", summary="Returns the user's daily playtime over the last two weeks for the specified game only.")
-def get_weekly_playtime_by_game(game_id: int, auth_user: AuthenticatedUser = Depends(get_current_user), db: Session = Depends(get_db)):
-    return game_service.get_last_two_weeks_playtime_by_game(db, auth_user.uid, game_id)
+def get_weekly_playtime_by_game(steam_app_id: str, auth_user: AuthenticatedUser = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_last_two_weeks_playtime_by_game(db, auth_user.uid, steam_app_id)

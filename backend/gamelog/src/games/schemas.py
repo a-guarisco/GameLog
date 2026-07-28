@@ -26,3 +26,7 @@ class SteamGame(BaseModel):
 class GetOwnedGamesResponse(BaseModel):
     game_count: int
     games: list[SteamGame]
+
+class DayByDayPlaytime(BaseModel):
+    date: datetime.date
+    playtime_minutes: int

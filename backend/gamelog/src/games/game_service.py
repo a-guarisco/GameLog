@@ -1,16 +1,16 @@
 import json
-from typing import List
+from typing import Sequence
 import uuid
 import warnings
 from urllib.request import urlopen
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from collections import defaultdict
 
 from fastapi import HTTPException
 
 from sqlmodel import Session, select
 
-from src.games.schemas import GetOwnedGamesResponse, SteamGame
+from src.games.schemas import GetOwnedGamesResponse, SteamGame, DayByDayPlaytime
 from src.models import Game, GameStatus, Shelving, SteamRollingTime
 from src.users import UserRead
 
@@ -31,6 +31,8 @@ def update_user_shelving_steamrolling(session: Session, user: UserRead) -> None:
             _create_steam_rolling(session, user, steam_game, steam_app_id, is_baseline=True)
         else:
             _create_steam_rolling(session, user, steam_game, steam_app_id, is_baseline=False)
+
+    _prune_old_steam_rolling(session, user.id)
 
 
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
@@ -75,6 +77,38 @@ def _create_steam_rolling(session: Session, user: UserRead, game: SteamGame, ste
     session.commit()
 
 
+def _prune_old_steam_rolling(session: Session, user_id: uuid.UUID) -> None:
+    cutoff = date.today() - timedelta(days=13)
+
+    app_ids = session.exec(
+        select(SteamRollingTime.steam_app_id)
+        .where(SteamRollingTime.user_id == user_id)
+        .distinct()
+    ).all()
+
+    for app_id in app_ids:
+        old_records = session.exec(
+            select(SteamRollingTime)
+            .where(SteamRollingTime.user_id == user_id)
+            .where(SteamRollingTime.steam_app_id == app_id)
+            .where(SteamRollingTime.created_at < cutoff)
+            .order_by(SteamRollingTime.created_at)
+        ).all()
+
+        if len(old_records) <= 1:
+            continue
+
+        anchor = old_records[-1]
+        if not anchor.is_baseline:
+            anchor.is_baseline = True
+            session.add(anchor)
+
+        for record in old_records[:-1]:
+            session.delete(record)
+
+    session.commit()
+
+
 def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
     if user.steam_api_key is None:
         warnings.warn("Using default steam api key")
@@ -97,9 +131,17 @@ def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
     )
 
 
-def get_last_two_weeks_playtime_by_user(session: Session, user_id: str) -> list[dict]:
+def get_last_two_weeks_playtime_by_user(session: Session, user_id: str) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id)
+    return _compute_daily_playtimes(steam_rolling_times)
 
+
+def get_last_two_weeks_playtime_by_game(session: Session, user_id: str, steam_app_id: str) -> list[DayByDayPlaytime]:
+    steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
+    return _compute_daily_playtimes(steam_rolling_times)
+
+
+def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime]) -> list[DayByDayPlaytime]:
     records_by_game = defaultdict(list)
     for record in steam_rolling_times:
         records_by_game[record.steam_app_id].append(record)
@@ -124,21 +166,24 @@ def get_last_two_weeks_playtime_by_user(session: Session, user_id: str) -> list[
 
     for i in range(13, -1, -1):
         target_date = today - timedelta(days=i)
-        result.append({
-            "date": target_date.isoformat(),
-            "playtime": daily_totals.get(target_date, 0)
-        })
+        result.append(
+            DayByDayPlaytime(
+                date=target_date,
+                playtime_minutes=daily_totals.get(target_date, 0)
+            )
+        )
 
     return result
-    
-def _get_steam_rolling_by_user(session: Session, user_id: str) -> Sequence[SteamRollingTime]:
+
+
+def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:
     user = session.exec(select(UserRead).where(UserRead.uid == user_id)).first()
     if not user:
         raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
     
-    return session.exec(
-        select(SteamRollingTime)
-        .where(SteamRollingTime.user_id == user.id)
-        .order_by(SteamRollingTime.created_at)
-    ).all()
+    query = select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)
+    if steam_app_id is not None:
+        query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
+        
+    return session.exec(query.order_by(SteamRollingTime.created_at)).all()
         
