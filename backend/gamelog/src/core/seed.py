@@ -62,32 +62,71 @@ def _shelvings() -> list[Shelving]:
 
 
 def _rolling_times() -> list[SteamRollingTime]:
-    return [
-        SteamRollingTime(
-            id=uuid4(),
-            user_id=DEMO_USER_A_ID,
-            steam_app_id="730",
-            last_day_playtime=120,
-            created_at=date(2026, 4, 17),
-            is_baseline=False,
-        ),
-        SteamRollingTime(
-            id=uuid4(),
-            user_id=DEMO_USER_A_ID,
-            steam_app_id="1174180",
-            last_day_playtime=45,
-            created_at=date(2026, 4, 18),
-            is_baseline=False,
-        ),
-        SteamRollingTime(
-            id=uuid4(),
-            user_id=DEMO_USER_B_ID,
-            steam_app_id="570",
-            last_day_playtime=300,
-            created_at=date(2026, 4, 18),
-            is_baseline=False,
-        ),
-    ]
+    from datetime import timedelta
+    today = date.today()
+    records = []
+
+    # Seed for Alice (DEMO_USER_A_ID) - CS2 (730)
+    cs2_playtime = 1000
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = (day_offset == 14)
+        if not is_baseline:
+            playtime_increment = [30, 45, 0, 60, 20, 0, 90, 15, 40, 0, 50, 75, 10, 80, 45][14 - day_offset]
+            cs2_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_A_ID,
+                steam_app_id="730",
+                last_day_playtime=cs2_playtime,
+                created_at=record_date,
+                is_baseline=is_baseline,
+            )
+        )
+
+    # Seed RDR2 (1174180) for Alice (DEMO_USER_A_ID)
+    rdr2_playtime = 500
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = (day_offset == 14)
+        if not is_baseline:
+            playtime_increment = [0, 60, 90, 0, 15, 30, 45, 0, 0, 120, 10, 0, 35, 50, 0][14 - day_offset]
+            rdr2_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_A_ID,
+                steam_app_id="1174180",
+                last_day_playtime=rdr2_playtime,
+                created_at=record_date,
+                is_baseline=is_baseline,
+            )
+        )
+
+    # Seed Dota (570) for Bob (DEMO_USER_B_ID)
+    dota_playtime = 2000
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = (day_offset == 14)
+        if not is_baseline:
+            playtime_increment = [100, 120, 0, 80, 90, 150, 0, 60, 40, 110, 0, 85, 95, 120, 60][14 - day_offset]
+            dota_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_B_ID,
+                steam_app_id="570",
+                last_day_playtime=dota_playtime,
+                created_at=record_date,
+                is_baseline=is_baseline,
+            )
+        )
+
+    return records
 
 
 def seed_database() -> None:
