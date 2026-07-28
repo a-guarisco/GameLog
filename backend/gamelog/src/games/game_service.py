@@ -177,7 +177,8 @@ def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime]) ->
 
 
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:
-    user = session.exec(select(UserRead).where(UserRead.uid == user_id)).first()
+    from src.models import User as UserModel
+    user = session.exec(select(UserModel).where(UserModel.firebase_uid == user_id)).first()
     if not user:
         raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
     
@@ -185,5 +186,4 @@ def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str
     if steam_app_id is not None:
         query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
         
-    return session.exec(query.order_by(SteamRollingTime.created_at)).all()
-        
+    return session.exec(query.order_by(SteamRollingTime.created_at)).all()
