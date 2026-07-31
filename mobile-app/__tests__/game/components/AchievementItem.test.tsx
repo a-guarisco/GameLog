@@ -31,7 +31,7 @@ describe('AchievementItem', () => {
     );
   });
 
-  it('renders displayName and description when provided', () => {
+  it('renders displayName when provided', () => {
     render(<AchievementItem name="PLAY_CS2" displayName="A New Beginning" percentage={80} />);
     expect(screen.getByText('A New Beginning')).toBeTruthy();
   });
