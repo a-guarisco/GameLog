@@ -5,7 +5,7 @@
     "paths": {
       "@gamelog/*": ["./src/*"]
     },
-    "types": ["jest", "react-native"],
+    "types": ["jest"],
     "strict": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "target": "ESNext",

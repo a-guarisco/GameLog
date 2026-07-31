@@ -15,6 +15,22 @@ jest.mock('expo-font', () => ({
   loadAsync: jest.fn(() => Promise.resolve()),
 }));
 
+jest.mock('@gamelog/auth/firebaseClient', () => ({
+  app: {},
+  auth: {
+    currentUser: null,
+  },
+}));
+
+jest.mock('firebase/app', () => ({
+  initializeApp: jest.fn(() => ({})),
+}));
+
+jest.mock('firebase/auth', () => ({
+  getAuth: jest.fn(() => ({ currentUser: null })),
+  signInWithEmailAndPassword: jest.fn(),
+}));
+
 if (!process.env.EXPO_PUBLIC_STEAM_API_KEY) {
   process.env.EXPO_PUBLIC_STEAM_API_KEY = 'test-steam-api-key';
 }

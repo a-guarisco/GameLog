@@ -49,8 +49,13 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
       ) : (
         <VStack className="mb-4">
           {topAchievements.map(
-            (item: { name: string; percent: number }, index: Key | null | undefined) => (
-              <AchievementItem key={index} name={item.name} percentage={item.percent} />
+            (item, index) => (
+              <AchievementItem
+                key={index}
+                name={item.name}
+                displayName={item.displayName}
+                percentage={item.percent}
+              />
             )
           )}
         </VStack>
@@ -71,6 +76,6 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
           {totalCount > 3 ? `See all ${totalCount} achievements →` : 'See more →'}
         </ButtonText>
       </Button>
-    </Box>
+    </Box >
   );
 }

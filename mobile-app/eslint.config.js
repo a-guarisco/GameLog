@@ -1,3 +1,5 @@
+/* global __dirname */
+const path = require('path');
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
@@ -14,7 +16,7 @@ module.exports = defineConfig([
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: './tsconfig.json',
+          project: path.resolve(__dirname, 'tsconfig.json'),
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],

@@ -66,9 +66,9 @@ describe('ChartWrapperCard', () => {
     expect(screen.getByTestId('default-error')).toBeTruthy();
   });
 
-  it('renders error component when cardWidth is 0 (before layout)', () => {
+  it('renders Spinner when cardWidth is 0 (before layout)', () => {
     render(<ChartWrapperCard {...defaultProps}>{noop}</ChartWrapperCard>);
-    expect(screen.getByTestId('default-error')).toBeTruthy();
+    expect(screen.getByTestId('spinner')).toBeTruthy();
   });
 
   it('renders children after a layout event provides a width', () => {

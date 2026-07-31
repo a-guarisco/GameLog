@@ -6,6 +6,7 @@ import { formatAchievementName } from '@gamelog/utils/formatUtils';
 
 interface AchievementItemProps {
   name: string;
+  displayName?: string;
   percentage: number;
   unlockTime?: number;
 }
@@ -43,9 +44,8 @@ const AchievementItem = ({ name, percentage, unlockTime }: AchievementItemProps)
 
   return (
     <Box
-      className={`relative overflow-hidden rounded-lg border mb-3 bg-background-50 ${
-        isUnlocked ? 'border-success-500' : 'border-error-500'
-      }`}
+      className={`relative overflow-hidden rounded-lg border mb-3 bg-background-50 ${isUnlocked ? 'border-success-500' : 'border-error-500'
+        }`}
     >
       <Box
         testID="global-progress-bar"
@@ -55,11 +55,10 @@ const AchievementItem = ({ name, percentage, unlockTime }: AchievementItemProps)
 
       <HStack className="min-h-16 px-3 py-3 items-center relative z-10" space="md">
         <Box
-          className={`w-10 h-10 rounded-md items-center justify-center border ${
-            isUnlocked
+          className={`w-10 h-10 rounded-md items-center justify-center border ${isUnlocked
               ? 'bg-success-100 border-success-300'
               : 'bg-background-100 border-error-500'
-          }`}
+            }`}
         >
           <Text size="md">{isUnlocked ? '🏆' : '🔒'}</Text>
         </Box>

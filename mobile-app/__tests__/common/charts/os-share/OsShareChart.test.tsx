@@ -1,10 +1,8 @@
 import { render } from '@testing-library/react-native';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
 import { computePieRadius, computePieInnerRadius } from '@gamelog/common/charts/chartsHelpers';
 import buildOsShareData from '@gamelog/common/charts/os-share/buildOsShareData';
 
-jest.mock('@gamelog/api-manager/useApi');
 jest.mock('react-native-gifted-charts', () => ({ PieChart: 'PieChart' }));
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
   computePieRadius: jest.fn(() => 100),
@@ -32,8 +30,6 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   return MockChartWrapperCard;
 });
 
-const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
-
 const OWNED_GAMES = {
   response: {
     game_count: 1,
@@ -58,87 +54,43 @@ beforeEach(() => jest.clearAllMocks());
 
 describe('OsShareChart', () => {
   it('passes isLoading=true to ChartWrapperCard while data is loading', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: true,
-      errorOwnedGames: null,
-    });
-
-    const { getByTestId, UNSAFE_queryByType } = render(<OsShareChart />);
+    const { getByTestId, UNSAFE_queryByType } = render(
+      <OsShareChart ownedGames={null} isLoadingOwnedGames={true} />
+    );
 
     expect(getByTestId('chart-wrapper')).toBeTruthy();
     expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
   it('passes error=true to ChartWrapperCard when there is an error', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: new Error('fail'),
-    });
-
-    const { UNSAFE_queryByType } = render(<OsShareChart />);
+    const { UNSAFE_queryByType } = render(
+      <OsShareChart ownedGames={null} errorOwnedGames={new Error('fail')} />
+    );
 
     expect(UNSAFE_queryByType('PieChart' as any)).toBeNull();
   });
 
   it('renders PieChart when data is available', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const { UNSAFE_getByType } = render(<OsShareChart ownedGames={OWNED_GAMES} />);
 
     expect(UNSAFE_getByType('PieChart' as any)).toBeTruthy();
   });
 
-  it('calls useGetOwnedGames with the hardcoded userId and false', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: true,
-      errorOwnedGames: null,
-    });
-
-    render(<OsShareChart />);
-
-    expect(mockUseGetOwnedGames).toHaveBeenCalledWith('76561198077919169', false);
-  });
-
   it('passes an empty pieData array when ownedGames is null', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: null,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const { UNSAFE_getByType } = render(<OsShareChart ownedGames={null} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
     expect(pie.props.data).toEqual([]);
   });
 
   it('passes an empty pieData array when ownedGames.response is missing', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: {},
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const { UNSAFE_getByType } = render(<OsShareChart ownedGames={{}} />);
 
     expect(UNSAFE_getByType('PieChart' as any).props.data).toEqual([]);
   });
 
   it('derives radius and innerRadius from cardWidth via helpers', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const { UNSAFE_getByType } = render(<OsShareChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
     expect(computePieRadius).toHaveBeenCalledWith(300);
@@ -148,13 +100,7 @@ describe('OsShareChart', () => {
   });
 
   it('sets innerCircleColor and textColor from the theme', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { UNSAFE_getByType } = render(<OsShareChart />);
+    const { UNSAFE_getByType } = render(<OsShareChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
     expect(pie.props.innerCircleColor).toBe('rgb(30,30,30)');
@@ -162,15 +108,9 @@ describe('OsShareChart', () => {
   });
 
   it('memoizes pieData — buildOsShareData is not re-called on unrelated re-renders', () => {
-    mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: OWNED_GAMES,
-      isLoadingOwnedGames: false,
-      errorOwnedGames: null,
-    });
-
-    const { rerender } = render(<OsShareChart />);
+    const { rerender } = render(<OsShareChart ownedGames={OWNED_GAMES} />);
     const callsBefore = (buildOsShareData as jest.Mock).mock.calls.length;
-    rerender(<OsShareChart />);
+    rerender(<OsShareChart ownedGames={OWNED_GAMES} />);
 
     expect((buildOsShareData as jest.Mock).mock.calls.length).toBe(callsBefore);
   });

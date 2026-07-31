@@ -3,6 +3,7 @@ import os
 from fastapi.testclient import TestClient
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_main.db")
+os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/dummy_credentials.json")
 
 from src.main import app
 

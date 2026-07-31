@@ -1,5 +1,6 @@
 import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
 import EndPoints, { getSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
+import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
@@ -51,12 +52,121 @@ describe('ApiManager', () => {
   );
 
   testHelper(
-    'fetches global achievement successfully',
-    'handles global achievement fetch failure',
-    { achievementpercentages: { achievements: [] } },
-    () => ApiManager.getGlobalAchievement(appId),
-    EndPoints.getGlobalAchievementsForApp(appId)
+    'fetches schema for game successfully',
+    'handles schema for game fetch failure',
+    { game: { gameName: 'CSGO', gameVersion: '1', availableGameStats: { achievements: [] } } },
+    () => ApiManager.getSchemaForGame(appId),
+    EndPoints.getSchemaForGame(appId)
   );
+
+  describe('getGlobalAchievement', () => {
+    it('fetches global achievements and merges schema display name and description', async () => {
+      const mockGlobalData = {
+        achievementpercentages: {
+          achievements: [
+            { name: 'PLAY_CS2', percent: 85.5 },
+            { name: 'WIN_MATCH', percent: 12.3 },
+          ],
+        },
+      };
+      const mockSchemaData = {
+        game: {
+          gameName: 'CS2',
+          gameVersion: '1',
+          availableGameStats: {
+            achievements: [
+              {
+                name: 'PLAY_CS2',
+                displayName: 'A New Beginning',
+                description: 'Played first CS2 match',
+              },
+              { name: 'WIN_MATCH', displayName: 'Winner Winner', description: 'Won a match' },
+            ],
+          },
+        },
+      };
+
+      mockFetch.mockImplementation((url: string) => {
+        if (url === EndPoints.getGlobalAchievementsForApp(appId)) {
+          return Promise.resolve({ ok: true, json: async () => mockGlobalData });
+        }
+        if (url === EndPoints.getSchemaForGame(appId)) {
+          return Promise.resolve({ ok: true, json: async () => mockSchemaData });
+        }
+        return Promise.reject(new Error('Unknown URL'));
+      });
+
+      const result = await ApiManager.getGlobalAchievement(appId);
+
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getGlobalAchievementsForApp(appId));
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getSchemaForGame(appId));
+      expect(result).toEqual({
+        achievementpercentages: {
+          achievements: [
+            {
+              name: 'PLAY_CS2',
+              percent: 85.5,
+              displayName: 'A New Beginning',
+              description: 'Played first CS2 match',
+            },
+            {
+              name: 'WIN_MATCH',
+              percent: 12.3,
+              displayName: 'Winner Winner',
+              description: 'Won a match',
+            },
+          ],
+        },
+      });
+    });
+
+    it('falls back to raw global achievements if game schema fetch fails', async () => {
+      const mockGlobalData = {
+        achievementpercentages: {
+          achievements: [{ name: 'PLAY_CS2', percent: 85.5 }],
+        },
+      };
+
+      mockFetch.mockImplementation((url: string) => {
+        if (url === EndPoints.getGlobalAchievementsForApp(appId)) {
+          return Promise.resolve({ ok: true, json: async () => mockGlobalData });
+        }
+        if (url === EndPoints.getSchemaForGame(appId)) {
+          return Promise.resolve({ ok: false, status: 404 });
+        }
+        return Promise.reject(new Error('Unknown URL'));
+      });
+
+      const result = await ApiManager.getGlobalAchievement(appId);
+
+      expect(result).toEqual(mockGlobalData);
+    });
+
+    it('rejects if global achievements fetch fails', async () => {
+      mockFetch.mockImplementation((url: string) => {
+        if (url === EndPoints.getGlobalAchievementsForApp(appId)) {
+          return Promise.resolve({ ok: false, status: 500 });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      await expect(ApiManager.getGlobalAchievement(appId)).rejects.toThrow();
+    });
+  });
+
+  describe('mergeGlobalAchievementsWithSchema', () => {
+    it('returns original global achievements if schema is null or missing achievements', () => {
+      const globalData = {
+        achievementpercentages: { achievements: [{ name: 'ach1', percent: 50 }] },
+      };
+      expect(mergeGlobalAchievementsWithSchema(globalData, null)).toEqual(globalData);
+      expect(
+        mergeGlobalAchievementsWithSchema(globalData, {
+          game: { gameName: 'g', gameVersion: '1' },
+        })
+      ).toEqual(globalData);
+    });
+  });
 
   testHelper(
     'fetches player achievements successfully',

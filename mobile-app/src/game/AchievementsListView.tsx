@@ -35,6 +35,7 @@ const AchievementsListView = ({ route }: any) => {
 
         return {
           name: globalAch.name,
+          displayName: globalAch.displayName,
           percent: globalAch.percent,
           unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
         };
@@ -66,7 +67,7 @@ const AchievementsListView = ({ route }: any) => {
         <Text size="3xl" className="font-bold uppercase text-center mb-3">
           Achievements
         </Text>
-      
+
         <Box className="relative overflow-hidden border-2 border-outline-300 h-8 bg-background-100">
           <Box
             className="absolute top-0 left-0 h-full bg-success-500"
@@ -85,6 +86,7 @@ const AchievementsListView = ({ route }: any) => {
           <AchievementItem
             key={index}
             name={item.name}
+            displayName={item.displayName}
             percentage={item.percent}
             unlockTime={item.unlockTime}
           />
