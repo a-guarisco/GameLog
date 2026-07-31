@@ -70,6 +70,11 @@ const EndPoints = {
     return `${STORE_BASE_URL}/api/appdetails?appids=${appId}&filters=genres`;
   },
 
+  getSchemaForGame: (appId: string) => {
+    // TODO: use isBackendProvider() if backend endpoint differs
+    return `${STEAM_BASE_URL}ISteamUserStats/GetSchemaForGame/v2/?key=${getSteamApiKey()}&appid=${appId}`;
+  },
+
   getAuthOutcome: () => {
     return `${BACKEND_BASE_URL}/me`;
   },

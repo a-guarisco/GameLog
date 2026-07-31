@@ -5,11 +5,12 @@ import { Text } from '@gamelog/common/gluestack/text';
 
 interface AchievementItemProps {
   name: string;
+  displayName?: string;
   percentage: number;
   unlockTime?: number;
 }
 
-const AchievementItem = ({ name, percentage, unlockTime }: AchievementItemProps) => {
+const AchievementItem = ({ name, displayName, percentage, unlockTime }: AchievementItemProps) => {
   return (
     <Box className="relative overflow-hidden rounded-2xl border-2 border-outline-500 mb-3 h-20">
       <Box
@@ -21,7 +22,7 @@ const AchievementItem = ({ name, percentage, unlockTime }: AchievementItemProps)
       <HStack className="h-full px-5 items-center relative z-10" space="md">
         <VStack className="flex-1 items-center justify-center">
           <Text size="xl" className="font-bold uppercase text-center">
-            {name}
+            {displayName || name}
           </Text>
           {unlockTime && (
             <Text size="sm" className="font-mono text-center">

@@ -34,6 +34,7 @@ const AchievementsListView = ({ route }: any) => {
 
       return {
         name: globalAch.name,
+        displayName: globalAch.displayName,
         percent: globalAch.percent,
         unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
       };
@@ -62,6 +63,7 @@ const AchievementsListView = ({ route }: any) => {
           <AchievementItem
             key={index}
             name={item.name}
+            displayName={item.displayName}
             percentage={item.percent}
             unlockTime={item.unlockTime}
           />

@@ -1,8 +1,10 @@
 import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
 import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
+import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import type {
   GameGenres,
   GlobalAchievement,
+  GameSchema,
   OwnedGames,
   PlayerAchievement,
   PlayerFriends,
@@ -23,11 +25,20 @@ async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
 export { getApiProvider, setApiProvider, isBackendProvider, fetchData };
 export default {
   getGameNews: (appId: string, count: number, maxLength: number) =>
-    fetchData<SteamNews>(EndPoints.getNewsForApp(appId, count, maxLength)),
+    fetchData(EndPoints.getNewsForApp(appId, count, maxLength)),
+  getSchemaForGame: (appId: string) => fetchData<GameSchema>(EndPoints.getSchemaForGame(appId)),
+  getGlobalAchievement: async (appId: string): Promise<GlobalAchievement> => {
+    const globalAchievementsPromise = fetchData<GlobalAchievement>(
+      EndPoints.getGlobalAchievementsForApp(appId)
+    );
+    const schemaPromise = fetchData<GameSchema>(EndPoints.getSchemaForGame(appId)).catch(
+      () => null
+    );
 
-  getGlobalAchievement: (appId: string) =>
-    fetchData<GlobalAchievement>(EndPoints.getGlobalAchievementsForApp(appId)),
+    const [globalData, schemaData] = await Promise.all([globalAchievementsPromise, schemaPromise]);
 
+    return mergeGlobalAchievementsWithSchema(globalData, schemaData);
+  },
   getAllPlayerAchievementsPerApp: (appId: string, steamId: string) =>
     fetchData<PlayerAchievement>(EndPoints.getPlayerAchievements(appId, steamId)),
 

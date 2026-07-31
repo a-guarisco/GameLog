@@ -75,6 +75,9 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.getGameGenres('440')).toBe(
         'https://store.steampowered.com/api/appdetails?appids=440&filters=genres'
       );
+      expect(EndPoints.getSchemaForGame('730')).toBe(
+        'https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=abc123&appid=730'
+      );
     });
   });
 
