@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth
 
@@ -7,13 +7,29 @@ from src.auth.schemas import AuthenticatedUser
 security = HTTPBearer(auto_error=False)
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security),
-) -> AuthenticatedUser:
-    if not credentials:
+def extract_bearer_token(
+    credentials: HTTPAuthorizationCredentials | None = None,
+    authorization: str | None = None,
+) -> str:
+    token = None
+    if credentials and credentials.credentials:
+        token = credentials.credentials
+    elif authorization:
+        parts = authorization.split(" ")
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            token = parts[1]
+
+    if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing Authorization header")
 
-    token = credentials.credentials
+    return token
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+    authorization: str | None = Header(default=None),
+) -> AuthenticatedUser:
+    token = extract_bearer_token(credentials, authorization)
 
     try:
         decoded_token = auth.verify_id_token(token)
