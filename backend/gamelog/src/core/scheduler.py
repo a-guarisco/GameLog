@@ -13,7 +13,7 @@ from src.models.config import Config
 from src.users import UserRead
 
 
-def run_daily_job():
+def _run_daily_job():
     print("Running midnight cronjob", flush=True)
     with Session(engine) as session:
         try:
@@ -64,7 +64,7 @@ async def _scheduler_loop():
     try:
         print("Scheduler loop started...", flush=True)
         if _should_run_startup_catchup():
-            run_daily_job()
+            _run_daily_job()
         
         while True:
             now = datetime.now(UTC)
@@ -76,13 +76,15 @@ async def _scheduler_loop():
             
             await asyncio.sleep(seconds_to_wait)
             
-            run_daily_job()
+            _run_daily_job()
     except Exception as e:  # noqa: BLE001
         import traceback
         print(f"ERROR in scheduler loop: {e}", flush=True)
         traceback.print_exc()
 
-
+"""
+If no dev option is set (make up), then the scheduler will run on startup to catch up any missed updates since the last update.
+"""
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Lifespan starting...", flush=True)

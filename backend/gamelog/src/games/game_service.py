@@ -13,7 +13,10 @@ from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
 from src.models import Game, GameStatus, Shelving, SteamRollingTime
 from src.users import UserRead
 
-
+"""
+For the specified user, fetch GetOwnedGames from steam, update DB catalog, User Shelving and create
+a new steamRolling object if the today "playtime_forever" is different than the last one saved (yesterday)
+"""
 def update_user_shelving_steamrolling(session: Session, user: UserRead) -> None:
     steam_games = _get_owned_games_from_steam(user)
     for steam_game in steam_games.games:
@@ -108,12 +111,18 @@ def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
         games=[SteamGame(**game) for game in steam_response.get("games", [])],
     )
 
-
+"""
+Return a list of DayByDayPlaytime (date, playtime) of length days (if days=-1, return all possible entry)
+telling how much the specified user has played in the last days
+"""
 def get_playtime_by_user(session: Session, user_id: str, days: int) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
 
-
+"""
+Return a list of DayByDayPlaytime (date, playtime) of length days (if days=-1, return all possible entry)
+telling how much the specified user has played the specified game (by steam_app_id) in the last days
+"""
 def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days: int) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
