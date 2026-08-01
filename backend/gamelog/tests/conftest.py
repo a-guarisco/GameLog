@@ -31,6 +31,7 @@ from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 # SQLite engine / session
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="function")
 def engine():
     """Fresh in-memory SQLite engine for each test."""
@@ -54,6 +55,7 @@ def session(engine):
 # ---------------------------------------------------------------------------
 # Data factories
 # ---------------------------------------------------------------------------
+
 
 def make_user(
     session: Session,
@@ -119,6 +121,7 @@ def make_rolling(
 # ---------------------------------------------------------------------------
 # FastAPI TestClient with overridden dependencies
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="function")
 def client(session):

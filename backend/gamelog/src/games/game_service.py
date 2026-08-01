@@ -1,4 +1,3 @@
-import json
 import uuid
 import warnings
 from collections import defaultdict
@@ -17,6 +16,8 @@ from src.users import UserRead
 For the specified user, fetch GetOwnedGames from steam, update DB catalog, User Shelving and create
 a new steamRolling object if the today "playtime_forever" is different than the last one saved (yesterday)
 """
+
+
 async def update_user_shelving_steamrolling_async(
     session: Session,
     user: UserRead | User,
@@ -35,9 +36,7 @@ async def update_user_shelving_steamrolling_async(
             _shelve_game(session, game_cached.id, user.id, GameStatus.SHELVED)
 
         latest_rolling = _get_latest_steam_rolling(session, user.id, steam_app_id)
-        if latest_rolling is None:
-            _create_steam_rolling(session, user, steam_game, steam_app_id)
-        elif steam_game.playtime_forever != latest_rolling.last_day_playtime:
+        if latest_rolling is None or steam_game.playtime_forever != latest_rolling.last_day_playtime:
             _create_steam_rolling(session, user, steam_game, steam_app_id)
 
 
@@ -46,11 +45,7 @@ def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
 
 
 def _get_game_player_shelve(session: Session, game_id: uuid.UUID, user_id: uuid.UUID) -> Shelving | None:
-    return session.exec(
-        select(Shelving)
-        .where(Shelving.game_id == game_id)
-        .where(Shelving.owner_id == user_id)
-    ).first()
+    return session.exec(select(Shelving).where(Shelving.game_id == game_id).where(Shelving.owner_id == user_id)).first()
 
 
 def _cache_game(session: Session, steam_app_id: str) -> Game:
@@ -134,6 +129,8 @@ async def _get_owned_games_from_steam_async(
 Return a list of DayByDayPlaytime (date, playtime) of length days (if days=-1, return all possible entry)
 telling how much the specified user has played in the last days
 """
+
+
 def get_playtime_by_user(session: Session, user_id: str, days: int = -1) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
@@ -143,6 +140,8 @@ def get_playtime_by_user(session: Session, user_id: str, days: int = -1) -> list
 Return a list of DayByDayPlaytime (date, playtime) of length days (if days=-1, return all possible entry)
 telling how much the specified user has played the specified game (by steam_app_id) in the last days
 """
+
+
 def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days: int = -1) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
@@ -195,18 +194,14 @@ def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], da
     result = []
     for i in range(num_days):
         target_date = start_date + timedelta(days=i)
-        result.append(
-            DayByDayPlaytime(
-                date=target_date,
-                playtime_minutes=daily_totals.get(target_date, 0)
-            )
-        )
+        result.append(DayByDayPlaytime(date=target_date, playtime_minutes=daily_totals.get(target_date, 0)))
 
     return result
 
 
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:
     from src.models import User as UserModel
+
     user = session.exec(select(UserModel).where(UserModel.firebase_uid == user_id)).first()
     if not user:
         raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")

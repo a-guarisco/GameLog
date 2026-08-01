@@ -23,12 +23,11 @@ async def _run_daily_job_async() -> None:
             print(f"Found {len(users)} users with Steam ID to process.", flush=True)
 
             async with httpx.AsyncClient(timeout=10.0) as client:
+
                 async def _process_user(user_db: User) -> None:
                     try:
                         user_read = UserRead.model_validate(user_db)
-                        await game_service.update_user_shelving_steamrolling_async(
-                            session, user_read, client=client
-                        )
+                        await game_service.update_user_shelving_steamrolling_async(session, user_read, client=client)
                     except Exception as user_err:  # noqa: BLE001
                         print(f"Error processing user {user_db.username}: {user_err}", flush=True)
 
@@ -83,6 +82,7 @@ async def _scheduler_loop():
             await _run_daily_job_async()
     except Exception as e:  # noqa: BLE001
         import traceback
+
         print(f"ERROR in scheduler loop: {e}", flush=True)
         traceback.print_exc()
 
@@ -90,6 +90,8 @@ async def _scheduler_loop():
 """
 If no dev option is set (make up), then the scheduler will run on startup to catch up any missed updates since the last update.
 """
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Lifespan starting...", flush=True)

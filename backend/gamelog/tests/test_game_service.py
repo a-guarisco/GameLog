@@ -1,4 +1,3 @@
-import json
 import uuid
 import warnings
 from datetime import date, timedelta
@@ -17,6 +16,7 @@ from src.users import UserRead
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_user(
     session: Session,
@@ -101,6 +101,7 @@ def _mock_httpx_get(payload: dict):
 # _compute_daily_playtimes (Unit Tests)
 # ---------------------------------------------------------------------------
 
+
 class TestComputeDailyPlaytimes:
     def test_empty_records_returns_single_day_when_days_minus_1(self):
         result = game_service._compute_daily_playtimes([], days=-1)
@@ -117,12 +118,8 @@ class TestComputeDailyPlaytimes:
     def test_single_game_two_days(self, session):
         user = make_user(session)
         today = date.today()
-        r1 = SteamRollingTime(
-            user_id=user.id, steam_app_id="570", last_day_playtime=100, created_at=today - timedelta(days=1)
-        )
-        r2 = SteamRollingTime(
-            user_id=user.id, steam_app_id="570", last_day_playtime=160, created_at=today
-        )
+        r1 = SteamRollingTime(user_id=user.id, steam_app_id="570", last_day_playtime=100, created_at=today - timedelta(days=1))
+        r2 = SteamRollingTime(user_id=user.id, steam_app_id="570", last_day_playtime=160, created_at=today)
         result = game_service._compute_daily_playtimes([r1, r2], days=-1)
         assert len(result) == 2
         assert result[0].playtime_minutes == 0  # first day baseline = 0
@@ -192,6 +189,7 @@ class TestComputeDailyPlaytimes:
 # Helper CRUD functions
 # ---------------------------------------------------------------------------
 
+
 class TestHelperCrudFunctions:
     def test_get_cached_game_returns_game_or_none(self, session):
         assert game_service._get_cached_game(session, "570") is None
@@ -224,6 +222,7 @@ class TestHelperCrudFunctions:
     def test_create_steam_rolling(self, session):
         user = make_user(session)
         from src.games.schemas import SteamGame
+
         steam_game = SteamGame(
             appid=570,
             playtime_forever=150,
@@ -253,6 +252,7 @@ class TestHelperCrudFunctions:
 # update_user_shelving_steamrolling_async
 # ---------------------------------------------------------------------------
 
+
 class TestUpdateUserShelvingSteamRollingAsync:
     """Integration-style tests using patched Steam API calls."""
 
@@ -261,19 +261,27 @@ class TestUpdateUserShelvingSteamRollingAsync:
         user = make_user(session)
         user_read = _user_read(user)
 
-        games = [{"appid": 570, "playtime_forever": 120, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 120,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         game = session.exec(select(Game).where(Game.steam_app_id == "570")).first()
         assert game is not None
-        shelving = session.exec(
-            select(Shelving).where(Shelving.game_id == game.id)
-        ).first()
+        shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
         assert shelving is not None
         assert shelving.owner_id == user.id
 
@@ -282,14 +290,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         user = make_user(session)
         user_read = _user_read(user)
 
-        games = [{"appid": 730, "playtime_forever": 0, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 730,
+                "playtime_forever": 0,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         game = session.exec(select(Game).where(Game.steam_app_id == "730")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
         assert shelving.status == GameStatus.SHELVED
@@ -299,14 +317,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         user = make_user(session)
         user_read = _user_read(user)
 
-        games = [{"appid": 570, "playtime_forever": 300, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 300,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         game = session.exec(select(Game).where(Game.steam_app_id == "570")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
         assert shelving.status == GameStatus.SHELVED
@@ -317,14 +345,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         user = make_user(session)
         user_read = _user_read(user)
 
-        games = [{"appid": 730, "playtime_forever": 0, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 730,
+                "playtime_forever": 0,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).all()
         assert len(rolling) == 1
         assert rolling[0].last_day_playtime == 0
@@ -335,14 +373,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         user = make_user(session)
         user_read = _user_read(user)
 
-        games = [{"appid": 570, "playtime_forever": 120, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 120,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).all()
         assert len(rolling) == 1
         assert rolling[0].last_day_playtime == 120
@@ -355,14 +403,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         # Pre-existing rolling with playtime=100
         make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100)
 
-        games = [{"appid": 570, "playtime_forever": 100, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 100,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).all()
         assert len(rolling) == 1  # no new entry created
 
@@ -374,19 +432,25 @@ class TestUpdateUserShelvingSteamRollingAsync:
         # Pre-existing rolling with playtime=100
         make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100)
 
-        games = [{"appid": 570, "playtime_forever": 150, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 150,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
-        rolling = session.exec(
-            select(SteamRollingTime)
-            .where(SteamRollingTime.user_id == user.id)
-            .order_by(SteamRollingTime.created_at)
-        ).all()
+
+        rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id).order_by(SteamRollingTime.created_at)).all()
         assert len(rolling) == 2
         assert rolling[-1].last_day_playtime == 150
 
@@ -397,14 +461,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         game = make_game(session, steam_app_id="570")
         make_shelving(session, user=user, game=game)
 
-        games = [{"appid": 570, "playtime_forever": 200, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 200,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).first()
         assert rolling is not None
         assert rolling.last_day_playtime == 200
@@ -415,14 +489,24 @@ class TestUpdateUserShelvingSteamRollingAsync:
         user_read = _user_read(user)
         existing_game = make_game(session, steam_app_id="570")
 
-        games = [{"appid": 570, "playtime_forever": 100, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+        games = [
+            {
+                "appid": 570,
+                "playtime_forever": 100,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            }
+        ]
 
         with _mock_httpx_get(_make_steam_response(games)):
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         all_games = session.exec(select(Game).where(Game.steam_app_id == "570")).all()
         assert len(all_games) == 1  # no duplicate
         assert all_games[0].id == existing_game.id
@@ -436,6 +520,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
             await game_service.update_user_shelving_steamrolling_async(session, user_read)
 
         from sqlmodel import select
+
         assert session.exec(select(Game)).all() == []
         assert session.exec(select(Shelving)).all() == []
         assert session.exec(select(SteamRollingTime)).all() == []
@@ -444,6 +529,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
 # ---------------------------------------------------------------------------
 # _get_owned_games_from_steam_async
 # ---------------------------------------------------------------------------
+
 
 class TestGetOwnedGamesFromSteamAsync:
     @pytest.mark.anyio
@@ -472,11 +558,10 @@ class TestGetOwnedGamesFromSteamAsync:
             steam_api_key=None,
         )
 
-        with _mock_httpx_get(_make_steam_response([])):
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter("always")
-                await game_service._get_owned_games_from_steam_async(user_read)
-                assert any("default steam api key" in str(warning.message).lower() for warning in w)
+        with _mock_httpx_get(_make_steam_response([])), warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            await game_service._get_owned_games_from_steam_async(user_read)
+            assert any("default steam api key" in str(warning.message).lower() for warning in w)
 
     @pytest.mark.anyio
     async def test_warns_and_uses_default_key_when_empty_string(self, session):
@@ -488,23 +573,36 @@ class TestGetOwnedGamesFromSteamAsync:
             steam_api_key="",
         )
 
-        with _mock_httpx_get(_make_steam_response([])):
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter("always")
-                await game_service._get_owned_games_from_steam_async(user_read)
-                assert any("default steam api key" in str(warning.message).lower() for warning in w)
+        with _mock_httpx_get(_make_steam_response([])), warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            await game_service._get_owned_games_from_steam_async(user_read)
+            assert any("default steam api key" in str(warning.message).lower() for warning in w)
 
     @pytest.mark.anyio
     async def test_returns_parsed_games(self, session):
         user = make_user(session)
         user_read = _user_read(user)
         games_data = [
-            {"appid": 570, "playtime_forever": 100, "playtime_windows_forever": 0,
-             "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-             "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0},
-            {"appid": 730, "playtime_forever": 0, "playtime_windows_forever": 0,
-             "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-             "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0},
+            {
+                "appid": 570,
+                "playtime_forever": 100,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            },
+            {
+                "appid": 730,
+                "playtime_forever": 0,
+                "playtime_windows_forever": 0,
+                "playtime_mac_forever": 0,
+                "playtime_linux_forever": 0,
+                "playtime_deck_forever": 0,
+                "rtime_last_played": 0,
+                "playtime_disconnected": 0,
+            },
         ]
         payload = _make_steam_response(games_data)
         with _mock_httpx_get(payload):
@@ -517,6 +615,7 @@ class TestGetOwnedGamesFromSteamAsync:
 # ---------------------------------------------------------------------------
 # get_playtime_by_user
 # ---------------------------------------------------------------------------
+
 
 class TestGetPlaytimeByUser:
     def test_returns_single_day_when_no_data(self, session):
@@ -535,10 +634,8 @@ class TestGetPlaytimeByUser:
         today = date.today()
         # Two games each contributing 30 min today
         for app_id in ("570", "730"):
-            make_rolling(session, user=user, steam_app_id=app_id, last_day_playtime=100,
-                         created_at=today - timedelta(days=1))
-            make_rolling(session, user=user, steam_app_id=app_id, last_day_playtime=130,
-                         created_at=today)
+            make_rolling(session, user=user, steam_app_id=app_id, last_day_playtime=100, created_at=today - timedelta(days=1))
+            make_rolling(session, user=user, steam_app_id=app_id, last_day_playtime=130, created_at=today)
 
         result = game_service.get_playtime_by_user(session, user.firebase_uid)
         assert len(result) == 2
@@ -554,12 +651,12 @@ class TestGetPlaytimeByUser:
 # get_playtime_by_game
 # ---------------------------------------------------------------------------
 
+
 class TestGetPlaytimeByGame:
     def test_returns_entries_when_data_exists(self, session):
         user = make_user(session)
         today = date.today()
-        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100,
-                     created_at=today)
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100, created_at=today)
         result = game_service.get_playtime_by_game(session, user.firebase_uid, "570")
         assert len(result) >= 1
         assert isinstance(result[0], DayByDayPlaytime)
@@ -569,15 +666,11 @@ class TestGetPlaytimeByGame:
         today = date.today()
         yesterday = today - timedelta(days=1)
         # game 570: 40 min today
-        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100,
-                     created_at=yesterday)
-        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=140,
-                     created_at=today)
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100, created_at=yesterday)
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=140, created_at=today)
         # game 440: 200 min today — should NOT appear
-        make_rolling(session, user=user, steam_app_id="440", last_day_playtime=0,
-                     created_at=yesterday)
-        make_rolling(session, user=user, steam_app_id="440", last_day_playtime=200,
-                     created_at=today)
+        make_rolling(session, user=user, steam_app_id="440", last_day_playtime=0, created_at=yesterday)
+        make_rolling(session, user=user, steam_app_id="440", last_day_playtime=200, created_at=today)
 
         result = game_service.get_playtime_by_game(session, user.firebase_uid, "570")
         assert len(result) == 2
