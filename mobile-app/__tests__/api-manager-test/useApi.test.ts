@@ -105,9 +105,9 @@ describe('useGetGlobalAchievement', () => {
 
 describe('useGetOwnedGames', () => {
   useTestApiHook({
-    useHook: () => useGetOwnedGames('player-1', true),
+    useHook: () => useGetOwnedGames('player-1', true, true),
     apiMethod: 'getOwnedGames',
-    apiArgs: ['player-1', true],
+    apiArgs: ['player-1', true, true],
     expectedKeys: { data: 'ownedGames', loading: 'isLoadingOwnedGames', error: 'errorOwnedGames' },
     mockData: [{ appid: 123, name: 'Half-Life' }],
   });

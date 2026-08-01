@@ -66,8 +66,8 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.getPlayerFriendsList('7656119', true)).toBe(
         'https://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=abc123&steamid=7656119&relationship=all'
       );
-      expect(EndPoints.getOwnedGames('7656119', true)).toBe(
-        'https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=abc123&steamid=7656119&include_appinfo=true&include_played_free_games=true'
+      expect(EndPoints.getOwnedGames('7656119', true, true)).toBe(
+        'https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=abc123&steamid=7656119&include_appinfo=true&include_free_sub=true&include_played_free_games=true'
       );
       expect(EndPoints.getRecentPlayedGames('7656119', 5)).toBe(
         'https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=abc123&steamid=7656119&count=5'
