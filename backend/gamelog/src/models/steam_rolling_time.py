@@ -12,7 +12,6 @@ class SteamRollingTimeBase(SQLModel):
     steam_app_id: str = Field(max_length=32, index=True)
     last_day_playtime: int = 0
     created_at: date = Field(default_factory=date.today, index=True)
-    is_baseline: bool = Field(default=False, index=True)
 
 
 class SteamRollingTime(SteamRollingTimeBase, table=True):

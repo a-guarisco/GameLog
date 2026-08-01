@@ -2,12 +2,11 @@
 Comprehensive tests for src.games.game_service
 
 Covers:
-- _compute_daily_playtimes: baseline handling, delta computation, spike clamping, multi-game,
-  missing days, date windowing, negative delta prevention
-- _prune_old_steam_rolling: keeps anchor, promotes anchor to baseline, deletes surplus records
-- update_user_shelving_steamrolling: new game, existing shelving, existing game (no re-cache),
-  correct status assignment (TO_BE_PLAYED vs PLAYING), baseline flag
-- get_last_two_weeks_playtime_by_user / by_game: delegation, correct aggregation, 404 for unknown user
+- _compute_daily_playtimes: implicit baseline (first entry), delta computation,
+  negative delta prevention, multi-game aggregation, days parameter, gap-filling
+- update_user_shelving_steamrolling: new game, existing shelving, existing game,
+  zero-playtime games not saved
+- get_playtime_by_user / by_game: delegation, correct aggregation, 404 for unknown user
 - _get_owned_games_from_steam: patching urlopen, missing steam key warning
 """
 
@@ -57,54 +56,50 @@ def _make_steam_response(games: list[dict]) -> bytes:
 # ---------------------------------------------------------------------------
 
 class TestComputeDailyPlaytimes:
-    def test_empty_records_returns_14_zero_days(self):
-        result = game_service._compute_daily_playtimes([])
-        assert len(result) == 14
+    def test_empty_records_with_days_minus_1_returns_single_zero_day(self):
+        """No records with days=-1 returns just today with 0."""
+        result = game_service._compute_daily_playtimes([], days=-1)
+        assert len(result) == 1
+        assert result[0].date == date.today()
+        assert result[0].playtime_minutes == 0
+
+    def test_empty_records_with_specific_days(self):
+        """No records with days=7 returns 7 zero-filled days."""
+        result = game_service._compute_daily_playtimes([], days=7)
+        assert len(result) == 7
         assert all(r.playtime_minutes == 0 for r in result)
 
-    def test_baseline_only_contributes_zero(self, session):
-        user = make_user(session)
-        r = make_rolling(session, user=user, last_day_playtime=500, is_baseline=True)
-        result = game_service._compute_daily_playtimes([r])
-        assert all(day.playtime_minutes == 0 for day in result)
-
-    def test_single_delta_record(self, session):
-        """Second record (non-baseline) should yield delta vs first."""
+    def test_first_entry_is_implicit_baseline(self, session):
+        """The first entry per game contributes 0 (it's the baseline)."""
         user = make_user(session)
         today = date.today()
-        r1 = make_rolling(session, user=user, last_day_playtime=100, is_baseline=True,
+        r = make_rolling(session, user=user, last_day_playtime=500,
+                         created_at=today)
+        result = game_service._compute_daily_playtimes([r], days=-1)
+        today_entry = next(d for d in result if d.date == today)
+        assert today_entry.playtime_minutes == 0
+
+    def test_single_delta_record(self, session):
+        """Second record yields delta vs the first (implicit baseline)."""
+        user = make_user(session)
+        today = date.today()
+        r1 = make_rolling(session, user=user, last_day_playtime=100,
                           created_at=today - timedelta(days=1))
-        r2 = make_rolling(session, user=user, last_day_playtime=160, is_baseline=False,
+        r2 = make_rolling(session, user=user, last_day_playtime=160,
                           created_at=today)
-        result = game_service._compute_daily_playtimes([r1, r2])
+        result = game_service._compute_daily_playtimes([r1, r2], days=-1)
         today_entry = next(d for d in result if d.date == today)
         assert today_entry.playtime_minutes == 60
 
-    def test_baseline_in_middle_resets_delta(self, session):
-        """A baseline record mid-sequence should not propagate a delta."""
-        user = make_user(session)
-        today = date.today()
-        r1 = make_rolling(session, user=user, last_day_playtime=100, is_baseline=True,
-                          created_at=today - timedelta(days=2))
-        r2 = make_rolling(session, user=user, last_day_playtime=200, is_baseline=True,
-                          created_at=today - timedelta(days=1))  # new baseline
-        r3 = make_rolling(session, user=user, last_day_playtime=250, is_baseline=False,
-                          created_at=today)
-        result = game_service._compute_daily_playtimes([r1, r2, r3])
-        yesterday_entry = next(d for d in result if d.date == today - timedelta(days=1))
-        assert yesterday_entry.playtime_minutes == 0  # baseline never contributes
-        today_entry = next(d for d in result if d.date == today)
-        assert today_entry.playtime_minutes == 50  # 250 - 200
-
     def test_negative_delta_clamped_to_zero(self, session):
-        """If cumulative playtime goes backwards (e.g. spike removal), clamp to 0."""
+        """If cumulative playtime goes backwards, clamp to 0."""
         user = make_user(session)
         today = date.today()
-        r1 = make_rolling(session, user=user, last_day_playtime=500, is_baseline=True,
+        r1 = make_rolling(session, user=user, last_day_playtime=500,
                           created_at=today - timedelta(days=1))
-        r2 = make_rolling(session, user=user, last_day_playtime=100, is_baseline=False,
+        r2 = make_rolling(session, user=user, last_day_playtime=100,
                           created_at=today)
-        result = game_service._compute_daily_playtimes([r1, r2])
+        result = game_service._compute_daily_playtimes([r1, r2], days=-1)
         today_entry = next(d for d in result if d.date == today)
         assert today_entry.playtime_minutes == 0
 
@@ -115,139 +110,100 @@ class TestComputeDailyPlaytimes:
         yesterday = today - timedelta(days=1)
         # Game 570
         r1 = make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100,
-                          is_baseline=True, created_at=yesterday)
+                          created_at=yesterday)
         r2 = make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130,
-                          is_baseline=False, created_at=today)
+                          created_at=today)
         # Game 440
         r3 = make_rolling(session, user=user, steam_app_id="440", last_day_playtime=50,
-                          is_baseline=True, created_at=yesterday)
+                          created_at=yesterday)
         r4 = make_rolling(session, user=user, steam_app_id="440", last_day_playtime=70,
-                          is_baseline=False, created_at=today)
-        result = game_service._compute_daily_playtimes([r1, r2, r3, r4])
+                          created_at=today)
+        result = game_service._compute_daily_playtimes([r1, r2, r3, r4], days=-1)
         today_entry = next(d for d in result if d.date == today)
         assert today_entry.playtime_minutes == 30 + 20  # 50
 
-    def test_result_covers_exactly_14_days_from_today(self, session):
-        result = game_service._compute_daily_playtimes([])
+    def test_gap_days_filled_with_zero(self, session):
+        """Days with no records between entries are filled with 0."""
+        user = make_user(session)
         today = date.today()
-        expected_dates = [today - timedelta(days=i) for i in range(13, -1, -1)]
-        assert [r.date for r in result] == expected_dates
+        r1 = make_rolling(session, user=user, last_day_playtime=100,
+                          created_at=today - timedelta(days=3))
+        r2 = make_rolling(session, user=user, last_day_playtime=150,
+                          created_at=today)
+        result = game_service._compute_daily_playtimes([r1, r2], days=-1)
+        # Should span 4 days: today-3, today-2, today-1, today
+        assert len(result) == 4
+        gap_days = [d for d in result if d.date in (today - timedelta(days=2), today - timedelta(days=1))]
+        assert all(d.playtime_minutes == 0 for d in gap_days)
 
-    def test_out_of_window_records_do_not_appear(self, session):
-        """Records from 30 days ago should not contribute to the 14-day window."""
+    def test_days_minus_1_returns_everything(self, session):
+        """days=-1 returns from earliest record to today."""
         user = make_user(session)
-        old_date = date.today() - timedelta(days=30)
-        r1 = make_rolling(session, user=user, last_day_playtime=0, is_baseline=True,
-                          created_at=old_date - timedelta(days=1))
-        r2 = make_rolling(session, user=user, last_day_playtime=999, is_baseline=False,
+        today = date.today()
+        start = today - timedelta(days=5)
+        r1 = make_rolling(session, user=user, last_day_playtime=100,
+                          created_at=start)
+        r2 = make_rolling(session, user=user, last_day_playtime=200,
+                          created_at=today)
+        result = game_service._compute_daily_playtimes([r1, r2], days=-1)
+        assert len(result) == 6  # 5 days ago to today inclusive
+        assert result[0].date == start
+        assert result[-1].date == today
+
+    def test_specific_days_returns_correct_window(self, session):
+        """days=3 returns the last 3 days."""
+        user = make_user(session)
+        today = date.today()
+        r1 = make_rolling(session, user=user, last_day_playtime=100,
+                          created_at=today - timedelta(days=10))
+        r2 = make_rolling(session, user=user, last_day_playtime=200,
+                          created_at=today)
+        result = game_service._compute_daily_playtimes([r1, r2], days=3)
+        assert len(result) == 3
+        assert result[0].date == today - timedelta(days=2)
+        assert result[-1].date == today
+
+    def test_fewer_days_than_requested_returns_everything(self, session):
+        """If fewer days exist than requested, return everything."""
+        user = make_user(session)
+        today = date.today()
+        r1 = make_rolling(session, user=user, last_day_playtime=100,
+                          created_at=today - timedelta(days=2))
+        r2 = make_rolling(session, user=user, last_day_playtime=200,
+                          created_at=today)
+        result = game_service._compute_daily_playtimes([r1, r2], days=30)
+        # Only 3 days of data (today-2 to today), should return 3
+        assert len(result) == 3
+        assert result[0].date == today - timedelta(days=2)
+
+    def test_result_dates_are_sorted_oldest_first(self, session):
+        """Results should always be sorted oldest first."""
+        user = make_user(session)
+        today = date.today()
+        for i in range(5):
+            make_rolling(session, user=user, last_day_playtime=100 + i * 10,
+                         created_at=today - timedelta(days=4 - i))
+        result = game_service._compute_daily_playtimes(
+            list(session.exec(
+                __import__('sqlmodel', fromlist=['select']).select(SteamRollingTime)
+            ).all()),
+            days=-1
+        )
+        dates = [r.date for r in result]
+        assert dates == sorted(dates)
+
+    def test_old_records_contribute_to_history(self, session):
+        """Records from 30 days ago should appear when days=-1."""
+        user = make_user(session)
+        today = date.today()
+        old_date = today - timedelta(days=30)
+        r1 = make_rolling(session, user=user, last_day_playtime=0,
                           created_at=old_date)
-        result = game_service._compute_daily_playtimes([r1, r2])
-        assert all(day.playtime_minutes == 0 for day in result)
-
-
-# ---------------------------------------------------------------------------
-# _prune_old_steam_rolling
-# ---------------------------------------------------------------------------
-
-class TestPruneOldSteamRolling:
-    def _cutoff(self):
-        return date.today() - timedelta(days=13)
-
-    def test_no_records_does_nothing(self, session):
-        user = make_user(session)
-        game_service._prune_old_steam_rolling(session, user.id)  # should not raise
-
-    def test_single_old_record_is_kept(self, session):
-        """A lone old record is kept regardless (len <= 1 guard)."""
-        user = make_user(session)
-        cutoff = self._cutoff()
-        r = make_rolling(session, user=user, created_at=cutoff - timedelta(days=1), is_baseline=False)
-        game_service._prune_old_steam_rolling(session, user.id)
-        from sqlmodel import select
-        remaining = session.exec(select(SteamRollingTime)).all()
-        assert len(remaining) == 1
-
-    def test_multiple_old_records_pruned_to_one_anchor(self, session):
-        """Multiple old records collapse to one anchor (the latest one)."""
-        user = make_user(session)
-        cutoff = self._cutoff()
-        r1 = make_rolling(session, user=user, created_at=cutoff - timedelta(days=5), is_baseline=True)
-        r2 = make_rolling(session, user=user, created_at=cutoff - timedelta(days=3), is_baseline=False)
-        r3 = make_rolling(session, user=user, created_at=cutoff - timedelta(days=1), is_baseline=False)
-
-        game_service._prune_old_steam_rolling(session, user.id)
-
-        from sqlmodel import select
-        remaining = session.exec(select(SteamRollingTime)).all()
-        assert len(remaining) == 1
-        assert remaining[0].id == r3.id
-
-    def test_anchor_promoted_to_baseline(self, session):
-        """The surviving anchor is promoted to is_baseline=True if it wasn't."""
-        user = make_user(session)
-        cutoff = self._cutoff()
-        r1 = make_rolling(session, user=user, created_at=cutoff - timedelta(days=5), is_baseline=False)
-        r2 = make_rolling(session, user=user, created_at=cutoff - timedelta(days=2), is_baseline=False)
-
-        game_service._prune_old_steam_rolling(session, user.id)
-
-        from sqlmodel import select
-        anchor = session.exec(select(SteamRollingTime)).first()
-        assert anchor.is_baseline is True
-
-    def test_recent_records_are_not_pruned(self, session):
-        """Records within the 13-day window should be left alone."""
-        user = make_user(session)
-        cutoff = self._cutoff()
-        r_recent = make_rolling(session, user=user, created_at=date.today(), is_baseline=False)
-        r_recent2 = make_rolling(session, user=user, created_at=cutoff, is_baseline=False)
-
-        game_service._prune_old_steam_rolling(session, user.id)
-
-        from sqlmodel import select
-        remaining = session.exec(select(SteamRollingTime)).all()
-        assert len(remaining) == 2
-
-    def test_prune_per_game_independently(self, session):
-        """Old records are pruned per game app_id independently."""
-        user = make_user(session)
-        cutoff = self._cutoff()
-        # Game 570 – 3 old records → should collapse to 1
-        for i in range(3):
-            make_rolling(session, user=user, steam_app_id="570",
-                         created_at=cutoff - timedelta(days=i + 1))
-        # Game 440 – 1 old record → should be kept
-        make_rolling(session, user=user, steam_app_id="440",
-                     created_at=cutoff - timedelta(days=1))
-
-        game_service._prune_old_steam_rolling(session, user.id)
-
-        from sqlmodel import select
-        remaining = session.exec(select(SteamRollingTime)).all()
-        ids_570 = [r for r in remaining if r.steam_app_id == "570"]
-        ids_440 = [r for r in remaining if r.steam_app_id == "440"]
-        assert len(ids_570) == 1
-        assert len(ids_440) == 1
-
-    def test_only_prunes_records_for_given_user(self, session):
-        """Records belonging to a different user are never touched."""
-        user_a = make_user(session, firebase_uid="uid-a", username="userA", steam_id="111")
-        user_b = make_user(session, firebase_uid="uid-b", username="userB", steam_id="222")
-        cutoff = self._cutoff()
-        # 3 old records for user_a
-        for i in range(3):
-            make_rolling(session, user=user_a, created_at=cutoff - timedelta(days=i + 1))
-        # 1 record for user_b
-        r_b = make_rolling(session, user=user_b, created_at=cutoff - timedelta(days=1))
-
-        game_service._prune_old_steam_rolling(session, user_a.id)
-
-        from sqlmodel import select
-        b_remaining = session.exec(
-            select(SteamRollingTime).where(SteamRollingTime.user_id == user_b.id)
-        ).all()
-        assert len(b_remaining) == 1
-        assert b_remaining[0].id == r_b.id
+        r2 = make_rolling(session, user=user, last_day_playtime=999,
+                          created_at=old_date + timedelta(days=1))
+        result = game_service._compute_daily_playtimes([r1, r2], days=-1)
+        day_entry = next(d for d in result if d.date == old_date + timedelta(days=1))
+        assert day_entry.playtime_minutes == 999
 
 
 # ---------------------------------------------------------------------------
@@ -256,22 +212,6 @@ class TestPruneOldSteamRolling:
 
 class TestUpdateUserShelvingSteamRolling:
     """Integration-style tests using patched Steam API calls."""
-
-    def _mock_steam(self, games: list[dict]):
-        raw = _make_steam_response(games)
-        mock_response = MagicMock()
-        mock_response.read.return_value = raw
-        mock_response.__enter__ = lambda s: s
-        mock_response.__exit__ = MagicMock(return_value=False)
-
-        class _FakeFile:
-            def read(self):
-                return raw
-
-        mock_cm = MagicMock()
-        mock_cm.__enter__ = lambda s: BytesIO(raw)
-        mock_cm.__exit__ = MagicMock(return_value=False)
-        return mock_cm
 
     def test_new_game_is_cached_and_shelved(self, session):
         user = make_user(session)
@@ -331,7 +271,90 @@ class TestUpdateUserShelvingSteamRolling:
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
         assert shelving.status == GameStatus.SHELVED
 
-    def test_existing_shelving_creates_non_baseline_rolling(self, session):
+    def test_first_time_zero_playtime_creates_baseline_rolling(self, session):
+        """First time seeing a game always creates a baseline rolling, even with 0 playtime."""
+        user = make_user(session)
+        user_read = _user_read(user)
+
+        games = [{"appid": 730, "playtime_forever": 0, "playtime_windows_forever": 0,
+                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
+                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+
+        with patch("src.games.game_service.urlopen") as mock_urlopen:
+            mock_urlopen.return_value.__enter__ = lambda s: BytesIO(_make_steam_response(games))
+            mock_urlopen.return_value.__exit__ = MagicMock(return_value=False)
+            game_service.update_user_shelving_steamrolling(session, user_read)
+
+        from sqlmodel import select
+        rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).all()
+        assert len(rolling) == 1
+        assert rolling[0].last_day_playtime == 0
+
+    def test_nonzero_playtime_game_creates_rolling(self, session):
+        """Games with playtime_forever > 0 should create a steam rolling entry."""
+        user = make_user(session)
+        user_read = _user_read(user)
+
+        games = [{"appid": 570, "playtime_forever": 120, "playtime_windows_forever": 0,
+                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
+                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+
+        with patch("src.games.game_service.urlopen") as mock_urlopen:
+            mock_urlopen.return_value.__enter__ = lambda s: BytesIO(_make_steam_response(games))
+            mock_urlopen.return_value.__exit__ = MagicMock(return_value=False)
+            game_service.update_user_shelving_steamrolling(session, user_read)
+
+        from sqlmodel import select
+        rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).all()
+        assert len(rolling) == 1
+        assert rolling[0].last_day_playtime == 120
+
+    def test_unchanged_playtime_does_not_create_new_rolling(self, session):
+        """If playtime hasn't changed from the latest rolling, no new entry is created."""
+        user = make_user(session)
+        user_read = _user_read(user)
+        # Pre-existing rolling with playtime=100
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100)
+
+        games = [{"appid": 570, "playtime_forever": 100, "playtime_windows_forever": 0,
+                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
+                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+
+        with patch("src.games.game_service.urlopen") as mock_urlopen:
+            mock_urlopen.return_value.__enter__ = lambda s: BytesIO(_make_steam_response(games))
+            mock_urlopen.return_value.__exit__ = MagicMock(return_value=False)
+            game_service.update_user_shelving_steamrolling(session, user_read)
+
+        from sqlmodel import select
+        rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).all()
+        assert len(rolling) == 1  # no new entry created
+
+    def test_changed_playtime_creates_new_rolling(self, session):
+        """If playtime changed from the latest rolling, a new entry is created."""
+        user = make_user(session)
+        user_read = _user_read(user)
+        # Pre-existing rolling with playtime=100
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100)
+
+        games = [{"appid": 570, "playtime_forever": 150, "playtime_windows_forever": 0,
+                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
+                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
+
+        with patch("src.games.game_service.urlopen") as mock_urlopen:
+            mock_urlopen.return_value.__enter__ = lambda s: BytesIO(_make_steam_response(games))
+            mock_urlopen.return_value.__exit__ = MagicMock(return_value=False)
+            game_service.update_user_shelving_steamrolling(session, user_read)
+
+        from sqlmodel import select
+        rolling = session.exec(
+            select(SteamRollingTime)
+            .where(SteamRollingTime.user_id == user.id)
+            .order_by(SteamRollingTime.created_at)
+        ).all()
+        assert len(rolling) == 2
+        assert rolling[-1].last_day_playtime == 150
+
+    def test_existing_shelving_still_creates_rolling(self, session):
         user = make_user(session)
         user_read = _user_read(user)
         game = make_game(session, steam_app_id="570")
@@ -349,24 +372,7 @@ class TestUpdateUserShelvingSteamRolling:
         from sqlmodel import select
         rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).first()
         assert rolling is not None
-        assert rolling.is_baseline is False  # not a new entry
-
-    def test_new_game_creates_baseline_rolling(self, session):
-        user = make_user(session)
-        user_read = _user_read(user)
-
-        games = [{"appid": 570, "playtime_forever": 50, "playtime_windows_forever": 0,
-                  "playtime_mac_forever": 0, "playtime_linux_forever": 0,
-                  "playtime_deck_forever": 0, "rtime_last_played": 0, "playtime_disconnected": 0}]
-
-        with patch("src.games.game_service.urlopen") as mock_urlopen:
-            mock_urlopen.return_value.__enter__ = lambda s: BytesIO(_make_steam_response(games))
-            mock_urlopen.return_value.__exit__ = MagicMock(return_value=False)
-            game_service.update_user_shelving_steamrolling(session, user_read)
-
-        from sqlmodel import select
-        rolling = session.exec(select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)).first()
-        assert rolling.is_baseline is True
+        assert rolling.last_day_playtime == 200
 
     def test_game_not_recached_if_already_exists(self, session):
         user = make_user(session)
@@ -479,18 +485,19 @@ class TestGetOwnedGamesFromSteam:
 
 
 # ---------------------------------------------------------------------------
-# get_last_two_weeks_playtime_by_user
+# get_playtime_by_user
 # ---------------------------------------------------------------------------
 
-class TestGetLastTwoWeeksPlaytimeByUser:
-    def test_returns_14_entries(self, session):
+class TestGetPlaytimeByUser:
+    def test_returns_single_day_when_no_data(self, session):
         user = make_user(session)
-        result = game_service.get_last_two_weeks_playtime_by_user(session, user.firebase_uid)
-        assert len(result) == 14
+        result = game_service.get_playtime_by_user(session, user.firebase_uid)
+        assert len(result) >= 1
+        assert all(d.playtime_minutes == 0 for d in result)
 
     def test_raises_404_for_unknown_user(self, session):
         with pytest.raises(HTTPException) as exc_info:
-            game_service.get_last_two_weeks_playtime_by_user(session, "no-such-uid")
+            game_service.get_playtime_by_user(session, "no-such-uid")
         assert exc_info.value.status_code == 404
 
     def test_correct_aggregate_playtime(self, session):
@@ -499,29 +506,42 @@ class TestGetLastTwoWeeksPlaytimeByUser:
         # Two games each contributing 30 min today
         for app_id in ("570", "730"):
             make_rolling(session, user=user, steam_app_id=app_id, last_day_playtime=100,
-                         is_baseline=True, created_at=today - timedelta(days=1))
+                         created_at=today - timedelta(days=1))
             make_rolling(session, user=user, steam_app_id=app_id, last_day_playtime=130,
-                         is_baseline=False, created_at=today)
+                         created_at=today)
 
-        result = game_service.get_last_two_weeks_playtime_by_user(session, user.firebase_uid)
+        result = game_service.get_playtime_by_user(session, user.firebase_uid)
         today_entry = next(d for d in result if d.date == today)
         assert today_entry.playtime_minutes == 60  # 30 + 30
 
     def test_no_data_all_zeros(self, session):
         user = make_user(session)
-        result = game_service.get_last_two_weeks_playtime_by_user(session, user.firebase_uid)
+        result = game_service.get_playtime_by_user(session, user.firebase_uid)
         assert all(d.playtime_minutes == 0 for d in result)
 
-
-# ---------------------------------------------------------------------------
-# get_last_two_weeks_playtime_by_game
-# ---------------------------------------------------------------------------
-
-class TestGetLastTwoWeeksPlaytimeByGame:
-    def test_returns_14_entries(self, session):
+    def test_specific_days_parameter(self, session):
         user = make_user(session)
-        result = game_service.get_last_two_weeks_playtime_by_game(session, user.firebase_uid, "570")
-        assert len(result) == 14
+        today = date.today()
+        make_rolling(session, user=user, last_day_playtime=100,
+                     created_at=today - timedelta(days=10))
+        make_rolling(session, user=user, last_day_playtime=200,
+                     created_at=today)
+        result = game_service.get_playtime_by_user(session, user.firebase_uid, days=5)
+        assert len(result) == 5
+
+
+# ---------------------------------------------------------------------------
+# get_playtime_by_game
+# ---------------------------------------------------------------------------
+
+class TestGetPlaytimeByGame:
+    def test_returns_entries_when_data_exists(self, session):
+        user = make_user(session)
+        today = date.today()
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100,
+                     created_at=today)
+        result = game_service.get_playtime_by_game(session, user.firebase_uid, "570")
+        assert len(result) >= 1
 
     def test_filters_by_game(self, session):
         user = make_user(session)
@@ -529,25 +549,35 @@ class TestGetLastTwoWeeksPlaytimeByGame:
         yesterday = today - timedelta(days=1)
         # game 570: 40 min today
         make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100,
-                     is_baseline=True, created_at=yesterday)
+                     created_at=yesterday)
         make_rolling(session, user=user, steam_app_id="570", last_day_playtime=140,
-                     is_baseline=False, created_at=today)
+                     created_at=today)
         # game 440: 200 min today — should NOT appear
         make_rolling(session, user=user, steam_app_id="440", last_day_playtime=0,
-                     is_baseline=True, created_at=yesterday)
+                     created_at=yesterday)
         make_rolling(session, user=user, steam_app_id="440", last_day_playtime=200,
-                     is_baseline=False, created_at=today)
+                     created_at=today)
 
-        result = game_service.get_last_two_weeks_playtime_by_game(session, user.firebase_uid, "570")
+        result = game_service.get_playtime_by_game(session, user.firebase_uid, "570")
         today_entry = next(d for d in result if d.date == today)
         assert today_entry.playtime_minutes == 40
 
     def test_raises_404_for_unknown_user(self, session):
         with pytest.raises(HTTPException) as exc_info:
-            game_service.get_last_two_weeks_playtime_by_game(session, "ghost-uid", "570")
+            game_service.get_playtime_by_game(session, "ghost-uid", "570")
         assert exc_info.value.status_code == 404
 
     def test_returns_zeros_for_game_with_no_records(self, session):
         user = make_user(session)
-        result = game_service.get_last_two_weeks_playtime_by_game(session, user.firebase_uid, "99999")
+        result = game_service.get_playtime_by_game(session, user.firebase_uid, "99999")
         assert all(d.playtime_minutes == 0 for d in result)
+
+    def test_specific_days_parameter(self, session):
+        user = make_user(session)
+        today = date.today()
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100,
+                     created_at=today - timedelta(days=10))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=200,
+                     created_at=today)
+        result = game_service.get_playtime_by_game(session, user.firebase_uid, "570", days=5)
+        assert len(result) == 5

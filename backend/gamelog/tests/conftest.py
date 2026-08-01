@@ -103,14 +103,12 @@ def make_rolling(
     steam_app_id: str = "570",
     last_day_playtime: int = 100,
     created_at: date | None = None,
-    is_baseline: bool = False,
 ) -> SteamRollingTime:
     rolling = SteamRollingTime(
         user_id=user.id,
         steam_app_id=steam_app_id,
         last_day_playtime=last_day_playtime,
         created_at=created_at or date.today(),
-        is_baseline=is_baseline,
     )
     session.add(rolling)
     session.commit()

@@ -26,11 +26,14 @@ def update_user_shelving_steamrolling(session: Session, user: UserRead) -> None:
         shelve_exists = _get_game_player_shelve(session, game_cached.id, user.id)
         if not shelve_exists:
             _shelve_game(session, game_cached.id, user.id, GameStatus.SHELVED)
-            _create_steam_rolling(session, user, steam_game, steam_app_id, is_baseline=True)
-        else:
-            _create_steam_rolling(session, user, steam_game, steam_app_id, is_baseline=False)
+            _create_steam_rolling(session, user, steam_game, steam_app_id)
+            return
 
-    _prune_old_steam_rolling(session, user.id)
+        latest_rolling = _get_latest_steam_rolling(session, user.id, steam_app_id)
+        if latest_rolling is None:
+            _create_steam_rolling(session, user, steam_game, steam_app_id)
+        elif steam_game.playtime_forever != latest_rolling.last_day_playtime:
+            _create_steam_rolling(session, user, steam_game, steam_app_id)
 
 
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
@@ -64,47 +67,24 @@ def _shelve_game(session: Session, game_id: uuid.UUID, user_id: uuid.UUID, statu
     session.commit()
 
 
-def _create_steam_rolling(session: Session, user: UserRead, game: SteamGame, steam_app_id: str, is_baseline: bool) -> None:
+def _create_steam_rolling(session: Session, user: UserRead, game: SteamGame, steam_app_id: str) -> None:
     steam_rolling = SteamRollingTime(
         user_id=user.id,
         steam_app_id=steam_app_id,
         last_day_playtime=game.playtime_forever,
-        is_baseline=is_baseline,
+        created_at=date.today(),
     )
     session.add(steam_rolling)
     session.commit()
 
 
-def _prune_old_steam_rolling(session: Session, user_id: uuid.UUID) -> None:
-    cutoff = date.today() - timedelta(days=13)
-
-    app_ids = session.exec(
-        select(SteamRollingTime.steam_app_id)
+def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id: str) -> SteamRollingTime | None:
+    return session.exec(
+        select(SteamRollingTime)
         .where(SteamRollingTime.user_id == user_id)
-        .distinct()
-    ).all()
-
-    for app_id in app_ids:
-        old_records = session.exec(
-            select(SteamRollingTime)
-            .where(SteamRollingTime.user_id == user_id)
-            .where(SteamRollingTime.steam_app_id == app_id)
-            .where(SteamRollingTime.created_at < cutoff)
-            .order_by(SteamRollingTime.created_at)
-        ).all()
-
-        if len(old_records) <= 1:
-            continue
-
-        anchor = old_records[-1]
-        if not anchor.is_baseline:
-            anchor.is_baseline = True
-            session.add(anchor)
-
-        for record in old_records[:-1]:
-            session.delete(record)
-
-    session.commit()
+        .where(SteamRollingTime.steam_app_id == steam_app_id)
+        .order_by(SteamRollingTime.created_at.desc())
+    ).first()
 
 
 def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
@@ -129,41 +109,63 @@ def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
     )
 
 
-def get_last_two_weeks_playtime_by_user(session: Session, user_id: str) -> list[DayByDayPlaytime]:
+def get_playtime_by_user(session: Session, user_id: str, days: int) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id)
-    return _compute_daily_playtimes(steam_rolling_times)
+    return _compute_daily_playtimes(steam_rolling_times, days)
 
 
-def get_last_two_weeks_playtime_by_game(session: Session, user_id: str, steam_app_id: str) -> list[DayByDayPlaytime]:
+def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days: int) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
-    return _compute_daily_playtimes(steam_rolling_times)
+    return _compute_daily_playtimes(steam_rolling_times, days)
 
 
-def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime]) -> list[DayByDayPlaytime]:
+def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], days: int) -> list[DayByDayPlaytime]:
     records_by_game = defaultdict(list)
     for record in steam_rolling_times:
         records_by_game[record.steam_app_id].append(record)
 
     daily_totals = defaultdict(int)
+    earliest_date = None
 
     for game_id, records in records_by_game.items():
         records.sort(key=lambda r: r.created_at)
-        
-        previous_playtime = None
-        for record in records:
-            if previous_playtime is not None and not record.is_baseline:
-                daily_playtime = max(0, record.last_day_playtime - previous_playtime)
-            else:
+
+        for i, record in enumerate(records):
+            if i == 0:
                 daily_playtime = 0
-                
+            else:
+                daily_playtime = max(0, record.last_day_playtime - records[i - 1].last_day_playtime)
+
             daily_totals[record.created_at] += daily_playtime
-            previous_playtime = record.last_day_playtime
+
+            if earliest_date is None or record.created_at < earliest_date:
+                earliest_date = record.created_at
 
     today = date.today()
-    result = []
 
-    for i in range(13, -1, -1):
-        target_date = today - timedelta(days=i)
+    if earliest_date is None:
+        # No records at all for the specified user. If days is -1 return a single day (today),
+        # otherwise return the requested number of days
+        if days == -1:
+            return [DayByDayPlaytime(date=today, playtime_minutes=0)]
+        num_days = days
+        start_date = today - timedelta(days=num_days - 1)
+    elif days == -1:
+        # Return everything from earliest record to today
+        start_date = earliest_date
+        num_days = (today - start_date).days + 1
+    else:
+        # Return the last N days; if fewer days exist, return everything
+        candidate_start = today - timedelta(days=days - 1)
+        if candidate_start > earliest_date:
+            start_date = candidate_start
+        else:
+            start_date = earliest_date
+        num_days = (today - start_date).days + 1
+
+    result = []
+    for i in range(num_days):
+        target_date = start_date + timedelta(days=i)
         result.append(
             DayByDayPlaytime(
                 date=target_date,
