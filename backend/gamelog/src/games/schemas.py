@@ -1,7 +1,6 @@
 import datetime
 import uuid
 
-
 from pydantic import BaseModel
 
 from src.models.game import GameBase

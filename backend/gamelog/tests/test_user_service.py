@@ -19,17 +19,16 @@ import uuid
 
 import pytest
 from fastapi import HTTPException
-from sqlmodel import Session
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/dummy_credentials.json")
 os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 
-from src.models import User  # noqa: E402
-from src.users import UserRead  # noqa: E402
-from src.users.user_service import get_user_by_firebase_uid  # noqa: E402
-from tests.conftest import make_user  # noqa: E402
+from src.models import User
+from src.users import UserRead
+from src.users.user_service import get_user_by_firebase_uid
+from tests.conftest import make_user
 
 
 class TestGetUserByFirebaseUid:
@@ -102,9 +101,8 @@ class TestGetUserByFirebaseUid:
         mock_result = MagicMock()
         mock_result.first.return_value = fake_user
 
-        with patch.object(session, "exec", return_value=mock_result):
-            with pytest.raises(HTTPException) as exc_info:
-                get_user_by_firebase_uid(session, "uid-none-steam")
+        with patch.object(session, "exec", return_value=mock_result), pytest.raises(HTTPException) as exc_info:
+            get_user_by_firebase_uid(session, "uid-none-steam")
         assert exc_info.value.status_code == 500
 
     # ------------------------------------------------------------------

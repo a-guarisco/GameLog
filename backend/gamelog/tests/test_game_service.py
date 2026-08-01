@@ -14,22 +14,18 @@ Covers:
 import json
 import uuid
 import warnings
-from collections.abc import Sequence
 from datetime import date, timedelta
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi import HTTPException
-from sqlmodel import Session
-
-from tests.conftest import make_game, make_rolling, make_shelving, make_user
 
 from src.games import game_service
-from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
+from src.games.schemas import SteamGame
 from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 from src.users import UserRead
-
+from tests.conftest import make_game, make_rolling, make_shelving, make_user
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -299,7 +295,7 @@ class TestUpdateUserShelvingSteamRolling:
         assert shelving is not None
         assert shelving.owner_id == user.id
 
-    def test_unplayed_game_gets_to_be_played_status(self, session):
+    def test_unplayed_game_gets_shelved_status(self, session):
         user = make_user(session)
         user_read = _user_read(user)
 
@@ -315,9 +311,9 @@ class TestUpdateUserShelvingSteamRolling:
         from sqlmodel import select
         game = session.exec(select(Game).where(Game.steam_app_id == "730")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
-        assert shelving.status == GameStatus.TO_BE_PLAYED
+        assert shelving.status == GameStatus.SHELVED
 
-    def test_played_game_gets_playing_status(self, session):
+    def test_played_game_gets_shelved_status(self, session):
         user = make_user(session)
         user_read = _user_read(user)
 
@@ -333,7 +329,7 @@ class TestUpdateUserShelvingSteamRolling:
         from sqlmodel import select
         game = session.exec(select(Game).where(Game.steam_app_id == "570")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
-        assert shelving.status == GameStatus.PLAYING
+        assert shelving.status == GameStatus.SHELVED
 
     def test_existing_shelving_creates_non_baseline_rolling(self, session):
         user = make_user(session)
@@ -432,6 +428,24 @@ class TestGetOwnedGamesFromSteam:
             username="x",
             steam_id="999",
             steam_api_key=None,
+        )
+
+        payload = _make_steam_response([])
+        with patch("src.games.game_service.urlopen") as mock_urlopen:
+            mock_urlopen.return_value.__enter__ = lambda s: BytesIO(payload)
+            mock_urlopen.return_value.__exit__ = MagicMock(return_value=False)
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                game_service._get_owned_games_from_steam(user_read)
+                assert any("default steam api key" in str(warning.message).lower() for warning in w)
+
+    def test_warns_and_uses_default_key_when_empty_string(self, session):
+        user_read = UserRead.model_construct(
+            id=uuid.uuid4(),
+            firebase_uid="x",
+            username="x",
+            steam_id="999",
+            steam_api_key="",
         )
 
         payload = _make_steam_response([])

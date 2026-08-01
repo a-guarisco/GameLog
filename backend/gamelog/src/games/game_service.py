@@ -1,16 +1,15 @@
 import json
-from typing import Sequence
 import uuid
 import warnings
-from urllib.request import urlopen
-from datetime import date, timedelta, datetime
 from collections import defaultdict
+from collections.abc import Sequence
+from datetime import date, timedelta
+from urllib.request import urlopen
 
 from fastapi import HTTPException
-
 from sqlmodel import Session, select
 
-from src.games.schemas import GetOwnedGamesResponse, SteamGame, DayByDayPlaytime
+from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
 from src.models import Game, GameStatus, Shelving, SteamRollingTime
 from src.users import UserRead
 
@@ -26,8 +25,7 @@ def update_user_shelving_steamrolling(session: Session, user: UserRead) -> None:
 
         shelve_exists = _get_game_player_shelve(session, game_cached.id, user.id)
         if not shelve_exists:
-            status = GameStatus.TO_BE_PLAYED if steam_game.playtime_forever == 0 else GameStatus.PLAYING
-            _shelve_game(session, game_cached.id, user.id, status)
+            _shelve_game(session, game_cached.id, user.id, GameStatus.SHELVED)
             _create_steam_rolling(session, user, steam_game, steam_app_id, is_baseline=True)
         else:
             _create_steam_rolling(session, user, steam_game, steam_app_id, is_baseline=False)
@@ -110,7 +108,7 @@ def _prune_old_steam_rolling(session: Session, user_id: uuid.UUID) -> None:
 
 
 def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
-    if user.steam_api_key is None:
+    if not user.steam_api_key:
         warnings.warn("Using default steam api key")
         steam_api_key = "724FF154B1D2A357857A257EA28C6415"
     else:
@@ -186,4 +184,4 @@ def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str
     if steam_app_id is not None:
         query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
         
-    return session.exec(query.order_by(SteamRollingTime.created_at)).all()
+    return session.exec(query.order_by(SteamRollingTime.created_at)).all()

@@ -15,11 +15,9 @@ Strategy:
 """
 
 import os
-import uuid
 from datetime import date, timedelta
 from unittest.mock import patch
 
-import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
@@ -28,9 +26,8 @@ os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/dummy_credentials.
 os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 
-from src.games.schemas import DayByDayPlaytime  # noqa: E402
-from tests.conftest import make_user  # noqa: E402
-
+from src.games.schemas import DayByDayPlaytime
+from tests.conftest import make_user
 
 # ---------------------------------------------------------------------------
 # Helpers

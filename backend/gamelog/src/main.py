@@ -10,8 +10,8 @@ from src.games.games_router import router as games_router
 
 settings = get_settings()
 initialize_firebase_app(settings)
-app = FastAPI(title=settings.app_name, version=settings.app_version)
-#app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
+#app = FastAPI(title=settings.app_name, version=settings.app_version)
+app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
 app.include_router(achievements_router)
 app.include_router(games_router)
 

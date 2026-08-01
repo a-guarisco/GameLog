@@ -7,7 +7,7 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
+from src.models import Config, Game, GameStatus, Shelving, SteamRollingTime, User
 
 DEMO_USER_A_ID = UUID("11111111-1111-1111-1111-111111111111")
 DEMO_USER_B_ID = UUID("22222222-2222-2222-2222-222222222222")
@@ -136,6 +136,7 @@ def seed_database() -> None:
         session.exec(delete(Shelving))
         session.exec(delete(Game))
         session.exec(delete(User))
+        session.exec(delete(Config))
         session.flush()
 
         for user in _users():
@@ -146,6 +147,10 @@ def seed_database() -> None:
             session.add(shelving)
         for rolling_time in _rolling_times():
             session.add(rolling_time)
+
+        from datetime import UTC, datetime, timedelta
+        yesterday_iso = (datetime.now(UTC) - timedelta(days=1)).isoformat()
+        session.add(Config(key="last_update", value=yesterday_iso))
 
         session.commit()
 

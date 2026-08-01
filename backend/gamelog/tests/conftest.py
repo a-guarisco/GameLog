@@ -8,8 +8,7 @@ Provides:
 """
 
 import os
-import uuid
-from datetime import date, timedelta
+from datetime import date
 
 import pytest
 from fastapi.testclient import TestClient
@@ -23,11 +22,10 @@ os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/dummy_credentials.
 os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 
-from src.auth.schemas import AuthenticatedUser  # noqa: E402
-from src.core.database import get_db  # noqa: E402
-from src.main import app  # noqa: E402
-from src.models import Game, GameStatus, Shelving, SteamRollingTime, User  # noqa: E402
-
+from src.auth.schemas import AuthenticatedUser
+from src.core.database import get_db
+from src.main import app
+from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 
 # ---------------------------------------------------------------------------
 # SQLite engine / session
