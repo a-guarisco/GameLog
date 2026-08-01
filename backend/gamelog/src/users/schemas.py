@@ -23,6 +23,7 @@ class UserUpdate(SQLModel):
 
 class SteamRollingTimeCreate(SteamRollingTimeBase):
     user_id: uuid.UUID
+    is_baseline: bool = True
 
 
 class SteamRollingTimeRead(SteamRollingTimeBase):
