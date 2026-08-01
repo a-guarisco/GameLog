@@ -125,6 +125,9 @@ downgrade:
 seed:
 	$(COMPOSE) exec gamelog uv run python -m src.core.seed
 
+seed-firebase:
+	@python3 scripts/seed_firebase_users.py
+
 # ==============================================================================
 # 🛠️ DATABASE UTILITIES & SNAPSHOTS
 # ==============================================================================
