@@ -13,7 +13,6 @@ class UserBase(SQLModel):
     firebase_uid: str = Field(max_length=255, index=True)
     username: str = Field(max_length=100, index=True)
     steam_id: str = Field(max_length=32, index=True)
-    steam_api_key: str = Field(max_length=255)
 
 
 class User(UserBase, table=True):
@@ -24,5 +23,6 @@ class User(UserBase, table=True):
     )
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    steam_api_key: str = Field(max_length=255)
     game_shelvings: list["Shelving"] = Relationship(back_populates="user")
     steam_rolling_time: list["SteamRollingTime"] = Relationship(back_populates="user")
