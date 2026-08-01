@@ -1,89 +1,103 @@
-# GameLog
+# 🎮 GameLog
 
-GameLog is split into two main workspaces:
+GameLog is a full-stack gaming statistics and tracking platform split into two main workspaces:
 
-- `backend/`: FastAPI API, PostgreSQL, Docker Compose, Firebase Admin SDK.
-- `mobile-app/`: Expo / React Native client, dev tools, and test views.
+- `backend/`: FastAPI REST API, PostgreSQL, Docker Compose, Alembic migrations, and Firebase Admin SDK.
+- `mobile-app/`: Expo / React Native mobile client, custom charts, Dev View tools, and Firebase Auth client.
 
-This repository currently supports a Firebase-based authentication flow that can be tested end to end from the mobile app to the backend.
+---
 
-## Authentication test flow
+## 📌 Table of Contents
 
-The authentication flow is intended for local development and manual validation.
+- [Workspaces Overview](#workspaces-overview)
+- [Firebase Authentication Setup](#firebase-authentication-setup)
+  - [Option A: Local Firebase Auth Emulator Workflow (Recommended - No Console Access Required)](#option-a-local-firebase-auth-emulator-workflow-recommended---no-console-access-required)
+  - [Option B: Live Firebase Cloud Project (Production Mode)](#option-b-live-firebase-cloud-project-production-mode)
+- [End-to-End Authentication Test Flow](#end-to-end-authentication-test-flow)
+- [Workspace Documentation Links](#workspace-documentation-links)
 
-### 1. Get access to the Firebase project
+---
 
-First, make sure you have access to the Firebase project used by the app. If you do not have access yet, request it from the project owner or ask for a test user to be created in Firebase Authentication.
+## Workspaces Overview
 
-### 2. Download the Firebase Admin credentials
+| Workspace | Technology Stack | Documentation |
+| :--- | :--- | :--- |
+| **`backend/`** | Python 3.12, FastAPI, SQLModel, Alembic, PostgreSQL, Docker | [backend/README.md](backend/README.md) |
+| **`mobile-app/`** | React Native, Expo SDK 52, TypeScript, Firebase SDK | [mobile-app/README.md](mobile-app/README.md) |
 
-The backend needs the Firebase service account JSON file to verify tokens.
+---
 
-Download the service account key from the Firebase project and keep it outside the repository.
+## Firebase Authentication Setup
 
-### 3. Configure the backend environment
+GameLog uses Firebase Authentication to issue and verify JWT Bearer tokens between the Expo mobile app and the FastAPI backend.
 
-Set the Firebase service account path in `backend/.env`.
+### Option A: Local Firebase Auth Emulator Workflow (Recommended - No Console Access Required)
 
-Use the host path to the JSON file, for example:
+All teammates can run and test authentication locally **without needing developer access to the Firebase Console**:
 
-```bash
-GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH=/absolute/path/to/serviceAccountKey.json
-```
+1. **Public Client Credentials**: The mobile client configuration in `mobile-app/.env.example` already includes the public Firebase Web client keys for project `gamelog-40e10`.
+2. **Start Local Auth Emulator**: From the repository root, start the Firebase Emulator:
+   ```bash
+   npx firebase emulators:start --only auth --project gamelog-40e10 --import=./emulator-data --export-on-exit
+   ```
+   *(No Google Cloud login or Firebase Console permissions required — the emulator runs 100% offline).*
 
-The Docker Compose setup mounts that file into the backend container as `/run/secrets/firebase-service-account.json`.
+3. **Backend Configuration (`USE_FIREBASE_EMULATOR=true`)**:
+   In `backend/.env`:
+   ```env
+   USE_FIREBASE_EMULATOR=true
+   FIREBASE_AUTH_EMULATOR_HOST=host.docker.internal:9099
+   ```
 
-### 4. Configure the mobile environment
+4. **Mobile Client Configuration (`EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true`)**:
+   In `mobile-app/.env`:
+   ```env
+   EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true
+   EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=http://localhost:9099
+   ```
 
-Copy the example file and edit it:
+5. **Emulator User Interface**: Open `http://127.0.0.1:4000/auth` in your browser to manage local test users.
 
-```bash
-cp mobile-app/.env.example mobile-app/.env
-```
+---
 
-For the auth flow, set these variables in `mobile-app/.env`:
+### Option B: Live Firebase Cloud Project (Production Mode)
 
-- `EXPO_PUBLIC_BACKEND_BASE_URL`: backend URL reachable from the emulator or device.
-- `EXPO_PUBLIC_TOKEN_GEN_EMAIL`: test Firebase user email.
-- `EXPO_PUBLIC_TOKEN_GEN_PASSWORD`: test Firebase user password.
+To connect directly to live Firebase Cloud services:
 
-### 5. Start Docker
+1. Request developer access to the Firebase project or request a test account from the project administrator.
+2. Download `serviceAccountKey.json` from the Firebase Console.
+3. Place the file **outside the repository** (e.g. `~/.config/gamelog/serviceAccountKey.json`) to prevent committing sensitive keys to Git:
+   ```bash
+   mkdir -p ~/.config/gamelog
+   cp /path/to/serviceAccountKey.json ~/.config/gamelog/serviceAccountKey.json
+   chmod 600 ~/.config/gamelog/serviceAccountKey.json
+   ```
+4. Configure `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH=/home/yourusername/.config/gamelog/serviceAccountKey.json` and `USE_FIREBASE_EMULATOR=false` in `backend/.env`.
 
-Start the backend stack from `backend/`:
+---
 
-```bash
-make up
-```
+## End-to-End Authentication Test Flow
 
-This starts:
+To validate authentication end-to-end from the mobile app to the backend:
 
-- FastAPI backend on `http://localhost:8000`
-- PostgreSQL on `5432`
-- Adminer on `http://localhost:8080`
+1. **Start Backend Stack**:
+   ```bash
+   cd backend && make up
+   ```
+2. **Start Mobile App**:
+   ```bash
+   cd mobile-app && npm run start:backend
+   ```
+3. **Open Dev View in Mobile App**:
+   - Press **Generate Firebase Token** to log in as the test user (`test@test.com`). The session token is saved on device storage.
+   - Press **Test Backend Auth**. The app sends `GET /me` with `Authorization: Bearer <token>`.
+   - The backend validates the token and returns `200 OK Authorized` with decoded `uid`.
 
-### 6. Start the Expo client
+---
 
-Open `mobile-app/` and start Expo with the provider you need:
+## Workspace Documentation Links
 
-```bash
-npm run start:backend
-```
-
-If you are testing on Android emulator, make sure `EXPO_PUBLIC_BACKEND_BASE_URL` points to your host LAN IP or to the emulator-compatible host.
-
-### 7. Open Dev View and test authentication
-
-In the app, open the Dev tab:
-1. Press **Generate Firebase Token** to log in as the test user. The session token is saved automatically on the device via `AsyncStorage`.
-2. Press **Test Backend Auth**. The component automatically attaches the live session token in the `Authorization: Bearer <token>` header to `GET /me`.
-
-The backend validates the token and returns:
-- `Authorized (200 OK)` with your Firebase `uid` if the token is accepted.
-- `Unauthorized (401)` if the token is invalid or rejected.
-
-## Useful references
-
-- Backend setup: [backend/README.md](backend/README.md)
-- Mobile app setup: [mobile-app/README.md](mobile-app/README.md)
-- Firebase service account env example: [backend/.env.example](backend/.env.example)
-- Mobile env example: [mobile-app/.env.example](mobile-app/.env.example)
+- **Backend Architecture & Docker Commands**: [backend/README.md](backend/README.md)
+- **Mobile Client Setup & Dev View**: [mobile-app/README.md](mobile-app/README.md)
+- **Backend Env Template**: [backend/.env.example](backend/.env.example)
+- **Mobile Env Template**: [mobile-app/.env.example](mobile-app/.env.example)
