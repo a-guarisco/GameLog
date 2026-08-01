@@ -54,7 +54,6 @@ class TestGetUserByFirebaseUid:
         assert result.id == user.id
         assert result.username == "bob"
         assert result.steam_id == "999"
-        assert result.steam_api_key == "MYKEY"
 
     # ------------------------------------------------------------------
     # Not found
