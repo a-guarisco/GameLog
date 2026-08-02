@@ -54,7 +54,7 @@ const AchievementsListView = ({ route }: any) => {
   const gameName = personalAchievements?.playerstats?.gameName ?? 'Unknown Game';
 
   return isLoadingPlayerAchievement ? (
-    <LoadingBox className="flex-1" message="Loading achievements..." />
+    <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
   ) : errorPlayerAchievement ? (
     <ErrorBox
       className="flex-1"
@@ -62,15 +62,16 @@ const AchievementsListView = ({ route }: any) => {
     />
   ) : (
     <ScrollView
-      className="flex-1"
+      className="flex-1 bg-background-100"
       contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
     >
+      <Box className="mb-5 mt-5"></Box>
       <Box className="mb-5">
         <Text size="3xl" className="font-bold uppercase text-center mb-3">
           Achievements for {gameName}
         </Text>
 
-        <Box className="relative overflow-hidden rounded-lg bg-background-100">
+        <Box className="relative overflow-hidden rounded-lg bg-background-200 shadow-xl">
           <Box
             className="absolute top-0 left-0 h-full bg-success-500 opacity-15"
             style={{ width: `${completionPercent}%` }}

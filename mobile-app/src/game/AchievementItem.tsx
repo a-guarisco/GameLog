@@ -41,7 +41,7 @@ const AchievementItem = ({
   const lockedFillColor = getLockedFillColor(!isUnlocked);
 
   return (
-    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200">
+    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200 shadow-md">
       <Box
         testID="global-progress-bar"
         className={`absolute top-0 left-0 h-full ${lockedFillColor} opacity-15`}

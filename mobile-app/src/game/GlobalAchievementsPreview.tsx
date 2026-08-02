@@ -31,7 +31,7 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
   const totalCount = achievements.length;
 
   return (
-    <Box className="rounded-lg bg-background-100 p-5 w-full">
+    <Box className="rounded-lg bg-background-100 p-5 w-full shadow-lg">
       <HStack className="items-center justify-center mb-4" space="sm">
         <Text size="2xl" className="font-bold tracking-widest uppercase text-center">
           Global Achievements
