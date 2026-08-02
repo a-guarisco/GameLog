@@ -1,108 +1,135 @@
-# Backend Guide
+# 🚀 GameLog Backend Guide
 
-This folder contains:
+This directory contains the Docker orchestration, database setup, and FastAPI application for the GameLog backend.
 
-- Docker orchestration for the backend and database
-- the FastAPI application in `gamelog/`
+---
+
+## 📌 Table of Contents
+
+- [Structure](#structure)
+- [Prerequisites](#prerequisites)
+- [Environment Configuration (`.env`)](#environment-configuration-env)
+- [Firebase Integration (Backend Runtime)](#firebase-integration-backend-runtime)
+- [Makefile Reference](#makefile-reference)
+  - [Environment & Scheduler Control (`RUN_SCHEDULER`)](#environment--scheduler-control-run_scheduler)
+  - [🐳 Lifecycle & Services](#-lifecycle--services)
+  - [🛠️ Rebuilds](#%EF%B8%8F-rebuilds)
+  - [🗄️ Database & Migration Commands](#%EF%B8%8F-database--migration-commands)
+- [Database Workflows & Lifecycle](#database-workflows--lifecycle)
+- [Typical URLs](#typical-urls)
+
+---
 
 ## Structure
 
-- `compose.yml`: Docker services (`gamelog`, `db`, `adminer`)
-- `compose.override.yml`: local overrides (ports, Adminer CSS)
-- `.env`: variables used by Docker Compose
-- `Makefile`: Docker commands
-- `gamelog/`: FastAPI code, Python dependencies, tests, and app Makefile
+- `compose.yml`: Docker services (`gamelog` API, `db` PostgreSQL, `adminer` web GUI)
+- `compose.override.yml`: Local overrides (ports, Adminer styling)
+- `.env`: Environment variables used by Docker Compose and FastAPI
+- `Makefile`: Cross-platform command shortcut runner
+- `gamelog/`: FastAPI code, Python dependencies (`uv.lock`), Alembic migrations, and unit tests
+
+---
 
 ## Prerequisites
 
-- Docker + Docker Compose plugin
-- `uv` (only if you want to run FastAPI outside Docker)
+- **Docker + Docker Compose plugin** (v2.0+)
+- **`uv`** (Package manager, required only if running FastAPI locally outside Docker)
+- **Firebase Auth Setup**: See shared [Firebase Authentication Setup](../README.md#firebase-authentication-setup) in root README.
 
-## Required .env file
+---
 
-Copy the example file and adjust it for your local setup:
+## Environment Configuration (`.env`)
+
+Copy the example configuration file to create your local `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-`backend/.env` is required to start Docker services.
+### Key Environment Variables Breakdown
 
-Notes:
+| Variable | Description | Default / Example |
+| :--- | :--- | :--- |
+| `POSTGRES_USER` | Username for the PostgreSQL database container | `user` |
+| `POSTGRES_PASSWORD` | Password for PostgreSQL | `password` |
+| `POSTGRES_DB` | Database name created on startup | `steam_db` |
+| `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH` | **Absolute host path** to your Firebase service account JSON | `/home/user/.config/gamelog/serviceAccountKey.json` |
+| `USE_FIREBASE_EMULATOR` | Set to `true` for local Firebase Auth Emulator, `false` for Firebase Cloud | `true` |
+| `FIREBASE_AUTH_EMULATOR_HOST` | Host address for Firebase Auth Emulator container networking | `host.docker.internal:9099` |
+| `RUN_SCHEDULER` | Toggle to enable/disable background sync jobs (`true`/`false`) | `true` |
 
-- Do not commit real credentials.
-- `DATABASE_URL` is built in `compose.yml` from these variables.
-- `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH` points to the Firebase service account key on host; Compose mounts it as a read-only secret inside the API container.
+---
 
-### Firebase auth prerequisites
+## Firebase Integration (Backend Runtime)
 
-The backend verifies Firebase ID tokens using the Firebase Admin SDK.
+For full instructions on setting up Firebase Auth (both Local Emulator and Cloud mode), see the shared [Firebase Authentication Setup Guide](../README.md#firebase-authentication-setup).
 
-To make that work:
+### Backend Runtime Secret Mounting
+At runtime, Docker Compose mounts the host service account key securely as a read-only secret inside the `gamelog` API container at `/run/secrets/firebase-service-account.json`. When `USE_FIREBASE_EMULATOR=true`, the backend bypasses strict cloud key checks and verifies tokens using the local emulator.
 
-1. Request access to the Firebase project or ask for a test user to be created.
-2. Download the Firebase service account JSON file from the Firebase console.
-3. Keep the file outside the repository.
-4. Set `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH` in `backend/.env` to the absolute host path of that file.
+### Protected Auth Endpoint
+The backend exposes `GET /me` (requires `Authorization: Bearer <FIREBASE_ID_TOKEN>`) which verifies the token via Firebase Admin SDK and returns `200 OK` with user details.
 
-Example:
+---
 
-```bash
-GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH=/absolute/path/to/serviceAccountKey.json
-```
+## Makefile Reference
 
-The container receives the file as `/run/secrets/firebase-service-account.json` and uses it to validate bearer tokens sent by the mobile app.
+The `backend/Makefile` automates Docker lifecycle, database migrations, and testing tasks across **Linux, macOS, and Windows**.
 
-### Firebase Key (Docker)
+### Environment & Scheduler Control (`RUN_SCHEDULER`)
 
-Add this variable in `backend/.env` (absolute path outside the repository):
+- **Default**: `RUN_SCHEDULER=true` (background sync jobs run automatically).
+- **`make dev` Override**: Adding `dev` (e.g., `make dev up` or `make dev rebuild`) dynamically exports `RUN_SCHEDULER=false` to temporarily disable background jobs during active development without modifying `.env`.
 
-```bash
-GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH=/absolute/path/to/serviceAccountKey.json
-```
+### 🐳 Lifecycle & Services
 
-Suggested local setup:
+| Command | Description |
+| :--- | :--- |
+| `make up` | Starts all services in background (`gamelog`, `db`, `adminer`) |
+| `make down` | Stops and removes all running containers and networks |
+| `make restart` | Restarts all running services |
+| `make logs` | Follows log output for all services |
+| `make logs SERVICE=gamelog` | Follows log output for a specific service (`gamelog` or `db`) |
 
-```bash
-mkdir -p ~/.config/gamelog
-cp /path/where/you/downloaded/serviceAccountKey.json ~/.config/gamelog/serviceAccountKey.json
-chmod 600 ~/.config/gamelog/serviceAccountKey.json
-```
+### 🛠️ Rebuilds
 
-At runtime, the API container reads the key from `/run/secrets/firebase-service-account.json`.
+| Command | Description |
+| :--- | :--- |
+| `make rebuild` | Rebuilds Docker images and force-recreates all containers |
+| `make rebuild-gamelog` | Rebuilds and force-recreates only the `gamelog` API container |
+| `make rebuild-no-cache` | Rebuilds all services without using Docker build cache |
+| `make rebuild-gamelog-no-cache` | Rebuilds only the `gamelog` API without build cache |
 
-### Auth test endpoint
+### 🗄️ Database & Migration Commands
 
-The backend exposes a protected auth test endpoint used by the mobile Dev View.
+| Command | Description |
+| :--- | :--- |
+| `make migrate` | Applies all pending Alembic migrations (`alembic upgrade head`) |
+| `make revision m="Description"` | Autogenerates a new Alembic migration script *(Requires `m` parameter)* |
+| `make downgrade` | Rolls back the last applied Alembic migration (`alembic downgrade -1`) |
+| `make seed` | Populates the database with initial demo users and test data |
+| `make db-shell` | Opens an interactive `psql` shell inside the PostgreSQL container |
+| `make db-clean` | Destroys database volume (`down -v`) and recreates empty schema |
+| `make db-snapshot` | Creates a SQL dump of current DB state in `postgres/snapshots/` |
+| `make db-restore` | Restores database from `postgres/snapshots/snapshot_latest.sql` |
 
-The mobile app sends a Firebase ID token through the `Authorization: Bearer <token>` header and the backend returns a simple outcome that can be checked from the UI.
+---
 
-## Makefile in `backend/` (Docker)
+## Database Workflows & Lifecycle
 
-Quick reference for Docker commands:
+To manage local database states efficiently, choose the appropriate workflow target:
 
-| Task                                | Command                         |
-| ----------------------------------- | ------------------------------- |
-| Start all services                  | `make up`                       |
-| Stop and remove containers          | `make down`                     |
-| Restart all running services        | `make restart`                  |
-| Follow all service logs             | `make logs`                     |
-| Follow logs for one service         | `make logs SERVICE=db`          |
-| Rebuild and recreate all services   | `make rebuild`                  |
-| Rebuild only the API                | `make rebuild-gamelog`          |
-| Rebuild all without cache           | `make rebuild-no-cache`         |
-| Rebuild only API without cache      | `make rebuild-gamelog-no-cache` |
-| Open psql shell in DB container     | `make db-shell`                 |
-| Create SQL dump of current DB state | `make db-snapshot`              |
-| Restore DB from latest snapshot     | `make db-restore`               |
-| Clean DB volume and recreate schema | `make db-clean`                 |
-
-Database snapshots are stored in `postgres/snapshots`.
+- **`make setup` (Initial Setup)**: Use the first time you set up a fresh repository clone. Executes `up` ➔ `migrate` ➔ `seed`.
+- **`make db-reset` (Daily Reset)**: Use during daily development when you want to wipe dirty test data and start clean without deleting migration files. Executes `db-clean` ➔ `migrate` ➔ `seed`.
+- **`make db-fresh-baseline` (Baseline Reset)**: Use when refactoring data models before a release. Deletes old `.py` version files in `alembic/versions/`, wipes DB, autogenerates a single clean `initial_schema` baseline, applies it, and seeds test data. *(Includes interactive prompt confirmation)*.
 
 For local development commands (without Docker), see [gamelog/README.md](gamelog/README.md).
 
+---
+
 ## Typical URLs
 
-- API: `http://localhost:8000`
-- Swagger UI: `http://localhost:8000/docs`
-- Adminer: `http://localhost:8080`
+- **API Base**: `http://localhost:8000`
+- **Swagger Interactive API Docs**: `http://localhost:8000/docs`
+- **Healthcheck Endpoint**: `http://localhost:8000/health`
+- **Adminer Database GUI**: `http://localhost:8080` (System: `PostgreSQL`, Server: `db`, User: `user`, Pass: `password`, DB: `steam_db`)

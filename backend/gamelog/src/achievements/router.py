@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from .service import get_hello_message
 
 router = APIRouter(prefix="/achievements", tags=["Achievements"])

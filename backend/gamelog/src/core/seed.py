@@ -7,7 +7,7 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
+from src.models import Config, Game, GameStatus, Shelving, SteamRollingTime, User
 
 DEMO_USER_A_ID = UUID("11111111-1111-1111-1111-111111111111")
 DEMO_USER_B_ID = UUID("22222222-2222-2222-2222-222222222222")
@@ -21,17 +21,17 @@ def _users() -> list[User]:
     return [
         User(
             id=DEMO_USER_A_ID,
-            firebase_uid="firebase-demo-001",
+            firebase_uid="f4vGO3YdnJDyo8HZ3kfZqW5Ao6fJ",
             username="alice",
-            steam_id="76561198000000001",
-            steam_api_key="demo-key-alice",
+            steam_id="76561198077919169",
+            steam_api_key="724FF154B1D2A357857A257EA28C6415",
         ),
         User(
             id=DEMO_USER_B_ID,
             firebase_uid="firebase-demo-002",
             username="bob",
             steam_id="76561198000000002",
-            steam_api_key="demo-key-bob",
+            steam_api_key="",
         ),
     ]
 
@@ -41,20 +41,14 @@ def _games() -> list[Game]:
         Game(
             id=DEMO_GAME_CS2_ID,
             steam_app_id="730",
-            logo_url="https://cdn.example.com/games/cs2-logo.png",
-            banner_url="https://cdn.example.com/games/cs2-banner.png",
         ),
         Game(
             id=DEMO_GAME_DOTA_ID,
             steam_app_id="570",
-            logo_url="https://cdn.example.com/games/dota2-logo.png",
-            banner_url="https://cdn.example.com/games/dota2-banner.png",
         ),
         Game(
             id=DEMO_GAME_RDR2_ID,
             steam_app_id="1174180",
-            logo_url="https://cdn.example.com/games/rdr2-logo.png",
-            banner_url="https://cdn.example.com/games/rdr2-banner.png",
         ),
     ]
 
@@ -68,29 +62,71 @@ def _shelvings() -> list[Shelving]:
 
 
 def _rolling_times() -> list[SteamRollingTime]:
-    return [
-        SteamRollingTime(
-            id=uuid4(),
-            user_id=DEMO_USER_A_ID,
-            steam_app_id="730",
-            last_day_playtime=120,
-            created_at=date(2026, 4, 17),
-        ),
-        SteamRollingTime(
-            id=uuid4(),
-            user_id=DEMO_USER_A_ID,
-            steam_app_id="1174180",
-            last_day_playtime=45,
-            created_at=date(2026, 4, 18),
-        ),
-        SteamRollingTime(
-            id=uuid4(),
-            user_id=DEMO_USER_B_ID,
-            steam_app_id="570",
-            last_day_playtime=300,
-            created_at=date(2026, 4, 18),
-        ),
-    ]
+    from datetime import timedelta
+    today = date.today()
+    records = []
+
+    # Seed for Alice (DEMO_USER_A_ID) - CS2 (730)
+    cs2_playtime = 1000
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = (day_offset == 14)
+        if not is_baseline:
+            playtime_increment = [30, 45, 0, 60, 20, 0, 90, 15, 40, 0, 50, 75, 10, 80, 45][14 - day_offset]
+            cs2_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_A_ID,
+                steam_app_id="730",
+                last_day_playtime=cs2_playtime,
+                created_at=record_date,
+                is_baseline=is_baseline,
+            )
+        )
+
+    # Seed RDR2 (1174180) for Alice (DEMO_USER_A_ID)
+    rdr2_playtime = 500
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = (day_offset == 14)
+        if not is_baseline:
+            playtime_increment = [0, 60, 90, 0, 15, 30, 45, 0, 0, 120, 10, 0, 35, 50, 0][14 - day_offset]
+            rdr2_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_A_ID,
+                steam_app_id="1174180",
+                last_day_playtime=rdr2_playtime,
+                created_at=record_date,
+                is_baseline=is_baseline,
+            )
+        )
+
+    # Seed Dota (570) for Bob (DEMO_USER_B_ID)
+    dota_playtime = 2000
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = (day_offset == 14)
+        if not is_baseline:
+            playtime_increment = [100, 120, 0, 80, 90, 150, 0, 60, 40, 110, 0, 85, 95, 120, 60][14 - day_offset]
+            dota_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_B_ID,
+                steam_app_id="570",
+                last_day_playtime=dota_playtime,
+                created_at=record_date,
+                is_baseline=is_baseline,
+            )
+        )
+
+    return records
 
 
 def seed_database() -> None:
@@ -100,6 +136,7 @@ def seed_database() -> None:
         session.exec(delete(Shelving))
         session.exec(delete(Game))
         session.exec(delete(User))
+        session.exec(delete(Config))
         session.flush()
 
         for user in _users():
@@ -110,6 +147,10 @@ def seed_database() -> None:
             session.add(shelving)
         for rolling_time in _rolling_times():
             session.add(rolling_time)
+
+        from datetime import UTC, datetime, timedelta
+        yesterday_iso = (datetime.now(UTC) - timedelta(days=1)).isoformat()
+        session.add(Config(key="last_update", value=yesterday_iso))
 
         session.commit()
 

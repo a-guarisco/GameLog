@@ -7,7 +7,7 @@ from src.models.user import UserBase
 
 
 class UserCreate(UserBase):
-    pass
+    steam_api_key: str = Field(max_length=255)
 
 
 class UserRead(UserBase):
@@ -23,6 +23,7 @@ class UserUpdate(SQLModel):
 
 class SteamRollingTimeCreate(SteamRollingTimeBase):
     user_id: uuid.UUID
+    is_baseline: bool = True
 
 
 class SteamRollingTimeRead(SteamRollingTimeBase):

@@ -24,7 +24,7 @@ type UseGameListResult = {
 
 export const useGameList = (playerID: string): UseGameListResult => {
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames, errorMessageOwnedGames } =
-    useGetOwnedGames(playerID, true);
+    useGetOwnedGames(playerID, true, true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('playtime');
   const [isProcessing, setIsProcessing] = useState(false);

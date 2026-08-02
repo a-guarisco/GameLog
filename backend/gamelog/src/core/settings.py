@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     firebase_service_account_key_path: str = Field(validation_alias="GOOGLE_APPLICATION_CREDENTIALS")
     use_firebase_emulator: bool = Field(default=True, validation_alias="USE_FIREBASE_EMULATOR")
     firebase_auth_emulator_host: str = Field(default="host.docker.internal:9099", validation_alias="FIREBASE_AUTH_EMULATOR_HOST")
+    run_scheduler: bool = Field(default=True, validation_alias="RUN_SCHEDULER")
     app_name: str = "GameLog API"
     app_version: str = "0.1.0"
 
@@ -17,4 +18,4 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
