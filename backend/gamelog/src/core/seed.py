@@ -46,7 +46,7 @@ DEMO_GAME_RDR2_ID = UUID("88888888-8888-8888-8888-888888888888")
 def _users() -> list[User]:
     """
     Returns the initial list of test users.
-    
+
     WARNING: `firebase_uid` values MUST be kept in sync with:
     1. Firebase Auth Emulator script (`backend/scripts/seed_firebase_users.py`)
     2. Firebase Console Cloud accounts for production E2E tests.
@@ -122,12 +122,13 @@ def _shelvings() -> list[Shelving]:
 def _rolling_times() -> list[SteamRollingTime]:
     """
     Generates 14 days of historical daily playtime snapshots.
-    
+
     Used to test endpoints:
     - GET /games/_playtime_by_user
     - GET /games/_playtime_by_game
     """
     from datetime import timedelta
+
     today = date.today()
     records = []
 
@@ -135,7 +136,7 @@ def _rolling_times() -> list[SteamRollingTime]:
     cs2_playtime = 1000
     for day_offset in range(14, -1, -1):
         record_date = today - timedelta(days=day_offset)
-        is_baseline = (day_offset == 14)
+        is_baseline = day_offset == 14
         if not is_baseline:
             playtime_increment = [30, 45, 0, 60, 20, 0, 90, 15, 40, 0, 50, 75, 10, 80, 45][14 - day_offset]
             cs2_playtime += playtime_increment
@@ -155,7 +156,7 @@ def _rolling_times() -> list[SteamRollingTime]:
     rdr2_playtime = 500
     for day_offset in range(14, -1, -1):
         record_date = today - timedelta(days=day_offset)
-        is_baseline = (day_offset == 14)
+        is_baseline = day_offset == 14
         if not is_baseline:
             playtime_increment = [0, 60, 90, 0, 15, 30, 45, 0, 0, 120, 10, 0, 35, 50, 0][14 - day_offset]
             rdr2_playtime += playtime_increment
@@ -175,7 +176,7 @@ def _rolling_times() -> list[SteamRollingTime]:
     dota_playtime = 2000
     for day_offset in range(14, -1, -1):
         record_date = today - timedelta(days=day_offset)
-        is_baseline = (day_offset == 14)
+        is_baseline = day_offset == 14
         if not is_baseline:
             playtime_increment = [100, 120, 0, 80, 90, 150, 0, 60, 40, 110, 0, 85, 95, 120, 60][14 - day_offset]
             dota_playtime += playtime_increment
@@ -214,6 +215,7 @@ def seed_database() -> None:
             session.add(rolling_time)
 
         from datetime import UTC, datetime, timedelta
+
         yesterday_iso = (datetime.now(UTC) - timedelta(days=1)).isoformat()
         session.add(Config(key="last_update", value=yesterday_iso))
 

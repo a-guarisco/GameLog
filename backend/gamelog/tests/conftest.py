@@ -31,6 +31,7 @@ from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 # SQLite engine / session
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="function")
 def engine():
     """Fresh in-memory SQLite engine for each test."""
@@ -54,6 +55,7 @@ def session(engine):
 # ---------------------------------------------------------------------------
 # Data factories
 # ---------------------------------------------------------------------------
+
 
 def make_user(
     session: Session,
@@ -120,6 +122,7 @@ def make_rolling(
 # FastAPI TestClient with overridden dependencies
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="function")
 def client(session):
     """
@@ -132,13 +135,10 @@ def client(session):
     def override_get_db():
         yield session
 
-    def override_get_current_user():
-        return fake_auth
-
     from src.auth.auth import get_current_user
 
     app.dependency_overrides[get_db] = override_get_db
-    app.dependency_overrides[get_current_user] = override_get_current_user
+    app.dependency_overrides[get_current_user] = lambda: fake_auth
 
     with TestClient(app) as c:
         yield c
