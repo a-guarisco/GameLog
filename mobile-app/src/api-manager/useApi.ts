@@ -28,9 +28,13 @@ export const useGetGlobalAchievement = (gameID: string) => {
   };
 };
 
-export const useGetOwnedGames = (playerID: string, includeFreeGame: boolean) => {
+export const useGetOwnedGames = (
+  playerID: string,
+  includeSub: boolean,
+  includeFreeGame: boolean
+) => {
   const fetchFunc = useCallback(
-    () => ApiManager.getOwnedGames(playerID, includeFreeGame),
+    () => ApiManager.getOwnedGames(playerID, includeSub, includeFreeGame),
     [playerID, includeFreeGame]
   );
 
@@ -54,9 +58,13 @@ export const useGetPlayersInfo = (steamIds: string[]) => {
   };
 };
 
-export const useGetGameGenreChartData = (userId: string) => {
+export const useGetGameGenreChartData = (
+  userId: string,
+  includeSub: boolean,
+  includeFreeGame: boolean
+) => {
   const fetchFunc = useCallback(async () => {
-    const ownedGames = await ApiManager.getOwnedGames(userId, false);
+    const ownedGames = await ApiManager.getOwnedGames(userId, includeSub, includeFreeGame);
     return buildGenreChartData(ownedGames.response.games);
   }, [userId]);
 

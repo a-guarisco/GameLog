@@ -231,12 +231,12 @@ describe('ApiManager', () => {
       json: async () => ({ response: { games: [] } }),
     });
 
-    await ApiManager.getOwnedGames(steamId, false);
+    await ApiManager.getOwnedGames(steamId, false, false);
 
     // For now, all endpoints use Steam regardless of provider selection
     // Backend-specific endpoints will be implemented gradually as needed
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_played_free_games=false`
+      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=false&include_played_free_games=false`
     );
   });
 });
