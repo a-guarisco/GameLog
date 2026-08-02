@@ -27,7 +27,7 @@ const getLockedFillColor = (locked: boolean) => {
   return 'bg-success-500';
 };
 
-const AchievementItem = ({ name, percentage, unlockTime, description }: AchievementItemProps) => {
+const AchievementItem = ({ name, displayName, percentage, unlockTime, description }: AchievementItemProps) => {
   const safePercentage = Number(percentage);
   const normalizedPercentage = Number.isFinite(safePercentage) ? safePercentage : 0;
   const isUnlocked = !!unlockTime;
@@ -53,7 +53,7 @@ const AchievementItem = ({ name, percentage, unlockTime, description }: Achievem
 
         <VStack className="flex-1">
           <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-            {formatAchievementName(name)}
+            {displayName ? displayName : formatAchievementName(name)}
           </Text>
           <Text size="xs" className="font-medium text-typography-400 mt-0.5">
             {rarity.label} · {normalizedPercentage.toFixed(1)}% of players

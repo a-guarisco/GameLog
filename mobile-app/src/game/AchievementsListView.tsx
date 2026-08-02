@@ -51,6 +51,7 @@ const AchievementsListView = ({ route }: any) => {
   const unlockedCount = mergedAchievements.filter((a) => a.unlockTime).length;
   const totalCount = mergedAchievements.length;
   const completionPercent = totalCount ? Math.round((unlockedCount / totalCount) * 100) : 0;
+  const gameName = personalAchievements?.playerstats?.gameName ?? 'Unknown Game';
 
   return isLoadingPlayerAchievement ? (
     <LoadingBox className="flex-1" message="Loading achievements..." />
@@ -66,7 +67,7 @@ const AchievementsListView = ({ route }: any) => {
     >
       <Box className="mb-5">
         <Text size="3xl" className="font-bold uppercase text-center mb-3">
-          Achievements
+          Achievements for {gameName}
         </Text>
 
         <Box className="relative overflow-hidden rounded-lg bg-background-100">
