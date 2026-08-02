@@ -17,7 +17,7 @@ const getRarity = (percentage: number) => {
   if (percentage < 5) return { label: 'Legendary', fill: 'bg-warning-500' };
   if (percentage < 20) return { label: 'Rare', fill: 'bg-info-500' };
   if (percentage < 50) return { label: 'Uncommon', fill: 'bg-success-500' };
-  return { label: 'Common', fill: 'bg-background-400' };
+  return { label: 'Common', fill: 'bg-background-500' };
 };
 
 const getLockedFillColor = (locked: boolean) => {
@@ -35,7 +35,7 @@ const AchievementItem = ({ name, percentage, unlockTime, description }: Achievem
   const lockedFillColor = getLockedFillColor(!isUnlocked);
 
   return (
-    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-100">
+    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200">
       <Box
         testID="global-progress-bar"
         className={`absolute top-0 left-0 h-full ${lockedFillColor} opacity-15`}
@@ -45,7 +45,7 @@ const AchievementItem = ({ name, percentage, unlockTime, description }: Achievem
       <HStack space="md" className="relative z-10 px-3 py-3 items-start">
         <Box
           className={`w-10 h-10 rounded-md items-center justify-center shrink-0 ${
-            isUnlocked ? 'bg-success-100' : 'bg-background-200'
+            isUnlocked ? 'bg-success-100' : 'bg-background-300'
           }`}
         >
           <AchievementIcon isUnlocked={isUnlocked} />
@@ -55,11 +55,11 @@ const AchievementItem = ({ name, percentage, unlockTime, description }: Achievem
           <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
             {formatAchievementName(name)}
           </Text>
-          <Text size="xs" className="font-medium text-typography-500 mt-0.5">
+          <Text size="xs" className="font-medium text-typography-400 mt-0.5">
             {rarity.label} · {normalizedPercentage.toFixed(1)}% of players
           </Text>
           {description && (
-            <Text size="xs" className="text-typography-600 mt-1" numberOfLines={2}>
+            <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
               {description}
             </Text>
           )}

@@ -69,12 +69,12 @@ const AchievementsListView = ({ route }: any) => {
           Achievements
         </Text>
 
-        <Box className="relative overflow-hidden border-2 border-outline-300 h-8 bg-background-100">
+        <Box className="relative overflow-hidden rounded-lg bg-background-100">
           <Box
-            className="absolute top-0 left-0 h-full bg-success-500"
+            className="absolute top-0 left-0 h-full bg-success-500 opacity-15"
             style={{ width: `${completionPercent}%` }}
           />
-          <HStack className="h-full items-center justify-center relative z-10">
+          <HStack className="h-10 items-center justify-center px-3 relative z-10">
             <Text size="sm" className="font-bold">
               {unlockedCount} / {totalCount} unlocked · {completionPercent}%
             </Text>

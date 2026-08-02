@@ -31,9 +31,8 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
   const totalCount = achievements.length;
 
   return (
-    <Box className="border-2 border-outline-200 rounded-2xl bg-background-50 p-5 w-full">
+    <Box className="rounded-lg bg-background-100 p-5 w-full">
       <HStack className="items-center justify-center mb-4" space="sm">
-        <Text size="2xl">🏆</Text>
         <Text size="2xl" className="font-bold tracking-widest uppercase text-center">
           Global Achievements
         </Text>
@@ -74,12 +73,12 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
             gameItem,
           })
         }
-        className="w-full py-2"
+        className="w-full rounded-lg bg-success-200 py-2"
       >
-        <ButtonText>
+        <ButtonText className="font-bold uppercase">
           {totalCount > 3 ? `See all ${totalCount} achievements →` : 'See more →'}
         </ButtonText>
       </Button>
-    </Box >
+    </Box>
   );
 }
