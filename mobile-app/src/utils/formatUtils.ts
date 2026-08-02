@@ -5,7 +5,6 @@ export const formatMinutesToHours = (minutes: number): string => {
 };
 export const formatMinutesToHoursShort = (mins: number) => `${Math.floor(mins / 60)}h`;
 
-export const formatAchievementName = (name: string): string =>
-  name.replace(/_/g, ' ').trim();
+export const formatAchievementName = (name: string): string => name.replace(/_/g, ' ').trim();
 
 export const formatDate = (timestamp: number) => new Date(timestamp * 1000).toLocaleDateString();
