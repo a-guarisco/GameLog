@@ -7,7 +7,7 @@ interface AchievementIconProps {
 
 const AchievementIcon = ({ isUnlocked }: AchievementIconProps) => {
   const colorScheme = useColorScheme();
-  const iconColor = colorScheme === 'dark' ? '#a8a8a8' : '#3b3b3b';
+  const iconColor = colorScheme === 'dark' ? '#717070' : '#3b3b3b';
 
   if (!isUnlocked) {
     return (
