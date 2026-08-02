@@ -13,6 +13,7 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/firebase-service-account.json
       - USE_FIREBASE_EMULATOR=${USE_FIREBASE_EMULATOR:-true}
       - FIREBASE_AUTH_EMULATOR_HOST=${FIREBASE_AUTH_EMULATOR_HOST:-host.docker.internal:9099}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-gamelog-40e10}
       - RUN_SCHEDULER=${RUN_SCHEDULER:-true}
     secrets:
       - source: firebase_service_account
