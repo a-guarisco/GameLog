@@ -2,6 +2,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
+import AchievementIcon from '@gamelog/game/AchievementIcon';
 import { formatAchievementName } from '@gamelog/utils/formatUtils';
 
 interface AchievementItemProps {
@@ -47,7 +48,7 @@ const AchievementItem = ({ name, percentage, unlockTime, description }: Achievem
             isUnlocked ? 'bg-success-100' : 'bg-background-200'
           }`}
         >
-          <Text size="md">{isUnlocked ? '🏆' : '🔒'}</Text>
+          <AchievementIcon isUnlocked={isUnlocked} />
         </Box>
 
         <VStack className="flex-1">
