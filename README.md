@@ -58,6 +58,23 @@ All teammates can run and test authentication locally **without needing develope
 
 5. **Emulator User Interface**: Open `http://127.0.0.1:4000/auth` in your browser to manage local test users.
 
+#### Standard Test Users & Bearer Token Retrieval
+
+To populate your local Firebase Auth Emulator with the 5 standard test accounts (`test-01` through `test-05`) matching backend database seed data:
+
+- **Via Seeding Script / Makefile**:
+  Run the automated helper script to populate all 5 test accounts in the local Firebase Auth Emulator with production-matching UIDs and display fresh Bearer tokens for all test users:
+  ```bash
+  # From repository root
+  python backend/scripts/seed_firebase_users.py
+
+  # Or from backend/ folder
+  make seed-firebase
+  ```
+
+- **Via Mobile App Dev View**:
+  Start the mobile client (`npm run start:backend`), open the **Dev Tab**, and press **"Generate Firebase Token"**. The app automatically registers `test-01` (`test-01@test.com`) against the emulator and saves the token to local device storage.
+
 ---
 
 ### Option B: Live Firebase Cloud Project (Production Mode)
