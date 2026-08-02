@@ -37,6 +37,7 @@ const AchievementsListView = ({ route }: any) => {
           name: globalAch.name,
           displayName: globalAch.displayName,
           percent: globalAch.percent,
+          description: globalAch.description,
           unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
         };
       })
@@ -89,6 +90,7 @@ const AchievementsListView = ({ route }: any) => {
             displayName={item.displayName}
             percentage={item.percent}
             unlockTime={item.unlockTime}
+            description={item.description}
           />
         ))}
       </VStack>
