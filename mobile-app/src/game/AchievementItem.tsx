@@ -62,7 +62,7 @@ const AchievementItem = ({
             {displayName ? displayName : formatAchievementName(name)}
           </Text>
           <Text size="xs" className="font-medium text-typography-400 mt-0.5">
-            {rarity.label} · {normalizedPercentage.toFixed(1)}% of players
+            <Text size="xs" className="font-medium text-typography-300 mt-0.5">{rarity.label}</Text> · {normalizedPercentage.toFixed(1)}% of players
           </Text>
           {description && (
             <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
