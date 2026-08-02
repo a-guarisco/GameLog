@@ -13,7 +13,7 @@ interface GameBannerProps {
 export default function GameBanner({ appid, title, streak }: GameBannerProps) {
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(appid);
   const gameHeaderImage = steamAssetUrls.getGameHeaderImage(appid);
-  const secondaryText = streak > 0 ? `🔥 ${streak} day streak` : 'No streak yet';
+  const secondaryText = streak > 0 ? `🔥 ${streak} day streak` : '0 day streak';
 
   return (
     <VStack className="w-full">
