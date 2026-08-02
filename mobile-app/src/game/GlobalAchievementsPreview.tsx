@@ -73,7 +73,7 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
             gameItem,
           })
         }
-        className="w-full rounded-lg bg-success-200 py-2"
+        className="w-full rounded-lg py-2"
       >
         <ButtonText className="font-bold uppercase">
           {totalCount > 3 ? `See all ${totalCount} achievements →` : 'See more →'}
