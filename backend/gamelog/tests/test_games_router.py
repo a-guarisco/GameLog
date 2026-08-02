@@ -200,3 +200,81 @@ class TestWeeklyPlaytimeByGame:
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
         dates = [e["date"] for e in response.json()]
         assert dates == sorted(dates)
+
+
+# ---------------------------------------------------------------------------
+# /games/_streak_by_user
+# ---------------------------------------------------------------------------
+
+
+class TestStreakByUser:
+    ENDPOINT = "/games/_streak_by_user"
+
+    def test_requires_auth(self):
+        from src.main import app as _app
+
+        _app.dependency_overrides.clear()
+
+        plain_client = TestClient(_app, raise_server_exceptions=False)
+        response = plain_client.get(self.ENDPOINT)
+        assert response.status_code == 401
+
+    def test_returns_streak(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_streak", return_value=5) as mock_svc:
+            response = client.get(self.ENDPOINT)
+            # The order_by or order of args: session, user_id, steam_app_id
+            mock_svc.assert_called_once()
+            args, kwargs = mock_svc.call_args
+            assert args[1] == "firebase-uid-1"
+            assert args[2] is None
+
+        assert response.status_code == 200
+        assert response.json() == 5
+
+    def test_propagates_404_from_service(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_streak", side_effect=HTTPException(status_code=404, detail="User not found")):
+            response = client.get(self.ENDPOINT)
+        assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# /games/_streak_by_game
+# ---------------------------------------------------------------------------
+
+
+class TestStreakByGame:
+    ENDPOINT = "/games/_streak_by_game"
+
+    def test_requires_auth(self):
+        from src.main import app as _app
+
+        _app.dependency_overrides.clear()
+
+        plain_client = TestClient(_app, raise_server_exceptions=False)
+        response = plain_client.get(self.ENDPOINT, params={"steam_app_id": "570"})
+        assert response.status_code == 401
+
+    def test_requires_steam_app_id_param(self, client, session):
+        make_user(session)
+        response = client.get(self.ENDPOINT)
+        assert response.status_code == 422
+
+    def test_returns_streak_by_game(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_streak", return_value=3) as mock_svc:
+            response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
+            mock_svc.assert_called_once()
+            args, kwargs = mock_svc.call_args
+            assert args[1] == "firebase-uid-1"
+            assert args[2] == "570"
+
+        assert response.status_code == 200
+        assert response.json() == 3
+
+    def test_propagates_404_from_service(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_streak", side_effect=HTTPException(status_code=404, detail="User not found")):
+            response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
+        assert response.status_code == 404
