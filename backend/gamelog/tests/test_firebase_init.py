@@ -17,7 +17,10 @@ def test_initialize_firebase_app_uses_emulator_without_service_account_key():
     ):
         settings = Settings()
 
-        with patch("src.auth.firebase_init.firebase_admin.get_app", side_effect=ValueError), patch("src.auth.firebase_init.firebase_admin.initialize_app") as mock_init:
+        with (
+            patch("src.auth.firebase_init.firebase_admin.get_app", side_effect=ValueError),
+            patch("src.auth.firebase_init.firebase_admin.initialize_app") as mock_init,
+        ):
             initialize_firebase_app(settings)
 
     mock_init.assert_called_once_with(options={"projectId": "gamelog-40e10"})
