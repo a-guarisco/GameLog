@@ -35,6 +35,6 @@ describe('AchievementIcon', () => {
 
     const { UNSAFE_getByType } = render(<AchievementIcon isUnlocked={true} />);
 
-    expect(UNSAFE_getByType(Path).props.fill).toBe('#a8a8a8');
+    expect(UNSAFE_getByType(Path).props.fill).toBe('#717070');
   });
 });
