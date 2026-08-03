@@ -7,14 +7,14 @@ describe('AchievementItem', () => {
   it('render without crash', () => {
     render(<AchievementItem name="test" percentage={50.5} />);
     expect(screen.getByText('test')).toBeTruthy();
-    expect(screen.getByText('50.5%')).toBeTruthy();
+    expect(screen.getByText(/50\.5\s*% of players/)).toBeTruthy();
   });
 
   it('timestamp is display correctly when achievement is unlocked', () => {
     const timestamp = 1600000000;
     render(<AchievementItem name="test" percentage={100} unlockTime={timestamp} />);
     const expectedDate = new Date(timestamp * 1000).toLocaleDateString();
-    expect(screen.getByText(`Achievement unlocked on: ${expectedDate}`)).toBeTruthy();
+    expect(screen.getByText(`Unlocked ${expectedDate}`)).toBeTruthy();
   });
 
   it('should not display unlock time when achievement is locked', () => {
