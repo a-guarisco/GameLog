@@ -14,7 +14,9 @@ This directory contains the Docker orchestration, database setup, and FastAPI ap
   - [Environment & Scheduler Control (`RUN_SCHEDULER`)](#environment--scheduler-control-run_scheduler)
   - [🐳 Lifecycle & Services](#-lifecycle--services)
   - [🛠️ Rebuilds](#%EF%B8%8F-rebuilds)
+  - [🧪 Testing & Code Quality](#-testing--code-quality)
   - [🗄️ Database & Migration Commands](#%EF%B8%8F-database--migration-commands)
+- [Testing & Code Quality (pytest & ruff)](#testing--code-quality-pytest--ruff)
 - [Database Workflows & Lifecycle](#database-workflows--lifecycle)
 - [Typical URLs](#typical-urls)
 
@@ -56,6 +58,7 @@ cp .env.example .env
 | `GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH` | **Absolute host path** to your Firebase service account JSON | `/home/user/.config/gamelog/serviceAccountKey.json` |
 | `USE_FIREBASE_EMULATOR` | Set to `true` for local Firebase Auth Emulator, `false` for Firebase Cloud | `true` |
 | `FIREBASE_AUTH_EMULATOR_HOST` | Host address for Firebase Auth Emulator container networking | `host.docker.internal:9099` |
+| `FIREBASE_PROJECT_ID` | Firebase Project ID used by Firebase Admin SDK | `gamelog-40e10` |
 | `RUN_SCHEDULER` | Toggle to enable/disable background sync jobs (`true`/`false`) | `true` |
 
 ---
@@ -124,6 +127,13 @@ The `backend/Makefile` automates Docker lifecycle, database migrations, and test
 | `make rebuild-no-cache` | Rebuilds all services without using Docker build cache |
 | `make rebuild-gamelog-no-cache` | Rebuilds only the `gamelog` API without build cache |
 
+### 🧪 Testing & Code Quality
+
+| Command | Description |
+| :--- | :--- |
+| `make test` | Runs the full `pytest` suite inside the API container (`RUN_SCHEDULER=false`) |
+| `make lint` | Runs `ruff` check and formatters to lint and format Python code |
+
 ### 🗄️ Database & Migration Commands
 
 | Command | Description |
@@ -139,6 +149,40 @@ The `backend/Makefile` automates Docker lifecycle, database migrations, and test
 | `make db-restore` | Restores database from `postgres/snapshots/snapshot_latest.sql` |
 
 ---
+
+## Testing & Code Quality (pytest & ruff)
+
+We use **`pytest`** for unit & integration testing and **`ruff`** for Python linting and code formatting.
+
+### Running via Docker Compose (Recommended)
+
+From the `backend/` directory:
+
+```bash
+# Run pytest test suite
+make test
+
+# Format code and fix linter issues
+make lint
+```
+
+### Running Locally with `uv` (Outside Docker)
+
+If you prefer running tests and linter directly on your host machine without Docker:
+
+```bash
+cd backend/gamelog
+
+# Sync dev dependencies (pytest, ruff)
+uv sync --group dev
+
+# Run pytest test suite
+RUN_SCHEDULER=false uv run --group dev python -m pytest
+
+# Run ruff check & format
+uv run --group dev ruff check . --fix
+uv run --group dev ruff format .
+```
 
 ## Database Workflows & Lifecycle
 
