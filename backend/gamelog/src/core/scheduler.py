@@ -77,7 +77,7 @@ async def _scheduler_loop():
             await asyncio.sleep(seconds_to_wait)
 
             await _run_daily_job_async()
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         import traceback
 
         print(f"ERROR in scheduler loop: {e}", flush=True)

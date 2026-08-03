@@ -26,6 +26,9 @@ dev = [
 line-length = 150
 target-version = "py312"
 
+[tool.ruff.lint]
+extend-ignore = ["B008", "BLE001", "DTZ011"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"

@@ -59,7 +59,7 @@ class TestWeeklyPlaytimeByUser:
         assert response.status_code == 401
 
     def test_returns_200_with_default_days(self, client, session):
-        user = make_user(session)  # uid = "firebase-uid-1" matches fake auth
+        make_user(session)  # uid = "firebase-uid-1" matches fake auth
         payload = _n_day_payload(1, 30)
         with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload):
             response = client.get(self.ENDPOINT)
@@ -225,7 +225,7 @@ class TestStreakByUser:
             response = client.get(self.ENDPOINT)
             # The order_by or order of args: session, user_id, steam_app_id
             mock_svc.assert_called_once()
-            args, kwargs = mock_svc.call_args
+            args, _kwargs = mock_svc.call_args
             assert args[1] == "firebase-uid-1"
             assert args[2] is None
 
@@ -266,7 +266,7 @@ class TestStreakByGame:
         with patch("src.games.games_router.game_service.get_streak", return_value=3) as mock_svc:
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
             mock_svc.assert_called_once()
-            args, kwargs = mock_svc.call_args
+            args, _kwargs = mock_svc.call_args
             assert args[1] == "firebase-uid-1"
             assert args[2] == "570"
 
