@@ -4,25 +4,25 @@ export
 COMPOSE ?= docker compose
 SERVICE ?=
 SNAPSHOT_DIR ?= postgres/snapshots
-RUN_SCHEDULER ?= true
+RUN_SCHEDULER ?= false
 
-ifneq ($(filter dev,$(MAKECMDGOALS)),)
-  RUN_SCHEDULER = false
+ifneq ($(filter prod,$(MAKECMDGOALS)),)
+  RUN_SCHEDULER = true
 endif
 
 export RUN_SCHEDULER
 
-.PHONY: help dev up down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed seed-firebase db-shell db-clean db-snapshot db-restore
+.PHONY: help prod up down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed seed-firebase db-shell db-clean db-snapshot db-restore
 
-dev:
+prod:
 	@:
 
 help:
 	@echo "GameLog backend Docker commands"
 	@echo ""
 	@echo "Lifecycle:"
-	@echo "  make up                  - Start all services"
-	@echo "  make dev up              - Start all services with background scheduler disabled (RUN_SCHEDULER=false)"
+	@echo "  make up                  - Start all services with background scheduler disabled (RUN_SCHEDULER=false)"
+	@echo "  make up prod             - Start all services with background scheduler enabled (RUN_SCHEDULER=true)"
 	@echo "  make down                - Stop and remove containers"
 	@echo "  make restart             - Restart all running services"
 	@echo "  make logs                - Follow all service logs"

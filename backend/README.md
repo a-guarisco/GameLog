@@ -102,8 +102,8 @@ The `backend/Makefile` automates Docker lifecycle, database migrations, and test
 
 ### Environment & Scheduler Control (`RUN_SCHEDULER`)
 
-- **Default**: `RUN_SCHEDULER=true` (background sync jobs run automatically).
-- **`make dev` Override**: Adding `dev` (e.g., `make dev up` or `make dev rebuild`) dynamically exports `RUN_SCHEDULER=false` to temporarily disable background jobs during active development without modifying `.env`.
+- **Default**: `RUN_SCHEDULER=false` (background sync jobs disabled).
+- **`make prod` Override**: Adding `prod` (e.g., `make prod up` or `make prod rebuild`) dynamically exports `RUN_SCHEDULER=true` to enable background jobs during execution without modifying `.env`.
 
 ### 🐳 Lifecycle & Services
 
