@@ -82,6 +82,14 @@ const EndPoints = {
   getBackendHealth: () => {
     return `${BACKEND_BASE_URL}/health`;
   },
+
+  registerUser: () => {
+    return `${BACKEND_BASE_URL}/users/register`;
+  },
+
+  getUserMe: () => {
+    return `${BACKEND_BASE_URL}/users/me`;
+  },
 };
 
 export { isBackendProvider, getSteamApiKey };

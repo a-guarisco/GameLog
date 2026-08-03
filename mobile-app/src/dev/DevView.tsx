@@ -10,6 +10,7 @@ import { BackendHealthCheck } from './BackendHealthCheck';
 import { ExpoEnvInfo } from './ExpoEnvInfo';
 import { FirebaseTokenGenerator } from './FirebaseTokenGenerator';
 import { BackendTestAuth } from './BackendTestAuth';
+import { FirebaseSignUpTest } from './FirebaseSignUpTest';
 
 export const DevView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -48,6 +49,7 @@ export const DevView = () => {
           <BackendHealthCheck className="w-full max-w-[320px] self-center" />
           <FirebaseTokenGenerator className="w-full max-w-[320px] self-center" />
           <BackendTestAuth className="w-full max-w-[320px] self-center" />
+          <FirebaseSignUpTest className="w-full max-w-[320px] self-center" />
           <Box className="w-full max-w-[640px] flex-row flex-wrap justify-between gap-2">
             <ErrorBox className="w-[48%]" errorMessage="test error message" />
             <InfoBox className="w-[48%]" message="test info message" />

@@ -4,3 +4,4 @@ export { FontsView } from './FontsView';
 export { BackendHealthCheck } from './BackendHealthCheck';
 export { BackendTestAuth } from './BackendTestAuth';
 export { ExpoEnvInfo } from './ExpoEnvInfo';
+export { FirebaseSignUpTest } from './FirebaseSignUpTest';
