@@ -1,24 +1,29 @@
-import json
 import uuid
 import warnings
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date, timedelta
-from urllib.request import urlopen
 
+import httpx
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
-from src.models import Game, GameStatus, Shelving, SteamRollingTime
+from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 from src.users import UserRead
 
 """
 For the specified user, fetch GetOwnedGames from steam, update DB catalog, User Shelving and create
 a new steamRolling object if the today "playtime_forever" is different than the last one saved (yesterday)
 """
-def update_user_shelving_steamrolling(session: Session, user: UserRead) -> None:
-    steam_games = _get_owned_games_from_steam(user)
+
+
+async def update_user_shelving_steamrolling_async(
+    session: Session,
+    user: UserRead | User,
+    client: httpx.AsyncClient | None = None,
+) -> None:
+    steam_games = await _get_owned_games_from_steam_async(user, client=client)
     for steam_game in steam_games.games:
         steam_app_id = str(steam_game.appid)
 
@@ -29,13 +34,9 @@ def update_user_shelving_steamrolling(session: Session, user: UserRead) -> None:
         shelve_exists = _get_game_player_shelve(session, game_cached.id, user.id)
         if not shelve_exists:
             _shelve_game(session, game_cached.id, user.id, GameStatus.SHELVED)
-            _create_steam_rolling(session, user, steam_game, steam_app_id)
-            return
 
         latest_rolling = _get_latest_steam_rolling(session, user.id, steam_app_id)
-        if latest_rolling is None:
-            _create_steam_rolling(session, user, steam_game, steam_app_id)
-        elif steam_game.playtime_forever != latest_rolling.last_day_playtime:
+        if latest_rolling is None or steam_game.playtime_forever != latest_rolling.last_day_playtime:
             _create_steam_rolling(session, user, steam_game, steam_app_id)
 
 
@@ -44,11 +45,7 @@ def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
 
 
 def _get_game_player_shelve(session: Session, game_id: uuid.UUID, user_id: uuid.UUID) -> Shelving | None:
-    return session.exec(
-        select(Shelving)
-        .where(Shelving.game_id == game_id)
-        .where(Shelving.owner_id == user_id)
-    ).first()
+    return session.exec(select(Shelving).where(Shelving.game_id == game_id).where(Shelving.owner_id == user_id)).first()
 
 
 def _cache_game(session: Session, steam_app_id: str) -> Game:
@@ -70,7 +67,7 @@ def _shelve_game(session: Session, game_id: uuid.UUID, user_id: uuid.UUID, statu
     session.commit()
 
 
-def _create_steam_rolling(session: Session, user: UserRead, game: SteamGame, steam_app_id: str) -> None:
+def _create_steam_rolling(session: Session, user: UserRead | User, game: SteamGame, steam_app_id: str) -> None:
     steam_rolling = SteamRollingTime(
         user_id=user.id,
         steam_app_id=steam_app_id,
@@ -90,20 +87,36 @@ def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id
     ).first()
 
 
-def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
-    if not user.steam_api_key:
+async def _get_owned_games_from_steam_async(
+    user: UserRead | User,
+    client: httpx.AsyncClient | None = None,
+) -> GetOwnedGamesResponse:
+    steam_api_key = getattr(user, "steam_api_key", None)
+    if not steam_api_key and hasattr(user, "__dict__"):
+        steam_api_key = user.__dict__.get("steam_api_key")
+
+    if not steam_api_key:
         warnings.warn("Using default steam api key")
         steam_api_key = "724FF154B1D2A357857A257EA28C6415"
-    else:
-        steam_api_key = user.steam_api_key
+
     url = (
         "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/"
         f"?key={steam_api_key}&steamid={user.steam_id}&format=json"
         "&include_played_free_games=true&include_free_sub=true"
     )
 
-    with urlopen(url, timeout=10) as response:
-        payload = json.load(response)
+    should_close = False
+    if client is None:
+        client = httpx.AsyncClient(timeout=10.0)
+        should_close = True
+
+    try:
+        response = await client.get(url)
+        response.raise_for_status()
+        payload = response.json()
+    finally:
+        if should_close:
+            await client.aclose()
 
     steam_response = payload.get("response", {})
     return GetOwnedGamesResponse(
@@ -111,19 +124,25 @@ def _get_owned_games_from_steam(user: UserRead) -> GetOwnedGamesResponse:
         games=[SteamGame(**game) for game in steam_response.get("games", [])],
     )
 
+
 """
 Return a list of DayByDayPlaytime (date, playtime) of length days (if days=-1, return all possible entry)
 telling how much the specified user has played in the last days
 """
-def get_playtime_by_user(session: Session, user_id: str, days: int) -> list[DayByDayPlaytime]:
+
+
+def get_playtime_by_user(session: Session, user_id: str, days: int = -1) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
+
 
 """
 Return a list of DayByDayPlaytime (date, playtime) of length days (if days=-1, return all possible entry)
 telling how much the specified user has played the specified game (by steam_app_id) in the last days
 """
-def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days: int) -> list[DayByDayPlaytime]:
+
+
+def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days: int = -1) -> list[DayByDayPlaytime]:
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
 
@@ -175,24 +194,20 @@ def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], da
     result = []
     for i in range(num_days):
         target_date = start_date + timedelta(days=i)
-        result.append(
-            DayByDayPlaytime(
-                date=target_date,
-                playtime_minutes=daily_totals.get(target_date, 0)
-            )
-        )
+        result.append(DayByDayPlaytime(date=target_date, playtime_minutes=daily_totals.get(target_date, 0)))
 
     return result
 
 
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:
     from src.models import User as UserModel
+
     user = session.exec(select(UserModel).where(UserModel.firebase_uid == user_id)).first()
     if not user:
         raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
-    
+
     query = select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)
     if steam_app_id is not None:
         query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
-        
+
     return session.exec(query.order_by(SteamRollingTime.created_at)).all()

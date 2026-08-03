@@ -33,25 +33,25 @@ from tests.conftest import make_user
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _n_day_payload(n: int = 14, base_minutes: int = 0) -> list[DayByDayPlaytime]:
     today = date.today()
-    return [
-        DayByDayPlaytime(date=today - timedelta(days=i), playtime_minutes=base_minutes)
-        for i in range(n - 1, -1, -1)
-    ]
+    return [DayByDayPlaytime(date=today - timedelta(days=i), playtime_minutes=base_minutes) for i in range(n - 1, -1, -1)]
 
 
 # ---------------------------------------------------------------------------
 # /games/weekly_playtime_by_user
 # ---------------------------------------------------------------------------
 
+
 class TestWeeklyPlaytimeByUser:
-    ENDPOINT = "/games/weekly_playtime_by_user"
+    ENDPOINT = "/games/_playtime_by_user"
 
     def test_requires_auth(self):
         """Without overriding auth dependency the client must send a valid token."""
         # Import a plain client WITHOUT the auth override to verify the guard.
         from src.main import app as _app
+
         _app.dependency_overrides.clear()
 
         plain_client = TestClient(_app, raise_server_exceptions=False)
@@ -61,8 +61,7 @@ class TestWeeklyPlaytimeByUser:
     def test_returns_200_with_default_days(self, client, session):
         user = make_user(session)  # uid = "firebase-uid-1" matches fake auth
         payload = _n_day_payload(1, 30)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   return_value=payload):
+        with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload):
             response = client.get(self.ENDPOINT)
 
         assert response.status_code == 200
@@ -72,8 +71,7 @@ class TestWeeklyPlaytimeByUser:
     def test_days_parameter_is_forwarded(self, client, session):
         make_user(session)
         payload = _n_day_payload(7)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   return_value=payload) as mock_svc:
+        with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload) as mock_svc:
             client.get(self.ENDPOINT, params={"days": 7})
             mock_svc.assert_called_once()
             args, kwargs = mock_svc.call_args
@@ -83,8 +81,7 @@ class TestWeeklyPlaytimeByUser:
     def test_default_days_is_minus_1(self, client, session):
         make_user(session)
         payload = _n_day_payload(1)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   return_value=payload) as mock_svc:
+        with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload) as mock_svc:
             client.get(self.ENDPOINT)
             mock_svc.assert_called_once()
             args, kwargs = mock_svc.call_args
@@ -93,8 +90,7 @@ class TestWeeklyPlaytimeByUser:
     def test_service_called_with_correct_uid(self, client, session):
         make_user(session)
         payload = _n_day_payload(1)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   return_value=payload) as mock_svc:
+        with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload) as mock_svc:
             client.get(self.ENDPOINT)
             mock_svc.assert_called_once()
             _, uid_arg, _ = mock_svc.call_args[0]
@@ -102,16 +98,14 @@ class TestWeeklyPlaytimeByUser:
 
     def test_propagates_service_http_exception(self, client, session):
         make_user(session)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   side_effect=HTTPException(status_code=404, detail="User not found")):
+        with patch("src.games.games_router.game_service.get_playtime_by_user", side_effect=HTTPException(status_code=404, detail="User not found")):
             response = client.get(self.ENDPOINT)
         assert response.status_code == 404
 
     def test_response_schema_has_date_and_playtime_fields(self, client, session):
         make_user(session)
         payload = _n_day_payload(1, 10)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   return_value=payload):
+        with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload):
             response = client.get(self.ENDPOINT)
         entry = response.json()[0]
         assert "date" in entry
@@ -120,8 +114,7 @@ class TestWeeklyPlaytimeByUser:
     def test_all_zero_when_no_data(self, client, session):
         make_user(session)
         payload = _n_day_payload(1, 0)
-        with patch("src.games.games_router.game_service.get_playtime_by_user",
-                   return_value=payload):
+        with patch("src.games.games_router.game_service.get_playtime_by_user", return_value=payload):
             response = client.get(self.ENDPOINT)
         assert all(e["playtime_minutes"] == 0 for e in response.json())
 
@@ -130,11 +123,13 @@ class TestWeeklyPlaytimeByUser:
 # /games/weekly_playtime_by_game
 # ---------------------------------------------------------------------------
 
+
 class TestWeeklyPlaytimeByGame:
-    ENDPOINT = "/games/weekly_playtime_by_game"
+    ENDPOINT = "/games/_playtime_by_game"
 
     def test_requires_auth(self):
         from src.main import app as _app
+
         _app.dependency_overrides.clear()
 
         plain_client = TestClient(_app, raise_server_exceptions=False)
@@ -149,8 +144,7 @@ class TestWeeklyPlaytimeByGame:
     def test_returns_200_with_data(self, client, session):
         make_user(session)
         payload = _n_day_payload(7, 60)
-        with patch("src.games.games_router.game_service.get_playtime_by_game",
-                   return_value=payload):
+        with patch("src.games.games_router.game_service.get_playtime_by_game", return_value=payload):
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
 
         assert response.status_code == 200
@@ -159,8 +153,7 @@ class TestWeeklyPlaytimeByGame:
     def test_days_parameter_is_forwarded(self, client, session):
         make_user(session)
         payload = _n_day_payload(5)
-        with patch("src.games.games_router.game_service.get_playtime_by_game",
-                   return_value=payload) as mock_svc:
+        with patch("src.games.games_router.game_service.get_playtime_by_game", return_value=payload) as mock_svc:
             client.get(self.ENDPOINT, params={"steam_app_id": "570", "days": 5})
             mock_svc.assert_called_once()
             args, kwargs = mock_svc.call_args
@@ -169,8 +162,7 @@ class TestWeeklyPlaytimeByGame:
     def test_default_days_is_minus_1(self, client, session):
         make_user(session)
         payload = _n_day_payload(1)
-        with patch("src.games.games_router.game_service.get_playtime_by_game",
-                   return_value=payload) as mock_svc:
+        with patch("src.games.games_router.game_service.get_playtime_by_game", return_value=payload) as mock_svc:
             client.get(self.ENDPOINT, params={"steam_app_id": "570"})
             mock_svc.assert_called_once()
             args, kwargs = mock_svc.call_args
@@ -179,8 +171,7 @@ class TestWeeklyPlaytimeByGame:
     def test_service_called_with_correct_uid_and_app_id(self, client, session):
         make_user(session)
         payload = _n_day_payload(1)
-        with patch("src.games.games_router.game_service.get_playtime_by_game",
-                   return_value=payload) as mock_svc:
+        with patch("src.games.games_router.game_service.get_playtime_by_game", return_value=payload) as mock_svc:
             client.get(self.ENDPOINT, params={"steam_app_id": "570"})
             mock_svc.assert_called_once()
             _, uid_arg, app_id_arg, _ = mock_svc.call_args[0]
@@ -189,8 +180,7 @@ class TestWeeklyPlaytimeByGame:
 
     def test_propagates_404_from_service(self, client, session):
         make_user(session)
-        with patch("src.games.games_router.game_service.get_playtime_by_game",
-                   side_effect=HTTPException(status_code=404, detail="User not found")):
+        with patch("src.games.games_router.game_service.get_playtime_by_game", side_effect=HTTPException(status_code=404, detail="User not found")):
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
         assert response.status_code == 404
 
@@ -198,8 +188,7 @@ class TestWeeklyPlaytimeByGame:
         make_user(session)
         payload = _n_day_payload(1, 5)
         for app_id in ("570", "730", "440"):
-            with patch("src.games.games_router.game_service.get_playtime_by_game",
-                       return_value=payload) as mock_svc:
+            with patch("src.games.games_router.game_service.get_playtime_by_game", return_value=payload) as mock_svc:
                 client.get(self.ENDPOINT, params={"steam_app_id": app_id})
                 _, _, forwarded_id, _ = mock_svc.call_args[0]
                 assert forwarded_id == app_id
@@ -207,8 +196,7 @@ class TestWeeklyPlaytimeByGame:
     def test_response_dates_are_ordered_oldest_first(self, client, session):
         make_user(session)
         payload = _n_day_payload(7)
-        with patch("src.games.games_router.game_service.get_playtime_by_game",
-                   return_value=payload):
+        with patch("src.games.games_router.game_service.get_playtime_by_game", return_value=payload):
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
         dates = [e["date"] for e in response.json()]
         assert dates == sorted(dates)

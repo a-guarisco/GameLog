@@ -13,10 +13,7 @@ def test_settings_scheduler_default():
         # We need to clear the lru cache for get_settings to read new env
         get_settings.cache_clear()
         try:
-            settings = Settings(
-                DATABASE_URL="sqlite:///:memory:",
-                GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json"
-            )
+            settings = Settings(DATABASE_URL="sqlite:///:memory:", GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json")
             assert settings.run_scheduler is True
         finally:
             get_settings.cache_clear()
@@ -26,10 +23,7 @@ def test_settings_scheduler_disabled():
     with patch.dict("os.environ", {"RUN_SCHEDULER": "false"}):
         get_settings.cache_clear()
         try:
-            settings = Settings(
-                DATABASE_URL="sqlite:///:memory:",
-                GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json"
-            )
+            settings = Settings(DATABASE_URL="sqlite:///:memory:", GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json")
             assert settings.run_scheduler is False
         finally:
             get_settings.cache_clear()
@@ -37,11 +31,7 @@ def test_settings_scheduler_disabled():
 
 @pytest.mark.anyio
 async def test_lifespan_scheduler_enabled():
-    mock_settings = Settings(
-        DATABASE_URL="sqlite:///:memory:",
-        GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json",
-        RUN_SCHEDULER="true"
-    )
+    mock_settings = Settings(DATABASE_URL="sqlite:///:memory:", GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json", RUN_SCHEDULER="true")
     with patch("src.core.scheduler.get_settings", return_value=mock_settings), patch("src.core.scheduler._scheduler_loop") as mock_loop:
         with patch("src.core.scheduler.asyncio.create_task") as mock_create_task:
             async with lifespan(None):
@@ -51,11 +41,7 @@ async def test_lifespan_scheduler_enabled():
 
 @pytest.mark.anyio
 async def test_lifespan_scheduler_disabled():
-    mock_settings = Settings(
-        DATABASE_URL="sqlite:///:memory:",
-        GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json",
-        RUN_SCHEDULER="false"
-    )
+    mock_settings = Settings(DATABASE_URL="sqlite:///:memory:", GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json", RUN_SCHEDULER="false")
     with patch("src.core.scheduler.get_settings", return_value=mock_settings), patch("src.core.scheduler._scheduler_loop") as mock_loop:
         with patch("src.core.scheduler.asyncio.create_task") as mock_create_task:
             async with lifespan(None):

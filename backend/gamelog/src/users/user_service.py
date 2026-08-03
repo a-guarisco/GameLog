@@ -7,6 +7,8 @@ from src.users import UserRead
 """
 Fetch the db in order to return a UserRead from a given firebase uuid
 """
+
+
 def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     statement = select(User).where(User.firebase_uid == firebase_uid)
     user = session.exec(statement).first()
