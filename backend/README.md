@@ -70,6 +70,30 @@ At runtime, Docker Compose mounts the host service account key securely as a rea
 ### Protected Auth Endpoint
 The backend exposes `GET /me` (requires `Authorization: Bearer <FIREBASE_ID_TOKEN>`) which verifies the token via Firebase Admin SDK and returns `200 OK` with user details.
 
+### Firebase Test User Seeding & Token Generation
+
+The `make seed-firebase` target populates and authenticates the 5 standard test accounts (`test-01@test.com` through `test-05@test.com`) matching production UIDs and displays fresh Bearer tokens for Swagger UI testing (`http://localhost:8000/docs`).
+
+- **Dual-Mode Auto-Detection**:
+  Automatically detects if the local Firebase Auth Emulator port (`9099`) is listening:
+  - **Local Emulator Mode**: Automatically seeds missing test users into the emulator with target UIDs and generates local Bearer tokens.
+  - **Live Cloud Console Mode**: If the emulator is offline, authenticates directly against the live Firebase Cloud project (`gamelog-40e10`) and outputs real Google-signed Bearer tokens.
+
+- **Makefile Reference & Options**:
+  ```bash
+  # Auto-detect mode (Emulator if active, Cloud Console if offline)
+  make seed-firebase
+
+  # Force Live Firebase Cloud Console mode
+  make seed-firebase ARGS="--cloud"
+
+  # Force Local Firebase Auth Emulator mode
+  make seed-firebase ARGS="--emulator"
+
+  # Retrieve token for a specific user (e.g. test-02@test.com)
+  make seed-firebase ARGS="test-02@test.com"
+  ```
+
 ---
 
 ## Makefile Reference
@@ -78,8 +102,8 @@ The `backend/Makefile` automates Docker lifecycle, database migrations, and test
 
 ### Environment & Scheduler Control (`RUN_SCHEDULER`)
 
-- **Default**: `RUN_SCHEDULER=true` (background sync jobs run automatically).
-- **`make dev` Override**: Adding `dev` (e.g., `make dev up` or `make dev rebuild`) dynamically exports `RUN_SCHEDULER=false` to temporarily disable background jobs during active development without modifying `.env`.
+- **Default**: `RUN_SCHEDULER=false` (background sync jobs disabled).
+- **`make prod` Override**: Adding `prod` (e.g., `make prod up` or `make prod rebuild`) dynamically exports `RUN_SCHEDULER=true` to enable background jobs during execution without modifying `.env`.
 
 ### 🐳 Lifecycle & Services
 
@@ -107,7 +131,8 @@ The `backend/Makefile` automates Docker lifecycle, database migrations, and test
 | `make migrate` | Applies all pending Alembic migrations (`alembic upgrade head`) |
 | `make revision m="Description"` | Autogenerates a new Alembic migration script *(Requires `m` parameter)* |
 | `make downgrade` | Rolls back the last applied Alembic migration (`alembic downgrade -1`) |
-| `make seed` | Populates the database with initial demo users and test data |
+| `make seed` | Populates PostgreSQL database with demo users, games, shelvings, and stats |
+| `make seed-firebase` | Seeds/authenticates Firebase Auth test users and generates live Bearer tokens (Auto-detects Emulator vs Cloud, supports `--cloud` / `--emulator`) |
 | `make db-shell` | Opens an interactive `psql` shell inside the PostgreSQL container |
 | `make db-clean` | Destroys database volume (`down -v`) and recreates empty schema |
 | `make db-snapshot` | Creates a SQL dump of current DB state in `postgres/snapshots/` |

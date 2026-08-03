@@ -8,7 +8,7 @@ IMPORTANT RELATIONAL NOTES:
 ---------------------------
 1. `firebase_uid`:
    - Every `User` in PostgreSQL MUST match a valid `firebase_uid` emitted by Firebase Auth.
-   - The primary test user `test-01` uses `firebase_uid="cCNp75n3Nci7OEVC2vKY86nxCg5U"`.
+   - The primary test user `test-01` uses `firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2"`.
    - DO NOT MODIFY the `firebase_uid` of `DEMO_USER_1_ID` without updating:
      * `backend/scripts/seed_firebase_users.py` (which seeds the local emulator)
      * Mobile app test credentials (`mobile-app/.env.example`)
@@ -54,35 +54,35 @@ def _users() -> list[User]:
     return [
         User(
             id=DEMO_USER_1_ID,
-            firebase_uid="cCNp75n3Nci7OEVC2vKY86nxCg5U",  # Matches test-01@test.com
+            firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",  # Matches test-01@test.com
             username="test-01",
             steam_id="76561198077919169",
             steam_api_key="724FF154B1D2A357857A257EA28C6415",
         ),
         User(
             id=DEMO_USER_2_ID,
-            firebase_uid="uTclEh6Zwo3q5XYkARjZoVE4NTOW",  # Matches test-02@test.com
+            firebase_uid="tcYaHPGYDkVBlnNrcI7jNf2z4MS2",  # Matches test-02@test.com
             username="test-02",
             steam_id="76561198000000002",
             steam_api_key="",
         ),
         User(
             id=DEMO_USER_3_ID,
-            firebase_uid="kvrOcoJkCwPSlMiyT8uhoMVdnVI7",  # Matches test-03@test.com
+            firebase_uid="GRbqhGIYlzb1GHEaBINeJq1ZXld2",  # Matches test-03@test.com
             username="test-03",
             steam_id="76561198000000003",
             steam_api_key="",
         ),
         User(
             id=DEMO_USER_4_ID,
-            firebase_uid="ygJlv3UdumIq5zHQVdNnwCGsiypG",  # Matches test-04@test.com
+            firebase_uid="wcMFGsVqaYYNHSAeUXgGiK14WPk2",  # Matches test-04@test.com
             username="test-04",
             steam_id="76561198000000004",
             steam_api_key="",
         ),
         User(
             id=DEMO_USER_5_ID,
-            firebase_uid="9vx2bD0RZVG6VK4zi091w2r5bwug",  # Matches test-05@test.com
+            firebase_uid="a7swvzI0APgq57SMa8B7PsHevG02",  # Matches test-05@test.com
             username="test-05",
             steam_id="76561198000000005",
             steam_api_key="",

@@ -60,16 +60,28 @@ All teammates can run and test authentication locally **without needing develope
 
 #### Standard Test Users & Bearer Token Retrieval
 
-To populate your local Firebase Auth Emulator with the 5 standard test accounts (`test-01` through `test-05`) matching backend database seed data:
+The backend workspace includes an automated helper script (`backend/scripts/seed_firebase_users.py`, runnable via `backend/Makefile`) to populate and authenticate the 5 standard test accounts (`test-01@test.com` through `test-05@test.com`) with production-matching UIDs (`YLRMA6ot...`, etc.) and display fresh Bearer tokens for Swagger UI and API testing.
 
-- **Via Seeding Script / Makefile**:
-  Run the automated helper script to populate all 5 test accounts in the local Firebase Auth Emulator with production-matching UIDs and display fresh Bearer tokens for all test users:
+- **Dual-Mode Auto-Detection**:
+  The script automatically detects whether the local Firebase Auth Emulator is active on port `9099`:
+  - **Local Emulator Mode**: Automatically seeds missing test users into the emulator with target UIDs, then generates local Bearer tokens.
+  - **Live Cloud Console Mode**: If the emulator is offline (or when using `ARGS="--cloud"`), authenticates directly against the live Firebase Cloud Console project (`gamelog-40e10`) and outputs real Google-signed Bearer tokens.
+
+- **Command-Line Reference** (run from `backend/` directory):
   ```bash
-  # From repository root
-  python backend/scripts/seed_firebase_users.py
+  cd backend
 
-  # Or from backend/ folder
+  # Auto-detect mode (Emulator if active, Cloud Console if offline)
   make seed-firebase
+
+  # Force Live Firebase Cloud Console mode
+  make seed-firebase ARGS="--cloud"
+
+  # Force Local Firebase Auth Emulator mode
+  make seed-firebase ARGS="--emulator"
+
+  # Retrieve token for a specific user (e.g. test-02@test.com)
+  make seed-firebase ARGS="test-02@test.com"
   ```
 
 - **Via Mobile App Dev View**:

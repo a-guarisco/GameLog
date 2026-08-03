@@ -17,8 +17,6 @@ class GameRead(GameBase):
 """
 Schemas from the Steam API GetOwnedGames response item
 """
-
-
 class SteamGame(BaseModel):
     appid: int
     playtime_forever: int
@@ -33,18 +31,20 @@ class SteamGame(BaseModel):
 """
 Schema from the Steam API GetOwnedGames complete response
 """
-
-
 class GetOwnedGamesResponse(BaseModel):
     game_count: int
     games: list[SteamGame]
 
 
 """
-Schema from the backend response to _playtime_by_user or _playtime_by_game
+Schema from the backend response to playtime_by_user or playtime_by_game
 """
-
-
 class DayByDayPlaytime(BaseModel):
     date: datetime.date
     playtime_minutes: int
+
+"""
+Schema from the backend in response to streak_by_user or streak_by_game
+"""
+class Streak(BaseModel):
+    streak: int

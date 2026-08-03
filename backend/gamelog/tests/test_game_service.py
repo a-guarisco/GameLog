@@ -544,8 +544,6 @@ class TestGetOwnedGamesFromSteamAsync:
 
     @pytest.mark.anyio
     async def test_warns_and_uses_default_key_when_none(self, session):
-        user_read = UserRead.model_construct(
-    def test_warns_and_uses_default_key_when_none(self, session):
         # Build a User directly without DB insertion; the DB column has NOT NULL
         # but the service only reads from the Python object.
         user = User(
@@ -683,3 +681,71 @@ class TestGetPlaytimeByGame:
         result = game_service.get_playtime_by_game(session, user.firebase_uid, "99999")
         assert len(result) == 1
         assert result[0].playtime_minutes == 0
+
+
+# ---------------------------------------------------------------------------
+# get_streak
+# ---------------------------------------------------------------------------
+
+
+class TestGetStreak:
+    def test_returns_zero_when_no_records(self, session):
+        user = make_user(session)
+        assert game_service.get_streak(session, user.firebase_uid, None) == 0
+
+    def test_streak_when_played_today(self, session):
+        user = make_user(session)
+        today = date.today()
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100, created_at=today - timedelta(days=2))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today - timedelta(days=1))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=180, created_at=today)
+
+        # Streak should be 2 (yesterday and today have playtime > 0)
+        assert game_service.get_streak(session, user.firebase_uid, None) == 2
+
+    def test_streak_when_played_yesterday_but_not_today(self, session):
+        user = make_user(session)
+        today = date.today()
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100, created_at=today - timedelta(days=2))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today - timedelta(days=1))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today)
+
+        # Streak should be 1 (yesterday had playtime > 0, today is 0 but streak is not broken yet)
+        assert game_service.get_streak(session, user.firebase_uid, None) == 1
+
+    def test_streak_broken_days_ago(self, session):
+        user = make_user(session)
+        today = date.today()
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100, created_at=today - timedelta(days=3))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today - timedelta(days=2))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today - timedelta(days=1))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today)
+
+        # Streak is 0 because yesterday and today are 0
+        assert game_service.get_streak(session, user.firebase_uid, None) == 0
+
+    def test_streak_filtered_by_game(self, session):
+        user = make_user(session)
+        today = date.today()
+
+        # Game 570 has active streak of 2
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100, created_at=today - timedelta(days=2))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=130, created_at=today - timedelta(days=1))
+        make_rolling(session, user=user, steam_app_id="570", last_day_playtime=180, created_at=today)
+
+        # Game 730 has baseline but no additional playtime
+        make_rolling(session, user=user, steam_app_id="730", last_day_playtime=50, created_at=today - timedelta(days=2))
+        make_rolling(session, user=user, steam_app_id="730", last_day_playtime=50, created_at=today - timedelta(days=1))
+        make_rolling(session, user=user, steam_app_id="730", last_day_playtime=50, created_at=today)
+
+        # Check total streak
+        assert game_service.get_streak(session, user.firebase_uid, None) == 2
+        # Check streak for game 570
+        assert game_service.get_streak(session, user.firebase_uid, "570") == 2
+        # Check streak for game 730
+        assert game_service.get_streak(session, user.firebase_uid, "730") == 0
+
+    def test_streak_raises_404_for_unknown_user(self, session):
+        with pytest.raises(HTTPException) as exc_info:
+            game_service.get_streak(session, "ghost-uid", None)
+        assert exc_info.value.status_code == 404
