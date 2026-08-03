@@ -10,7 +10,6 @@ from sqlmodel import Session, select
 
 from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
 from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
-from src.users import UserRead
 
 """
 For the specified user, fetch GetOwnedGames from steam, update DB catalog, User Shelving and create
@@ -20,7 +19,7 @@ a new steamRolling object if the today "playtime_forever" is different than the 
 
 async def update_user_shelving_steamrolling_async(
     session: Session,
-    user: UserRead | User,
+    user: User,
     client: httpx.AsyncClient | None = None,
 ) -> None:
     steam_games = await _get_owned_games_from_steam_async(user, client=client)
@@ -34,6 +33,7 @@ async def update_user_shelving_steamrolling_async(
         shelve_exists = _get_game_player_shelve(session, game_cached.id, user.id)
         if not shelve_exists:
             _shelve_game(session, game_cached.id, user.id, GameStatus.SHELVED)
+            _create_steam_rolling(session, user, steam_game, steam_app_id)
 
         latest_rolling = _get_latest_steam_rolling(session, user.id, steam_app_id)
         if latest_rolling is None or steam_game.playtime_forever != latest_rolling.last_day_playtime:
@@ -67,7 +67,7 @@ def _shelve_game(session: Session, game_id: uuid.UUID, user_id: uuid.UUID, statu
     session.commit()
 
 
-def _create_steam_rolling(session: Session, user: UserRead | User, game: SteamGame, steam_app_id: str) -> None:
+def _create_steam_rolling(session: Session, user: User, game: SteamGame, steam_app_id: str) -> None:
     steam_rolling = SteamRollingTime(
         user_id=user.id,
         steam_app_id=steam_app_id,
@@ -88,7 +88,7 @@ def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id
 
 
 async def _get_owned_games_from_steam_async(
-    user: UserRead | User,
+    user: User,
     client: httpx.AsyncClient | None = None,
 ) -> GetOwnedGamesResponse:
     steam_api_key = getattr(user, "steam_api_key", None)

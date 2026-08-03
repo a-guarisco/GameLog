@@ -11,14 +11,12 @@ from src.core.settings import get_settings
 from src.games import game_service
 from src.models import User
 from src.models.config import Config
-from src.users import UserRead
-
 
 async def _run_daily_job_async() -> None:
     print("Running midnight cronjob", flush=True)
     with Session(engine) as session:
         try:
-            statement = select(User).where(User.steam_id is not None)
+            statement = select(User).where(User.steam_id != None)
             users = session.exec(statement).all()
             print(f"Found {len(users)} users with Steam ID to process.", flush=True)
 
@@ -26,8 +24,7 @@ async def _run_daily_job_async() -> None:
 
                 async def _process_user(user_db: User) -> None:
                     try:
-                        user_read = UserRead.model_validate(user_db)
-                        await game_service.update_user_shelving_steamrolling_async(session, user_read, client=client)
+                        await game_service.update_user_shelving_steamrolling_async(session, user_db, client=client)
                     except Exception as user_err:  # noqa: BLE001
                         print(f"Error processing user {user_db.username}: {user_err}", flush=True)
 
