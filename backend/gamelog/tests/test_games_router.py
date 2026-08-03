@@ -45,7 +45,7 @@ def _n_day_payload(n: int = 14, base_minutes: int = 0) -> list[DayByDayPlaytime]
 
 
 class TestWeeklyPlaytimeByUser:
-    ENDPOINT = "/games/_playtime_by_user"
+    ENDPOINT = "/games/playtime_by_user"
 
     def test_requires_auth(self):
         """Without overriding auth dependency the client must send a valid token."""
@@ -125,7 +125,7 @@ class TestWeeklyPlaytimeByUser:
 
 
 class TestWeeklyPlaytimeByGame:
-    ENDPOINT = "/games/_playtime_by_game"
+    ENDPOINT = "/games/playtime_by_game"
 
     def test_requires_auth(self):
         from src.main import app as _app
@@ -208,7 +208,7 @@ class TestWeeklyPlaytimeByGame:
 
 
 class TestStreakByUser:
-    ENDPOINT = "/games/_streak_by_user"
+    ENDPOINT = "/games/streak_by_user"
 
     def test_requires_auth(self):
         from src.main import app as _app
@@ -245,7 +245,7 @@ class TestStreakByUser:
 
 
 class TestStreakByGame:
-    ENDPOINT = "/games/_streak_by_game"
+    ENDPOINT = "/games/streak_by_game"
 
     def test_requires_auth(self):
         from src.main import app as _app

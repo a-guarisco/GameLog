@@ -544,8 +544,6 @@ class TestGetOwnedGamesFromSteamAsync:
 
     @pytest.mark.anyio
     async def test_warns_and_uses_default_key_when_none(self, session):
-        user_read = UserRead.model_construct(
-    def test_warns_and_uses_default_key_when_none(self, session):
         # Build a User directly without DB insertion; the DB column has NOT NULL
         # but the service only reads from the Python object.
         user = User(
