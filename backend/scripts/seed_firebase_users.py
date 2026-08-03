@@ -1,75 +1,174 @@
 #!/usr/bin/env python3
 """
-Utility script to seed standard test accounts (test-01@test.com through test-05@test.com)
-in the local Firebase Auth Emulator and retrieve live Bearer Tokens.
+Utility script to seed/authenticate standard test accounts (test-01@test.com through test-05@test.com)
+and retrieve live Bearer Tokens for Swagger UI and API testing.
+
+Supports both:
+  1. 🛠️ Local Firebase Auth Emulator (auto-detected when running at localhost:9099)
+  2. ☁️ Live Firebase Cloud Console (project gamelog-40e10)
 
 Usage:
-    python backend/scripts/seed_firebase_users.py
-    python backend/scripts/seed_firebase_users.py test-02@test.com
+    python3 scripts/seed_firebase_users.py
+    python3 scripts/seed_firebase_users.py test-02@test.com
+    python3 scripts/seed_firebase_users.py --cloud
+    python3 scripts/seed_firebase_users.py --emulator
 """
 
 import json
+import os
+import socket
 import sys
 import urllib.error
 import urllib.request
 
-EMULATOR_HOST = "http://localhost:9099"
-API_KEY = "fake-api-key"
+try:
+    import firebase_admin
+    from firebase_admin import auth, credentials
+
+    HAS_FIREBASE_ADMIN = True
+except ImportError:
+    HAS_FIREBASE_ADMIN = False
+
+# Default fallback Cloud Web API key from project config
+CLOUD_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY", "AIzaSyAVGPT6CKyiS_HmeGg_i0K7GH8qzSGpCWc")
+EMULATOR_HOST_PORT = ("127.0.0.1", 9099)
+EMULATOR_URL = "http://localhost:9099"
 
 TEST_USERS = [
-    {"email": "test-01@test.com", "password": "12345678", "displayName": "test-01"},
-    {"email": "test-02@test.com", "password": "12345678", "displayName": "test-02"},
-    {"email": "test-03@test.com", "password": "12345678", "displayName": "test-03"},
-    {"email": "test-04@test.com", "password": "12345678", "displayName": "test-04"},
-    {"email": "test-05@test.com", "password": "12345678", "displayName": "test-05"},
+    {
+        "email": "test-01@test.com",
+        "password": "12345678",
+        "displayName": "test-01",
+        "localId": "YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",
+    },
+    {
+        "email": "test-02@test.com",
+        "password": "12345678",
+        "displayName": "test-02",
+        "localId": "tcYaHPGYDkVBlnNrcI7jNf2z4MS2",
+    },
+    {
+        "email": "test-03@test.com",
+        "password": "12345678",
+        "displayName": "test-03",
+        "localId": "GRbqhGIYlzb1GHEaBINeJq1ZXld2",
+    },
+    {
+        "email": "test-04@test.com",
+        "password": "12345678",
+        "displayName": "test-04",
+        "localId": "wcMFGsVqaYYNHSAeUXgGiK14WPk2",
+    },
+    {
+        "email": "test-05@test.com",
+        "password": "12345678",
+        "displayName": "test-05",
+        "localId": "a7swvzI0APgq57SMa8B7PsHevG02",
+    },
 ]
 
 
-def seed_and_get_tokens(target_email: str | None = None):
-    print(f"🔥 Seeding test accounts in Firebase Auth Emulator at {EMULATOR_HOST}...\n")
-    signup_url = f"{EMULATOR_HOST}/identitytoolkit.googleapis.com/v1/accounts:signUp?key={API_KEY}"
-    signin_url = f"{EMULATOR_HOST}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
+def is_emulator_running(host: str = EMULATOR_HOST_PORT[0], port: int = EMULATOR_HOST_PORT[1]) -> bool:
+    """Checks whether the local Firebase Auth Emulator port is listening."""
+    try:
+        with socket.create_connection((host, port), timeout=0.5):
+            return True
+    except OSError:
+        return False
+
+
+def setup_firebase_app(use_emulator: bool):
+    """Initializes Firebase Admin SDK for either Emulator or Cloud mode if package is installed."""
+    if not HAS_FIREBASE_ADMIN:
+        return
+
+    if use_emulator:
+        os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = f"{EMULATOR_HOST_PORT[0]}:{EMULATOR_HOST_PORT[1]}"
+        if not firebase_admin._apps:
+            firebase_admin.initialize_app(options={"projectId": "gamelog-40e10"})
+    else:
+        os.environ.pop("FIREBASE_AUTH_EMULATOR_HOST", None)
+        sa_key_path = os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "/home/slaitroc/.config/gamelog/serviceAccountKey.json",
+        )
+        if not firebase_admin._apps:
+            if os.path.exists(sa_key_path):
+                cred = credentials.Certificate(sa_key_path)
+                firebase_admin.initialize_app(cred)
+            else:
+                firebase_admin.initialize_app(options={"projectId": "gamelog-40e10"})
+
+
+def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = False, force_emulator: bool = False):
+    use_emulator = False
+    if force_emulator:
+        use_emulator = True
+    elif force_cloud:
+        use_emulator = False
+    else:
+        use_emulator = is_emulator_running()
+
+    setup_firebase_app(use_emulator)
+
+    if use_emulator:
+        print(f"🔥 Mode: LOCAL EMULATOR ({EMULATOR_URL})\n")
+        signin_url = f"{EMULATOR_URL}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-api-key"
+    else:
+        print("☁️ Mode: FIREBASE CLOUD CONSOLE (gamelog-40e10)\n")
+        signin_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={CLOUD_WEB_API_KEY}"
 
     user_tokens = {}
 
     for user in TEST_USERS:
+        uid = user["localId"]
+        email = user["email"]
+        password = user["password"]
+        display_name = user["displayName"]
+
+        if HAS_FIREBASE_ADMIN:
+            if use_emulator:
+                try:
+                    try:
+                        u = auth.get_user(uid)
+                        print(f"  ℹ️ User {display_name} ({email}) exists in emulator ➔ UID: {u.uid}")
+                    except auth.UserNotFoundError:
+                        u = auth.create_user(
+                            uid=uid,
+                            email=email,
+                            password=password,
+                            display_name=display_name,
+                        )
+                        print(f"  ✅ Created user {display_name} ({email}) in emulator ➔ UID: {u.uid}")
+                except Exception as e:
+                    print(f"  ❌ Error seeding emulator user {email}: {e}")
+                    continue
+            else:
+                try:
+                    u = auth.get_user(uid)
+                    print(f"  ℹ️ User {display_name} ({email}) found in Cloud Auth ➔ UID: {u.uid}")
+                except Exception:
+                    pass
+
+        # Retrieve live bearer token via signInWithPassword REST endpoint
         payload = json.dumps({
-            "email": user["email"],
-            "password": user["password"],
+            "email": email,
+            "password": password,
             "returnSecureToken": True,
         }).encode("utf-8")
-
         headers = {"Content-Type": "application/json"}
 
-        # Try sign up first
-        req = urllib.request.Request(signup_url, data=payload, headers=headers)
+        req = urllib.request.Request(signin_url, data=payload, headers=headers)
         try:
             with urllib.request.urlopen(req) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-                uid = data.get("localId")
                 token = data.get("idToken")
-                print(f"  ✅ Created user {user['displayName']} ({user['email']}) ➔ UID: {uid}")
-                user_tokens[user["email"]] = (user["displayName"], token)
-        except urllib.error.HTTPError as e:
-            err_body = json.loads(e.read().decode("utf-8"))
-            err_msg = err_body.get("error", {}).get("message", "")
-            if "EMAIL_EXISTS" in err_msg:
-                # User exists, try sign in to retrieve fresh token
-                req_in = urllib.request.Request(signin_url, data=payload, headers=headers)
-                try:
-                    with urllib.request.urlopen(req_in) as resp_in:
-                        data = json.loads(resp_in.read().decode("utf-8"))
-                        uid = data.get("localId")
-                        token = data.get("idToken")
-                        print(f"  ℹ️ User {user['displayName']} ({user['email']}) already exists ➔ UID: {uid}")
-                        user_tokens[user["email"]] = (user["displayName"], token)
-                except Exception as ex:
-                    print(f"  ❌ Error signing in {user['email']}: {ex}")
-            else:
-                print(f"  ❌ Error creating {user['email']}: {err_msg}")
-        except Exception as e:
-            print(f"  ❌ Failed to connect to emulator at {EMULATOR_HOST}: {e}")
-            sys.exit(1)
+                user_tokens[email] = (display_name, token)
+        except urllib.error.HTTPError as err:
+            err_msg = err.read().decode("utf-8")
+            print(f"  ❌ Error retrieving token for {email}: {err_msg}")
+        except Exception as ex:
+            print(f"  ❌ Error retrieving token for {email}: {ex}")
 
     print("\n==============================================================================")
     print("🔑 Live Bearer Tokens for Test Accounts")
@@ -91,5 +190,9 @@ def seed_and_get_tokens(target_email: str | None = None):
 
 
 if __name__ == "__main__":
-    target = sys.argv[1] if len(sys.argv) > 1 and "@" in sys.argv[1] else None
-    seed_and_get_tokens(target)
+    args = sys.argv[1:]
+    force_cloud = "--cloud" in args
+    force_emulator = "--emulator" in args
+    target_email = next((a for a in args if "@" in a), None)
+
+    seed_and_get_tokens(target_email=target_email, force_cloud=force_cloud, force_emulator=force_emulator)
