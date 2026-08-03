@@ -10,8 +10,8 @@ router = APIRouter(prefix="/games", tags=["games"])
 
 
 @router.get(
-    "/_playtime_by_user",
-    summary="Returns the user's total playtime for each day, summed across all games played on that day. Use days=-1 for all history.",
+    "/playtime_by_user",
+    summary="Returns the user's total playtime for each day, summed across all games played on that day. Default on days=-1 to get all history.",
 )
 def get_weekly_playtime(
     days: int = -1,
@@ -22,8 +22,8 @@ def get_weekly_playtime(
 
 
 @router.get(
-    "/_playtime_by_game",
-    summary="Returns the user's daily playtime for the specified game. Use days=-1 for all history.",
+    "/playtime_by_game",
+    summary="Returns the user's daily playtime for the specified game. Default on days=-1 to get all history.",
 )
 def get_weekly_playtime_by_game(
     steam_app_id: str,

@@ -148,7 +148,6 @@ def _rolling_times() -> list[SteamRollingTime]:
                 steam_app_id="730",
                 last_day_playtime=cs2_playtime,
                 created_at=record_date,
-                is_baseline=is_baseline,
             )
         )
 
@@ -168,7 +167,6 @@ def _rolling_times() -> list[SteamRollingTime]:
                 steam_app_id="1174180",
                 last_day_playtime=rdr2_playtime,
                 created_at=record_date,
-                is_baseline=is_baseline,
             )
         )
 
@@ -188,7 +186,6 @@ def _rolling_times() -> list[SteamRollingTime]:
                 steam_app_id="570",
                 last_day_playtime=dota_playtime,
                 created_at=record_date,
-                is_baseline=is_baseline,
             )
         )
 

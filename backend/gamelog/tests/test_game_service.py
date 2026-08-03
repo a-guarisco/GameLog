@@ -259,7 +259,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     @pytest.mark.anyio
     async def test_new_game_is_cached_and_shelved(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
 
         games = [
             {
@@ -275,7 +274,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -288,7 +287,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     @pytest.mark.anyio
     async def test_unplayed_game_gets_shelved_status(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
 
         games = [
             {
@@ -304,7 +302,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -315,7 +313,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     @pytest.mark.anyio
     async def test_played_game_gets_shelved_status(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
 
         games = [
             {
@@ -331,7 +328,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -343,7 +340,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     async def test_first_time_zero_playtime_creates_baseline_rolling(self, session):
         """First time seeing a game always creates a baseline rolling, even with 0 playtime."""
         user = make_user(session)
-        user_read = _user_read(user)
 
         games = [
             {
@@ -359,7 +355,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -371,7 +367,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     async def test_nonzero_playtime_game_creates_rolling(self, session):
         """Games with playtime_forever > 0 should create a steam rolling entry."""
         user = make_user(session)
-        user_read = _user_read(user)
 
         games = [
             {
@@ -387,7 +382,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -399,7 +394,8 @@ class TestUpdateUserShelvingSteamRollingAsync:
     async def test_unchanged_playtime_does_not_create_new_rolling(self, session):
         """If playtime hasn't changed from the latest rolling, no new entry is created."""
         user = make_user(session)
-        user_read = _user_read(user)
+        game = make_game(session, steam_app_id="570")
+        make_shelving(session, user=user, game=game)
         # Pre-existing rolling with playtime=100
         make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100)
 
@@ -417,7 +413,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -428,7 +424,8 @@ class TestUpdateUserShelvingSteamRollingAsync:
     async def test_changed_playtime_creates_new_rolling(self, session):
         """If playtime changed from the latest rolling, a new entry is created."""
         user = make_user(session)
-        user_read = _user_read(user)
+        game = make_game(session, steam_app_id="570")
+        make_shelving(session, user=user, game=game)
         # Pre-existing rolling with playtime=100
         make_rolling(session, user=user, steam_app_id="570", last_day_playtime=100)
 
@@ -446,7 +443,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -457,7 +454,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     @pytest.mark.anyio
     async def test_existing_shelving_still_creates_rolling(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
         game = make_game(session, steam_app_id="570")
         make_shelving(session, user=user, game=game)
 
@@ -475,7 +471,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -486,7 +482,6 @@ class TestUpdateUserShelvingSteamRollingAsync:
     @pytest.mark.anyio
     async def test_game_not_recached_if_already_exists(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
         existing_game = make_game(session, steam_app_id="570")
 
         games = [
@@ -503,7 +498,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         ]
 
         with _mock_httpx_get(_make_steam_response(games)):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -514,10 +509,9 @@ class TestUpdateUserShelvingSteamRollingAsync:
     @pytest.mark.anyio
     async def test_empty_steam_library_does_nothing(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
 
         with _mock_httpx_get(_make_steam_response([])):
-            await game_service.update_user_shelving_steamrolling_async(session, user_read)
+            await game_service.update_user_shelving_steamrolling_async(session, user)
 
         from sqlmodel import select
 
@@ -551,6 +545,10 @@ class TestGetOwnedGamesFromSteamAsync:
     @pytest.mark.anyio
     async def test_warns_and_uses_default_key_when_none(self, session):
         user_read = UserRead.model_construct(
+    def test_warns_and_uses_default_key_when_none(self, session):
+        # Build a User directly without DB insertion; the DB column has NOT NULL
+        # but the service only reads from the Python object.
+        user = User(
             id=uuid.uuid4(),
             firebase_uid="x",
             username="x",
@@ -560,12 +558,12 @@ class TestGetOwnedGamesFromSteamAsync:
 
         with _mock_httpx_get(_make_steam_response([])), warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            await game_service._get_owned_games_from_steam_async(user_read)
+            await game_service._get_owned_games_from_steam_async(user)
             assert any("default steam api key" in str(warning.message).lower() for warning in w)
 
     @pytest.mark.anyio
     async def test_warns_and_uses_default_key_when_empty_string(self, session):
-        user_read = UserRead.model_construct(
+        user = User(
             id=uuid.uuid4(),
             firebase_uid="x",
             username="x",
@@ -575,13 +573,12 @@ class TestGetOwnedGamesFromSteamAsync:
 
         with _mock_httpx_get(_make_steam_response([])), warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            await game_service._get_owned_games_from_steam_async(user_read)
+            await game_service._get_owned_games_from_steam_async(user)
             assert any("default steam api key" in str(warning.message).lower() for warning in w)
 
     @pytest.mark.anyio
     async def test_returns_parsed_games(self, session):
         user = make_user(session)
-        user_read = _user_read(user)
         games_data = [
             {
                 "appid": 570,
@@ -606,7 +603,7 @@ class TestGetOwnedGamesFromSteamAsync:
         ]
         payload = _make_steam_response(games_data)
         with _mock_httpx_get(payload):
-            response = await game_service._get_owned_games_from_steam_async(user_read)
+            response = await game_service._get_owned_games_from_steam_async(user)
         assert response.game_count == 2
         assert len(response.games) == 2
         assert response.games[0].appid == 570
