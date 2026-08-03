@@ -4,7 +4,7 @@ Utility script to seed/authenticate standard test accounts (test-01@test.com thr
 and retrieve live Bearer Tokens for Swagger UI and API testing.
 
 Supports both:
-  1. 🛠️ Local Firebase Auth Emulator (auto-detected when running at localhost:9099)
+  1. 🛠️ Local Firebase Auth Emulator (auto-detected when running at localhost:9099 or 127.0.0.1:9099)
   2. ☁️ Live Firebase Cloud Console (project gamelog-40e10)
 
 Usage:
@@ -31,7 +31,7 @@ except ImportError:
 
 # Default fallback Cloud Web API key from project config
 CLOUD_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY", "AIzaSyAVGPT6CKyiS_HmeGg_i0K7GH8qzSGpCWc")
-EMULATOR_HOST_PORT = ("127.0.0.1", 9099)
+EMULATOR_PORT = 9099
 EMULATOR_URL = "http://localhost:9099"
 
 TEST_USERS = [
@@ -68,13 +68,15 @@ TEST_USERS = [
 ]
 
 
-def is_emulator_running(host: str = EMULATOR_HOST_PORT[0], port: int = EMULATOR_HOST_PORT[1]) -> bool:
-    """Checks whether the local Firebase Auth Emulator port is listening."""
-    try:
-        with socket.create_connection((host, port), timeout=0.5):
-            return True
-    except OSError:
-        return False
+def is_emulator_running(port: int = EMULATOR_PORT) -> bool:
+    """Checks whether the local Firebase Auth Emulator port is listening on 127.0.0.1 or localhost."""
+    for host in ("127.0.0.1", "localhost"):
+        try:
+            with socket.create_connection((host, port), timeout=0.5):
+                return True
+        except OSError:
+            pass
+    return False
 
 
 def setup_firebase_app(use_emulator: bool):
@@ -83,7 +85,7 @@ def setup_firebase_app(use_emulator: bool):
         return
 
     if use_emulator:
-        os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = f"{EMULATOR_HOST_PORT[0]}:{EMULATOR_HOST_PORT[1]}"
+        os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = f"localhost:{EMULATOR_PORT}"
         if not firebase_admin._apps:
             firebase_admin.initialize_app(options={"projectId": "gamelog-40e10"})
     else:
@@ -126,12 +128,16 @@ def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = Fal
         password = user["password"]
         display_name = user["displayName"]
 
-        if HAS_FIREBASE_ADMIN:
-            if use_emulator:
+        if use_emulator:
+            seeded = False
+
+            # 1. Try seeding via Firebase Admin SDK if available
+            if HAS_FIREBASE_ADMIN:
                 try:
                     try:
                         u = auth.get_user(uid)
                         print(f"  ℹ️ User {display_name} ({email}) exists in emulator ➔ UID: {u.uid}")
+                        seeded = True
                     except auth.UserNotFoundError:
                         u = auth.create_user(
                             uid=uid,
@@ -140,10 +146,39 @@ def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = Fal
                             display_name=display_name,
                         )
                         print(f"  ✅ Created user {display_name} ({email}) in emulator ➔ UID: {u.uid}")
-                except Exception as e:
-                    print(f"  ❌ Error seeding emulator user {email}: {e}")
-                    continue
-            else:
+                        seeded = True
+                except Exception:
+                    seeded = False
+
+            # 2. Fallback: Seed directly via Emulator Admin REST API (works without firebase-admin package on all OSes)
+            if not seeded:
+                rest_admin_url = (
+                    f"{EMULATOR_URL}/identitytoolkit.googleapis.com/v1/projects/gamelog-40e10/accounts?key=fake-api-key"
+                )
+                rest_payload = json.dumps({
+                    "localId": uid,
+                    "email": email,
+                    "password": password,
+                    "displayName": display_name,
+                }).encode("utf-8")
+                rest_headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer owner",
+                }
+                req_seed = urllib.request.Request(rest_admin_url, data=rest_payload, headers=rest_headers)
+                try:
+                    with urllib.request.urlopen(req_seed) as resp_seed:
+                        print(f"  ✅ Created user {display_name} ({email}) in emulator ➔ UID: {uid}")
+                except urllib.error.HTTPError as err_seed:
+                    err_text = err_seed.read().decode("utf-8")
+                    if "EMAIL_EXISTS" in err_text or "DUPLICATE" in err_text or "LOCAL_ID_EXISTS" in err_text:
+                        print(f"  ℹ️ User {display_name} ({email}) already exists in emulator ➔ UID: {uid}")
+                    else:
+                        print(f"  ❌ Error seeding user {email} via REST: {err_text}")
+                except Exception as ex_seed:
+                    print(f"  ❌ Error seeding user {email} via REST: {ex_seed}")
+        else:
+            if HAS_FIREBASE_ADMIN:
                 try:
                     u = auth.get_user(uid)
                     print(f"  ℹ️ User {display_name} ({email}) found in Cloud Auth ➔ UID: {u.uid}")
