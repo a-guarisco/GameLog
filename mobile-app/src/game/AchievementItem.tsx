@@ -2,40 +2,82 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
+import AchievementIcon from '@gamelog/game/AchievementIcon';
+import { formatAchievementName } from '@gamelog/utils/formatUtils';
 
 interface AchievementItemProps {
   name: string;
   displayName?: string;
   percentage: number;
   unlockTime?: number;
+  description?: string;
 }
 
-const AchievementItem = ({ name, displayName, percentage, unlockTime }: AchievementItemProps) => {
+const getRarity = (percentage: number) => {
+  if (percentage < 5) return { label: 'Legendary', fill: 'bg-warning-500' };
+  if (percentage < 20) return { label: 'Rare', fill: 'bg-info-500' };
+  if (percentage < 50) return { label: 'Uncommon', fill: 'bg-success-500' };
+  return { label: 'Common', fill: 'bg-background-500' };
+};
+
+const getLockedFillColor = (locked: boolean) => {
+  if (locked) {
+    return 'bg-warning-500';
+  }
+  return 'bg-success-500';
+};
+
+const AchievementItem = ({
+  name,
+  displayName,
+  percentage,
+  unlockTime,
+  description,
+}: AchievementItemProps) => {
+  const safePercentage = Number(percentage);
+  const normalizedPercentage = Number.isFinite(safePercentage) ? safePercentage : 0;
+  const isUnlocked = !!unlockTime;
+  const rarity = getRarity(normalizedPercentage);
+  const lockedFillColor = getLockedFillColor(!isUnlocked);
+
   return (
-    <Box className="relative overflow-hidden rounded-2xl border-2 border-outline-500 mb-3 h-20">
+    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200 shadow-md">
       <Box
         testID="global-progress-bar"
-        className="absolute top-0 left-0 h-full bg-tertiary-500"
-        style={{ width: `${percentage}%` }}
+        className={`absolute top-0 left-0 h-full ${lockedFillColor} opacity-15`}
+        style={{ width: `${normalizedPercentage}%` }}
       />
 
-      <HStack className="h-full px-5 items-center relative z-10" space="md">
-        <VStack className="flex-1 items-center justify-center">
-          <Text size="xl" className="font-bold uppercase text-center">
-            {displayName || name}
+      <HStack space="md" className="relative z-10 px-3 py-3 items-start">
+        <Box
+          className={`w-10 h-10 rounded-md items-center justify-center shrink-0 ${
+            isUnlocked ? 'bg-success-100' : 'bg-background-300'
+          }`}
+        >
+          <AchievementIcon isUnlocked={isUnlocked} />
+        </Box>
+
+        <VStack className="flex-1">
+          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+            {displayName ? displayName : formatAchievementName(name)}
           </Text>
-          {unlockTime && (
-            <Text size="sm" className="font-mono text-center">
-              Achievement unlocked on: {new Date(unlockTime * 1000).toLocaleDateString()}
+          <Text size="xs" className="font-medium text-typography-400 mt-0.5">
+            <Text size="xs" className="font-medium text-typography-300 mt-0.5">
+              {rarity.label}
+            </Text>{' '}
+            · {normalizedPercentage.toFixed(1)}% of players
+          </Text>
+          {description && (
+            <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
+              {description}
+            </Text>
+          )}
+          {isUnlocked && (
+            <Text size="xs" className="text-success-700 mt-1">
+              Unlocked {new Date(unlockTime! * 1000).toLocaleDateString()}
             </Text>
           )}
         </VStack>
-
-        <Box className="border-2 border-outline-500 rounded-xl px-4 py-1 bg-background-300">
-          <Text size="sm" className="font-bold">
-            {percentage}%
-          </Text>
-        </Box>
       </HStack>
     </Box>
   );

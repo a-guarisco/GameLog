@@ -1,4 +1,10 @@
-import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
+import { formatAchievementName, formatMinutesToHours } from '@gamelog/utils/formatUtils';
+
+describe('formatAchievementName', () => {
+  it('replaces underscores with spaces', () => {
+    expect(formatAchievementName('ACHIEVE_QUEST_COMPLETE')).toBe('ACHIEVE QUEST COMPLETE');
+  });
+});
 
 describe('formatMinutesToHours', () => {
   it('formats minutes under 60 as Xm', () => {

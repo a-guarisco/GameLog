@@ -64,13 +64,13 @@ describe('GameBanner', () => {
   it('shows fire emoji and streak count when streak is greater than 0', () => {
     render(<GameBanner {...defaultProps} streak={7} />);
 
-    expect(screen.getByTestId('banner-secondary').props.children).toBe('🔥 7 streak');
+    expect(screen.getByTestId('banner-secondary').props.children).toBe('🔥 7 day streak');
   });
 
   it('shows plain streak count (no fire emoji) when streak is 0', () => {
     render(<GameBanner {...defaultProps} streak={0} />);
 
-    expect(screen.getByTestId('banner-secondary').props.children).toBe('0 streak');
+    expect(screen.getByTestId('banner-secondary').props.children).toBe('0 day streak');
   });
 
   it('passes the correct image URLs from steam asset helpers', () => {
