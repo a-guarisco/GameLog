@@ -12,7 +12,7 @@ endif
 
 export RUN_SCHEDULER
 
-.PHONY: help dev up down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed db-shell db-clean db-snapshot db-restore
+.PHONY: help dev up down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed seed-firebase db-shell db-clean db-snapshot db-restore
 
 dev:
 	@:
@@ -22,16 +22,17 @@ help:
 	@echo ""
 	@echo "Lifecycle:"
 	@echo "  make up                  - Start all services"
+	@echo "  make dev up              - Start all services with background scheduler disabled (RUN_SCHEDULER=false)"
 	@echo "  make down                - Stop and remove containers"
 	@echo "  make restart             - Restart all running services"
 	@echo "  make logs                - Follow all service logs"
-	@echo "  make logs SERVICE=db     - Follow logs for one service"
+	@echo "  make logs SERVICE=gamelog- Follow logs for a specific service (gamelog or db)"
 	@echo ""
 	@echo "Rebuilds:"
 	@echo "  make rebuild             - Rebuild and recreate all services"
-	@echo "  make rebuild-gamelog     - Rebuild and recreate only the API"
+	@echo "  make rebuild-gamelog     - Rebuild and recreate only the API container"
 	@echo "  make rebuild-no-cache    - Rebuild all services without cache"
-	@echo "  make rebuild-gamelog-no-cache - Rebuild only the API without cache"
+	@echo "  make rebuild-gamelog-no-cache - Rebuild only the API container without cache"
 	@echo ""
 	@echo "Database Workflows & Setup:"
 	@echo "  make setup               - Initial setup: start services, migrate DB, insert seed data"
@@ -42,7 +43,9 @@ help:
 	@echo "  make migrate             - Apply pending Alembic migrations to DB"
 	@echo "  make revision m=\"...\"    - Autogenerate an Alembic migration script"
 	@echo "  make downgrade           - Roll back the last Alembic migration"
-	@echo "  make seed           - Load demo data into the DB"
+	@echo "  make seed                - Load demo data into PostgreSQL database"
+	@echo "  make seed-firebase       - Seed/authenticate Firebase Auth test users & display Bearer tokens"
+	@echo "                             (Supports ARGS=\"--cloud\", ARGS=\"--emulator\", or ARGS=\"email@test.com\")"
 	@echo ""
 	@echo "Database Utilities & Snapshots:"
 	@echo "  make db-shell            - Open a psql shell in the database container"
