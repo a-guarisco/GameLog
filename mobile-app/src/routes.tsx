@@ -6,7 +6,15 @@ import GameListView from '@gamelog/game-list/GameListView';
 import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
-import { DevView, PaletteView, FontsView } from '@gamelog/dev';
+import {
+  DevView,
+  DevEnvView,
+  DevAestheticsView,
+  DevBackendView,
+  DevAuthView,
+  PaletteView,
+  FontsView,
+} from '@gamelog/dev';
 import GameBanner from '@gamelog/game/GameBanner';
 
 const renderGameBannerHeader = (route: any) => {
@@ -53,13 +61,29 @@ export const TestingStack = createNativeStackNavigator({
       screen: DevView,
       options: { headerShown: false },
     },
+    DevEnv: {
+      screen: DevEnvView,
+      options: { title: 'Environment Variables', headerShown: true },
+    },
+    DevAesthetics: {
+      screen: DevAestheticsView,
+      options: { title: 'Aesthetics & Theme', headerShown: true },
+    },
+    DevBackend: {
+      screen: DevBackendView,
+      options: { title: 'Backend & Endpoints', headerShown: true },
+    },
+    DevAuth: {
+      screen: DevAuthView,
+      options: { title: 'Authentication', headerShown: true },
+    },
     DevPalette: {
       screen: PaletteView,
-      options: { headerShown: false },
+      options: { title: 'Color Palette', headerShown: true },
     },
     DevFonts: {
       screen: FontsView,
-      options: { headerShown: false },
+      options: { title: 'Fonts & Typography', headerShown: true },
     },
   },
 });

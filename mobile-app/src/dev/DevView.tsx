@@ -1,63 +1,84 @@
-import { NativeStackNavigationProp } from 'node_modules/@react-navigation/native-stack/lib/typescript/src/types';
+// Developer Dashboard Main Navigation View (Minimal, Generous Padding, Minimal Gap)
+import { Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { NativeStackNavigationProp } from 'node_modules/@react-navigation/native-stack/lib/typescript/src/types';
+import Ionicons from '@react-native-vector-icons/ionicons';
+
 import { Box } from '@gamelog/common/gluestack/box';
-import { ScrollView } from 'react-native';
-import { useColorScheme } from 'nativewind';
-import { ErrorBox } from '@gamelog/common/feedbacks/ErrorBox';
-import { InfoBox, LoadingBox, WarningBox } from '@gamelog/common/feedbacks';
-import { BackendHealthCheck } from './BackendHealthCheck';
-import { ExpoEnvInfo } from './ExpoEnvInfo';
-import { FirebaseTokenGenerator } from './FirebaseTokenGenerator';
-import { BackendTestAuth } from './BackendTestAuth';
-import { FirebaseSignUpTest } from './FirebaseSignUpTest';
+import { Text } from '@gamelog/common/gluestack/text';
+import { Card } from '@gamelog/common/gluestack/card';
+import { HStack } from '@gamelog/common/gluestack/hstack';
+
+interface DevMenuSection {
+  id: string;
+  title: string;
+  route: string;
+}
+
+const SECTIONS: DevMenuSection[] = [
+  {
+    id: 'env',
+    title: 'Environment Variables',
+    route: 'DevEnv',
+  },
+  {
+    id: 'aesthetics',
+    title: 'Aesthetics & Theme',
+    route: 'DevAesthetics',
+  },
+  {
+    id: 'backend',
+    title: 'Backend & Endpoints',
+    route: 'DevBackend',
+  },
+  {
+    id: 'auth',
+    title: 'Authentication',
+    route: 'DevAuth',
+  },
+];
 
 export const DevView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
-
-  const toggleTheme = () => {
-    const newTheme = isDarkMode ? 'light' : 'dark';
-    setColorScheme(newTheme);
-  };
 
   return (
-    <>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Box className="flex-1 items-center justify-start gap-4 px-4 py-6">
-          <ExpoEnvInfo />
-          <Button onPress={toggleTheme} className="w-full max-w-[320px] self-center">
-            <ButtonText>Toggle Theme : active = {isDarkMode ? 'Dark' : 'Light'}</ButtonText>
-          </Button>
-          <Button
-            onPress={() => {
-              navigation.navigate('DevPalette');
-            }}
-            className="w-full max-w-[320px] self-center"
-          >
-            <ButtonText>Go to Color Palette</ButtonText>
-          </Button>
-          <Button
-            onPress={() => {
-              navigation.navigate('DevFonts');
-            }}
-            className="w-full max-w-[320px] self-center"
-          >
-            <ButtonText>Go to Fonts</ButtonText>
-          </Button>
-          <BackendHealthCheck className="w-full max-w-[320px] self-center" />
-          <FirebaseTokenGenerator className="w-full max-w-[320px] self-center" />
-          <BackendTestAuth className="w-full max-w-[320px] self-center" />
-          <FirebaseSignUpTest className="w-full max-w-[320px] self-center" />
-          <Box className="w-full max-w-[640px] flex-row flex-wrap justify-between gap-2">
-            <ErrorBox className="w-[48%]" errorMessage="test error message" />
-            <InfoBox className="w-[48%]" message="test info message" />
-            <WarningBox className="w-[48%]" message="test warning message" />
-            <LoadingBox className="w-[48%]" message="test loading message" />
-          </Box>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <Box className="flex-1 justify-start gap-3 px-4 py-4">
+        {/* Header */}
+        <Box className="mb-1">
+          <Text className="text-2xl font-bold text-typography-0">Developer Dashboard</Text>
         </Box>
-      </ScrollView>
-    </>
+
+        {/* Generous Padding Cards with Tiny Gap Between Cards */}
+        <Box className="gap-1 w-full max-w-[640px] self-center">
+          {SECTIONS.map((section) => (
+            <Pressable
+              key={section.id}
+              onPress={() => navigation.navigate(section.route)}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.8 : 1.0,
+                transform: [{ scale: pressed ? 0.98 : 1.0 }],
+              })}
+            >
+              <Card
+                variant="elevated"
+                className="w-full py-5 px-5 bg-background-50 rounded-md"
+              >
+                <HStack className="items-center justify-between">
+                  <Text className="text-base font-semibold text-typography-0">
+                    {section.title}
+                  </Text>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color="#94A3B8"
+                  />
+                </HStack>
+              </Card>
+            </Pressable>
+          ))}
+        </Box>
+      </Box>
+    </ScrollView>
   );
 };

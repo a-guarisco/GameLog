@@ -1,4 +1,8 @@
 export { DevView } from './DevView';
+export { DevEnvView } from './DevEnvView';
+export { DevAestheticsView } from './DevAestheticsView';
+export { DevBackendView } from './DevBackendView';
+export { DevAuthView } from './DevAuthView';
 export { PaletteView } from './PaletteView';
 export { FontsView } from './FontsView';
 export { BackendHealthCheck } from './BackendHealthCheck';
