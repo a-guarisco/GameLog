@@ -27,6 +27,12 @@ def register_user(
     auth_user: AuthenticatedUser,
     register_data: UserRegisterRequest,
 ) -> UserRead:
+    if not auth_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email is not verified. Please verify your email address before registering.",
+        )
+
     existing_uid = session.exec(select(User).where(User.firebase_uid == auth_user.uid)).first()
     if existing_uid:
         raise HTTPException(

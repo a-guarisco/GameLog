@@ -36,6 +36,7 @@ async def get_current_user(
         return AuthenticatedUser(
             uid=decoded_token["uid"],
             email=decoded_token.get("email"),
+            email_verified=bool(decoded_token.get("email_verified", False)),
             claims=decoded_token,
         )
     except Exception as e:
