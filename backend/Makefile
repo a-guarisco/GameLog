@@ -134,7 +134,7 @@ seed:
 	$(COMPOSE) exec gamelog uv run python -m src.core.seed
 
 seed-firebase:
-	@python3 scripts/seed_firebase_users.py $(ARGS)
+	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(ARGS)
 
 # ==============================================================================
 # 🧪 TESTING & CODE QUALITY

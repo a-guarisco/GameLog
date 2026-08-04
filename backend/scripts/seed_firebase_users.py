@@ -24,10 +24,12 @@ import urllib.request
 try:
     import firebase_admin
     from firebase_admin import auth, credentials
-
-    HAS_FIREBASE_ADMIN = True
 except ImportError:
-    HAS_FIREBASE_ADMIN = False
+    print("❌ Error: 'firebase-admin' package is required to seed users with fixed UIDs.")
+    print("💡 Please run the script using uv:")
+    print("   cd gamelog && uv run python ../scripts/seed_firebase_users.py")
+    print("   or via make: make seed-firebase")
+    sys.exit(1)
 
 # Default fallback Cloud Web API key from project config
 CLOUD_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY", "AIzaSyAVGPT6CKyiS_HmeGg_i0K7GH8qzSGpCWc")
@@ -80,10 +82,7 @@ def is_emulator_running(port: int = EMULATOR_PORT) -> bool:
 
 
 def setup_firebase_app(use_emulator: bool):
-    """Initializes Firebase Admin SDK for either Emulator or Cloud mode if package is installed."""
-    if not HAS_FIREBASE_ADMIN:
-        return
-
+    """Initializes Firebase Admin SDK for either Emulator or Cloud mode."""
     if use_emulator:
         os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = f"localhost:{EMULATOR_PORT}"
         if not firebase_admin._apps:
@@ -128,62 +127,37 @@ def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = Fal
         password = user["password"]
         display_name = user["displayName"]
 
-        if use_emulator:
-            seeded = False
-
-            # 1. Try seeding via Firebase Admin SDK if available
-            if HAS_FIREBASE_ADMIN:
-                try:
-                    try:
-                        u = auth.get_user(uid)
-                        print(f"  ℹ️ User {display_name} ({email}) exists in emulator ➔ UID: {u.uid}")
-                        seeded = True
-                    except auth.UserNotFoundError:
-                        u = auth.create_user(
-                            uid=uid,
-                            email=email,
-                            password=password,
-                            display_name=display_name,
-                        )
-                        print(f"  ✅ Created user {display_name} ({email}) in emulator ➔ UID: {u.uid}")
-                        seeded = True
-                except Exception:
-                    seeded = False
-
-            # 2. Fallback: Seed directly via Emulator Admin REST API (works without firebase-admin package on all OSes)
-            if not seeded:
-                rest_admin_url = (
-                    f"{EMULATOR_URL}/identitytoolkit.googleapis.com/v1/projects/gamelog-40e10/accounts?key=fake-api-key"
+        try:
+            try:
+                u = auth.get_user_by_email(email)
+                if u.uid == uid:
+                    mode_str = "emulator" if use_emulator else "Cloud Auth"
+                    print(f"  ℹ️ User {display_name} ({email}) exists in {mode_str} ➔ UID: {u.uid}")
+                else:
+                    mode_str = "emulator" if use_emulator else "Cloud Auth"
+                    print(f"  ⚠️ User {display_name} ({email}) in {mode_str} has wrong UID ({u.uid}). Recreating with correct UID ({uid})...")
+                    auth.delete_user(u.uid)
+                    u = auth.create_user(
+                        uid=uid,
+                        email=email,
+                        password=password,
+                        display_name=display_name,
+                    )
+                    print(f"  ✅ Re-created user {display_name} ({email}) in {mode_str} ➔ UID: {u.uid}")
+            except auth.UserNotFoundError:
+                u = auth.create_user(
+                    uid=uid,
+                    email=email,
+                    password=password,
+                    display_name=display_name,
                 )
-                rest_payload = json.dumps({
-                    "localId": uid,
-                    "email": email,
-                    "password": password,
-                    "displayName": display_name,
-                }).encode("utf-8")
-                rest_headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer owner",
-                }
-                req_seed = urllib.request.Request(rest_admin_url, data=rest_payload, headers=rest_headers)
-                try:
-                    with urllib.request.urlopen(req_seed) as resp_seed:
-                        print(f"  ✅ Created user {display_name} ({email}) in emulator ➔ UID: {uid}")
-                except urllib.error.HTTPError as err_seed:
-                    err_text = err_seed.read().decode("utf-8")
-                    if "EMAIL_EXISTS" in err_text or "DUPLICATE" in err_text or "LOCAL_ID_EXISTS" in err_text:
-                        print(f"  ℹ️ User {display_name} ({email}) already exists in emulator ➔ UID: {uid}")
-                    else:
-                        print(f"  ❌ Error seeding user {email} via REST: {err_text}")
-                except Exception as ex_seed:
-                    print(f"  ❌ Error seeding user {email} via REST: {ex_seed}")
-        else:
-            if HAS_FIREBASE_ADMIN:
-                try:
-                    u = auth.get_user(uid)
-                    print(f"  ℹ️ User {display_name} ({email}) found in Cloud Auth ➔ UID: {u.uid}")
-                except Exception:
-                    pass
+                mode_str = "emulator" if use_emulator else "Cloud Auth"
+                print(f"  ✅ Created user {display_name} ({email}) in {mode_str} ➔ UID: {u.uid}")
+        except Exception as e:
+            mode_str = "emulator" if use_emulator else "Cloud Auth"
+            print(f"  ❌ Error seeding {mode_str} user {email}: {e}")
+            if use_emulator:
+                continue
 
         # Retrieve live bearer token via signInWithPassword REST endpoint
         payload = json.dumps({
