@@ -44,7 +44,10 @@ export const DevAuthView = () => {
         </Box>
 
         {/* Active Session & Clear Storage Card (Top) */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Active Session & Storage</Text>
 
           <InfoBox
@@ -63,20 +66,31 @@ export const DevAuthView = () => {
         </Card>
 
         {/* Token Generator Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Firebase Token Generator</Text>
           <FirebaseTokenGenerator className="w-full" />
         </Card>
 
         {/* Backend Auth Tester Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Backend Auth Verification</Text>
           <BackendTestAuth className="w-full" />
         </Card>
 
         {/* User Registration Pipeline Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
-          <Text className="text-sm font-semibold text-typography-0">User Sign Up & Email Verification</Text>
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">
+            User Sign Up & Email Verification
+          </Text>
           <FirebaseSignUpTest className="w-full" />
         </Card>
       </Box>

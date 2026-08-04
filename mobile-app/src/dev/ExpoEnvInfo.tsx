@@ -42,7 +42,7 @@ export const ExpoEnvInfo = () => {
           key.includes('KEY') || key.includes('SECRET') || key.includes('PASSWORD');
         const displayValue = isSensitive
           ? getStableHash(rawValue)
-          : rawValue ?? 'missing / undefined';
+          : (rawValue ?? 'missing / undefined');
 
         return (
           <Box key={key} className="gap-0.5 pb-2 border-b border-outline-200/30 last:border-b-0">

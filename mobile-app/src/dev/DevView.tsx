@@ -60,19 +60,10 @@ export const DevView = () => {
                 transform: [{ scale: pressed ? 0.98 : 1.0 }],
               })}
             >
-              <Card
-                variant="elevated"
-                className="w-full py-5 px-5 bg-background-50 rounded-md"
-              >
+              <Card variant="elevated" className="w-full py-5 px-5 bg-background-50 rounded-md">
                 <HStack className="items-center justify-between">
-                  <Text className="text-base font-semibold text-typography-0">
-                    {section.title}
-                  </Text>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color="#94A3B8"
-                  />
+                  <Text className="text-base font-semibold text-typography-0">{section.title}</Text>
+                  <Ionicons name="chevron-forward-outline" size={20} color="#94A3B8" />
                 </HStack>
               </Card>
             </Pressable>

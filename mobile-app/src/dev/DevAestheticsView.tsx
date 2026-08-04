@@ -26,7 +26,10 @@ export const DevAestheticsView = () => {
         </Box>
 
         {/* Theme Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Theme Mode</Text>
           <Button onPress={toggleTheme} className="w-full">
             <ButtonText>Toggle Theme : active = {isDarkMode ? 'Dark' : 'Light'}</ButtonText>
@@ -34,7 +37,10 @@ export const DevAestheticsView = () => {
         </Card>
 
         {/* Design Assets Navigation Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Design System References</Text>
           <Box className="gap-2">
             <Button
@@ -57,8 +63,13 @@ export const DevAestheticsView = () => {
         </Card>
 
         {/* Feedback Previews Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
-          <Text className="text-sm font-semibold text-typography-0">Feedback Component Sandbox</Text>
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">
+            Feedback Component Sandbox
+          </Text>
           <Box className="w-full gap-2">
             <SuccessBox message="Sample success message" />
             <ErrorBox errorMessage="Sample error message" />

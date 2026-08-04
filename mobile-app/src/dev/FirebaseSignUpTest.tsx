@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { TextInput } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, type User } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  onAuthStateChanged,
+  type User,
+} from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';

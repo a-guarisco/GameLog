@@ -14,28 +14,40 @@ export const DevBackendView = () => {
         </Box>
 
         {/* Health Check Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Backend Status & Ping</Text>
           <BackendHealthCheck className="w-full" />
         </Card>
 
         {/* Active Endpoints Card */}
-        <Card variant="elevated" className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md">
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
           <Text className="text-sm font-semibold text-typography-0">Configured Endpoints</Text>
           <Box className="gap-2.5">
             <Box className="pb-1.5 border-b border-outline-200/30">
               <Text className="text-xs font-bold text-typography-0">GET Health</Text>
-              <Text className="text-xs text-typography-100 font-mono">{EndPoints.getBackendHealth()}</Text>
+              <Text className="text-xs text-typography-100 font-mono">
+                {EndPoints.getBackendHealth()}
+              </Text>
             </Box>
 
             <Box className="pb-1.5 border-b border-outline-200/30">
               <Text className="text-xs font-bold text-typography-0">GET Auth Me</Text>
-              <Text className="text-xs text-typography-100 font-mono">{EndPoints.getAuthOutcome()}</Text>
+              <Text className="text-xs text-typography-100 font-mono">
+                {EndPoints.getAuthOutcome()}
+              </Text>
             </Box>
 
             <Box className="pb-1.5 border-b border-outline-200/30">
               <Text className="text-xs font-bold text-typography-0">POST Register User</Text>
-              <Text className="text-xs text-typography-100 font-mono">{EndPoints.registerUser()}</Text>
+              <Text className="text-xs text-typography-100 font-mono">
+                {EndPoints.registerUser()}
+              </Text>
             </Box>
 
             <Box>
