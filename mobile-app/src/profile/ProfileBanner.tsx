@@ -41,22 +41,21 @@ export default function ProfileBanner({ userId, ownedGames, playersInfo }: Profi
   }
 
   return (
-    <Pressable onPress={openSteamProfile} className="w-full">
-      <VStack className="w-full">
+    <Pressable onPress={openSteamProfile} className="w-full px-3 pt-3">
+      <VStack className="w-full bg-background-100 rounded-2xl shadow-lg border border-outline-100 overflow-hidden">
         <Banner
           imageUrl={gameHeaderImage}
           minHeight={150}
           heightPercentage={20}
-          className="opacity-50"
         />
 
         <BannerInfo
           title={player?.personaname ?? 'Unknown User'}
           secondaryText="🔥 10 streak"
           iconUrl={player?.avatarfull}
-          className="h-100"
         />
       </VStack>
     </Pressable>
   );
 }
+

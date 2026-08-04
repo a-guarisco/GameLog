@@ -16,11 +16,12 @@ export default function GameBanner({ appid, title, streak }: GameBannerProps) {
   const secondaryText = streak > 0 ? `🔥 ${streak} day streak` : '0 day streak';
 
   return (
-    <VStack className="w-full">
+    <VStack className="w-full bg-background-100 rounded-b-2xl shadow-lg border-b border-outline-100 overflow-hidden">
       <Box className="overflow-hidden">
-        <Banner imageUrl={gameHeaderImage} minHeight={150} heightPercentage={20} />
+        <Banner imageUrl={gameHeaderImage} minHeight={140} heightPercentage={18} />
       </Box>
       <BannerInfo title={title} iconUrl={gameCapsuleImage} secondaryText={secondaryText} />
     </VStack>
   );
 }
+
