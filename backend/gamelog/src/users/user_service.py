@@ -54,6 +54,37 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
     return search_results
 
 
+def get_friend_list(session: Session, user_uid: str) -> list[UserSearchResult]:
+    current_user = get_user_by_firebase_uid(session, user_uid)
+
+    statement = (
+        select(User, Friendship)
+        .join(Friendship, _friendship_between_clause(current_user.id, User.id))
+        .where(
+            User.id != current_user.id,
+            or_(
+                Friendship.status == FriendshipStatus.ACCEPTED,
+                (Friendship.status == FriendshipStatus.PENDING) & (Friendship.addressee_id == current_user.id), #pending_incoming
+            ),
+        )
+    )
+    results = session.exec(statement).all()
+
+    friend_list = []
+    for user, friendship in results:
+        friend_list.append(
+            UserSearchResult(
+                user=UserRead.model_validate(user),
+                friendship=FriendshipInfo(
+                    friendship_id=friendship.id,
+                    friendship_status=_resolve_friendship_status(friendship, current_user.id),
+                    friendship_requester_id=friendship.requester_id,
+                ),
+            )
+        )
+    return friend_list
+
+
 def _resolve_friendship_status(friendship: Friendship | None, current_user_id: uuid.UUID) -> APIFriendshipStatus | None:
     if not friendship:
         return None
