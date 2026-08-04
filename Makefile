@@ -2,17 +2,20 @@
 # GameLog Root Monorepo Makefile
 # ==============================================================================
 
-.PHONY: help up down emulator emulator-bg seed-firebase test test-backend test-mobile lint lint-backend lint-mobile dev-mobile dev-all
+.PHONY: help up down emulator emulator-bg seed-firebase test test-backend test-mobile lint lint-backend lint-mobile dev-mobile dev-all dev-init db-reset logs
 
 help:
 	@echo "GameLog Monorepo Commands"
 	@echo ""
 	@echo "🚀 Full Environment Setup & Launch:"
-	@echo "  make dev-all        - Full zero-to-hero startup: emulator, DB reset, seed data, and launch Expo CLI"
+	@echo "  make dev-all        - Normal startup: emulator bg, backend containers up, seed Firebase, and launch Expo CLI"
+	@echo "  make dev-init       - Zero-to-hero initialization: emulator bg, DB reset, seed data, and launch Expo CLI"
 	@echo ""
 	@echo "🛠️ Individual Services & Lifecycle:"
 	@echo "  make up             - Start backend Docker services"
 	@echo "  make down           - Stop backend Docker services"
+	@echo "  make logs           - Follow backend Docker container logs"
+	@echo "  make db-reset       - Reset PostgreSQL database & apply migrations"
 	@echo "  make emulator       - Start local Firebase Auth Emulator in foreground"
 	@echo "  make seed-firebase  - Seed test users in Firebase Auth and print Bearer Tokens"
 	@echo "  make dev-mobile     - Start Expo Mobile App dev server"
@@ -26,7 +29,7 @@ help:
 	@echo "  make lint-mobile    - Run mobile app Expo linter"
 
 # ------------------------------------------------------------------------------
-# Full Monorepo Zero-to-Hero Launcher
+# Full Monorepo Launchers
 # ------------------------------------------------------------------------------
 
 emulator-bg:
@@ -38,17 +41,26 @@ emulator-bg:
 		echo "🔥 Firebase Auth Emulator is already running on port 9099"; \
 	fi
 
-dev-all: emulator-bg
+dev-init: emulator-bg
 	@echo "🔄 Starting backend services & resetting database..."
 	@make -C backend db-reset
 	@echo "🔑 Seeding Firebase test accounts..."
 	@make -C backend seed-firebase
 	@echo "🌱 Seeding PostgreSQL database..."
 	@make -C backend seed
+	@echo "📱 Launching Expo Mobile App (Interactive Console)..."
+	@cd mobile-app && npx expo start --go -c
+
+dev-all: emulator-bg
+	@echo "🔄 Starting backend services..."
+	@make -C backend up
+	@echo "🔑 Seeding Firebase test accounts..."
+	@make -C backend seed-firebase
+	@echo "📱 Launching Expo Mobile App (Interactive Console)..."
 	@cd mobile-app && npx expo start --go -c
 
 # ------------------------------------------------------------------------------
-# Services & Lifecycle
+# Services & Lifecycle Shortcuts
 # ------------------------------------------------------------------------------
 
 up:
@@ -56,6 +68,12 @@ up:
 
 down:
 	@make -C backend down
+
+logs:
+	@make -C backend logs
+
+db-reset:
+	@make -C backend db-reset
 
 emulator:
 	@npx firebase emulators:start --only auth --project gamelog-40e10 --import=./emulator-data --export-on-exit=./emulator-data
@@ -67,7 +85,7 @@ dev-mobile:
 	@cd mobile-app && npx expo start --go -c
 
 # ------------------------------------------------------------------------------
-# Testing & Code Quality
+# Testing & Code Quality Shortcuts
 # ------------------------------------------------------------------------------
 
 test: test-backend test-mobile
