@@ -5,7 +5,9 @@ Revises:
 Create Date: 2026-08-04 10:33:04.279501
 
 """
+from datetime import datetime
 from typing import Sequence, Union
+from uuid import UUID
 
 from alembic import op
 import sqlalchemy as sa
@@ -48,6 +50,56 @@ def upgrade() -> None:
     op.create_index(op.f('ix_user_firebase_uid'), 'user', ['firebase_uid'], unique=False)
     op.create_index(op.f('ix_user_steam_id'), 'user', ['steam_id'], unique=False)
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=False)
+
+    user_table = sa.table(
+        'user',
+        sa.column('id', sa.Uuid()),
+        sa.column('firebase_uid', sqlmodel.sql.sqltypes.AutoString(length=255)),
+        sa.column('username', sqlmodel.sql.sqltypes.AutoString(length=100)),
+        sa.column('steam_id', sqlmodel.sql.sqltypes.AutoString(length=32)),
+        sa.column('steam_api_key', sqlmodel.sql.sqltypes.AutoString(length=255)),
+    )
+    op.bulk_insert(
+        user_table,
+        [
+            {
+                'id': UUID('11111111-1111-1111-1111-111111111111'),
+                'firebase_uid': 'YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2',
+                'username': 'test-01',
+                'steam_id': '76561198077919169',
+                'steam_api_key': '724FF154B1D2A357857A257EA28C6415',
+            },
+            {
+                'id': UUID('22222222-2222-2222-2222-222222222222'),
+                'firebase_uid': 'tcYaHPGYDkVBlnNrcI7jNf2z4MS2',
+                'username': 'test-02',
+                'steam_id': '76561198000000002',
+                'steam_api_key': '',
+            },
+            {
+                'id': UUID('33333333-3333-3333-3333-333333333333'),
+                'firebase_uid': 'GRbqhGIYlzb1GHEaBINeJq1ZXld2',
+                'username': 'test-03',
+                'steam_id': '76561198000000003',
+                'steam_api_key': '',
+            },
+            {
+                'id': UUID('44444444-4444-4444-4444-444444444444'),
+                'firebase_uid': 'wcMFGsVqaYYNHSAeUXgGiK14WPk2',
+                'username': 'test-04',
+                'steam_id': '76561198000000004',
+                'steam_api_key': '',
+            },
+            {
+                'id': UUID('55555555-5555-5555-5555-555555555555'),
+                'firebase_uid': 'a7swvzI0APgq57SMa8B7PsHevG02',
+                'username': 'test-05',
+                'steam_id': '76561198000000005',
+                'steam_api_key': '',
+            },
+        ],
+    )
+
     op.create_table('friendship',
     sa.Column('requester_id', sa.Uuid(), nullable=False),
     sa.Column('addressee_id', sa.Uuid(), nullable=False),
@@ -60,6 +112,47 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('requester_id', 'addressee_id')
     )
+
+    friendship_table = sa.table(
+        'friendship',
+        sa.column('id', sa.Uuid()),
+        sa.column('requester_id', sa.Uuid()),
+        sa.column('addressee_id', sa.Uuid()),
+        sa.column('status', sa.Enum('PENDING', 'ACCEPTED', 'BLOCKED', name='friendshipstatus')),
+        sa.column('created_at', sa.DateTime()),
+        sa.column('updated_at', sa.DateTime()),
+    )
+    now = datetime.now()
+    op.bulk_insert(
+        friendship_table,
+        [
+            {
+                'id': UUID('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+                'requester_id': UUID('11111111-1111-1111-1111-111111111111'),
+                'addressee_id': UUID('22222222-2222-2222-2222-222222222222'),
+                'status': 'ACCEPTED',
+                'created_at': now,
+                'updated_at': now,
+            },
+            {
+                'id': UUID('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
+                'requester_id': UUID('44444444-4444-4444-4444-444444444444'),
+                'addressee_id': UUID('11111111-1111-1111-1111-111111111111'),
+                'status': 'PENDING',
+                'created_at': now,
+                'updated_at': now,
+            },
+            {
+                'id': UUID('cccccccc-cccc-cccc-cccc-cccccccccccc'),
+                'requester_id': UUID('11111111-1111-1111-1111-111111111111'),
+                'addressee_id': UUID('55555555-5555-5555-5555-555555555555'),
+                'status': 'BLOCKED',
+                'created_at': now,
+                'updated_at': now,
+            },
+        ],
+    )
+
     op.create_table('shelving',
     sa.Column('status', sa.Enum('shelved', 'to_be_played', 'playing', 'played', 'platinato', name='game_status'), nullable=False),
     sa.Column('owner_id', sa.Uuid(), nullable=False),

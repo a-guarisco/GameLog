@@ -1,11 +1,12 @@
 import uuid
+from datetime import datetime
 
 from fastapi import HTTPException
 from sqlmodel import Session, select, or_
 
 from src.models import User, Friendship, FriendshipStatus
 from src.users import UserRead, UserSearchResult, FriendshipInfo
-from src.users.schemas import FrienshipStatus
+from src.users.schemas import FrienshipStatus, FriendshipResponseStatus
 
 """
 Fetch the db in order to return a UserRead from a given firebase uuid
@@ -68,8 +69,9 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
             UserSearchResult(
                 user=UserRead.model_validate(user),
                 friendship=FriendshipInfo(
+                    friendship_id=friendship.id if friendship else None,
                     friendship_status=friendship_status,
-                    friendship_requester_id=friendship.requester_id if friendship else None
+                    friendship_requester_id=friendship.requester_id if friendship else None,
                 )
             )
         )
@@ -77,7 +79,7 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
 
 
 """
-    Send a friend request from the authenticated user to the addressee.
+Send a friend request from the authenticated user to the addressee.
 """
 def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid.UUID):
     requester = get_user_by_firebase_uid(session, requester_uid)
@@ -121,4 +123,61 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
     )
     session.add(friendship)
     session.commit()
-    return
+    session.refresh(friendship)
+    return {"message": "Friend request sent", "friendship_id": str(friendship.id)}
+
+
+"""
+Respond to a friend request (accepted, rejected, or blocked).
+"""
+def respond_to_friend_request(
+    session: Session,
+    addressee_uid: str,
+    friendship_id: uuid.UUID,
+    action: FriendshipResponseStatus,
+) -> dict[str, str]:
+    addressee = get_user_by_firebase_uid(session, addressee_uid)
+
+    friendship = session.get(Friendship, friendship_id)
+    if not friendship:
+        raise HTTPException(status_code=404, detail="Friend request not found")
+
+    if friendship.requester_id != addressee.id and friendship.addressee_id != addressee.id:
+        raise HTTPException(status_code=403, detail="You are not part of this friendship")
+
+    match action:
+        case FriendshipResponseStatus.ACCEPTED:
+            if friendship.status != FriendshipStatus.PENDING:
+                raise HTTPException(
+                    status_code=400, detail="Friend request is not pending"
+                )
+            if friendship.addressee_id != addressee.id:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Only the addressee can accept a friend request",
+                )
+            friendship.status = FriendshipStatus.ACCEPTED
+            friendship.updated_at = datetime.now()
+            session.add(friendship)
+            session.commit()
+            return {"message": "Friend request accepted"}
+
+        case FriendshipResponseStatus.REJECTED:
+            if friendship.status != FriendshipStatus.PENDING:
+                raise HTTPException(
+                    status_code=400, detail="Friend request is not pending"
+                )
+            session.delete(friendship)
+            session.commit()
+            return {"message": "Friend request rejected"}
+
+        case FriendshipResponseStatus.BLOCKED:
+            friendship.status = FriendshipStatus.BLOCKED
+            friendship.updated_at = datetime.now()
+            session.add(friendship)
+            session.commit()
+            return {"message": "User blocked"}
+
+        case _:
+            raise HTTPException(status_code=400, detail="Invalid action")
+

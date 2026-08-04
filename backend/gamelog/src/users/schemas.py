@@ -3,6 +3,8 @@ from enum import Enum
 from sqlmodel import Field, SQLModel
 from src.models.steam_rolling_time import SteamRollingTimeBase
 from src.models.user import UserBase
+from src.models.friendship import FriendshipBase
+from pydantic import BaseModel
 
 #region User
 class UserCreate(UserBase):
@@ -40,16 +42,28 @@ class FrienshipStatus(str, Enum):
     ACCEPTED = "accepted"
     BLOCKED = "blocked"
 
-class FriendshipInfo(SQLModel):
+class FriendshipInfo(BaseModel):
+    friendship_id: FriendshipBase.model_fields["id"].annotation | None = None
     friendship_status: FrienshipStatus | None = None
     friendship_requester_id: uuid.UUID | None = None
 
-class UserSearchResult(SQLModel):
+class UserSearchResult(BaseModel):
     user: UserRead
     friendship: FriendshipInfo
 
 
-class FriendshipRequest(SQLModel):
+class FriendshipRequest(BaseModel):
     addressee_id: uuid.UUID
+
+
+class FriendshipResponseStatus(str, Enum):
+    ACCEPTED = "ACCEPTED"
+    BLOCKED = "BLOCKED"
+    REJECTED = "REJECTED"
+
+
+class FriendshipResponse(BaseModel):
+    friendship_id: FriendshipBase.model_fields["id"].annotation
+    action: FriendshipResponseStatus
 
 #endregion

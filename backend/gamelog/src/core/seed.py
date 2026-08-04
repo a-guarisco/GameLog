@@ -200,12 +200,6 @@ def _friendships() -> list[Friendship]:
             addressee_id=DEMO_USER_2_ID,
             status=FriendshipStatus.ACCEPTED,
         ),
-        # test-01 requested test-03 (pending outgoing request from test-01)
-        Friendship(
-            requester_id=DEMO_USER_1_ID,
-            addressee_id=DEMO_USER_3_ID,
-            status=FriendshipStatus.PENDING,
-        ),
         # test-04 requested test-01 (pending incoming request to test-01)
         Friendship(
             requester_id=DEMO_USER_4_ID,
