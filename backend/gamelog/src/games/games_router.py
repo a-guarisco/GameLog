@@ -35,6 +35,7 @@ def get_weekly_playtime_by_game(
 ):
     return game_service.get_playtime_by_game(db, auth_user.uid, steam_app_id, days)
 
+
 @router.get(
     "/streak_by_user",
     summary="Returns the user's current streak of consecutive days played, computed across all games",
