@@ -1,3 +1,7 @@
+import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock';
+
+jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
+
 jest.mock('@expo-google-fonts/dm-sans', () => ({
   useFonts: jest.fn(() => [true]),
   DMSans_100Thin: 'DMSans_100Thin',
@@ -29,6 +33,10 @@ jest.mock('firebase/app', () => ({
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(() => ({ currentUser: null })),
   signInWithEmailAndPassword: jest.fn(),
+  onAuthStateChanged: jest.fn(() => jest.fn()),
+  signOut: jest.fn(() => Promise.resolve()),
+  createUserWithEmailAndPassword: jest.fn(),
+  sendEmailVerification: jest.fn(),
 }));
 
 if (!process.env.EXPO_PUBLIC_STEAM_API_KEY) {
