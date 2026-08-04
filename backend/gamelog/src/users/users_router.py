@@ -4,7 +4,7 @@ from sqlmodel import Session
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
-from src.users import user_service, UserSearchResult
+from src.users import user_service, UserSearchResult, FriendshipRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -20,4 +20,11 @@ def search_users(
 ):
     return user_service.search_users_by_username(db, q, auth_user.uid)
 
+@router.post("/add_friend", status_code=201)
+def add_friend(
+        payload: FriendshipRequest,
+        db: Session = Depends(get_db),
+        auth_user: AuthenticatedUser = Depends(get_current_user)
+):
+    return user_service.send_friend_request(db, auth_user.uid, payload.addressee_id)
 

@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from src.models import User, Friendship, FriendshipStatus
-from src.users.schemas import FriendshipSearchResultStatus
+from src.users.schemas import FrienshipStatus
 from tests.conftest import make_user
 
 
@@ -30,8 +30,8 @@ class TestUserSearch:
 
         # Should only find the other user, not self
         assert len(data) == 1
-        assert data[0]["username"] == "alice_other"
-        assert data[0]["id"] == str(other_user.id)
+        assert data[0]["user"]["username"] == "alice_other"
+        assert data[0]["user"]["id"] == str(other_user.id)
 
     def test_case_insensitive_and_partial_matching(self, client, session: Session):
         make_user(session, firebase_uid="firebase-uid-1", username="current_user", steam_id="111")
@@ -44,7 +44,7 @@ class TestUserSearch:
         assert response.status_code == 200
         data = response.json()
 
-        usernames = [user["username"] for user in data]
+        usernames = [res["user"]["username"] for res in data]
         assert len(usernames) == 2
         assert "JohnDoe" in usernames
         assert "johnny" in usernames
@@ -87,22 +87,22 @@ class TestUserSearch:
         assert len(data) == 5
 
         # Check mapping
-        results = {res["username"]: res for res in data}
+        results = {res["user"]["username"]: res for res in data}
 
         # None user
-        assert results["user_none"]["friendship_status"] is None
-        assert results["user_none"]["friendship_requester_id"] is None
+        assert results["user_none"]["friendship"]["friendship_status"] is None
+        assert results["user_none"]["friendship"]["friendship_requester_id"] is None
 
         # Sent request
-        assert results["user_sent"]["friendship_status"] == FriendshipSearchResultStatus.PENDING_OUTGOING.value
-        assert results["user_sent"]["friendship_requester_id"] == str(me.id)
+        assert results["user_sent"]["friendship"]["friendship_status"] == FrienshipStatus.PENDING_OUTGOING.value
+        assert results["user_sent"]["friendship"]["friendship_requester_id"] == str(me.id)
 
         # Received request
-        assert results["user_rec"]["friendship_status"] == FriendshipSearchResultStatus.PENDING_INCOMING.value
-        assert results["user_rec"]["friendship_requester_id"] == str(received_user.id)
+        assert results["user_rec"]["friendship"]["friendship_status"] == FrienshipStatus.PENDING_INCOMING.value
+        assert results["user_rec"]["friendship"]["friendship_requester_id"] == str(received_user.id)
 
         # Accepted friend
-        assert results["user_friend"]["friendship_status"] == FriendshipSearchResultStatus.ACCEPTED.value
+        assert results["user_friend"]["friendship"]["friendship_status"] == FrienshipStatus.ACCEPTED.value
 
         # Blocked
-        assert results["user_blocked"]["friendship_status"] == FriendshipSearchResultStatus.BLOCKED.value
+        assert results["user_blocked"]["friendship"]["friendship_status"] == FrienshipStatus.BLOCKED.value
