@@ -29,3 +29,17 @@ class SteamRollingTimeCreate(SteamRollingTimeBase):
 class SteamRollingTimeRead(SteamRollingTimeBase):
     id: uuid.UUID
     user_id: uuid.UUID
+
+
+from enum import Enum
+
+class FriendshipSearchResultStatus(str, Enum):
+    PENDING_OUTGOING = "pending_outgoing"
+    PENDING_INCOMING = "pending_incoming"
+    ACCEPTED = "accepted"
+    BLOCKED = "blocked"
+
+class UserSearchResult(UserRead):
+    friendship_status: FriendshipSearchResultStatus | None = None
+    friendship_requester_id: uuid.UUID | None = None
+

@@ -21,6 +21,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/dummy_credentials.json")
 os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
+os.environ.setdefault("RUN_SCHEDULER", "false")
 
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
@@ -35,9 +36,11 @@ from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 @pytest.fixture(scope="function")
 def engine():
     """Fresh in-memory SQLite engine for each test."""
+    from sqlalchemy.pool import StaticPool
     _engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     SQLModel.metadata.create_all(_engine)
     yield _engine

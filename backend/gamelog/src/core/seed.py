@@ -7,12 +7,11 @@ shelvings, and rolling playtime statistics) aligned with the Firebase Authentica
 IMPORTANT RELATIONAL NOTES:
 ---------------------------
 1. `firebase_uid`:
-   - Every `User` in PostgreSQL MUST match a valid `firebase_uid` emitted by Firebase Auth.
-   - The primary test user `test-01` uses `firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2"`.
-   - DO NOT MODIFY the `firebase_uid` of `DEMO_USER_1_ID` without updating:
-     * `backend/scripts/seed_firebase_users.py` (which seeds the local emulator)
-     * Mobile app test credentials (`mobile-app/.env.example`)
-     * Production Firebase Console test accounts
+    - The primary test user `test-01` uses `firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2"`.
+    - DO NOT MODIFY the `firebase_uid` of `DEMO_USER_1_ID` without updating:
+      * `backend/scripts/seed_firebase_users.py` (which seeds the local emulator)
+      * Mobile app test credentials (`mobile-app/.env.example`)
+      * Production/Staging Firebase Console accounts
 
 2. `steam_id` & Playtime Records:
    - `DEMO_USER_1_ID` uses a valid Steam ID (`76561198077919169`) for testing real Steam API sync.
@@ -29,7 +28,7 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Config, Game, GameStatus, Shelving, SteamRollingTime, User
+from src.models import Config, Game, GameStatus, Shelving, SteamRollingTime, User, Friendship, FriendshipStatus
 
 # Fixed UUIDs for predictable database referencing in unit tests and manual API verification.
 DEMO_USER_1_ID = UUID("11111111-1111-1111-1111-111111111111")
@@ -192,11 +191,42 @@ def _rolling_times() -> list[SteamRollingTime]:
     return records
 
 
+def _friendships() -> list[Friendship]:
+    """Returns sample friendships for manual testing."""
+    return [
+        # test-01 and test-02 are accepted friends
+        Friendship(
+            requester_id=DEMO_USER_1_ID,
+            addressee_id=DEMO_USER_2_ID,
+            status=FriendshipStatus.ACCEPTED,
+        ),
+        # test-01 requested test-03 (pending outgoing request from test-01)
+        Friendship(
+            requester_id=DEMO_USER_1_ID,
+            addressee_id=DEMO_USER_3_ID,
+            status=FriendshipStatus.PENDING,
+        ),
+        # test-04 requested test-01 (pending incoming request to test-01)
+        Friendship(
+            requester_id=DEMO_USER_4_ID,
+            addressee_id=DEMO_USER_1_ID,
+            status=FriendshipStatus.PENDING,
+        ),
+        # test-01 blocked test-05 (blocked relationship)
+        Friendship(
+            requester_id=DEMO_USER_1_ID,
+            addressee_id=DEMO_USER_5_ID,
+            status=FriendshipStatus.BLOCKED,
+        ),
+    ]
+
+
 def seed_database() -> None:
     """Reset demo data and insert a consistent sample dataset using SQLModel models."""
     with Session(engine) as session:
         session.exec(delete(SteamRollingTime))
         session.exec(delete(Shelving))
+        session.exec(delete(Friendship))
         session.exec(delete(Game))
         session.exec(delete(User))
         session.exec(delete(Config))
@@ -210,6 +240,8 @@ def seed_database() -> None:
             session.add(shelving)
         for rolling_time in _rolling_times():
             session.add(rolling_time)
+        for friendship in _friendships():
+            session.add(friendship)
 
         from datetime import UTC, datetime, timedelta
 

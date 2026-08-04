@@ -1,4 +1,4 @@
-from .schemas import SteamRollingTimeCreate, SteamRollingTimeRead, UserCreate, UserRead, UserUpdate
+from .schemas import SteamRollingTimeCreate, SteamRollingTimeRead, UserCreate, UserRead, UserUpdate, UserSearchResult
 from .shelving import ShelvingCreate, ShelvingRead, ShelvingStatusUpdate
 
 __all__ = [
@@ -10,4 +10,5 @@ __all__ = [
     "UserCreate",
     "UserRead",
     "UserUpdate",
+    "UserSearchResult",
 ]
