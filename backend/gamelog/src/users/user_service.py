@@ -111,10 +111,21 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
                     detail="You are already friends with this user",
                 )
             case FriendshipStatus.BLOCKED:
-                raise HTTPException(
-                    status_code=403,
-                    detail="Cannot send a friend request to this user",
-                )
+                if existing.requester_id == requester.id:
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Cannot send a friend request to this user",
+                    )
+                blocked_user_id = friendship.requester_id
+                friendship.requester_id = addressee.id
+                friendship.addressee_id = blocked_user_id
+                existing.status = FriendshipStatus.PENDING
+                existing.updated_at = datetime.now()
+                session.add(existing)
+                session.commit()
+                session.refresh(existing)
+                return {"message": "Friend request sent", "friendship_id": str(existing.id)}
+
 
     friendship = Friendship(
         requester_id=requester.id,
@@ -145,12 +156,14 @@ def respond_to_friend_request(
     if friendship.requester_id != addressee.id and friendship.addressee_id != addressee.id:
         raise HTTPException(status_code=403, detail="You are not part of this friendship")
 
+    if friendship.status != FriendshipStatus.PENDING:
+        raise HTTPException(
+            status_code=400, detail="Friend request is not pending"
+        )
+
     match action:
         case FriendshipResponseStatus.ACCEPTED:
-            if friendship.status != FriendshipStatus.PENDING:
-                raise HTTPException(
-                    status_code=400, detail="Friend request is not pending"
-                )
+
             if friendship.addressee_id != addressee.id:
                 raise HTTPException(
                     status_code=400,
@@ -163,15 +176,21 @@ def respond_to_friend_request(
             return {"message": "Friend request accepted"}
 
         case FriendshipResponseStatus.REJECTED:
-            if friendship.status != FriendshipStatus.PENDING:
+            if friendship.addressee_id != addressee.id:
                 raise HTTPException(
-                    status_code=400, detail="Friend request is not pending"
+                    status_code=400,
+                    detail="Only the addressee can reject a friend request",
                 )
             session.delete(friendship)
             session.commit()
             return {"message": "Friend request rejected"}
 
         case FriendshipResponseStatus.BLOCKED:
+            if friendship.addressee_id != addressee.id:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Only the addressee can block a friend request",
+                )
             friendship.status = FriendshipStatus.BLOCKED
             friendship.updated_at = datetime.now()
             session.add(friendship)
@@ -180,4 +199,3 @@ def respond_to_friend_request(
 
         case _:
             raise HTTPException(status_code=400, detail="Invalid action")
-
