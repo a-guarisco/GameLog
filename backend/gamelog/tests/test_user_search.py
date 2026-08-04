@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from src.models import User, Friendship, FriendshipStatus
-from src.users.schemas import FrienshipStatus
+from src.users.schemas import FriendshipStatus
 from tests.conftest import make_user
 
 
@@ -94,15 +94,15 @@ class TestUserSearch:
         assert results["user_none"]["friendship"]["friendship_requester_id"] is None
 
         # Sent request
-        assert results["user_sent"]["friendship"]["friendship_status"] == FrienshipStatus.PENDING_OUTGOING.value
+        assert results["user_sent"]["friendship"]["friendship_status"] == FriendshipStatus.PENDING_OUTGOING.value
         assert results["user_sent"]["friendship"]["friendship_requester_id"] == str(me.id)
 
         # Received request
-        assert results["user_rec"]["friendship"]["friendship_status"] == FrienshipStatus.PENDING_INCOMING.value
+        assert results["user_rec"]["friendship"]["friendship_status"] == FriendshipStatus.PENDING_INCOMING.value
         assert results["user_rec"]["friendship"]["friendship_requester_id"] == str(received_user.id)
 
         # Accepted friend
-        assert results["user_friend"]["friendship"]["friendship_status"] == FrienshipStatus.ACCEPTED.value
+        assert results["user_friend"]["friendship"]["friendship_status"] == FriendshipStatus.ACCEPTED.value
 
         # Blocked
-        assert results["user_blocked"]["friendship"]["friendship_status"] == FrienshipStatus.BLOCKED.value
+        assert results["user_blocked"]["friendship"]["friendship_status"] == FriendshipStatus.BLOCKED.value

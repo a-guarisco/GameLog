@@ -36,7 +36,7 @@ class SteamRollingTimeRead(SteamRollingTimeBase):
 
 
 #region Friendship
-class FrienshipStatus(str, Enum):
+class FriendshipStatus(str, Enum):
     PENDING_OUTGOING = "pending_outgoing"
     PENDING_INCOMING = "pending_incoming"
     ACCEPTED = "accepted"
@@ -44,7 +44,7 @@ class FrienshipStatus(str, Enum):
 
 class FriendshipInfo(BaseModel):
     friendship_id: FriendshipBase.model_fields["id"].annotation | None = None
-    friendship_status: FrienshipStatus | None = None
+    friendship_status: FriendshipStatus | None = None
     friendship_requester_id: uuid.UUID | None = None
 
 class UserSearchResult(BaseModel):

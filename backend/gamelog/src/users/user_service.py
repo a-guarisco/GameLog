@@ -1,12 +1,12 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import HTTPException
 from sqlmodel import Session, select, or_
 
 from src.models import User, Friendship, FriendshipStatus
 from src.users import UserRead, UserSearchResult, FriendshipInfo
-from src.users.schemas import FrienshipStatus, FriendshipResponseStatus
+from src.users.schemas import FriendshipStatus as APIFriendshipStatus, FriendshipResponseStatus
 
 """
 Fetch the db in order to return a UserRead from a given firebase uuid
@@ -30,13 +30,7 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
 
     statement = (
         select(User, Friendship)
-        .outerjoin(
-            Friendship,
-            or_(
-                (Friendship.requester_id == current_user.id) & (Friendship.addressee_id == User.id),
-                (Friendship.addressee_id == current_user.id) & (Friendship.requester_id == User.id)
-            )
-        )
+        .outerjoin(Friendship, _friendship_between_clause(current_user.id, User.id))
         .where(
             User.username.ilike(f"%{query}%"),
             User.id != current_user.id
@@ -46,36 +40,43 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
 
     search_results = []
     for user, friendship in results:
-        friendship_status = None
-
-        if friendship:
-            match friendship.status:
-                case FriendshipStatus.ACCEPTED:
-                    friendship_status = FrienshipStatus.ACCEPTED
-
-                case FriendshipStatus.BLOCKED:
-                    friendship_status = FrienshipStatus.BLOCKED
-
-                case FriendshipStatus.PENDING:
-                    friendship_status = (
-                        FrienshipStatus.PENDING_OUTGOING
-                        if friendship.requester_id == current_user.id
-                        else FrienshipStatus.PENDING_INCOMING
-                    )
-                case _:
-                    friendship_status = None
 
         search_results.append(
             UserSearchResult(
                 user=UserRead.model_validate(user),
                 friendship=FriendshipInfo(
                     friendship_id=friendship.id if friendship else None,
-                    friendship_status=friendship_status,
+                    friendship_status=_resolve_friendship_status(friendship, current_user.id) if friendship else None,
                     friendship_requester_id=friendship.requester_id if friendship else None,
                 )
             )
         )
     return search_results
+
+
+def _resolve_friendship_status(friendship: Friendship | None, current_user_id: uuid.UUID) -> APIFriendshipStatus | None:
+    if not friendship:
+        return None
+    match friendship.status:
+        case FriendshipStatus.ACCEPTED:
+            return APIFriendshipStatus.ACCEPTED
+        case FriendshipStatus.BLOCKED:
+            return APIFriendshipStatus.BLOCKED
+        case FriendshipStatus.PENDING:
+            return (
+                APIFriendshipStatus.PENDING_OUTGOING
+                if friendship.requester_id == current_user_id
+                else APIFriendshipStatus.PENDING_INCOMING
+            )
+        case _:
+            return None
+
+
+def _friendship_between_clause(user_a_id, user_b_id):
+    return or_(
+        (Friendship.requester_id == user_a_id) & (Friendship.addressee_id == user_b_id),
+        (Friendship.addressee_id == user_a_id) & (Friendship.requester_id == user_b_id),
+    )
 
 
 """
@@ -91,12 +92,7 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
         raise HTTPException(status_code=404, detail="Addressee user not found")
 
     existing = session.exec(
-        select(Friendship).where(
-            or_(
-                (Friendship.requester_id == requester.id) & (Friendship.addressee_id == addressee_id),
-                (Friendship.requester_id == addressee_id) & (Friendship.addressee_id == requester.id),
-            )
-        )
+        select(Friendship).where(_friendship_between_clause(requester.id, addressee_id))
     ).first()
     if existing:
         match existing.status:
@@ -116,16 +112,8 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
                         status_code=403,
                         detail="Cannot send a friend request to this user",
                     )
-                blocked_user_id = friendship.requester_id
-                friendship.requester_id = addressee.id
-                friendship.addressee_id = blocked_user_id
-                existing.status = FriendshipStatus.PENDING
-                existing.updated_at = datetime.now()
-                session.add(existing)
-                session.commit()
-                session.refresh(existing)
-                return {"message": "Friend request sent", "friendship_id": str(existing.id)}
-
+                else:
+                    _delete_friendship(session, existing.id)
 
     friendship = Friendship(
         requester_id=requester.id,
@@ -139,7 +127,7 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
 
 
 """
-Respond to a friend request (accepted, rejected, or blocked).
+Respond to a friend request (ACCEPTED, BLOCKED, or REJECTED).
 """
 def respond_to_friend_request(
     session: Session,
@@ -153,49 +141,38 @@ def respond_to_friend_request(
     if not friendship:
         raise HTTPException(status_code=404, detail="Friend request not found")
 
-    if friendship.requester_id != addressee.id and friendship.addressee_id != addressee.id:
-        raise HTTPException(status_code=403, detail="You are not part of this friendship")
-
     if friendship.status != FriendshipStatus.PENDING:
-        raise HTTPException(
-            status_code=400, detail="Friend request is not pending"
-        )
+        raise HTTPException(status_code=400, detail="Friend request is not pending")
+
+    if friendship.addressee_id != addressee.id:
+        raise HTTPException(status_code=400, detail="Only the addressee can respond to a friend request")
 
     match action:
         case FriendshipResponseStatus.ACCEPTED:
-
-            if friendship.addressee_id != addressee.id:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Only the addressee can accept a friend request",
-                )
             friendship.status = FriendshipStatus.ACCEPTED
-            friendship.updated_at = datetime.now()
+            friendship.updated_at = datetime.now(timezone.utc)
             session.add(friendship)
             session.commit()
             return {"message": "Friend request accepted"}
 
         case FriendshipResponseStatus.REJECTED:
-            if friendship.addressee_id != addressee.id:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Only the addressee can reject a friend request",
-                )
-            session.delete(friendship)
-            session.commit()
+            _delete_friendship(session, friendship.id)
             return {"message": "Friend request rejected"}
 
         case FriendshipResponseStatus.BLOCKED:
-            if friendship.addressee_id != addressee.id:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Only the addressee can block a friend request",
-                )
             friendship.status = FriendshipStatus.BLOCKED
-            friendship.updated_at = datetime.now()
+            friendship.updated_at = datetime.now(timezone.utc)
             session.add(friendship)
             session.commit()
             return {"message": "User blocked"}
 
         case _:
             raise HTTPException(status_code=400, detail="Invalid action")
+
+
+def _delete_friendship(session: Session, friendship_id: uuid.UUID):
+    friendship = session.get(Friendship, friendship_id)
+    if not friendship:
+        raise HTTPException(status_code=500, detail="Friendship to be deleted not found")
+    session.delete(friendship)
+    session.commit()
