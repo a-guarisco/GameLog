@@ -12,6 +12,7 @@ router = APIRouter(prefix="/games", tags=["games"])
 @router.get(
     "/playtime_by_user",
     summary="Returns the user's total playtime for each day, summed across all games played on that day. Default on days=-1 to get all history.",
+    status_code=200,
 )
 def get_weekly_playtime(
     days: int = -1,
@@ -24,6 +25,7 @@ def get_weekly_playtime(
 @router.get(
     "/playtime_by_game",
     summary="Returns the user's daily playtime for the specified game. Default on days=-1 to get all history.",
+    status_code=200
 )
 def get_weekly_playtime_by_game(
     steam_app_id: str,
@@ -36,6 +38,7 @@ def get_weekly_playtime_by_game(
 @router.get(
     "/streak_by_user",
     summary="Returns the user's current streak of consecutive days played, computed across all games",
+    status_code=200
 )
 def get_streak_by_user(
     auth_user: AuthenticatedUser = Depends(get_current_user),
@@ -45,7 +48,8 @@ def get_streak_by_user(
 
 @router.get(
     "/streak_by_game",
-    summary="Returns the user's current streak of consecutive days played for the specified game"
+    summary="Returns the user's current streak of consecutive days played for the specified game",
+    status_code=200
 )
 def get_streak_by_game(
         steam_app_id: str,

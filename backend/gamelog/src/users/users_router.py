@@ -8,11 +8,10 @@ from src.users import user_service, UserSearchResult, FriendshipRequest, Friends
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-"""
-Search users by username (case-insensitive) and return their basic info 
-along with their relationship status with the current authenticated user.
-"""
-@router.get("/search", response_model=list[UserSearchResult], status_code=200)
+@router.get("/search",
+            response_model=list[UserSearchResult],
+            summary="Search users by username (case-insensitive) and return their basic info along with their relationship status with the current authenticated user.",
+            status_code=200)
 def search_users(
     q: str,
     auth_user: AuthenticatedUser = Depends(get_current_user),
@@ -20,7 +19,9 @@ def search_users(
 ):
     return user_service.search_users_by_username(db, q, auth_user.uid)
 
-@router.post("/add_friend", status_code=201)
+@router.post("/add_friend",
+             summary="Send a friend request to another user. The addressee_id must be the UUID of the user you want to send a friend request to.",
+             status_code=201)
 def add_friend(
         payload: FriendshipRequest,
         db: Session = Depends(get_db),
@@ -28,7 +29,9 @@ def add_friend(
 ):
     return user_service.send_friend_request(db, auth_user.uid, payload.addressee_id)
 
-@router.post("/respond_to_friend", status_code=200)
+@router.post("/respond_to_friend",
+             summary="Respond to a pending friend request. Action can be ACCEPTED, BLOCKED, or REJECTED. A REJECTED friendship request can be resent by the sender, a BLOCKED friendship request blocks further requests.",
+             status_code=201)
 def response_friend(
         payload: FriendshipResponse,
         db: Session = Depends(get_db),
