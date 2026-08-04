@@ -19,6 +19,7 @@ def search_users(
 ):
     return user_service.search_users_by_username(db, q, auth_user.uid)
 
+
 @router.get("/friend_list",
             summary="Return a list of pending_incoming and accepted friendship",
             status_code = 200
@@ -30,7 +31,6 @@ def get_friend_list(
     return user_service.get_friend_list(db, auth_user.uid)
 
 
-
 @router.post("/add_friend",
              summary="Send a friend request to another user. The addressee_id must be the UUID of the user you want to send a friend request to.",
              status_code=201)
@@ -40,6 +40,7 @@ def add_friend(
         auth_user: AuthenticatedUser = Depends(get_current_user)
 ):
     return user_service.send_friend_request(db, auth_user.uid, payload.addressee_id)
+
 
 @router.post("/respond_to_friend",
              summary="Respond to a pending friend request. Action can be ACCEPTED, BLOCKED, or REJECTED. A REJECTED friendship request can be resent by the sender, a BLOCKED friendship request blocks further requests.",

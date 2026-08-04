@@ -84,13 +84,12 @@ async def _scheduler_loop():
         traceback.print_exc()
 
 
-"""
-If no dev option is set (make up), then the scheduler will run on startup to catch up any missed updates since the last update.
-"""
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    If no dev option is set (make up), then the scheduler will run on startup to catch up any missed updates since the last update.
+    """
     print("Lifespan starting...", flush=True)
     settings = get_settings()
     task = None
