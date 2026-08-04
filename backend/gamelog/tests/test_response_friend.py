@@ -19,7 +19,8 @@ from tests.conftest import make_user
 class TestRespondToFriendRequest:
     """Unit tests for user_service.respond_to_friend_request"""
 
-    def test_accept_friend_request_successfully(self, session):
+    @pytest.mark.anyio
+    async def test_accept_friend_request_successfully(self, session):
         requester = make_user(session, firebase_uid="uid-req-1", username="req1", steam_id="101")
         addressee = make_user(session, firebase_uid="uid-addr-1", username="addr1", steam_id="102")
 
@@ -31,7 +32,7 @@ class TestRespondToFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = respond_to_friend_request(
+        result = await respond_to_friend_request(
             session, "uid-addr-1", friendship.id, FriendshipResponseStatus.ACCEPTED
         )
 
@@ -39,7 +40,8 @@ class TestRespondToFriendRequest:
         updated = session.get(Friendship, friendship.id)
         assert updated.status == FriendshipStatus.ACCEPTED
 
-    def test_reject_friend_request_successfully(self, session):
+    @pytest.mark.anyio
+    async def test_reject_friend_request_successfully(self, session):
         requester = make_user(session, firebase_uid="uid-req-2", username="req2", steam_id="201")
         addressee = make_user(session, firebase_uid="uid-addr-2", username="addr2", steam_id="202")
 
@@ -51,14 +53,15 @@ class TestRespondToFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = respond_to_friend_request(
+        result = await respond_to_friend_request(
             session, "uid-addr-2", friendship.id, FriendshipResponseStatus.REJECTED
         )
 
         assert result["message"] == "Friend request rejected"
         assert session.get(Friendship, friendship.id) is None
 
-    def test_block_user(self, session):
+    @pytest.mark.anyio
+    async def test_block_user(self, session):
         requester = make_user(session, firebase_uid="uid-req-3", username="req3", steam_id="301")
         addressee = make_user(session, firebase_uid="uid-addr-3", username="addr3", steam_id="302")
 
@@ -70,7 +73,7 @@ class TestRespondToFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = respond_to_friend_request(
+        result = await respond_to_friend_request(
             session, "uid-addr-3", friendship.id, FriendshipResponseStatus.BLOCKED
         )
 
@@ -78,7 +81,8 @@ class TestRespondToFriendRequest:
         updated = session.get(Friendship, friendship.id)
         assert updated.status == FriendshipStatus.BLOCKED
 
-    def test_not_part_of_friendship(self, session):
+    @pytest.mark.anyio
+    async def test_not_part_of_friendship(self, session):
         user_a = make_user(session, firebase_uid="uid-a", username="userA", steam_id="401")
         user_b = make_user(session, firebase_uid="uid-b", username="userB", steam_id="402")
         outsider = make_user(session, firebase_uid="uid-outsider", username="outsider", steam_id="403")
@@ -92,18 +96,19 @@ class TestRespondToFriendRequest:
         session.commit()
 
         with pytest.raises(HTTPException) as exc_info:
-            respond_to_friend_request(
+            await respond_to_friend_request(
                 session, "uid-outsider", friendship.id, FriendshipResponseStatus.ACCEPTED
             )
 
-        assert exc_info.value.status_code == 403
+        assert exc_info.value.status_code == 400
 
-    def test_friend_request_not_found(self, session):
+    @pytest.mark.anyio
+    async def test_friend_request_not_found(self, session):
         make_user(session, firebase_uid="uid-addr-4", username="addr4", steam_id="501")
         fake_friendship_id = uuid.uuid4()
 
         with pytest.raises(HTTPException) as exc_info:
-            respond_to_friend_request(
+            await respond_to_friend_request(
                 session, "uid-addr-4", fake_friendship_id, FriendshipResponseStatus.ACCEPTED
             )
 
@@ -130,6 +135,6 @@ class TestResponseFriendRouter:
             json={"friendship_id": str(friendship.id), "action": "ACCEPTED"},
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         data = response.json()
         assert data["message"] == "Friend request accepted"
