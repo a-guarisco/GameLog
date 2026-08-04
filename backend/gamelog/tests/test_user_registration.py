@@ -8,7 +8,9 @@ from src.models import User
 
 
 def test_register_user_success(client: TestClient, session: Session):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid", email="newuser@test.com")
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="new-firebase-uid", email="newuser@test.com", email_verified=True
+    )
     payload = {
         "username": "new_user_1",
         "steam_id": "76561198999000001",
@@ -25,6 +27,22 @@ def test_register_user_success(client: TestClient, session: Session):
     assert "id" in data
 
 
+def test_register_user_unverified_email_raises_403(client: TestClient, session: Session):
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="unverified-uid", email="unverified@test.com", email_verified=False
+    )
+    payload = {
+        "username": "unverified_user",
+        "steam_id": "76561198999000099",
+        "steam_api_key": "",
+    }
+
+    response = client.post("/users/register", json=payload)
+
+    assert response.status_code == 403
+    assert "Email is not verified" in response.json()["detail"]
+
+
 def test_register_user_duplicate_username(client: TestClient, session: Session):
     existing_user = User(
         firebase_uid="uid-existing-1",
@@ -35,7 +53,9 @@ def test_register_user_duplicate_username(client: TestClient, session: Session):
     session.add(existing_user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="brand-new-uid", email="another@test.com")
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="brand-new-uid", email="another@test.com", email_verified=True
+    )
     payload = {
         "username": "taken_username",
         "steam_id": "76561198999000003",
@@ -58,7 +78,9 @@ def test_register_user_duplicate_steam_id(client: TestClient, session: Session):
     session.add(existing_user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="brand-new-uid-2", email="user3@test.com")
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="brand-new-uid-2", email="user3@test.com", email_verified=True
+    )
     payload = {
         "username": "user_3",
         "steam_id": "76561198999000002",
@@ -81,7 +103,9 @@ def test_register_user_already_registered_firebase_uid(client: TestClient, sessi
     session.add(existing_user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="uid-already-reg", email="reg@test.com")
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="uid-already-reg", email="reg@test.com", email_verified=True
+    )
     payload = {
         "username": "different_username",
         "steam_id": "76561198999000011",
@@ -92,6 +116,18 @@ def test_register_user_already_registered_firebase_uid(client: TestClient, sessi
 
     assert response.status_code == 409
     assert "Firebase user is already registered" in response.json()["detail"]
+
+
+def test_register_user_missing_required_fields_raises_422(client: TestClient):
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="valid-uid", email="valid@test.com", email_verified=True
+    )
+    # Missing steam_id
+    payload = {"username": "incomplete_user"}
+
+    response = client.post("/users/register", json=payload)
+
+    assert response.status_code == 422
 
 
 def test_register_user_requires_auth(client: TestClient):
@@ -111,10 +147,22 @@ def test_get_current_user_profile_success(client: TestClient, session: Session):
     session.add(user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="uid-profile-test", email="profile@test.com")
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="uid-profile-test", email="profile@test.com", email_verified=True
+    )
     response = client.get("/users/me")
 
     assert response.status_code == 200
     data = response.json()
     assert data["username"] == "profile_user"
     assert data["firebase_uid"] == "uid-profile-test"
+
+
+def test_get_current_user_profile_not_registered_raises_404(client: TestClient):
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
+        uid="unregistered-firebase-uid", email="unregistered@test.com", email_verified=True
+    )
+    response = client.get("/users/me")
+
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
