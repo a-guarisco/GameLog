@@ -7,6 +7,7 @@ from src.auth.schemas import AuthenticatedUser
 from src.core.scheduler import lifespan
 from src.core.settings import get_settings
 from src.games.games_router import router as games_router
+from src.users.users_router import router as users_router
 
 settings = get_settings()
 initialize_firebase_app(settings)
@@ -14,6 +15,7 @@ initialize_firebase_app(settings)
 app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
 app.include_router(achievements_router)
 app.include_router(games_router)
+app.include_router(users_router)
 
 
 @app.get("/hello")
