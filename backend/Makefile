@@ -63,7 +63,7 @@ help:
 # ==============================================================================
 
 up:
-	$(COMPOSE) up -d
+	USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR) $(COMPOSE) up -d
 
 down:
 	$(COMPOSE) down
@@ -134,7 +134,7 @@ seed:
 	$(COMPOSE) exec gamelog uv run python -m src.core.seed
 
 seed-firebase:
-	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(ARGS)
+	@cd gamelog && USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR) uv run python ../scripts/seed_firebase_users.py $(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,) $(ARGS)
 
 # ==============================================================================
 # 🧪 TESTING & CODE QUALITY
