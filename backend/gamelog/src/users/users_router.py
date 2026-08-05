@@ -77,8 +77,8 @@ def register_user(
     response_model=UserRead,
     summary="Get current registered user profile",
 )
-def get_current_user_profile(
+async def get_current_user_profile(
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return user_service.get_user_by_firebase_uid(db, auth_user.uid)
+    return await user_service.get_user_by_firebase_uid(db, auth_user.uid)
