@@ -134,7 +134,7 @@ seed:
 	$(COMPOSE) exec gamelog uv run python -m src.core.seed
 
 seed-firebase:
-	@cd gamelog && USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR) uv run python ../scripts/seed_firebase_users.py $(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,) $(ARGS)
+	@cd gamelog && USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR) uv run python ../scripts/seed_firebase_users.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
 
 # ==============================================================================
 # 🧪 TESTING & CODE QUALITY
