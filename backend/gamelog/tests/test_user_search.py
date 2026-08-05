@@ -1,8 +1,7 @@
-import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from src.models import User, Friendship, FriendshipStatus
+from src.models import Friendship, FriendshipStatus
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
 from tests.conftest import make_user
 
@@ -12,6 +11,7 @@ class TestUserSearch:
 
     def test_requires_auth(self):
         from src.main import app as _app
+
         _app.dependency_overrides.clear()
 
         plain_client = TestClient(_app, raise_server_exceptions=False)
@@ -20,7 +20,7 @@ class TestUserSearch:
 
     def test_search_excludes_self(self, client, session: Session):
         # Current user (fake auth has uid="firebase-uid-1")
-        self_user = make_user(session, firebase_uid="firebase-uid-1", username="alice_self", steam_id="111")
+        make_user(session, firebase_uid="firebase-uid-1", username="alice_self", steam_id="111")
         # Other user
         other_user = make_user(session, firebase_uid="firebase-uid-2", username="alice_other", steam_id="222")
 
@@ -35,9 +35,9 @@ class TestUserSearch:
 
     def test_case_insensitive_and_partial_matching(self, client, session: Session):
         make_user(session, firebase_uid="firebase-uid-1", username="current_user", steam_id="111")
-        user1 = make_user(session, firebase_uid="firebase-uid-2", username="JohnDoe", steam_id="222")
-        user2 = make_user(session, firebase_uid="firebase-uid-3", username="johnny", steam_id="333")
-        user3 = make_user(session, firebase_uid="firebase-uid-4", username="steve", steam_id="444")
+        make_user(session, firebase_uid="firebase-uid-2", username="JohnDoe", steam_id="222")
+        make_user(session, firebase_uid="firebase-uid-3", username="johnny", steam_id="333")
+        make_user(session, firebase_uid="firebase-uid-4", username="steve", steam_id="444")
 
         # Search for "jOhn" (case-insensitive and partial match)
         response = client.get(self.ENDPOINT, params={"q": "jOhn"})
@@ -55,7 +55,7 @@ class TestUserSearch:
         me = make_user(session, firebase_uid="firebase-uid-1", username="me", steam_id="111")
 
         # No relationship
-        none_user = make_user(session, firebase_uid="uid-none", username="user_none", steam_id="222")
+        make_user(session, firebase_uid="uid-none", username="user_none", steam_id="222")
 
         # Request sent by current user
         sent_user = make_user(session, firebase_uid="uid-sent", username="user_sent", steam_id="333")

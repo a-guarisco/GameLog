@@ -85,7 +85,6 @@ async def _scheduler_loop():
         traceback.print_exc()
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """

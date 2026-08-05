@@ -5,9 +5,9 @@ from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
+    from src.models.friendship import Friendship
     from src.models.shelving import Shelving
     from src.models.steam_rolling_time import SteamRollingTime
-    from src.models.friendship import Friendship
 
 
 class UserBase(SQLModel):
@@ -28,14 +28,8 @@ class User(UserBase, table=True):
     steam_rolling_time: list["SteamRollingTime"] = Relationship(back_populates="user")
 
     sent_friendships: list["Friendship"] = Relationship(
-        sa_relationship_kwargs={
-            "primaryjoin": "User.id==Friendship.requester_id",
-            "back_populates": "requester"
-        }
+        sa_relationship_kwargs={"primaryjoin": "User.id==Friendship.requester_id", "back_populates": "requester"}
     )
     received_friendships: list["Friendship"] = Relationship(
-        sa_relationship_kwargs={
-            "primaryjoin": "User.id==Friendship.addressee_id",
-            "back_populates": "addressee"
-        }
+        sa_relationship_kwargs={"primaryjoin": "User.id==Friendship.addressee_id", "back_populates": "addressee"}
     )

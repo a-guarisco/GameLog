@@ -32,9 +32,7 @@ class TestRespondToFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = await respond_to_friend_request(
-            session, "uid-addr-1", friendship.id, FriendshipResponseStatus.ACCEPTED
-        )
+        result = await respond_to_friend_request(session, "uid-addr-1", friendship.id, FriendshipResponseStatus.ACCEPTED)
 
         assert result["message"] == "Friend request accepted"
         updated = session.get(Friendship, friendship.id)
@@ -53,9 +51,7 @@ class TestRespondToFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = await respond_to_friend_request(
-            session, "uid-addr-2", friendship.id, FriendshipResponseStatus.REJECTED
-        )
+        result = await respond_to_friend_request(session, "uid-addr-2", friendship.id, FriendshipResponseStatus.REJECTED)
 
         assert result["message"] == "Friend request rejected"
         assert session.get(Friendship, friendship.id) is None
@@ -73,9 +69,7 @@ class TestRespondToFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = await respond_to_friend_request(
-            session, "uid-addr-3", friendship.id, FriendshipResponseStatus.BLOCKED
-        )
+        result = await respond_to_friend_request(session, "uid-addr-3", friendship.id, FriendshipResponseStatus.BLOCKED)
 
         assert result["message"] == "User blocked"
         updated = session.get(Friendship, friendship.id)
@@ -85,7 +79,7 @@ class TestRespondToFriendRequest:
     async def test_not_part_of_friendship(self, session):
         user_a = make_user(session, firebase_uid="uid-a", username="userA", steam_id="401")
         user_b = make_user(session, firebase_uid="uid-b", username="userB", steam_id="402")
-        outsider = make_user(session, firebase_uid="uid-outsider", username="outsider", steam_id="403")
+        make_user(session, firebase_uid="uid-outsider", username="outsider", steam_id="403")
 
         friendship = Friendship(
             requester_id=user_a.id,
@@ -96,9 +90,7 @@ class TestRespondToFriendRequest:
         session.commit()
 
         with pytest.raises(HTTPException) as exc_info:
-            await respond_to_friend_request(
-                session, "uid-outsider", friendship.id, FriendshipResponseStatus.ACCEPTED
-            )
+            await respond_to_friend_request(session, "uid-outsider", friendship.id, FriendshipResponseStatus.ACCEPTED)
 
         assert exc_info.value.status_code == 400
 
@@ -108,9 +100,7 @@ class TestRespondToFriendRequest:
         fake_friendship_id = uuid.uuid4()
 
         with pytest.raises(HTTPException) as exc_info:
-            await respond_to_friend_request(
-                session, "uid-addr-4", fake_friendship_id, FriendshipResponseStatus.ACCEPTED
-            )
+            await respond_to_friend_request(session, "uid-addr-4", fake_friendship_id, FriendshipResponseStatus.ACCEPTED)
 
         assert exc_info.value.status_code == 404
 
