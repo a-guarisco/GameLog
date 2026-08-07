@@ -3,6 +3,8 @@
 # ==============================================================================
 
 # Emulator Toggle & Launcher Configuration
+
+
 # Usage examples:
 #   make dev-emulator                       (starts all processes in Local Emulator mode)
 #   make dev-emulator START_EMULATOR=false  (skips bg emulator launch, connects to external emulator)
@@ -11,8 +13,10 @@
 
 EMULATOR ?= true
 START_EMULATOR ?= true
+PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 
 USE_FIREBASE_EMULATOR := $(EMULATOR)
+
 EXPO_PUBLIC_USE_FIREBASE_EMULATOR := $(EMULATOR)
 
 export USE_FIREBASE_EMULATOR
@@ -50,20 +54,21 @@ help:
 # Full Monorepo Launchers (Unified Process Orchestration)
 # ------------------------------------------------------------------------------
 
+ifeq ($(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),)
 emulator-bg:
-	@if [ "$(USE_FIREBASE_EMULATOR)" = "true" ] || [ "$(USE_FIREBASE_EMULATOR)" = "1" ]; then \
-		if [ "$(START_EMULATOR)" = "false" ] || [ "$(START_EMULATOR)" = "0" ]; then \
-			echo "ℹ️  Firebase Auth Emulator auto-launch skipped (START_EMULATOR=false). Connecting to emulator on port 9099..."; \
-		elif ! nc -z 127.0.0.1 9099 2>/dev/null; then \
-			echo "🔥 Starting Firebase Auth Emulator in background..."; \
-			npx firebase emulators:start --only auth --project gamelog-40e10 --import=./emulator-data --export-on-exit=./emulator-data > /tmp/firebase-emulator.log 2>&1 & \
-			sleep 3; \
-		else \
-			echo "🔥 Firebase Auth Emulator is already running on port 9099"; \
-		fi; \
-	else \
-		echo "☁️ Firebase Auth Emulator is DISABLED (All processes forced to Cloud Firebase)"; \
-	fi
+	@echo "☁️ Firebase Auth Emulator is DISABLED (All processes forced to Cloud Firebase)"
+else ifneq ($(filter false 0 no,$(START_EMULATOR)),)
+emulator-bg:
+	@echo "ℹ️  Firebase Auth Emulator auto-launch skipped (START_EMULATOR=false). Connecting to emulator on port 9099..."
+else
+emulator-bg:
+	@$(PYTHON) -c "import socket, subprocess; s = socket.socket(); open = (s.connect_ex(('127.0.0.1', 9099)) == 0); s.close(); print('🔥 Firebase Auth Emulator is already running on port 9099') if open else (print('🔥 Starting Firebase Auth Emulator in background...'), subprocess.Popen(['npx', 'firebase', 'emulators:start', '--only', 'auth', '--project', 'gamelog-40e10', '--import=./emulator-data', '--export-on-exit=./emulator-data'], shell=True))"
+
+
+endif
+
+
+
 
 dev-init:
 	@$(MAKE) dev-init-internal EMULATOR=true
@@ -76,7 +81,8 @@ dev-init-internal: emulator-bg
 	@echo "🌱 [All Processes] Seeding PostgreSQL database..."
 	@make -C backend seed USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
-	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo start --go -c
+	@npm --prefix mobile-app run start:fresh
+
 
 dev-emulator:
 	@$(MAKE) dev-run EMULATOR=true
@@ -90,7 +96,7 @@ dev-run: emulator-bg
 	@echo "🔑 [All Processes] Seeding Firebase test accounts..."
 	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
-	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo start --go -c
+	@npm --prefix mobile-app run start:fresh
 
 # ------------------------------------------------------------------------------
 # Services & Lifecycle Shortcuts
@@ -115,7 +121,8 @@ seed-firebase:
 	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 
 dev-mobile:
-	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo start --go -c
+	@npm --prefix mobile-app run start:fresh
+
 
 # ------------------------------------------------------------------------------
 # Testing & Code Quality Shortcuts
