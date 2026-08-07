@@ -12,13 +12,18 @@ endif
 
 export RUN_SCHEDULER
 
-.PHONY: help prod up down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed seed-firebase db-shell db-clean db-snapshot db-restore
+.PHONY: help prod down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed seed-firebase test test-local lint db-shell db-clean db-snapshot db-restore
 
 prod:
 	@:
 
 help:
 	@echo "GameLog backend Docker commands"
+	@echo ""
+	@echo "Testing & Code Quality:"
+	@echo "  make test                - Run pytest test suite in Docker container"
+	@echo "  make test-local          - Run pytest test suite locally on host"
+	@echo "  make lint                - Run ruff linter and code formatter on local files"
 	@echo ""
 	@echo "Lifecycle:"
 	@echo "  make up                  - Start all services with background scheduler disabled (RUN_SCHEDULER=false)"
@@ -130,6 +135,19 @@ seed:
 
 seed-firebase:
 	@python3 scripts/seed_firebase_users.py $(ARGS)
+
+# ==============================================================================
+# 🧪 TESTING & CODE QUALITY
+# ==============================================================================
+
+test:
+	$(COMPOSE) exec -e RUN_SCHEDULER=false gamelog uv run --group dev python -m pytest
+
+test-local:
+	@cd gamelog && RUN_SCHEDULER=false uv run --group dev python -m pytest
+
+lint:
+	@cd gamelog && uv run --group dev ruff format . && uv run --group dev ruff check . --fix || true
 
 # ==============================================================================
 # 🛠️ DATABASE UTILITIES & SNAPSHOTS

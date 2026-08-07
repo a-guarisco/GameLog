@@ -174,7 +174,7 @@ def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], da
     daily_totals = defaultdict(int)
     earliest_date = None
 
-    for game_id, records in records_by_game.items():
+    for records in records_by_game.values():
         records.sort(key=lambda r: r.created_at)
 
         for i, record in enumerate(records):
@@ -230,4 +230,3 @@ def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str
         query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
 
     return session.exec(query.order_by(SteamRollingTime.created_at)).all()
-

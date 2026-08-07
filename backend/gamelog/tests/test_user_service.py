@@ -38,7 +38,7 @@ class TestGetUserByFirebaseUid:
 
     @pytest.mark.anyio
     async def test_returns_user_read_for_existing_user(self, session):
-        user = make_user(session, firebase_uid="uid-1", username="alice", steam_id="111")
+        make_user(session, firebase_uid="uid-1", username="alice", steam_id="111")
         result = await get_user_by_firebase_uid(session, "uid-1")
         assert isinstance(result, UserRead)
         assert result.firebase_uid == "uid-1"

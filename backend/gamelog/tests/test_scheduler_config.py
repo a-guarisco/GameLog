@@ -32,18 +32,24 @@ def test_settings_scheduler_disabled():
 @pytest.mark.anyio
 async def test_lifespan_scheduler_enabled():
     mock_settings = Settings(DATABASE_URL="sqlite:///:memory:", GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json", RUN_SCHEDULER="true")
-    with patch("src.core.scheduler.get_settings", return_value=mock_settings), patch("src.core.scheduler._scheduler_loop") as mock_loop:
-        with patch("src.core.scheduler.asyncio.create_task") as mock_create_task:
-            async with lifespan(None):
-                pass
-            mock_create_task.assert_called_once()
+    with (
+        patch("src.core.scheduler.get_settings", return_value=mock_settings),
+        patch("src.core.scheduler._scheduler_loop"),
+        patch("src.core.scheduler.asyncio.create_task") as mock_create_task,
+    ):
+        async with lifespan(None):
+            pass
+        mock_create_task.assert_called_once()
 
 
 @pytest.mark.anyio
 async def test_lifespan_scheduler_disabled():
     mock_settings = Settings(DATABASE_URL="sqlite:///:memory:", GOOGLE_APPLICATION_CREDENTIALS="/tmp/dummy.json", RUN_SCHEDULER="false")
-    with patch("src.core.scheduler.get_settings", return_value=mock_settings), patch("src.core.scheduler._scheduler_loop") as mock_loop:
-        with patch("src.core.scheduler.asyncio.create_task") as mock_create_task:
-            async with lifespan(None):
-                pass
-            mock_create_task.assert_not_called()
+    with (
+        patch("src.core.scheduler.get_settings", return_value=mock_settings),
+        patch("src.core.scheduler._scheduler_loop"),
+        patch("src.core.scheduler.asyncio.create_task") as mock_create_task,
+    ):
+        async with lifespan(None):
+            pass
+        mock_create_task.assert_not_called()
