@@ -22,16 +22,22 @@ EXPO_PUBLIC_USE_FIREBASE_EMULATOR := $(EMULATOR)
 export USE_FIREBASE_EMULATOR
 export EXPO_PUBLIC_USE_FIREBASE_EMULATOR
 
-.PHONY: help up down emulator emulator-bg seed-firebase test test-backend test-mobile lint lint-backend lint-mobile dev-mobile dev-init dev-cloud dev-emulator db-reset logs
+.PHONY: help up down emulator emulator-bg seed-firebase test test-backend test-mobile lint lint-backend lint-mobile dev-mobile dev-android-mobile dev-init dev-cloud dev-emulator dev-android dev-android-emulator dev-android-cloud dev-android-run db-reset logs
 
 help:
 	@echo "GameLog Monorepo Commands"
 	@echo ""
-	@echo "🚀 Full Environment Setup & Launch (All Processes):"
-	@echo "  make dev-emulator                   - Launch all processes in Firebase Emulator mode"
+	@echo "🚀 Full Environment Setup & Launch (Expo Go Mode):"
+	@echo "  make dev-emulator                   - Launch all processes (Expo Go + Firebase Emulator)"
 	@echo "  make dev-emulator START_EMULATOR=false - Launch all processes using external/manual emulator"
-	@echo "  make dev-cloud                      - Launch all processes in Cloud Firebase mode"
-	@echo "  make dev-init                       - Full DB reset & launch all processes with Emulator"
+	@echo "  make dev-cloud                      - Launch all processes (Expo Go + Cloud Firebase)"
+	@echo "  make dev-init                       - Full DB reset & launch all processes (Expo Go + Emulator)"
+	@echo ""
+	@echo "🤖 Full Environment Setup & Launch (Android Native Build / OAuth2 Mode):"
+	@echo "  make dev-android                    - Alias for dev-android-emulator"
+	@echo "  make dev-android-emulator           - Launch all processes (Android Native Build + Firebase Emulator)"
+	@echo "  make dev-android-cloud              - Launch all processes (Android Native Build + Cloud Firebase)"
+	@echo "  make dev-android-mobile             - Launch Android Native Build app only"
 	@echo ""
 	@echo "🛠️ Individual Services & Lifecycle:"
 	@echo "  make up                             - Start backend Docker services"
@@ -40,7 +46,7 @@ help:
 	@echo "  make db-reset                       - Reset PostgreSQL database & apply migrations"
 	@echo "  make emulator                       - Start local Firebase Auth Emulator in foreground"
 	@echo "  make seed-firebase                  - Seed test users in Firebase Auth and print Bearer Tokens"
-	@echo "  make dev-mobile                     - Start Expo Mobile App dev server"
+	@echo "  make dev-mobile                     - Start Expo Mobile App dev server (Expo Go)"
 	@echo ""
 	@echo "🧪 Testing & Code Quality:"
 	@echo "  make test                           - Run full test suite (Backend pytest + Mobile Jest)"
@@ -49,6 +55,7 @@ help:
 	@echo "  make lint                           - Run all linters (Backend ruff + Mobile Expo lint)"
 	@echo "  make lint-backend                   - Run backend ruff linter & formatter"
 	@echo "  make lint-mobile                    - Run mobile app Expo linter"
+
 
 # ------------------------------------------------------------------------------
 # Full Monorepo Launchers (Unified Process Orchestration)
@@ -98,6 +105,23 @@ dev-run: emulator-bg
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
 	@npm --prefix mobile-app run start:fresh
 
+dev-android: dev-android-emulator
+
+dev-android-emulator:
+	@$(MAKE) dev-android-run EMULATOR=true
+
+dev-android-cloud:
+	@$(MAKE) dev-android-run EMULATOR=false
+
+dev-android-run: emulator-bg
+	@echo "🔄 [Android Native Build] Starting backend services (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
+	@make -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	@echo "🔑 [Android Native Build] Seeding Firebase test accounts..."
+	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	@echo "📱 [Android Native Build] Launching Expo Native Android Build (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
+	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo run:android
+
+
 # ------------------------------------------------------------------------------
 # Services & Lifecycle Shortcuts
 # ------------------------------------------------------------------------------
@@ -122,6 +146,10 @@ seed-firebase:
 
 dev-mobile:
 	@npm --prefix mobile-app run start:fresh
+
+
+dev-android-mobile:
+	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo run:android
 
 
 # ------------------------------------------------------------------------------
