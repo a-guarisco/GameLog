@@ -1,7 +1,6 @@
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import AchievementItem from '@gamelog/game/AchievementItem';
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
@@ -10,6 +9,7 @@ import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import useAchievementsData from './useAchievementsData';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
+import AchievementsProgressBar from './AchievementsProgressBar';
 
 type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
@@ -58,17 +58,11 @@ const AchievementsListView = ({ route }: any) => {
               Achievements for {gameName}
             </Text>
 
-            <Box className="relative overflow-hidden rounded-lg bg-background-200 shadow-xl">
-              <Box
-                className="absolute top-0 left-0 h-full bg-success-500 opacity-15"
-                style={{ width: `${completionPercent}%` }}
-              />
-              <HStack className="h-10 items-center justify-center px-3 relative z-10">
-                <Text size="sm" className="font-bold">
-                  {unlockedCount} / {totalCount} unlocked · {completionPercent}%
-                </Text>
-              </HStack>
-            </Box>
+            <AchievementsProgressBar
+              unlockedCount={unlockedCount}
+              totalCount={totalCount}
+              completionPercent={completionPercent}
+            />
           </Box>
 
           <VStack className="mb-4 px-4 pt-4">
