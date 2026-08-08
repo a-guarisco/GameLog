@@ -88,7 +88,7 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
           errorMessage={`Auth test failed: ${errorMessage}${requestUrl ? ` (${requestUrl})` : ''}`}
         />
       ) : null}
-      <Text className="text-xs text-typography-300">
+      <Text className="text-xs text-typography-100">
         Uses active logged in Firebase session (persisted via AsyncStorage).
       </Text>
     </Box>

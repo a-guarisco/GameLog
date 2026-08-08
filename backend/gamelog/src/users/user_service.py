@@ -1,11 +1,11 @@
 import uuid
 from datetime import datetime, timezone
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlmodel import Session, select, or_
 from src.models import User, Friendship, FriendshipStatus
 from src.users import UserRead, UserSearchResult, FriendshipInfo
-from src.users.schemas import FriendshipStatus as APIFriendshipStatus, FriendshipResponseStatus
-
+from src.users.schemas import FriendshipStatus as APIFriendshipStatus, FriendshipResponseStatus, UserRead, UserRegisterRequest
+from src.auth.schemas import AuthenticatedUser
 
 async def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     """
@@ -20,6 +20,51 @@ async def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserR
         raise HTTPException(status_code=500, detail="User Steam ID not found")
 
     return UserRead.model_validate(user)
+
+
+def register_user(
+    session: Session,
+    auth_user: AuthenticatedUser,
+    register_data: UserRegisterRequest,
+) -> UserRead:
+    if not auth_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email is not verified. Please verify your email address before registering.",
+        )
+
+    existing_uid = session.exec(select(User).where(User.firebase_uid == auth_user.uid)).first()
+    if existing_uid:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Firebase user is already registered",
+        )
+
+    existing_username = session.exec(select(User).where(User.username == register_data.username)).first()
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username is already taken",
+        )
+
+    existing_steam = session.exec(select(User).where(User.steam_id == register_data.steam_id)).first()
+    if existing_steam:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Steam ID is already registered",
+        )
+
+    new_user = User(
+        firebase_uid=auth_user.uid,
+        username=register_data.username,
+        steam_id=register_data.steam_id,
+        steam_api_key=register_data.steam_api_key or "",
+    )
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+
+    return UserRead.model_validate(new_user)
 
 
 async def search_users_by_username(session: Session, query: str, current_user_uid: str) -> list[UserSearchResult]:

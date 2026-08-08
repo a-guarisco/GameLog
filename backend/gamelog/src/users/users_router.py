@@ -5,6 +5,9 @@ from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.users import user_service, UserSearchResult, FriendshipRequest, FriendshipResponse
+from fastapi import APIRouter, Depends, status
+from sqlmodel import Session
+from src.users.schemas import UserRead, UserRegisterRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -53,3 +56,29 @@ async def response_friend(
     return await user_service.respond_to_friend_request(
         db, auth_user.uid, payload.friendship_id, payload.action
     )
+
+
+@router.post(
+    "/register",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserRead,
+    summary="Register a new user in PostgreSQL linked to their Firebase Auth UID",
+)
+def register_user(
+    register_data: UserRegisterRequest,
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return user_service.register_user(db, auth_user, register_data)
+
+
+@router.get(
+    "/me",
+    response_model=UserRead,
+    summary="Get current registered user profile",
+)
+async def get_current_user_profile(
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return await user_service.get_user_by_firebase_uid(db, auth_user.uid)

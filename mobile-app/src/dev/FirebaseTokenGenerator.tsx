@@ -60,7 +60,7 @@ export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProp
             <ButtonText>{showToken ? 'Hide Token' : 'Show Token'}</ButtonText>
           </Button>
           {showToken ? (
-            <Text className="break-all text-xs text-typography-500">{idToken}</Text>
+            <Text className="break-all text-xs font-mono text-typography-100">{idToken}</Text>
           ) : null}
         </>
       ) : null}

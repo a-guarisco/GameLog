@@ -23,30 +23,34 @@ const getStableHash = (value: string | undefined): string => {
   return `hash:${((hash2 >>> 0).toString(16) + (hash1 >>> 0).toString(16)).padStart(16, '0')}`;
 };
 
-const envInfoRows = [
-  {
-    label: 'EXPO_PUBLIC_API_PROVIDER',
-    value: process.env.EXPO_PUBLIC_API_PROVIDER ?? 'steam',
-  },
-  {
-    label: 'EXPO_PUBLIC_BACKEND_BASE_URL',
-    value: process.env.EXPO_PUBLIC_BACKEND_BASE_URL ?? 'missing',
-  },
-  {
-    label: 'EXPO_PUBLIC_STEAM_API_KEY',
-    value: getStableHash(process.env.EXPO_PUBLIC_STEAM_API_KEY),
-  },
-];
+export const ExpoEnvInfo = () => {
+  const envObj = process.env || {};
+  const publicKeys = Object.keys(envObj).filter((key) => key.startsWith('EXPO_PUBLIC_'));
 
-export const ExpoEnvInfo = () => (
-  <Box className="gap-2">
-    <Box className="gap-2 bg-background-0 px-4 py-3">
-      {envInfoRows.map((row) => (
-        <Box key={row.label} className="gap-1">
-          <Text className="text-sm font-semibold text-typography-50">{row.label}</Text>
-          <Text className="text-sm text-typography-300">{row.value}</Text>
-        </Box>
-      ))}
+  const defaultKeys = [
+    'EXPO_PUBLIC_API_PROVIDER',
+    'EXPO_PUBLIC_BACKEND_BASE_URL',
+    'EXPO_PUBLIC_STEAM_API_KEY',
+  ];
+  const allKeys = Array.from(new Set([...defaultKeys, ...publicKeys])).sort();
+
+  return (
+    <Box className="gap-3">
+      {allKeys.map((key) => {
+        const rawValue = envObj[key];
+        const isSensitive =
+          key.includes('KEY') || key.includes('SECRET') || key.includes('PASSWORD');
+        const displayValue = isSensitive
+          ? getStableHash(rawValue)
+          : (rawValue ?? 'missing / undefined');
+
+        return (
+          <Box key={key} className="gap-0.5 pb-2 border-b border-outline-200/30 last:border-b-0">
+            <Text className="text-xs font-bold text-typography-0">{key}</Text>
+            <Text className="text-xs text-typography-100 font-mono">{displayValue}</Text>
+          </Box>
+        );
+      })}
     </Box>
-  </Box>
-);
+  );
+};

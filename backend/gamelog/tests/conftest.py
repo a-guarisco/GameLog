@@ -23,14 +23,15 @@ os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 os.environ.setdefault("RUN_SCHEDULER", "false")
 
+# ---------------------------------------------------------------------------
+# SQLite engine / session
+# ---------------------------------------------------------------------------
+from sqlalchemy.pool import StaticPool
+
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.main import app
 from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
-
-# ---------------------------------------------------------------------------
-# SQLite engine / session
-# ---------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="function")

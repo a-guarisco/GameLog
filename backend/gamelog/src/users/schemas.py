@@ -11,6 +11,12 @@ class UserCreate(UserBase):
     steam_api_key: str = Field(max_length=255)
 
 
+class UserRegisterRequest(SQLModel):
+    username: str = Field(min_length=3, max_length=100)
+    steam_id: str = Field(min_length=1, max_length=32)
+    steam_api_key: str | None = Field(default="", max_length=255)
+
+
 class UserRead(UserBase):
     id: uuid.UUID
 
