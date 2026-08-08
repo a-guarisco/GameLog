@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "799231800910-d8kpchdhqa5gguupammugor7i72r9b1j.apps.googleusercontent.com",
+          "client_id": "799231800910-blsh6mejt76hhp6eg6ktogd0mrub31uu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.gamelog.app",
@@ -22,7 +22,7 @@
           }
         },
         {
-          "client_id": "799231800910-ajjc418riuhph5ng7hko69qdifl418om.apps.googleusercontent.com",
+          "client_id": "799231800910-coul5brdbsfglpgj41n2nsufedt1ju5p.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -35,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "799231800910-ajjc418riuhph5ng7hko69qdifl418om.apps.googleusercontent.com",
+              "client_id": "799231800910-coul5brdbsfglpgj41n2nsufedt1ju5p.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
