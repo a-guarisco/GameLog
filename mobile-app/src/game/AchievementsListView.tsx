@@ -1,7 +1,5 @@
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
-import { useRef } from 'react';
-import { Animated, useWindowDimensions, View, useColorScheme } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Animated, useColorScheme } from 'react-native';
 import AchievementItem from '@gamelog/game/AchievementItem';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
@@ -11,12 +9,10 @@ import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 import HeaderGameImage from './HeaderGameImage';
 import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
-import { BlurView, BlurTargetView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
+import { BlurTargetView } from 'expo-blur';
 import useAchievementsData from './useAchievementsData';
-
-const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+import useTopNotchBlurOverlay from '@gamelog/common/useTopNotchBlurOverlay';
+import TopNotchBlurOverlay from '@gamelog/common/TopNotchBlurOverlay';
 
 type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
@@ -39,21 +35,9 @@ const AchievementsListView = ({ route }: any) => {
     error,
   } = useAchievementsData(gameID, playerID, globalAchievements);
 
-  const { height: screenHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
-  const bannerHeight = Math.max((screenHeight * 18) / 100, 140);
+  const { bannerHeight, insetsTop, notchBlurOpacity, onScroll, scrollBlurTargetRef } =
+    useTopNotchBlurOverlay();
 
-  const blurThreshold = bannerHeight - insets.top;
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const notchBlurOpacity = scrollY.interpolate({
-    inputRange: [Math.max(blurThreshold - 40, 0), blurThreshold],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-
-  const scrollBlurTargetRef = useRef<View | null>(null);
-
-  
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameID);
   const secondaryText = streak > 0 ? `🔥 ${streak} day streak` : '0 day streak';
 
@@ -76,10 +60,7 @@ const AchievementsListView = ({ route }: any) => {
             paddingBottom: 24,
           }}
           scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false } // BlurView/BlurTargetView aren't native-driver friendly
-          )}
+          onScroll={onScroll}
         >
           <BannerInfo
             className="bg-background-100 shadow-xl"
@@ -123,37 +104,12 @@ const AchievementsListView = ({ route }: any) => {
         </Animated.ScrollView>
       </BlurTargetView>
 
-      <MaskedView
-        pointerEvents="none"
-        maskElement={
-          <LinearGradient
-            colors={['black', 'black', 'transparent']}
-            locations={[0, 0.65, 1]}
-            style={{ flex: 1 }}
-          />
-        }
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: insets.top + 16,
-          zIndex: 50,
-          elevation: 50,
-        }}
-      >
-        <AnimatedBlurView
-          blurTarget={scrollBlurTargetRef}
-          blurMethod="dimezisBlurView"
-          pointerEvents="none"
-          intensity={10}
-          tint={isDark ? 'dark' : 'light'}
-          style={{
-            flex: 1,
-            opacity: notchBlurOpacity,
-          }}
-        />
-      </MaskedView>
+      <TopNotchBlurOverlay
+        blurTargetRef={scrollBlurTargetRef}
+        height={insetsTop}
+        opacity={notchBlurOpacity}
+        isDark={isDark}
+      />
     </Box>
   );
 };
