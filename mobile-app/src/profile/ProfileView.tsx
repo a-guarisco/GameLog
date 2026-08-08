@@ -1,6 +1,4 @@
 import { useMemo } from 'react';
-import { Animated, useColorScheme } from 'react-native';
-import { BlurTargetView } from 'expo-blur';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox } from '@gamelog/common/feedbacks/LoadingBox';
 import {
@@ -15,8 +13,7 @@ import BannerInfo from '@gamelog/common/BannerInfo';
 import ProfileStats from './ProfileStats';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
-import useTopNotchBlurOverlay from '@gamelog/common/useTopNotchBlurOverlay';
-import TopNotchBlurOverlay from '@gamelog/common/TopNotchBlurOverlay';
+import ScrollablePage from '@gamelog/common/ScrollablePage';
 
 const USER_ID = '76561198077919169';
 const TEMP_APPID = '236390';
@@ -28,10 +25,6 @@ const ProfileView = () => {
   const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
   const isLoading = isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo;
   const player = playersInfo?.response?.players?.[0];
-
-  const isDark = useColorScheme() === 'dark';
-  const { bannerHeight, insetsTop, notchBlurOpacity, onScroll, scrollBlurTargetRef } =
-    useTopNotchBlurOverlay();
 
   const chartComponents = useMemo(
     () => [
@@ -84,35 +77,17 @@ const ProfileView = () => {
   return (
     <Box className="flex-1 relative">
       <HeaderGameImage appid={TEMP_APPID} />
-
-      <BlurTargetView ref={scrollBlurTargetRef} className="absolute inset-0 z-40">
-        <Animated.ScrollView
-          contentContainerStyle={{
-            paddingTop: bannerHeight,
-            paddingHorizontal: 0,
-            paddingBottom: 24,
-          }}
-          scrollEventThrottle={16}
-          onScroll={onScroll}
-        >
-          {chartComponents.map((item) => (
-            <Box
-              key={item.key}
-              style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}
-              className="bg-background-100"
-            >
-              {item}
-            </Box>
-          ))}
-        </Animated.ScrollView>
-      </BlurTargetView>
-
-      <TopNotchBlurOverlay
-        blurTargetRef={scrollBlurTargetRef}
-        height={insetsTop}
-        opacity={notchBlurOpacity}
-        isDark={isDark}
-      />
+      <ScrollablePage>
+        {chartComponents.map((item) => (
+          <Box
+            key={item.key}
+            style={{ width: '100%', alignItems: 'center' }}
+            className="bg-background-100"
+          >
+            {item}
+          </Box>
+        ))}
+      </ScrollablePage>
     </Box>
   );
 };
