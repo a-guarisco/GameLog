@@ -20,7 +20,6 @@ const GameView = () => {
 
   const { bannerHeight, insetsTop, notchBlurOpacity, onScroll, scrollBlurTargetRef } =
     useTopNotchBlurOverlay(MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO);
-  console.log(gameItem);
   return (
     <Box className="flex-1 relative">
       <HeaderGameImage appid={gameItem.appid} />

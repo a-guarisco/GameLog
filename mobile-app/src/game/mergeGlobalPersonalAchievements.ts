@@ -28,6 +28,6 @@ const mergeGlobalPersonalAchievements = (
       if (!!a.unlockTime !== !!b.unlockTime) return a.unlockTime ? -1 : 1;
       return a.percent - b.percent;
     });
-}
+};
 
 export default mergeGlobalPersonalAchievements;

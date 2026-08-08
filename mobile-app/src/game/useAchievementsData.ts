@@ -30,6 +30,6 @@ const useAchievementsData = (
     isLoading: isLoadingPlayerAchievement,
     error: errorPlayerAchievement,
   };
-}
+};
 
 export default useAchievementsData;
