@@ -12,6 +12,7 @@ import type {
   PlayerStats,
   RecentPlayedGames,
   SteamNews,
+  Streak,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
@@ -57,4 +58,7 @@ export default {
     fetchData<RecentPlayedGames>(EndPoints.getRecentPlayedGames(steamId, count)),
 
   getGameGenres: (appId: string) => fetchData<GameGenres>(EndPoints.getGameGenres(appId)),
+
+  getStreakByUser: () => fetchData<Streak>(EndPoints.getStreakByUser()),
+  getStreakByGame: (appId: string) => fetchData<Streak>(EndPoints.getStreakByGame(appId)),
 };

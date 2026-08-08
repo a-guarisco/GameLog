@@ -75,6 +75,14 @@ const EndPoints = {
     return `${STEAM_BASE_URL}ISteamUserStats/GetSchemaForGame/v2/?key=${getSteamApiKey()}&appid=${appId}`;
   },
 
+  getStreakByUser: () => {
+    return `${BACKEND_BASE_URL}/games/streak_by_user`;
+  },
+
+  getStreakByGame: (appId: string) => {
+    return `${BACKEND_BASE_URL}/games/streak_by_game?steam_app_id=${appId}`;
+  },
+
   getAuthOutcome: () => {
     return `${BACKEND_BASE_URL}/me`;
   },

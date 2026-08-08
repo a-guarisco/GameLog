@@ -58,6 +58,28 @@ export const useGetPlayersInfo = (steamIds: string[]) => {
   };
 };
 
+export const useGetGameStreak = (gameID: string) => {
+  const fetchFunc = useCallback(() => ApiManager.getStreakByGame(gameID), [gameID]);
+
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return {
+    gameStreak: data,
+    isLoadingGameStreak: isLoading,
+    errorGameStreak: error,
+  };
+};
+
+export const useGetUserStreak = () => {
+  const fetchFunc = useCallback(() => ApiManager.getStreakByUser(), []);
+
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return {
+    userStreak: data,
+    isLoadingUserStreak: isLoading,
+    errorUserStreak: error,
+  };
+};
+
 export const useGetGameGenreChartData = (
   userId: string,
   includeSub: boolean,
