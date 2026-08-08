@@ -1,5 +1,5 @@
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { Animated, useWindowDimensions, View, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AchievementItem from '@gamelog/game/AchievementItem';
@@ -8,13 +8,13 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
-import { useGetPlayerAchievementsPerApp } from '@gamelog/api-manager/useApi';
-import GameBanner from './GameBanner';
+import HeaderGameImage from './HeaderGameImage';
 import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { BlurView, BlurTargetView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
+import useAchievementsData from './useAchievementsData';
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
@@ -25,12 +25,19 @@ type AchievementsListViewProps = {
 };
 
 const AchievementsListView = ({ route }: any) => {
-  const isDark = useColorScheme() === 'dark';
-
   const { globalAchievements, gameID, playerID } = route.params as AchievementsListViewProps;
+  const streak = 19;
 
-  const { personalAchievements, isLoadingPlayerAchievement, errorPlayerAchievement } =
-    useGetPlayerAchievementsPerApp(gameID, playerID);
+  const isDark = useColorScheme() === 'dark';
+  const {
+    mergedAchievements,
+    unlockedCount,
+    totalCount,
+    completionPercent,
+    gameName,
+    isLoading,
+    error,
+  } = useAchievementsData(gameID, playerID, globalAchievements);
 
   const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -46,51 +53,20 @@ const AchievementsListView = ({ route }: any) => {
 
   const scrollBlurTargetRef = useRef<View | null>(null);
 
-  const mergedAchievements = useMemo(() => {
-    if (!isLoadingPlayerAchievement && !globalAchievements?.achievementpercentages?.achievements) {
-      return [];
-    }
-    const personalList = personalAchievements?.playerstats?.achievements || [];
-    const personalMap = new Map(personalList.map((ach) => [ach.apiname, ach]));
-
-    return globalAchievements.achievementpercentages.achievements
-      .map((globalAch) => {
-        const personalAch = personalMap.get(globalAch.name);
-        const isUnlocked = personalAch?.achieved === 1;
-
-        return {
-          name: globalAch.name,
-          displayName: globalAch.displayName,
-          percent: globalAch.percent,
-          description: globalAch.description,
-          unlockTime: isUnlocked ? personalAch.unlocktime : undefined,
-        };
-      })
-      .sort((a, b) => {
-        if (!!a.unlockTime !== !!b.unlockTime) return a.unlockTime ? -1 : 1;
-        return a.percent - b.percent;
-      });
-  }, [globalAchievements, personalAchievements, isLoadingPlayerAchievement]);
-
-  const streak = 19;
-  const unlockedCount = mergedAchievements.filter((a) => a.unlockTime).length;
-  const totalCount = mergedAchievements.length;
-  const completionPercent = totalCount ? Math.round((unlockedCount / totalCount) * 100) : 0;
-  const gameName = personalAchievements?.playerstats?.gameName ?? 'Unknown Game';
+  
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameID);
-  const gameHeaderImage = steamAssetUrls.getGameHeaderImage(gameID);
   const secondaryText = streak > 0 ? `🔥 ${streak} day streak` : '0 day streak';
 
-  return isLoadingPlayerAchievement ? (
+  return isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
-  ) : errorPlayerAchievement ? (
+  ) : error ? (
     <ErrorBox
       className="flex-1"
       errorMessage="Failed to load achievements, please try again later."
     />
   ) : (
     <Box className="flex-1 relative">
-      <GameBanner appid={gameID} title={gameName} streak={0} />
+      <HeaderGameImage appid={gameID} />
 
       <BlurTargetView ref={scrollBlurTargetRef} className="absolute inset-0 z-40">
         <Animated.ScrollView
