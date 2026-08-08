@@ -90,7 +90,7 @@ class TestSendFriendRequest:
 
     @pytest.mark.anyio
     async def test_duplicate_pending_same_direction(self, session):
-        requester = make_user(session, firebase_uid="uid-dup-req", username="dupreq", steam_id="500")
+        make_user(session, firebase_uid="uid-dup-req", username="dupreq", steam_id="500")
         addressee = make_user(session, firebase_uid="uid-dup-addr", username="dupaddr", steam_id="600")
 
         # First request succeeds
@@ -222,7 +222,7 @@ class TestAddFriendRouter:
 
     def test_add_friend_via_router(self, client, session):
         # The client fixture uses firebase-uid-1 as the auth user
-        requester = make_user(session, firebase_uid="firebase-uid-1", username="authed", steam_id="2000")
+        make_user(session, firebase_uid="firebase-uid-1", username="authed", steam_id="2000")
         addressee = make_user(session, firebase_uid="uid-router-addr", username="routeraddr", steam_id="2100")
 
         response = client.post("/users/add_friend", json={"addressee_id": str(addressee.id)})

@@ -37,7 +37,7 @@ from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 @pytest.fixture(scope="function")
 def engine():
     """Fresh in-memory SQLite engine for each test."""
-    from sqlalchemy.pool import StaticPool
+
     _engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},

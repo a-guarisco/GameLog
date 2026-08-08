@@ -28,7 +28,7 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Config, Game, GameStatus, Shelving, SteamRollingTime, User, Friendship, FriendshipStatus
+from src.models import Config, Friendship, FriendshipStatus, Game, GameStatus, Shelving, SteamRollingTime, User
 
 # Fixed UUIDs for predictable database referencing in unit tests and manual API verification.
 DEMO_USER_1_ID = UUID("11111111-1111-1111-1111-111111111111")

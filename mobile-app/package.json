@@ -4,6 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start --go",
+    "start:fresh": "expo start --go -c",
     "start:steam": "cross-env EXPO_PUBLIC_API_PROVIDER=steam expo start --go",
     "start:backend": "cross-env EXPO_PUBLIC_API_PROVIDER=backend expo start --go",
     "android": "expo run:android",

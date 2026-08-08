@@ -13,6 +13,7 @@ class TestFriendList:
 
     def test_requires_auth(self):
         from src.main import app as _app
+
         _app.dependency_overrides.clear()
 
         plain_client = TestClient(_app, raise_server_exceptions=False)

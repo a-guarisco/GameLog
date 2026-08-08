@@ -12,6 +12,7 @@ from src.games import game_service
 from src.models import User
 from src.models.config import Config
 
+
 async def _run_daily_job_async() -> None:
     print("Running midnight cronjob", flush=True)
     with Session(engine) as session:
@@ -25,7 +26,7 @@ async def _run_daily_job_async() -> None:
                 async def _process_user(user_db: User) -> None:
                     try:
                         await game_service.update_user_shelving_steamrolling_async(session, user_db, client=client)
-                    except Exception as user_err:  # noqa: BLE001
+                    except Exception as user_err:
                         print(f"Error processing user {user_db.username}: {user_err}", flush=True)
 
                 await asyncio.gather(*[_process_user(u) for u in users])
@@ -82,7 +83,6 @@ async def _scheduler_loop():
 
         print(f"ERROR in scheduler loop: {e}", flush=True)
         traceback.print_exc()
-
 
 
 @asynccontextmanager

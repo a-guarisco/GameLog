@@ -102,10 +102,12 @@ def setup_firebase_app(use_emulator: bool):
 
 
 def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = False, force_emulator: bool = False):
-    use_emulator = False
-    if force_emulator:
+    env_emulator = os.environ.get("USE_FIREBASE_EMULATOR", "").lower() in ("true", "1", "yes")
+    env_cloud = os.environ.get("USE_FIREBASE_EMULATOR", "").lower() in ("false", "0", "no")
+
+    if force_emulator or env_emulator:
         use_emulator = True
-    elif force_cloud:
+    elif force_cloud or env_cloud:
         use_emulator = False
     else:
         use_emulator = is_emulator_running()

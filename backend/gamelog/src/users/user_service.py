@@ -1,11 +1,15 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from fastapi import HTTPException, status
-from sqlmodel import Session, select, or_
-from src.models import User, Friendship, FriendshipStatus
-from src.users import UserRead, UserSearchResult, FriendshipInfo
-from src.users.schemas import FriendshipStatus as APIFriendshipStatus, FriendshipResponseStatus, UserRead, UserRegisterRequest
+from sqlmodel import Session, or_, select
+
 from src.auth.schemas import AuthenticatedUser
+from src.models import Friendship, FriendshipStatus, User
+from src.users import FriendshipInfo, UserSearchResult
+from src.users.schemas import FriendshipResponseStatus, UserRead, UserRegisterRequest
+from src.users.schemas import FriendshipStatus as APIFriendshipStatus
+
 
 async def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     """
@@ -75,16 +79,12 @@ async def search_users_by_username(session: Session, query: str, current_user_ui
     statement = (
         select(User, Friendship)
         .outerjoin(Friendship, _friendship_between_clause(current_user.id, User.id))
-        .where(
-            User.username.ilike(f"%{query}%"),
-            User.id != current_user.id
-        )
+        .where(User.username.ilike(f"%{query}%"), User.id != current_user.id)
     )
     results = session.exec(statement).all()
 
     search_results = []
     for user, friendship in results:
-
         search_results.append(
             UserSearchResult(
                 user=UserRead.model_validate(user),
@@ -92,11 +92,10 @@ async def search_users_by_username(session: Session, query: str, current_user_ui
                     friendship_id=friendship.id if friendship else None,
                     friendship_status=_resolve_friendship_status(friendship, current_user.id) if friendship else None,
                     friendship_requester_id=friendship.requester_id if friendship else None,
-                )
+                ),
             )
         )
     return search_results
-
 
 
 async def get_friend_list(session: Session, user_uid: str) -> list[UserSearchResult]:
@@ -111,7 +110,7 @@ async def get_friend_list(session: Session, user_uid: str) -> list[UserSearchRes
             User.id != current_user.id,
             or_(
                 Friendship.status == FriendshipStatus.ACCEPTED,
-                (Friendship.status == FriendshipStatus.PENDING) & (Friendship.addressee_id == current_user.id), #pending_incoming
+                (Friendship.status == FriendshipStatus.PENDING) & (Friendship.addressee_id == current_user.id),  # pending_incoming
             ),
         )
     )
@@ -141,11 +140,7 @@ def _resolve_friendship_status(friendship: Friendship | None, current_user_id: u
         case FriendshipStatus.BLOCKED:
             return APIFriendshipStatus.BLOCKED
         case FriendshipStatus.PENDING:
-            return (
-                APIFriendshipStatus.PENDING_OUTGOING
-                if friendship.requester_id == current_user_id
-                else APIFriendshipStatus.PENDING_INCOMING
-            )
+            return APIFriendshipStatus.PENDING_OUTGOING if friendship.requester_id == current_user_id else APIFriendshipStatus.PENDING_INCOMING
         case _:
             return None
 
@@ -169,9 +164,7 @@ async def send_friend_request(session: Session, requester_uid: str, addressee_id
     if not addressee:
         raise HTTPException(status_code=404, detail="Addressee user not found")
 
-    existing = session.exec(
-        select(Friendship).where(_friendship_between_clause(requester.id, addressee_id))
-    ).first()
+    existing = session.exec(select(Friendship).where(_friendship_between_clause(requester.id, addressee_id))).first()
     if existing:
         match existing.status:
             case FriendshipStatus.PENDING:
@@ -228,7 +221,7 @@ async def respond_to_friend_request(
     match action:
         case FriendshipResponseStatus.ACCEPTED:
             friendship.status = FriendshipStatus.ACCEPTED
-            friendship.updated_at = datetime.now(timezone.utc)
+            friendship.updated_at = datetime.now(UTC)
             session.add(friendship)
             session.commit()
             return {"message": "Friend request accepted"}
@@ -239,7 +232,7 @@ async def respond_to_friend_request(
 
         case FriendshipResponseStatus.BLOCKED:
             friendship.status = FriendshipStatus.BLOCKED
-            friendship.updated_at = datetime.now(timezone.utc)
+            friendship.updated_at = datetime.now(UTC)
             session.add(friendship)
             session.commit()
             return {"message": "User blocked"}

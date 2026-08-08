@@ -6,6 +6,13 @@ SERVICE ?=
 SNAPSHOT_DIR ?= postgres/snapshots
 RUN_SCHEDULER ?= false
 
+# Cross-platform Python resolver
+ifeq ($(OS),Windows_NT)
+  PYTHON ?= python
+else
+  PYTHON ?= python3
+endif
+
 ifneq ($(filter prod,$(MAKECMDGOALS)),)
   RUN_SCHEDULER = true
 endif
@@ -65,6 +72,7 @@ help:
 up:
 	$(COMPOSE) up -d
 
+
 down:
 	$(COMPOSE) down
 
@@ -105,7 +113,7 @@ setup: up migrate seed
 db-reset: db-clean migrate seed
 
 db-fresh-baseline:
-	@python3 -c "import sys; ans = input('⚠️  ATTENZIONE: Questo comando eliminerà TUTTE le migrazioni in alembic/versions/ e resetterà il DB! Continuare? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operazione annullata." && exit 1)
+	@$(PYTHON) -c "import sys; ans = input('⚠️  ATTENZIONE: Questo comando eliminerà TUTTE le migrazioni in alembic/versions/ e resetterà il DB! Continuare? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operazione annullata." && exit 1)
 	@echo "🗑️ Eliminazione vecchie migrazioni in alembic/versions/..."
 	rm -f gamelog/alembic/versions/*.py
 	$(MAKE) db-clean
@@ -134,7 +142,8 @@ seed:
 	$(COMPOSE) exec gamelog uv run python -m src.core.seed
 
 seed-firebase:
-	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(ARGS)
+	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
+
 
 # ==============================================================================
 # 🧪 TESTING & CODE QUALITY
@@ -144,10 +153,11 @@ test:
 	$(COMPOSE) exec -e RUN_SCHEDULER=false gamelog uv run --group dev python -m pytest
 
 test-local:
-	@cd gamelog && RUN_SCHEDULER=false uv run --group dev python -m pytest
+	@cd gamelog && uv run --group dev python -m pytest
 
 lint:
-	@cd gamelog && uv run --group dev ruff format . && uv run --group dev ruff check . --fix || true
+	-@cd gamelog && uv run --group dev ruff format .
+	-@cd gamelog && uv run --group dev ruff check . --fix
 
 # ==============================================================================
 # 🛠️ DATABASE UTILITIES & SNAPSHOTS
