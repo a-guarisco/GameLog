@@ -89,12 +89,12 @@ def setup_firebase_app(use_emulator: bool):
             firebase_admin.initialize_app(options={"projectId": "gamelog-40e10"})
     else:
         os.environ.pop("FIREBASE_AUTH_EMULATOR_HOST", None)
-        sa_key_path = os.environ.get(
-            "GOOGLE_APPLICATION_CREDENTIALS",
-            "/home/slaitroc/.config/gamelog/serviceAccountKey.json",
+        sa_key_path = (
+            os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH")
+            or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
         )
         if not firebase_admin._apps:
-            if os.path.exists(sa_key_path):
+            if sa_key_path and os.path.exists(sa_key_path):
                 cred = credentials.Certificate(sa_key_path)
                 firebase_admin.initialize_app(cred)
             else:
