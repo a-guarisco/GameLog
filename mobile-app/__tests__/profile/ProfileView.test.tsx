@@ -7,9 +7,27 @@ import {
 } from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi');
-jest.mock('@gamelog/profile/ProfileBanner', () => {
+
+jest.mock('@gamelog/game/HeaderGameImage', () => {
   const { View } = jest.requireActual('react-native');
-  return { __esModule: true, default: (props: any) => <View testID="profile-banner" {...props} /> };
+  return {
+    __esModule: true,
+    default: ({ appid }: any) => <View testID="profile-header-image" appid={appid} />,
+  };
+});
+
+jest.mock('@gamelog/common/BannerInfo', () => {
+  const { View, Text } = jest.requireActual('react-native');
+  return {
+    __esModule: true,
+    default: ({ title, secondaryText, iconUrl }: any) => (
+      <View testID="profile-banner">
+        <Text>{title}</Text>
+        <Text>{secondaryText}</Text>
+        <Text>{iconUrl}</Text>
+      </View>
+    ),
+  };
 });
 
 jest.mock('@gamelog/common/feedbacks/LoadingBox', () => {
@@ -120,6 +138,7 @@ describe('ProfileView', () => {
     render(<ProfileView />);
 
     expect(screen.queryByTestId('profile-loading-box')).toBeNull();
+    expect(screen.getByTestId('profile-header-image')).toBeTruthy();
     expect(screen.getByTestId('profile-banner')).toBeTruthy();
     expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
