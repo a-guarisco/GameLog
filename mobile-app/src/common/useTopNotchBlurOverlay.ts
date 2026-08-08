@@ -1,17 +1,15 @@
-import useGetBannerHeight from '@gamelog/utils/bannerUtils';
+import { useGetBannerHeight } from '@gamelog/utils/bannerUtils';
 import { useRef } from 'react';
 import { Animated, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const MIN_BANNER_HEIGHT = 140;
-const BANNER_HEIGHT_SCREEN_RATIO = 0.18;
 const BLUR_FADE_DISTANCE = 40;
 
-const useTopNotchBlurOverlay = () => {
+const useTopNotchBlurOverlay = (minBannerHeight: number, bannerHeightScreenRatio: number) => {
   const insets = useSafeAreaInsets();
   const scrollBlurTargetRef = useRef<View | null>(null);
 
-  const bannerHeight = useGetBannerHeight(MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO);
+  const bannerHeight = useGetBannerHeight(minBannerHeight, bannerHeightScreenRatio);
   const blurThreshold = bannerHeight - insets.top;
 
   const scrollY = useRef(new Animated.Value(0)).current;
