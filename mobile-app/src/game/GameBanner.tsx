@@ -24,4 +24,3 @@ export default function GameBanner({ appid, title, streak }: GameBannerProps) {
     </VStack>
   );
 }
-

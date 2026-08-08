@@ -14,10 +14,9 @@ import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { BlurView, BlurTargetView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import  MaskedView from '@react-native-masked-view/masked-view';
+import MaskedView from '@react-native-masked-view/masked-view';
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
-
 
 type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
@@ -106,7 +105,12 @@ const AchievementsListView = ({ route }: any) => {
             { useNativeDriver: false } // BlurView/BlurTargetView aren't native-driver friendly
           )}
         >
-          <BannerInfo className="bg-background-100 shadow-xl" title={gameName} iconUrl={gameCapsuleImage} secondaryText={secondaryText} />
+          <BannerInfo
+            className="bg-background-100 shadow-xl"
+            title={gameName}
+            iconUrl={gameCapsuleImage}
+            secondaryText={secondaryText}
+          />
 
           <Box className=" w-80% bg-background-100 shadow-xl pt-6">
             <Box className="mb-5 px-4">
@@ -143,38 +147,37 @@ const AchievementsListView = ({ route }: any) => {
         </Animated.ScrollView>
       </BlurTargetView>
 
-
-<MaskedView
-  pointerEvents="none"
-  maskElement={
-    <LinearGradient
-      colors={['black', 'black', 'transparent']}
-      locations={[0, 0.65, 1]}
-      style={{ flex: 1 }}
-    />
-  }
-  style={{
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: insets.top + 16,
-    zIndex: 50,
-    elevation: 50,
-  }}
->
-  <AnimatedBlurView
-    blurTarget={scrollBlurTargetRef}
-    blurMethod="dimezisBlurView"
-    pointerEvents="none"
-    intensity={10}
-    tint={isDark ? 'dark' : 'light'}
-    style={{
-      flex: 1,
-      opacity: notchBlurOpacity,
-    }}
-  />
-</MaskedView>
+      <MaskedView
+        pointerEvents="none"
+        maskElement={
+          <LinearGradient
+            colors={['black', 'black', 'transparent']}
+            locations={[0, 0.65, 1]}
+            style={{ flex: 1 }}
+          />
+        }
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top + 16,
+          zIndex: 50,
+          elevation: 50,
+        }}
+      >
+        <AnimatedBlurView
+          blurTarget={scrollBlurTargetRef}
+          blurMethod="dimezisBlurView"
+          pointerEvents="none"
+          intensity={10}
+          tint={isDark ? 'dark' : 'light'}
+          style={{
+            flex: 1,
+            opacity: notchBlurOpacity,
+          }}
+        />
+      </MaskedView>
     </Box>
   );
 };

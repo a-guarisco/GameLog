@@ -37,4 +37,3 @@ export default function Banner({ heightPercentage, minHeight, className, imageUr
     </Box>
   );
 }
-

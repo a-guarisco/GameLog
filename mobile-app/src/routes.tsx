@@ -42,13 +42,11 @@ export const GameListStack = createNativeStackNavigator({
     },
     Game: {
       screen: GameView,
-            options: { headerShown: false },
-
+      options: { headerShown: false },
     },
     AchievementsList: {
       screen: AchievementsListView,
-            options: { headerShown: false },
-
+      options: { headerShown: false },
     },
   },
 });

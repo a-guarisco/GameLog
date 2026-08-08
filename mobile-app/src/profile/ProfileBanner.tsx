@@ -45,11 +45,7 @@ export default function ProfileBanner({ userId, ownedGames, playersInfo }: Profi
     <Pressable onPress={openSteamProfile} className="w-full">
       <VStack className="w-full bg-background-100 rounded-b-2xl shadow-lg border-b border-outline-100 overflow-hidden">
         <Box className="overflow-hidden">
-          <Banner
-            imageUrl={gameHeaderImage}
-            minHeight={140}
-            heightPercentage={18}
-          />
+          <Banner imageUrl={gameHeaderImage} minHeight={140} heightPercentage={18} />
         </Box>
 
         <BannerInfo
@@ -61,4 +57,3 @@ export default function ProfileBanner({ userId, ownedGames, playersInfo }: Profi
     </Pressable>
   );
 }
-
