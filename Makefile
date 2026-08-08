@@ -119,7 +119,7 @@ dev-android-run: emulator-bg
 	@echo "🔑 [Android Native Build] Seeding Firebase test accounts..."
 	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 	@echo "📱 [Android Native Build] Launching Expo Native Android Build (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
-	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo run:android
+	@npm --prefix mobile-app run android
 
 
 # ------------------------------------------------------------------------------
@@ -149,7 +149,7 @@ dev-mobile:
 
 
 dev-android-mobile:
-	@cd mobile-app && EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR) npx expo run:android
+	@npm --prefix mobile-app run android
 
 
 # ------------------------------------------------------------------------------
