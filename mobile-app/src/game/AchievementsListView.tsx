@@ -7,6 +7,7 @@ import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 import HeaderGameImage from './HeaderGameImage';
 import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
+import { useGetGameStreak } from '@gamelog/api-manager/useApi';
 import useAchievementsData from './useAchievementsData';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import AchievementsProgressBar from './AchievementsProgressBar';
@@ -19,7 +20,8 @@ type AchievementsListViewProps = {
 
 const AchievementsListView = ({ route }: any) => {
   const { globalAchievements, gameID, playerID } = route.params as AchievementsListViewProps;
-  const streak = 19;
+  const { gameStreak, isLoadingGameStreak } = useGetGameStreak(gameID);
+  const streak = gameStreak?.streak ?? 0;
 
   const {
     mergedAchievements,
@@ -32,7 +34,11 @@ const AchievementsListView = ({ route }: any) => {
   } = useAchievementsData(gameID, playerID, globalAchievements);
 
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameID);
-  const secondaryText = streak > 0 ? `🔥 ${streak} day streak` : '0 day streak';
+  const secondaryText = isLoadingGameStreak
+    ? 'Loading streak...'
+    : streak > 0
+      ? `🔥 ${streak} day streak`
+      : '0 day streak';
 
   return isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
