@@ -1,7 +1,5 @@
 import uuid
-from http.client import HTTPException
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
