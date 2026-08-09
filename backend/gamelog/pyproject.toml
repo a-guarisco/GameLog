@@ -20,6 +20,7 @@ dev = [
     "httpx>=0.28.1",
     "pytest>=9.0.3",
     "ruff>=0.13.0",
+    "debugpy>=1.8.0",
 ]
 
 [tool.ruff]
@@ -39,6 +40,8 @@ search-path = ["."]
 
 [tool.pyright]
 pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
 executionEnvironments = [
   { root = "." }
 ]
