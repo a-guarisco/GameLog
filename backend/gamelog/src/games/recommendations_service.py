@@ -132,7 +132,6 @@ async def get_recommendations_of_steam(
 def include_top_games(
         common_games: list[RecommendationResponse],
         session: Session,
-        auth_user_uid: str | None = None
 ) -> list[RecommendationResponse]:
     if not common_games:
         top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc()).limit(10)).all()
@@ -156,24 +155,27 @@ def include_top_games(
         return common_games
 
     top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc())).all()
-    result_games = list(common_games)
-    added_count = 0
-
+    
+    candidates = []
     for tg in top_games:
-        if added_count >= 10:
-            break
         if tg.steam_app_id in common_app_ids:
             continue
         tg_genre_ids = {genre.id for genre in tg.genres}
-        if tg_genre_ids & computed_genre_ids:
-            result_games.append(
-                RecommendationResponse(
-                    gameSteamId=tg.steam_app_id,
-                    requester_play_time=0,
-                    friend_play_time=0,
-                )
+        intersection = tg_genre_ids & computed_genre_ids
+        if intersection:
+            candidates.append((len(intersection), tg))
+
+    candidates.sort(key=lambda item: (-item[0], item[1].rank))
+
+    result_games = list(common_games)
+    for _, tg in candidates[:10]:
+        result_games.append(
+            RecommendationResponse(
+                gameSteamId=tg.steam_app_id,
+                requester_play_time=0,
+                friend_play_time=0,
             )
-            added_count += 1
+        )
 
     return result_games
 

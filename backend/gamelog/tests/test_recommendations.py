@@ -280,7 +280,6 @@ class TestIncludeTopGames:
         recs = recommendations_service.include_top_games(
             common_games=[],
             session=session,
-            auth_user_uid="some-uid",
         )
 
         assert len(recs) == 2
@@ -341,7 +340,6 @@ class TestIncludeTopGames:
         recs = recommendations_service.include_top_games(
             common_games=common,
             session=session,
-            auth_user_uid="some-uid",
         )
 
         # Expected: common games first, then matching top games sorted by rank:
@@ -378,7 +376,6 @@ class TestIncludeTopGames:
         recs = recommendations_service.include_top_games(
             common_games=common,
             session=session,
-            auth_user_uid="some-uid",
         )
 
         # 1 common game + at most 10 top games = 11 games total
@@ -386,3 +383,56 @@ class TestIncludeTopGames:
         assert recs[0].gameSteamId == "101"
         for i in range(1, 11):
             assert recs[i].gameSteamId == f"20{i:02d}"
+
+    def test_include_top_games_prioritizes_multiple_genre_matches(self, session: Session):
+        from src.models import Genre
+        # Create genres
+        action = Genre(id="action", description="Action games")
+        shooter = Genre(id="shooter", description="Shooter games")
+        strategy = Genre(id="strategy", description="Strategy games")
+        session.add(action)
+        session.add(shooter)
+        session.add(strategy)
+        session.commit()
+
+        # Friend/Me has a game with action and shooter
+        game1 = Game(steam_app_id="101", genres=[action, shooter])
+        session.add(game1)
+        session.commit()
+
+        # Create top games:
+        # tg1 matches only 'strategy' (0 matches with action/shooter) -> skipped
+        tg1 = TopGame(steam_app_id="201", rank=1, genres=[strategy])
+        # tg2 matches 'action' (1 match) -> rank 2
+        tg2 = TopGame(steam_app_id="202", rank=2, genres=[action])
+        # tg3 matches 'action' and 'shooter' (2 matches) -> rank 3 (worse rank than tg2, but should be prioritized!)
+        tg3 = TopGame(steam_app_id="203", rank=3, genres=[action, shooter])
+        # tg4 matches 'shooter' (1 match) -> rank 4 (worse rank than tg2, but better than nothing)
+        tg4 = TopGame(steam_app_id="204", rank=4, genres=[shooter])
+        
+        session.add(tg1)
+        session.add(tg2)
+        session.add(tg3)
+        session.add(tg4)
+        session.commit()
+
+        common = [
+            RecommendationResponse(gameSteamId="101", requester_play_time=10, friend_play_time=20)
+        ]
+
+        recs = recommendations_service.include_top_games(
+            common_games=common,
+            session=session,
+        )
+
+        # Expected order:
+        # 1. Common game (101)
+        # 2. tg3 (2 matches, rank 3) -> gameSteamId="203"
+        # 3. tg2 (1 match, rank 2) -> gameSteamId="202"
+        # 4. tg4 (1 match, rank 4) -> gameSteamId="204"
+        # tg1 is skipped because it has 0 matches.
+        assert len(recs) == 4
+        assert recs[0].gameSteamId == "101"
+        assert recs[1].gameSteamId == "203"
+        assert recs[2].gameSteamId == "202"
+        assert recs[3].gameSteamId == "204"
