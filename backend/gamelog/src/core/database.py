@@ -56,6 +56,9 @@ def wait_for_db_and_migrate() -> None:
         alembic_cfg = Config(str(alembic_ini_path))
         alembic_cfg.set_main_option("script_location", str(alembic_dir_path))
         alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
+        # Prevent alembic's fileConfig() call in env.py from wiping out uvicorn's
+        # logging handlers (fileConfig disables existing loggers by default).
+        alembic_cfg.attributes["configure_logger"] = False
 
         command.upgrade(alembic_cfg, "head")
         print("Database migrations applied successfully.", flush=True)

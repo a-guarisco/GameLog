@@ -93,7 +93,10 @@ async def lifespan(app: FastAPI):
     print("Lifespan starting...", flush=True)
     
     # Ensure database is ready and migrated before starting any scheduler or serving requests
-    await asyncio.to_thread(wait_for_db_and_migrate)
+    # NOTE: Called directly (not via asyncio.to_thread) — Alembic's migration runner interacts
+    # badly with the thread pool and can silently prevent uvicorn from completing startup.
+    # The DB is guaranteed healthy at this point via Docker's depends_on healthcheck.
+    wait_for_db_and_migrate()
     
     settings = get_settings()
     task = None

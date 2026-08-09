@@ -13,7 +13,9 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-if config.config_file_name is not None:
+# When invoked programmatically at app startup, configure_logger is set to False
+# to prevent fileConfig from wiping out uvicorn's existing logging handlers.
+if config.config_file_name is not None and config.attributes.get("configure_logger", True):
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
