@@ -1,4 +1,5 @@
 import uuid
+from http.client import HTTPException
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
@@ -52,9 +53,20 @@ def get_streak_by_game(steam_app_id: str, auth_user: AuthenticatedUser = Depends
     "/recommendations",
     summary="Returns a list of recommended games for the user who made the request and the specified userID, sorted by combined play time",
     response_model=list[RecommendationResponse], status_code=200)
-def get_recommendations(
-        friend: uuid.UUID,
+async def get_recommendations(
+        friend: uuid.UUID | None = None,
+        steam_friend_id: str | None = None,
+        include_top_games: bool = False,
         auth_user: AuthenticatedUser = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
-    return recommendations_service.get_recommendations_of_friend(friend, db, auth_user.uid)
+    if friend is None and steam_friend_id is None:
+        raise HTTPException(status_code=400, detail="Either friend or steam_friend_id must be provided")
+    if friend is not None and steam_friend_id is not None:
+        raise HTTPException(status_code=400, detail="Only one of friend or steam_friend_id can be provided")
+
+    if friend is not None:
+        common_games = recommendations_service.get_recommendations_of_friend(friend, db, auth_user.uid)
+    else:
+        common_games = await recommendations_service.get_recommendations_of_steam(steam_friend_id, db, auth_user.uid)
+    return common_games

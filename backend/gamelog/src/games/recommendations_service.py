@@ -1,9 +1,54 @@
 from fastapi import HTTPException
 from src.users import user_service
 import uuid
+import httpx
 from sqlmodel import Session, select
 from src.games.schemas import RecommendationResponse
+from src.games import steam_fetcher_service
 from src.models import SteamRollingTime, User, Friendship, FriendshipStatus
+
+def _get_latest_rolling_times(user_id: uuid.UUID, session: Session) -> dict[str, SteamRollingTime]:
+    """
+    Retrieves the latest SteamRollingTime entries for a user from the DB.
+    """
+    rolling_records = session.exec(
+        select(SteamRollingTime)
+        .where(SteamRollingTime.user_id == user_id)
+        .order_by(SteamRollingTime.created_at.desc())
+    ).all()
+
+    latest = {}
+    for rolling in rolling_records:
+        if rolling.steam_app_id not in latest:
+            latest[rolling.steam_app_id] = rolling
+    return latest
+
+
+def _build_recommendation_responses(
+    auth_latest: dict[str, SteamRollingTime],
+    friend_playtimes: dict[str, int],
+) -> list[RecommendationResponse]:
+    common_games_playtime = {}
+    for app_id, auth_rec in auth_latest.items():
+        if app_id in friend_playtimes:
+            friend_time = friend_playtimes[app_id]
+            if auth_rec.last_day_playtime > 0 and friend_time > 0:
+                common_games_playtime[app_id] = auth_rec.last_day_playtime + friend_time
+
+    if not common_games_playtime:
+        return []
+
+    sorted_app_ids = sorted(common_games_playtime.keys(), key=lambda app_id: common_games_playtime[app_id], reverse=True)
+
+    return [
+        RecommendationResponse(
+            gameSteamId=app_id,
+            requester_play_time=auth_latest[app_id].last_day_playtime,
+            friend_play_time=friend_playtimes[app_id],
+        )
+        for app_id in sorted_app_ids
+    ]
+
 
 def get_recommendations_of_friend(
     friend_id: uuid.UUID,
@@ -39,45 +84,48 @@ def get_recommendations_of_friend(
             detail="Users are not friends or friendship request not accepted",
         )
 
-    auth_rolling = session.exec(
-        select(SteamRollingTime)
-        .where(SteamRollingTime.user_id == auth_user.id)
-        .order_by(SteamRollingTime.created_at.desc())
-    ).all()
+    auth_latest = _get_latest_rolling_times(auth_user.id, session)
+    friend_latest = _get_latest_rolling_times(friend_id, session)
 
-    friend_rolling = session.exec(
-        select(SteamRollingTime)
-        .where(SteamRollingTime.user_id == friend_id)
-        .order_by(SteamRollingTime.created_at.desc())
-    ).all()
+    friend_playtimes = {app_id: rec.last_day_playtime for app_id, rec in friend_latest.items()}
+    return _build_recommendation_responses(auth_latest, friend_playtimes)
 
-    auth_latest = {}
-    for rolling in auth_rolling:
-        if rolling.steam_app_id not in auth_latest:
-            auth_latest[rolling.steam_app_id] = rolling
 
-    friend_latest = {}
-    for rolling in friend_rolling:
-        if rolling.steam_app_id not in friend_latest:
-            friend_latest[rolling.steam_app_id] = rolling
+async def get_recommendations_of_steam(
+    steam_friend_id: str,
+    session: Session,
+    auth_user_uid: str,
+) -> list[RecommendationResponse]:
+    """
+    Returns a list of common games played by both auth_user and steam_friend_id,
+    sorted by combined playtime (descending).
+    """
+    user = session.exec(select(User).where(User.firebase_uid == auth_user_uid)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not user.steam_id:
+        raise HTTPException(status_code=500, detail="User Steam ID not found")
 
-    common_games_playtime = {}
-    for app_id, auth_rec in auth_latest.items():
-        if app_id in friend_latest:
-            friend_rec = friend_latest[app_id]
-            if auth_rec.last_day_playtime > 0 and friend_rec.last_day_playtime > 0:
-                common_games_playtime[app_id] = auth_rec.last_day_playtime + friend_rec.last_day_playtime
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        steam_friend_list = await steam_fetcher_service.get_friend_list_from_steam_async(user, client)
 
-    if not common_games_playtime:
-        return []
+        friend_found = None
+        for steam_friend in steam_friend_list.friends:
+            if steam_friend.steamid == steam_friend_id:
+                friend_found = steam_friend
+                break
+        if not friend_found:
+            raise HTTPException(status_code=404, detail="Friend not found on Steam")
 
-    sorted_app_ids = sorted(common_games_playtime.keys(), key=lambda app_id: common_games_playtime[app_id], reverse=True)
-
-    return [
-        RecommendationResponse(
-            gameSteamId=app_id,
-            requester_play_time=auth_latest[app_id].last_day_playtime,
-            friend_play_time=friend_latest[app_id].last_day_playtime,
+        friend_fake_user = User(
+            firebase_uid="dummy",
+            username="dummy",
+            steam_id=steam_friend_id,
+            steam_api_key=user.steam_api_key or "",
         )
-        for app_id in sorted_app_ids
-    ]
+        steam_friend_games_list = await steam_fetcher_service.get_owned_games_from_steam_async(friend_fake_user, client)
+
+    auth_latest = _get_latest_rolling_times(user.id, session)
+    friend_playtimes = {str(game.appid): game.playtime_forever for game in steam_friend_games_list.games}
+    return _build_recommendation_responses(auth_latest, friend_playtimes)
+
