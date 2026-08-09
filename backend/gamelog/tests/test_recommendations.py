@@ -5,16 +5,15 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from src.games import game_service
+from src.games import recommendations_service
 from src.models import Game, Friendship, FriendshipStatus, User
 from tests.conftest import make_user, make_game, make_rolling
 
 
 class TestRecommendationsService:
-    @pytest.mark.anyio
-    async def test_get_recommendations_auth_user_not_exist(self, session: Session):
+    def test_get_recommendations_auth_user_not_exist(self, session: Session):
         with pytest.raises(HTTPException) as exc_info:
-            await game_service.get_recommendations(
+            recommendations_service.get_recommendations_of_friend(
                 friend_id=uuid.uuid4(),
                 session=session,
                 auth_user_uid="non-existent",
@@ -22,11 +21,10 @@ class TestRecommendationsService:
         assert exc_info.value.status_code == 404
         assert "User not found" in exc_info.value.detail
 
-    @pytest.mark.anyio
-    async def test_get_recommendations_self(self, session: Session):
+    def test_get_recommendations_self(self, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-1", username="me", steam_id="steam-me")
         with pytest.raises(HTTPException) as exc_info:
-            await game_service.get_recommendations(
+            recommendations_service.get_recommendations_of_friend(
                 friend_id=me.id,
                 session=session,
                 auth_user_uid=me.firebase_uid,
@@ -34,11 +32,10 @@ class TestRecommendationsService:
         assert exc_info.value.status_code == 400
         assert "Cannot request recommendations with yourself" in exc_info.value.detail
 
-    @pytest.mark.anyio
-    async def test_get_recommendations_friend_not_exist(self, session: Session):
+    def test_get_recommendations_friend_not_exist(self, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-1", username="me", steam_id="steam-me")
         with pytest.raises(HTTPException) as exc_info:
-            await game_service.get_recommendations(
+            recommendations_service.get_recommendations_of_friend(
                 friend_id=uuid.uuid4(),
                 session=session,
                 auth_user_uid=me.firebase_uid,
@@ -46,13 +43,12 @@ class TestRecommendationsService:
         assert exc_info.value.status_code == 404
         assert "Friend not found" in exc_info.value.detail
 
-    @pytest.mark.anyio
-    async def test_get_recommendations_not_friends(self, session: Session):
+    def test_get_recommendations_not_friends(self, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-me", username="me", steam_id="steam-me")
         other = make_user(session, firebase_uid="firebase-uid-other", username="other", steam_id="steam-other")
         
         with pytest.raises(HTTPException) as exc_info:
-            await game_service.get_recommendations(
+            recommendations_service.get_recommendations_of_friend(
                 friend_id=other.id,
                 session=session,
                 auth_user_uid=me.firebase_uid,
@@ -60,8 +56,7 @@ class TestRecommendationsService:
         assert exc_info.value.status_code == 403
         assert "Users are not friends" in exc_info.value.detail
 
-    @pytest.mark.anyio
-    async def test_get_recommendations_pending_friendship(self, session: Session):
+    def test_get_recommendations_pending_friendship(self, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-me", username="me", steam_id="steam-me")
         other = make_user(session, firebase_uid="firebase-uid-other", username="other", steam_id="steam-other")
         
@@ -71,7 +66,7 @@ class TestRecommendationsService:
         session.commit()
 
         with pytest.raises(HTTPException) as exc_info:
-            await game_service.get_recommendations(
+            recommendations_service.get_recommendations_of_friend(
                 friend_id=other.id,
                 session=session,
                 auth_user_uid=me.firebase_uid,
@@ -79,8 +74,7 @@ class TestRecommendationsService:
         assert exc_info.value.status_code == 403
         assert "Users are not friends" in exc_info.value.detail
 
-    @pytest.mark.anyio
-    async def test_get_recommendations_success_and_sorting(self, session: Session):
+    def test_get_recommendations_success_and_sorting(self, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-me", username="me", steam_id="steam-me")
         friend = make_user(session, firebase_uid="firebase-uid-friend", username="friend", steam_id="steam-friend")
         
@@ -120,7 +114,7 @@ class TestRecommendationsService:
         # Game 104: Friend has None, so excluded
         # Expected order: Game 102 (350), Game 101 (250)
         
-        recs = await game_service.get_recommendations(
+        recs = recommendations_service.get_recommendations_of_friend(
             friend_id=friend.id,
             session=session,
             auth_user_uid=me.firebase_uid,

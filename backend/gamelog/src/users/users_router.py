@@ -16,13 +16,13 @@ router = APIRouter(prefix="/users", tags=["Users"])
     summary="Search users by username (case-insensitive) and return their basic info along with their relationship status with the current authenticated user.",
     status_code=200,
 )
-async def search_users(q: str, auth_user: AuthenticatedUser = Depends(get_current_user), db: Session = Depends(get_db)):
-    return await user_service.search_users_by_username(db, q, auth_user.uid)
+def search_users(q: str, auth_user: AuthenticatedUser = Depends(get_current_user), db: Session = Depends(get_db)):
+    return user_service.search_users_by_username(db, q, auth_user.uid)
 
 
 @router.get("/friend_list", summary="Return a list of pending_incoming and accepted friendship", status_code=200)
-async def get_friend_list(db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
-    return await user_service.get_friend_list(db, auth_user.uid)
+def get_friend_list(db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
+    return user_service.get_friend_list(db, auth_user.uid)
 
 
 @router.post(
@@ -30,8 +30,8 @@ async def get_friend_list(db: Session = Depends(get_db), auth_user: Authenticate
     summary="Send a friend request to another user. The addressee_id must be the UUID of the user you want to send a friend request to.",
     status_code=201,
 )
-async def add_friend(payload: FriendshipRequest, db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
-    return await user_service.send_friend_request(db, auth_user.uid, payload.addressee_id)
+def add_friend(payload: FriendshipRequest, db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
+    return user_service.send_friend_request(db, auth_user.uid, payload.addressee_id)
 
 
 @router.post(
@@ -39,8 +39,8 @@ async def add_friend(payload: FriendshipRequest, db: Session = Depends(get_db), 
     summary="Respond to a pending friend request. Action can be ACCEPTED, BLOCKED, or REJECTED. A REJECTED friendship request can be resent by the sender, a BLOCKED friendship request blocks further requests.",
     status_code=201,
 )
-async def response_friend(payload: FriendshipResponse, db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
-    return await user_service.respond_to_friend_request(db, auth_user.uid, payload.friendship_id, payload.action)
+def response_friend(payload: FriendshipResponse, db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
+    return user_service.respond_to_friend_request(db, auth_user.uid, payload.friendship_id, payload.action)
 
 
 @router.post(
@@ -62,8 +62,8 @@ def register_user(
     response_model=UserRead,
     summary="Get current registered user profile",
 )
-async def get_current_user_profile(
+def get_current_user_profile(
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return await user_service.get_user_by_firebase_uid(db, auth_user.uid)
+    return user_service.get_user_by_firebase_uid(db, auth_user.uid)

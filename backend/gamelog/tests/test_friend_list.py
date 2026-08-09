@@ -81,8 +81,7 @@ class TestFriendList:
         assert "blocked_user" not in results_by_name
         assert "unrelated_user" not in results_by_name
 
-    @pytest.mark.anyio
-    async def test_direct_service_call(self, session: Session):
+    def test_direct_service_call(self, session: Session):
         me = make_user(session, firebase_uid="direct-uid-1", username="direct_me", steam_id="888")
         other = make_user(session, firebase_uid="direct-uid-2", username="direct_other", steam_id="999")
 
@@ -91,7 +90,7 @@ class TestFriendList:
         session.add(f)
         session.commit()
 
-        results = await user_service.get_friend_list(session, "direct-uid-1")
+        results = user_service.get_friend_list(session, "direct-uid-1")
         assert len(results) == 1
         assert results[0].user.id == other.id
         assert results[0].friendship.friendship_status == APIFriendshipStatus.PENDING_INCOMING

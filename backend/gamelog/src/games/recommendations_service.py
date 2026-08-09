@@ -1,4 +1,5 @@
-﻿from src.users import user_service
+from fastapi import HTTPException
+from src.users import user_service
 import uuid
 from sqlmodel import Session, select
 from src.games.schemas import RecommendationResponse

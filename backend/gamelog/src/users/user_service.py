@@ -71,7 +71,7 @@ def register_user(
     return UserRead.model_validate(new_user)
 
 
-async def search_users_by_username(session: Session, query: str, current_user_uid: str) -> list[UserSearchResult]:
+def search_users_by_username(session: Session, query: str, current_user_uid: str) -> list[UserSearchResult]:
     """
     Fetch the db in order to return a list of UserSearchResult from a given query (can be a partial username) and the friendship status
     """
