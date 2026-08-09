@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
-from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
+from src.models import Game, GameStatus, Shelving, SteamRollingTime, User, Friendship, FriendshipStatus
 
 
 async def update_user_shelving_steamrolling_async(

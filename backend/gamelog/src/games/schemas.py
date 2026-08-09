@@ -57,3 +57,10 @@ Schema from the backend in response to streak_by_user or streak_by_game
 
 class Streak(BaseModel):
     streak: int
+
+
+class RecommendationResponse(BaseModel):
+    gameSteamId: str
+    requester_play_time: int
+    friend_play_time: int
+

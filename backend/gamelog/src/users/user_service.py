@@ -11,7 +11,7 @@ from src.users.schemas import FriendshipResponseStatus, UserRead, UserRegisterRe
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
 
 
-async def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
+def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     """
     Fetch the db in order to return a UserRead from a given firebase uuid
     """
@@ -75,7 +75,7 @@ async def search_users_by_username(session: Session, query: str, current_user_ui
     """
     Fetch the db in order to return a list of UserSearchResult from a given query (can be a partial username) and the friendship status
     """
-    current_user = await get_user_by_firebase_uid(session, current_user_uid)
+    current_user = get_user_by_firebase_uid(session, current_user_uid)
     statement = (
         select(User, Friendship)
         .outerjoin(Friendship, _friendship_between_clause(current_user.id, User.id))
@@ -98,11 +98,11 @@ async def search_users_by_username(session: Session, query: str, current_user_ui
     return search_results
 
 
-async def get_friend_list(session: Session, user_uid: str) -> list[UserSearchResult]:
+def get_friend_list(session: Session, user_uid: str) -> list[UserSearchResult]:
     """
     Return a list of Accepted and pending_incoming (friendship.addressee_id == current_user.id and friendship.status==PENDING) friendships for the current user
     """
-    current_user = await get_user_by_firebase_uid(session, user_uid)
+    current_user = get_user_by_firebase_uid(session, user_uid)
     statement = (
         select(User, Friendship)
         .join(Friendship, _friendship_between_clause(current_user.id, User.id))
@@ -152,11 +152,11 @@ def _friendship_between_clause(user_a_id, user_b_id):
     )
 
 
-async def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid.UUID):
+def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid.UUID):
     """
     Send a friend request from the authenticated user to the addressee.
     """
-    requester = await get_user_by_firebase_uid(session, requester_uid)
+    requester = get_user_by_firebase_uid(session, requester_uid)
     if requester.id == addressee_id:
         raise HTTPException(status_code=400, detail="You cannot send a friend request to yourself")
 
@@ -197,7 +197,7 @@ async def send_friend_request(session: Session, requester_uid: str, addressee_id
     return {"message": "Friend request sent", "friendship_id": str(friendship.id)}
 
 
-async def respond_to_friend_request(
+def respond_to_friend_request(
     session: Session,
     addressee_uid: str,
     friendship_id: uuid.UUID,
@@ -206,7 +206,7 @@ async def respond_to_friend_request(
     """
     Respond to a friend request (ACCEPTED, BLOCKED, or REJECTED).
     """
-    addressee = await get_user_by_firebase_uid(session, addressee_uid)
+    addressee = get_user_by_firebase_uid(session, addressee_uid)
 
     friendship = session.get(Friendship, friendship_id)
     if not friendship:

@@ -188,6 +188,44 @@ def _rolling_times() -> list[SteamRollingTime]:
             )
         )
 
+    # Seed Dota 2 (570) rolling playtime for test-01 (DEMO_USER_1_ID)
+    test01_dota_playtime = 700
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = day_offset == 14
+        if not is_baseline:
+            playtime_increment = [10, 15, 0, 20, 5, 0, 30, 0, 10, 0, 20, 25, 0, 10, 5][14 - day_offset]
+            test01_dota_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_1_ID,
+                steam_app_id="570",
+                last_day_playtime=test01_dota_playtime,
+                created_at=record_date,
+            )
+        )
+
+    # Seed CS2 (730) rolling playtime for test-02 (DEMO_USER_2_ID)
+    test02_cs2_playtime = 1100
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = day_offset == 14
+        if not is_baseline:
+            playtime_increment = [15, 20, 0, 30, 10, 0, 45, 5, 20, 0, 25, 35, 5, 40, 20][14 - day_offset]
+            test02_cs2_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_2_ID,
+                steam_app_id="730",
+                last_day_playtime=test02_cs2_playtime,
+                created_at=record_date,
+            )
+        )
+
     return records
 
 
