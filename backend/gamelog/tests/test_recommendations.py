@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from src.games import recommendations_service
-from src.models import Game, Friendship, FriendshipStatus, User
+from src.models import Game, Friendship, FriendshipStatus, User, TopGame
 from src.users.schemas import GetFriendListResponse, SteamFriend
-from src.games.schemas import GetOwnedGamesResponse, SteamGame
+from src.games.schemas import GetOwnedGamesResponse, SteamGame, RecommendationResponse
 from tests.conftest import make_user, make_game, make_rolling
 
 
@@ -266,3 +266,123 @@ class TestRecommendationsSteamService:
             assert recs[1].gameSteamId == "101"
             assert recs[1].requester_play_time == 100
             assert recs[1].friend_play_time == 150
+
+
+class TestIncludeTopGames:
+    def test_include_top_games_empty_common(self, session: Session):
+        # Create some top games
+        g1 = TopGame(steam_app_id="10", rank=2)
+        g2 = TopGame(steam_app_id="20", rank=1)
+        session.add(g1)
+        session.add(g2)
+        session.commit()
+
+        recs = recommendations_service.include_top_games(
+            common_games=[],
+            session=session,
+            auth_user_uid="some-uid",
+        )
+
+        assert len(recs) == 2
+        # Assert they are returned in rank order (rank 1 first, then rank 2)
+        assert recs[0].gameSteamId == "20"
+        assert recs[0].requester_play_time == 0
+        assert recs[0].friend_play_time == 0
+
+        assert recs[1].gameSteamId == "10"
+        assert recs[1].requester_play_time == 0
+        assert recs[1].friend_play_time == 0
+
+    def test_include_top_games_with_matching_genres(self, session: Session):
+        from src.models import Genre
+        # Create genres
+        action = Genre(id="action", description="Action games")
+        indie = Genre(id="indie", description="Indie games")
+        rpg = Genre(id="rpg", description="Roleplaying games")
+        session.add(action)
+        session.add(indie)
+        session.add(rpg)
+        session.commit()
+
+        # Create games in DB
+        game1 = Game(steam_app_id="101", genres=[action, indie])
+        game2 = Game(steam_app_id="102", genres=[rpg])
+        session.add(game1)
+        session.add(game2)
+        session.commit()
+
+        # Create top games
+        # Matches action: should be added
+        tg1 = TopGame(steam_app_id="201", rank=2, genres=[action])
+        # Already in common: should be skipped
+        tg2 = TopGame(steam_app_id="101", rank=1, genres=[action, indie])
+        # Matches rpg: should be added
+        tg3 = TopGame(steam_app_id="203", rank=3, genres=[rpg])
+        # Matches indie: should be added
+        tg4 = TopGame(steam_app_id="204", rank=4, genres=[indie])
+        # Doesn't match any computed genres: should be skipped
+        sports = Genre(id="sports", description="Sports games")
+        session.add(sports)
+        tg5 = TopGame(steam_app_id="205", rank=5, genres=[sports])
+        
+        session.add(tg1)
+        session.add(tg2)
+        session.add(tg3)
+        session.add(tg4)
+        session.add(tg5)
+        session.commit()
+
+        # Common games list (has 101 and 102)
+        common = [
+            RecommendationResponse(gameSteamId="101", requester_play_time=10, friend_play_time=20),
+            RecommendationResponse(gameSteamId="102", requester_play_time=30, friend_play_time=40),
+        ]
+
+        recs = recommendations_service.include_top_games(
+            common_games=common,
+            session=session,
+            auth_user_uid="some-uid",
+        )
+
+        # Expected: common games first, then matching top games sorted by rank:
+        # tg1 (rank 2), tg3 (rank 3), tg4 (rank 4).
+        # tg2 is skipped (already in common).
+        # tg5 is skipped (sports doesn't match action/indie/rpg).
+        assert len(recs) == 5
+        assert recs[0].gameSteamId == "101"
+        assert recs[1].gameSteamId == "102"
+        assert recs[2].gameSteamId == "201" # tg1
+        assert recs[3].gameSteamId == "203" # tg3
+        assert recs[4].gameSteamId == "204" # tg4
+
+    def test_include_top_games_limit_10(self, session: Session):
+        from src.models import Genre
+        action = Genre(id="action", description="Action games")
+        session.add(action)
+        session.commit()
+
+        game1 = Game(steam_app_id="101", genres=[action])
+        session.add(game1)
+        session.commit()
+
+        # Create 15 matching top games
+        for i in range(1, 16):
+            tg = TopGame(steam_app_id=f"20{i:02d}", rank=i, genres=[action])
+            session.add(tg)
+        session.commit()
+
+        common = [
+            RecommendationResponse(gameSteamId="101", requester_play_time=10, friend_play_time=20)
+        ]
+
+        recs = recommendations_service.include_top_games(
+            common_games=common,
+            session=session,
+            auth_user_uid="some-uid",
+        )
+
+        # 1 common game + at most 10 top games = 11 games total
+        assert len(recs) == 11
+        assert recs[0].gameSteamId == "101"
+        for i in range(1, 11):
+            assert recs[i].gameSteamId == f"20{i:02d}"

@@ -5,7 +5,7 @@ import httpx
 from sqlmodel import Session, select
 from src.games.schemas import RecommendationResponse
 from src.games import steam_fetcher_service
-from src.models import SteamRollingTime, User, Friendship, FriendshipStatus
+from src.models import SteamRollingTime, User, Friendship, FriendshipStatus, TopGame, Game
 
 def _get_latest_rolling_times(user_id: uuid.UUID, session: Session) -> dict[str, SteamRollingTime]:
     """
@@ -128,4 +128,52 @@ async def get_recommendations_of_steam(
     auth_latest = _get_latest_rolling_times(user.id, session)
     friend_playtimes = {str(game.appid): game.playtime_forever for game in steam_friend_games_list.games}
     return _build_recommendation_responses(auth_latest, friend_playtimes)
+
+def include_top_games(
+        common_games: list[RecommendationResponse],
+        session: Session,
+        auth_user_uid: str | None = None
+) -> list[RecommendationResponse]:
+    if not common_games:
+        top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc()).limit(10)).all()
+        return [
+            RecommendationResponse(
+                gameSteamId=tg.steam_app_id,
+                requester_play_time=0,
+                friend_play_time=0,
+            )
+            for tg in top_games
+        ]
+
+    common_app_ids = {g.gameSteamId for g in common_games}
+    games = session.exec(select(Game).where(Game.steam_app_id.in_(list(common_app_ids)))).all()
+    computed_genre_ids = set()
+    for g in games:
+        for genre in g.genres:
+            computed_genre_ids.add(genre.id)
+
+    if not computed_genre_ids:
+        return common_games
+
+    top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc())).all()
+    result_games = list(common_games)
+    added_count = 0
+
+    for tg in top_games:
+        if added_count >= 10:
+            break
+        if tg.steam_app_id in common_app_ids:
+            continue
+        tg_genre_ids = {genre.id for genre in tg.genres}
+        if tg_genre_ids & computed_genre_ids:
+            result_games.append(
+                RecommendationResponse(
+                    gameSteamId=tg.steam_app_id,
+                    requester_play_time=0,
+                    friend_play_time=0,
+                )
+            )
+            added_count += 1
+
+    return result_games
 

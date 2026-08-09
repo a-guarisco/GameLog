@@ -71,4 +71,4 @@ async def get_recommendations(
     if not include_top_games:
         return common_games
     else:
-        return recommendations_service.include_top_games(common_games, db, auth_user.uid)
+        return recommendations_service.include_top_games(common_games, db)
