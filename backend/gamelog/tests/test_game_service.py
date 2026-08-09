@@ -91,10 +91,30 @@ def _make_steam_response(games: list[dict]) -> dict:
 
 
 def _mock_httpx_get(payload: dict):
-    mock_resp = MagicMock()
-    mock_resp.raise_for_status = MagicMock()
-    mock_resp.json.return_value = payload
-    return patch.object(httpx.AsyncClient, "get", AsyncMock(return_value=mock_resp))
+    async def side_effect(url, *args, **kwargs):
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        if "appdetails" in str(url):
+            import urllib.parse
+            parsed = urllib.parse.urlparse(str(url))
+            params = urllib.parse.parse_qs(parsed.query)
+            appids = params.get("appids", [""])[0]
+            mock_resp.json.return_value = {
+                appids: {
+                    "success": True,
+                    "data": {
+                        "genres": [
+                            {"id": "1", "description": "Action"},
+                            {"id": "37", "description": "Free To Play"}
+                        ]
+                    }
+                }
+            }
+        else:
+            mock_resp.json.return_value = payload
+        return mock_resp
+
+    return patch.object(httpx.AsyncClient, "get", AsyncMock(side_effect=side_effect))
 
 
 # ---------------------------------------------------------------------------

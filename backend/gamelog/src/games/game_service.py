@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 from src.games import steam_fetcher_service
 from src.games.schemas import DayByDayPlaytime, SteamGame
-from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
+from src.models import Game, GameStatus, Genre, Shelving, SteamRollingTime, User
 
 
 async def update_user_shelving_steamrolling_async(
@@ -25,7 +25,9 @@ async def update_user_shelving_steamrolling_async(
 
         game_cached = _get_cached_game(session, steam_app_id)
         if not game_cached:
-            game_cached = _cache_game(session, steam_app_id)
+            genres_data = await steam_fetcher_service.get_game_genres_from_steam_async(steam_app_id, client=client)
+            genres = [Genre(id=str(g["id"]), description=g["description"]) for g in genres_data]
+            game_cached = _cache_game(session, steam_app_id, genres=genres)
 
         shelve_exists = _get_game_player_shelve(session, game_cached.id, user.id)
         if not shelve_exists:
@@ -87,10 +89,20 @@ def _get_game_player_shelve(session: Session, game_id: uuid.UUID, user_id: uuid.
     return session.exec(select(Shelving).where(Shelving.game_id == game_id).where(Shelving.owner_id == user_id)).first()
 
 
-def _cache_game(session: Session, steam_app_id: str) -> Game:
+def _cache_game(session: Session, steam_app_id: str, genres: list[Genre] | None = None) -> Game:
     game_cached = Game(
         steam_app_id=steam_app_id,
     )
+    if genres:
+        resolved_genres = []
+        for g in genres:
+            existing = session.get(Genre, g.id)
+            if not existing:
+                session.add(g)
+                resolved_genres.append(g)
+            else:
+                resolved_genres.append(existing)
+        game_cached.genres = resolved_genres
     session.add(game_cached)
     session.commit()
     return game_cached

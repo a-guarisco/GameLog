@@ -28,7 +28,7 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Config, Friendship, FriendshipStatus, Game, GameStatus, Shelving, SteamRollingTime, User
+from src.models import Config, Friendship, FriendshipStatus, Game, GameStatus, Genre, GameGenreLink, Shelving, SteamRollingTime, User
 
 # Fixed UUIDs for predictable database referencing in unit tests and manual API verification.
 DEMO_USER_1_ID = UUID("11111111-1111-1111-1111-111111111111")
@@ -259,15 +259,47 @@ def seed_database() -> None:
         session.exec(delete(SteamRollingTime))
         session.exec(delete(Shelving))
         session.exec(delete(Friendship))
+        session.exec(delete(GameGenreLink))
         session.exec(delete(Game))
+        session.exec(delete(Genre))
         session.exec(delete(User))
         session.exec(delete(Config))
         session.flush()
 
+        genre_action = Genre(id="1", description="Action")
+        genre_free = Genre(id="37", description="Free to Play")
+        genre_strategy = Genre(id="2", description="Strategy")
+        genre_adventure = Genre(id="25", description="Adventure")
+
+        session.add(genre_action)
+        session.add(genre_free)
+        session.add(genre_strategy)
+        session.add(genre_adventure)
+        session.flush()
+
         for user in _users():
             session.add(user)
-        for game in _games():
-            session.add(game)
+
+        game_cs2 = Game(
+            id=DEMO_GAME_CS2_ID,
+            steam_app_id="730",
+            genres=[genre_action, genre_free]
+        )
+        game_dota = Game(
+            id=DEMO_GAME_DOTA_ID,
+            steam_app_id="570",
+            genres=[genre_action, genre_free, genre_strategy]
+        )
+        game_rdr2 = Game(
+            id=DEMO_GAME_RDR2_ID,
+            steam_app_id="1174180",
+            genres=[genre_action, genre_adventure]
+        )
+
+        session.add(game_cs2)
+        session.add(game_dota)
+        session.add(game_rdr2)
+
         for shelving in _shelvings():
             session.add(shelving)
         for rolling_time in _rolling_times():

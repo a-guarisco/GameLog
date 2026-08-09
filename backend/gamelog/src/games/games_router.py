@@ -67,4 +67,8 @@ async def get_recommendations(
         common_games = recommendations_service.get_recommendations_of_friend(friend, db, auth_user.uid)
     else:
         common_games = await recommendations_service.get_recommendations_of_steam(steam_friend_id, db, auth_user.uid)
-    return common_games
+
+    if not include_top_games:
+        return common_games
+    else:
+        return recommendations_service.include_top_games(common_games, db, auth_user.uid)

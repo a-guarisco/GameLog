@@ -3,7 +3,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from src.models.game import GameBase
+from src.models.game import GameBase, Genre
 
 
 class GameCreate(GameBase):
@@ -12,6 +12,7 @@ class GameCreate(GameBase):
 
 class GameRead(GameBase):
     id: uuid.UUID
+    genres: list[Genre] = []
 
 
 """

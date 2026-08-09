@@ -68,3 +68,15 @@ def _retrieve_steam_key(
         warnings.warn("Using default steam api key")
         steam_api_key = "4C67D2313547027F4ECB151CD10E76EC"
     return steam_api_key
+
+
+async def get_game_genres_from_steam_async(
+    steam_app_id: str,
+    client: httpx.AsyncClient | None = None,
+) -> list[dict]:
+    url = f"https://store.steampowered.com/api/appdetails?appids={steam_app_id}&filter=genres"
+    payload = await _get_steam_api_response(url, client)
+    app_data = payload.get(str(steam_app_id), {})
+    if app_data.get("success"):
+        return app_data.get("data", {}).get("genres", [])
+    return []
