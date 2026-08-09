@@ -65,3 +65,7 @@ class RecommendationResponse(BaseModel):
     requester_play_time: int
     friend_play_time: int
 
+class SteamTopGame(BaseModel):
+    rank: int
+    appid: int
+

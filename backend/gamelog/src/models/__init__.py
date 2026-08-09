@@ -4,6 +4,7 @@ from .game import Game, GameStatus, Genre, GameGenreLink
 from .shelving import Shelving
 from .steam_rolling_time import SteamRollingTime
 from .user import User
+from .top_game import TopGame, TopGameGenreLink
 
 __all__ = [
     "Config",
@@ -16,4 +17,6 @@ __all__ = [
     "Shelving",
     "SteamRollingTime",
     "User",
+    "TopGame",
+    "TopGameGenreLink",
 ]

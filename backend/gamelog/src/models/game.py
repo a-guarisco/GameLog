@@ -22,11 +22,14 @@ class GameGenreLink(SQLModel, table=True):
     genre_id: str = Field(foreign_key="genre.id", primary_key=True)
 
 
+from src.models.top_game import TopGameGenreLink
+
 class Genre(SQLModel, table=True):
     id: str = Field(primary_key=True)
     description: str
 
     games: list["Game"] = Relationship(back_populates="genres", link_model=GameGenreLink)
+    top_games: list["TopGame"] = Relationship(back_populates="genres", link_model=TopGameGenreLink)
 
 
 class GameBase(SQLModel):
@@ -39,4 +42,5 @@ class Game(GameBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_shelvings: list["Shelving"] = Relationship(back_populates="game")
     genres: list[Genre] = Relationship(back_populates="games", link_model=GameGenreLink)
+
 

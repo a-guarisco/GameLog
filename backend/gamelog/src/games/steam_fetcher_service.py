@@ -1,7 +1,7 @@
 import warnings
 import httpx
 from src.models import User
-from src.games.schemas import GetOwnedGamesResponse, SteamGame
+from src.games.schemas import GetOwnedGamesResponse, SteamGame, SteamTopGame
 from src.users.schemas import GetFriendListResponse, SteamFriend
 
 
@@ -80,3 +80,17 @@ async def get_game_genres_from_steam_async(
     if app_data.get("success"):
         return app_data.get("data", {}).get("genres", [])
     return []
+
+
+async def get_most_played_games_from_steam_async(
+    client: httpx.AsyncClient | None = None,
+) -> list[SteamTopGame]:
+    """
+    Returns the top 100 most played games on Steam.
+    Each item is a dictionary containing at least 'appid' and 'rank'.
+    """
+    url = f"https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
+    payload = await _get_steam_api_response(url, client)
+    return [SteamTopGame(**game) for game in payload.get("response", {}).get("ranks", [])]
+
+
