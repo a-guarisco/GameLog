@@ -8,7 +8,7 @@ import pytest
 from fastapi import HTTPException
 from sqlmodel import Session
 
-from src.games import game_service
+from src.games import game_service, steam_fetcher_service
 from src.games.schemas import DayByDayPlaytime
 from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 from src.users import UserRead
@@ -521,7 +521,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
 
 
 # ---------------------------------------------------------------------------
-# _get_owned_games_from_steam_async
+# steam_fetcher_service.get_owned_games_from_steam_async
 # ---------------------------------------------------------------------------
 
 
@@ -538,7 +538,7 @@ class TestGetOwnedGamesFromSteamAsync:
         mock_get.return_value = mock_resp
 
         with patch.object(httpx.AsyncClient, "get", mock_get):
-            await game_service._get_owned_games_from_steam_async(user)
+            await steam_fetcher_service.get_owned_games_from_steam_async(user)
             called_url = mock_get.call_args[0][0]
         assert "MY_KEY" in called_url
 
@@ -556,7 +556,7 @@ class TestGetOwnedGamesFromSteamAsync:
 
         with _mock_httpx_get(_make_steam_response([])), warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            await game_service._get_owned_games_from_steam_async(user)
+            await steam_fetcher_service.get_owned_games_from_steam_async(user)
             assert any("default steam api key" in str(warning.message).lower() for warning in w)
 
     @pytest.mark.anyio
@@ -571,7 +571,7 @@ class TestGetOwnedGamesFromSteamAsync:
 
         with _mock_httpx_get(_make_steam_response([])), warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            await game_service._get_owned_games_from_steam_async(user)
+            await steam_fetcher_service.get_owned_games_from_steam_async(user)
             assert any("default steam api key" in str(warning.message).lower() for warning in w)
 
     @pytest.mark.anyio
@@ -601,10 +601,11 @@ class TestGetOwnedGamesFromSteamAsync:
         ]
         payload = _make_steam_response(games_data)
         with _mock_httpx_get(payload):
-            response = await game_service._get_owned_games_from_steam_async(user)
+            response = await steam_fetcher_service.get_owned_games_from_steam_async(user)
         assert response.game_count == 2
         assert len(response.games) == 2
         assert response.games[0].appid == 570
+
 
 
 # ---------------------------------------------------------------------------

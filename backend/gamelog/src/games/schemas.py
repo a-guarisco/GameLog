@@ -22,12 +22,12 @@ Schemas from the Steam API GetOwnedGames response item
 class SteamGame(BaseModel):
     appid: int
     playtime_forever: int
-    playtime_windows_forever: int
-    playtime_mac_forever: int
-    playtime_linux_forever: int
-    playtime_deck_forever: int
-    rtime_last_played: int
-    playtime_disconnected: int
+    playtime_windows_forever: int = 0
+    playtime_mac_forever: int = 0
+    playtime_linux_forever: int = 0
+    playtime_deck_forever: int = 0
+    rtime_last_played: int = 0
+    playtime_disconnected: int = 0
 
 
 """

@@ -56,7 +56,7 @@ def _users() -> list[User]:
             firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",  # Matches test-01@test.com
             username="test-01",
             steam_id="76561198077919169",
-            steam_api_key="724FF154B1D2A357857A257EA28C6415",
+            steam_api_key="4C67D2313547027F4ECB151CD10E76EC",
         ),
         User(
             id=DEMO_USER_2_ID,

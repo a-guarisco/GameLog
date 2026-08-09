@@ -6,7 +6,7 @@ import httpx
 from fastapi import FastAPI
 from sqlmodel import Session, select
 
-from src.core.database import engine
+from src.core.database import engine, wait_for_db_and_migrate
 from src.core.settings import get_settings
 from src.games import game_service
 from src.models import User
@@ -91,6 +91,10 @@ async def lifespan(app: FastAPI):
     If no dev option is set (make up), then the scheduler will run on startup to catch up any missed updates since the last update.
     """
     print("Lifespan starting...", flush=True)
+    
+    # Ensure database is ready and migrated before starting any scheduler or serving requests
+    await asyncio.to_thread(wait_for_db_and_migrate)
+    
     settings = get_settings()
     task = None
     if settings.run_scheduler:

@@ -1,15 +1,13 @@
 import uuid
-import warnings
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date, timedelta
-
 import httpx
 from fastapi import HTTPException
 from sqlmodel import Session, select
-
-from src.games.schemas import DayByDayPlaytime, GetOwnedGamesResponse, SteamGame
-from src.models import Game, GameStatus, Shelving, SteamRollingTime, User, Friendship, FriendshipStatus
+from src.games import steam_fetcher_service
+from src.games.schemas import DayByDayPlaytime, SteamGame
+from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
 
 
 async def update_user_shelving_steamrolling_async(
@@ -21,7 +19,7 @@ async def update_user_shelving_steamrolling_async(
     For the specified user, fetch GetOwnedGames from steam, update DB catalog, User Shelving and create
     a new steamRolling object if the today "playtime_forever" is different than the last one saved (yesterday)
     """
-    steam_games = await _get_owned_games_from_steam_async(user, client=client)
+    steam_games = await steam_fetcher_service.get_owned_games_from_steam_async(user, client=client)
     for steam_game in steam_games.games:
         steam_app_id = str(steam_game.appid)
 
@@ -126,45 +124,6 @@ def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id
         .where(SteamRollingTime.steam_app_id == steam_app_id)
         .order_by(SteamRollingTime.created_at.desc())
     ).first()
-
-
-async def _get_owned_games_from_steam_async(
-    user: User,
-    client: httpx.AsyncClient | None = None,
-) -> GetOwnedGamesResponse:
-    steam_api_key = getattr(user, "steam_api_key", None)
-    if not steam_api_key and hasattr(user, "__dict__"):
-        steam_api_key = user.__dict__.get("steam_api_key")
-
-    if not steam_api_key:
-        warnings.warn("Using default steam api key")
-        steam_api_key = "724FF154B1D2A357857A257EA28C6415"
-
-    url = (
-        "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/"
-        f"?key={steam_api_key}&steamid={user.steam_id}&format=json"
-        "&include_played_free_games=true&include_free_sub=true"
-    )
-
-    should_close = False
-    if client is None:
-        client = httpx.AsyncClient(timeout=10.0)
-        should_close = True
-
-    try:
-        response = await client.get(url)
-        response.raise_for_status()
-        payload = response.json()
-    finally:
-        if should_close:
-            await client.aclose()
-
-    steam_response = payload.get("response", {})
-    return GetOwnedGamesResponse(
-        game_count=steam_response.get("game_count", 0),
-        games=[SteamGame(**game) for game in steam_response.get("games", [])],
-    )
-
 
 def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], days: int) -> list[DayByDayPlaytime]:
     records_by_game = defaultdict(list)
