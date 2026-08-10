@@ -9,7 +9,7 @@ from sqlmodel import Session
 from src.games import recommendations_service
 from src.models import Game, Friendship, FriendshipStatus, User, TopGame
 from src.users.schemas import GetFriendListResponse, SteamFriend
-from src.games.schemas import GetOwnedGamesResponse, SteamGame, RecommendationResponse
+from src.games.schemas import GetOwnedGamesResponse, SteamGame, RecommendationResponse, CommonGames, RecommendedTopGame
 from tests.conftest import make_user, make_game, make_rolling
 
 
@@ -167,16 +167,17 @@ class TestRecommendationsRouter:
         assert response.status_code == 200
         
         data = response.json()
-        assert len(data) == 2
+        common_games = data["common_games"]
+        assert len(common_games) == 2
         
         # Game 202 has total 400 playtime, Game 201 has total 300 playtime
-        assert data[0]["gameSteamId"] == "202"
-        assert data[0]["requester_play_time"] == 300
-        assert data[0]["friend_play_time"] == 100
+        assert common_games[0]["gameSteamId"] == "202"
+        assert common_games[0]["requester_play_time"] == 300
+        assert common_games[0]["friend_play_time"] == 100
 
-        assert data[1]["gameSteamId"] == "201"
-        assert data[1]["requester_play_time"] == 100
-        assert data[1]["friend_play_time"] == 200
+        assert common_games[1]["gameSteamId"] == "201"
+        assert common_games[1]["requester_play_time"] == 100
+        assert common_games[1]["friend_play_time"] == 200
 
     def test_get_recommendations_endpoint_steam_success(self, client, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-1", username="me", steam_id="steam-me")
@@ -197,19 +198,20 @@ class TestRecommendationsRouter:
         
         with patch("src.games.recommendations_service.steam_fetcher_service.get_friend_list_from_steam_async", AsyncMock(return_value=mock_friend_list)), \
              patch("src.games.recommendations_service.steam_fetcher_service.get_owned_games_from_steam_async", AsyncMock(return_value=mock_games)):
-             
+              
             response = client.get(self.ENDPOINT, params={"steam_friend_id": "steam-friend-1"})
             assert response.status_code == 200
             
             data = response.json()
-            assert len(data) == 2
-            assert data[0]["gameSteamId"] == "202"
-            assert data[0]["requester_play_time"] == 300
-            assert data[0]["friend_play_time"] == 100
+            common_games = data["common_games"]
+            assert len(common_games) == 2
+            assert common_games[0]["gameSteamId"] == "202"
+            assert common_games[0]["requester_play_time"] == 300
+            assert common_games[0]["friend_play_time"] == 100
             
-            assert data[1]["gameSteamId"] == "201"
-            assert data[1]["requester_play_time"] == 100
-            assert data[1]["friend_play_time"] == 200
+            assert common_games[1]["gameSteamId"] == "201"
+            assert common_games[1]["requester_play_time"] == 100
+            assert common_games[1]["friend_play_time"] == 200
 
 
 class TestRecommendationsSteamService:
@@ -277,7 +279,7 @@ class TestIncludeTopGames:
         session.add(g2)
         session.commit()
 
-        recs = recommendations_service.include_top_games(
+        recs, common_genres = recommendations_service.include_top_games(
             common_games=[],
             session=session,
         )
@@ -285,12 +287,11 @@ class TestIncludeTopGames:
         assert len(recs) == 2
         # Assert they are returned in rank order (rank 1 first, then rank 2)
         assert recs[0].gameSteamId == "20"
-        assert recs[0].requester_play_time == 0
-        assert recs[0].friend_play_time == 0
+        assert recs[0].keys == []
 
         assert recs[1].gameSteamId == "10"
-        assert recs[1].requester_play_time == 0
-        assert recs[1].friend_play_time == 0
+        assert recs[1].keys == []
+        assert common_genres == []
 
     def test_include_top_games_with_matching_genres(self, session: Session):
         from src.models import Genre
@@ -333,25 +334,27 @@ class TestIncludeTopGames:
 
         # Common games list (has 101 and 102)
         common = [
-            RecommendationResponse(gameSteamId="101", requester_play_time=10, friend_play_time=20),
-            RecommendationResponse(gameSteamId="102", requester_play_time=30, friend_play_time=40),
+            CommonGames(gameSteamId="101", requester_play_time=10, friend_play_time=20),
+            CommonGames(gameSteamId="102", requester_play_time=30, friend_play_time=40),
         ]
 
-        recs = recommendations_service.include_top_games(
+        recs, common_genres = recommendations_service.include_top_games(
             common_games=common,
             session=session,
         )
 
-        # Expected: common games first, then matching top games sorted by rank:
+        # Expected: matching top games sorted by rank (common games are NOT returned by include_top_games):
         # tg1 (rank 2), tg3 (rank 3), tg4 (rank 4).
         # tg2 is skipped (already in common).
         # tg5 is skipped (sports doesn't match action/indie/rpg).
-        assert len(recs) == 5
-        assert recs[0].gameSteamId == "101"
-        assert recs[1].gameSteamId == "102"
-        assert recs[2].gameSteamId == "201" # tg1
-        assert recs[3].gameSteamId == "203" # tg3
-        assert recs[4].gameSteamId == "204" # tg4
+        assert len(recs) == 3
+        assert recs[0].gameSteamId == "201" # tg1
+        assert recs[0].keys == [action]
+        assert recs[1].gameSteamId == "203" # tg3
+        assert recs[1].keys == [rpg]
+        assert recs[2].gameSteamId == "204" # tg4
+        assert recs[2].keys == [indie]
+        assert set(g.id for g in common_genres) == {"action", "indie", "rpg"}
 
     def test_include_top_games_limit_10(self, session: Session):
         from src.models import Genre
@@ -370,19 +373,20 @@ class TestIncludeTopGames:
         session.commit()
 
         common = [
-            RecommendationResponse(gameSteamId="101", requester_play_time=10, friend_play_time=20)
+            CommonGames(gameSteamId="101", requester_play_time=10, friend_play_time=20)
         ]
 
-        recs = recommendations_service.include_top_games(
+        recs, common_genres = recommendations_service.include_top_games(
             common_games=common,
             session=session,
         )
 
-        # 1 common game + at most 10 top games = 11 games total
-        assert len(recs) == 11
-        assert recs[0].gameSteamId == "101"
-        for i in range(1, 11):
-            assert recs[i].gameSteamId == f"20{i:02d}"
+        # at most 10 top games = 10 games total (common games are NOT returned by include_top_games)
+        assert len(recs) == 10
+        for i in range(0, 10):
+            assert recs[i].gameSteamId == f"20{i+1:02d}"
+            assert recs[i].keys == [action]
+        assert set(g.id for g in common_genres) == {"action"}
 
     def test_include_top_games_prioritizes_multiple_genre_matches(self, session: Session):
         from src.models import Genre
@@ -417,22 +421,24 @@ class TestIncludeTopGames:
         session.commit()
 
         common = [
-            RecommendationResponse(gameSteamId="101", requester_play_time=10, friend_play_time=20)
+            CommonGames(gameSteamId="101", requester_play_time=10, friend_play_time=20)
         ]
 
-        recs = recommendations_service.include_top_games(
+        recs, common_genres = recommendations_service.include_top_games(
             common_games=common,
             session=session,
         )
 
-        # Expected order:
-        # 1. Common game (101)
-        # 2. tg3 (2 matches, rank 3) -> gameSteamId="203"
-        # 3. tg2 (1 match, rank 2) -> gameSteamId="202"
-        # 4. tg4 (1 match, rank 4) -> gameSteamId="204"
+        # Expected order (common games are NOT returned by include_top_games):
+        # 1. tg3 (2 matches, rank 3) -> gameSteamId="203"
+        # 2. tg2 (1 match, rank 2) -> gameSteamId="202"
+        # 3. tg4 (1 match, rank 4) -> gameSteamId="204"
         # tg1 is skipped because it has 0 matches.
-        assert len(recs) == 4
-        assert recs[0].gameSteamId == "101"
-        assert recs[1].gameSteamId == "203"
-        assert recs[2].gameSteamId == "202"
-        assert recs[3].gameSteamId == "204"
+        assert len(recs) == 3
+        assert recs[0].gameSteamId == "203"
+        assert recs[0].keys == [action, shooter]
+        assert recs[1].gameSteamId == "202"
+        assert recs[1].keys == [action]
+        assert recs[2].gameSteamId == "204"
+        assert recs[2].keys == [shooter]
+        assert set(g.id for g in common_genres) == {"action", "shooter"}

@@ -50,11 +50,12 @@ def get_streak_by_game(steam_app_id: str, auth_user: AuthenticatedUser = Depends
 @router.get(
     "/recommendations",
     summary="Returns a list of recommended games for the user who made the request and the specified userID, sorted by combined play time",
-    response_model=list[RecommendationResponse], status_code=200)
+    response_model=RecommendationResponse, status_code=200)
 async def get_recommendations(
         friend: uuid.UUID | None = None,
         steam_friend_id: str | None = None,
         include_top_games: bool = False,
+        top_game_length: int = 10,
         auth_user: AuthenticatedUser = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
@@ -62,6 +63,8 @@ async def get_recommendations(
         raise HTTPException(status_code=400, detail="Either friend or steam_friend_id must be provided")
     if friend is not None and steam_friend_id is not None:
         raise HTTPException(status_code=400, detail="Only one of friend or steam_friend_id can be provided")
+    if top_game_length < 0:
+        raise HTTPException(status_code=400, detail="Top game length must be a positive integer")
 
     if friend is not None:
         common_games = recommendations_service.get_recommendations_of_friend(friend, db, auth_user.uid)
@@ -69,6 +72,15 @@ async def get_recommendations(
         common_games = await recommendations_service.get_recommendations_of_steam(steam_friend_id, db, auth_user.uid)
 
     if not include_top_games:
-        return common_games
+        return RecommendationResponse(
+            common_games=common_games,
+            common_genres=[],
+            top_games=[]
+        )
     else:
-        return recommendations_service.include_top_games(common_games, db)
+        top_games, common_genres = recommendations_service.include_top_games(common_games, db, top_game_length)
+        return RecommendationResponse(
+            common_games=common_games,
+            common_genres=common_genres,
+            top_games=top_games
+        )

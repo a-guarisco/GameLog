@@ -60,12 +60,25 @@ class Streak(BaseModel):
     streak: int
 
 
-class RecommendationResponse(BaseModel):
+class CommonGames(BaseModel):
     gameSteamId: str
     requester_play_time: int
     friend_play_time: int
 
+
+class RecommendedTopGame(BaseModel):
+    gameSteamId: str
+    keys: list[Genre]
+
+
+class RecommendationResponse(BaseModel):
+    common_games: list[CommonGames]
+    common_genres: list[Genre]
+    top_games: list[RecommendedTopGame]
+
+
 class SteamTopGame(BaseModel):
     rank: int
     appid: int
+
 

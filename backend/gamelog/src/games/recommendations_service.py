@@ -3,9 +3,9 @@ from src.users import user_service
 import uuid
 import httpx
 from sqlmodel import Session, select
-from src.games.schemas import RecommendationResponse
+from src.games.schemas import RecommendationResponse, CommonGames, RecommendedTopGame
 from src.games import steam_fetcher_service
-from src.models import SteamRollingTime, User, Friendship, FriendshipStatus, TopGame, Game
+from src.models import SteamRollingTime, User, Friendship, FriendshipStatus, TopGame, Game, Genre
 
 def _get_latest_rolling_times(user_id: uuid.UUID, session: Session) -> dict[str, SteamRollingTime]:
     """
@@ -27,7 +27,7 @@ def _get_latest_rolling_times(user_id: uuid.UUID, session: Session) -> dict[str,
 def _build_recommendation_responses(
     auth_latest: dict[str, SteamRollingTime],
     friend_playtimes: dict[str, int],
-) -> list[RecommendationResponse]:
+) -> list[CommonGames]:
     common_games_playtime = {}
     for app_id, auth_rec in auth_latest.items():
         if app_id in friend_playtimes:
@@ -41,7 +41,7 @@ def _build_recommendation_responses(
     sorted_app_ids = sorted(common_games_playtime.keys(), key=lambda app_id: common_games_playtime[app_id], reverse=True)
 
     return [
-        RecommendationResponse(
+        CommonGames(
             gameSteamId=app_id,
             requester_play_time=auth_latest[app_id].last_day_playtime,
             friend_play_time=friend_playtimes[app_id],
@@ -54,7 +54,7 @@ def get_recommendations_of_friend(
     friend_id: uuid.UUID,
     session: Session,
     auth_user_uid: str,
-) -> list[RecommendationResponse]:
+) -> list[CommonGames]:
     """
     Returns a list of common games played by both auth_user and friend_id,
     sorted by combined playtime (descending).
@@ -95,7 +95,7 @@ async def get_recommendations_of_steam(
     steam_friend_id: str,
     session: Session,
     auth_user_uid: str,
-) -> list[RecommendationResponse]:
+) -> list[CommonGames]:
     """
     Returns a list of common games played by both auth_user and steam_friend_id,
     sorted by combined playtime (descending).
@@ -130,52 +130,53 @@ async def get_recommendations_of_steam(
     return _build_recommendation_responses(auth_latest, friend_playtimes)
 
 def include_top_games(
-        common_games: list[RecommendationResponse],
+        common_games: list[CommonGames],
         session: Session,
-) -> list[RecommendationResponse]:
+        list_length: int = 10
+) -> tuple[list[RecommendedTopGame], list[Genre]]:
     if not common_games:
-        top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc()).limit(10)).all()
+        top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc()).limit(list_length)).all()
         return [
-            RecommendationResponse(
+            RecommendedTopGame(
                 gameSteamId=tg.steam_app_id,
-                requester_play_time=0,
-                friend_play_time=0,
+                keys=[]
             )
             for tg in top_games
-        ]
+        ], []
 
     common_app_ids = {g.gameSteamId for g in common_games}
     games = session.exec(select(Game).where(Game.steam_app_id.in_(list(common_app_ids)))).all()
-    computed_genre_ids = set()
+    computed_genres = {}
     for g in games:
         for genre in g.genres:
-            computed_genre_ids.add(genre.id)
+            if genre.id not in computed_genres:
+                computed_genres[genre.id] = genre
 
-    if not computed_genre_ids:
-        return common_games
+    if not computed_genres:
+        return [], []
 
     top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc())).all()
     
     candidates = []
+    computed_genre_ids = set(computed_genres.keys())
     for tg in top_games:
         if tg.steam_app_id in common_app_ids:
             continue
-        tg_genre_ids = {genre.id for genre in tg.genres}
-        intersection = tg_genre_ids & computed_genre_ids
-        if intersection:
-            candidates.append((len(intersection), tg))
+        tg_genres = tg.genres
+        matching_genres = [genre for genre in tg_genres if genre.id in computed_genre_ids]
+        if matching_genres:
+            candidates.append((len(matching_genres), tg, matching_genres))
 
     candidates.sort(key=lambda item: (-item[0], item[1].rank))
 
-    result_games = list(common_games)
-    for _, tg in candidates[:10]:
+    result_games = []
+    for _, tg, matching_genres in candidates[:list_length]:
         result_games.append(
-            RecommendationResponse(
+            RecommendedTopGame(
                 gameSteamId=tg.steam_app_id,
-                requester_play_time=0,
-                friend_play_time=0,
+                keys=matching_genres,
             )
         )
 
-    return result_games
+    return result_games, list(computed_genres.values())
 
