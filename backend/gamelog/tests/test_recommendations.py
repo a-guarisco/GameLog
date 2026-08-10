@@ -332,10 +332,10 @@ class TestIncludeTopGames:
         session.add(tg5)
         session.commit()
 
-        # Common games list (has 101 and 102)
+        # Common games list (has 101 and 102 with equal playtimes so rank dominates sorting)
         common = [
-            CommonGames(gameSteamId="101", requester_play_time=10, friend_play_time=20),
-            CommonGames(gameSteamId="102", requester_play_time=30, friend_play_time=40),
+            CommonGames(gameSteamId="101", requester_play_time=25, friend_play_time=25),
+            CommonGames(gameSteamId="102", requester_play_time=25, friend_play_time=25),
         ]
 
         recs, common_genres = recommendations_service.include_top_games(
@@ -442,3 +442,53 @@ class TestIncludeTopGames:
         assert recs[2].gameSteamId == "204"
         assert recs[2].keys == [shooter]
         assert set(g.id for g in common_genres) == {"action", "shooter"}
+
+    def test_include_top_games_prioritizes_higher_playtime_genre(self, session: Session):
+        from src.models import Genre
+        # Create genres
+        action = Genre(id="action", description="Action games")
+        free_to_play = Genre(id="free_to_play", description="Free to play games")
+        gdr = Genre(id="gdr", description="Roleplaying games")
+        session.add_all([action, free_to_play, gdr])
+        session.commit()
+
+        # Create common games in DB
+        # Game 1: Action only - played a lot
+        game1 = Game(steam_app_id="101", genres=[action])
+        # Game 2: Free to play and GDR - played very little
+        game2 = Game(steam_app_id="102", genres=[free_to_play, gdr])
+        session.add_all([game1, game2])
+        session.commit()
+
+        # Create top games:
+        # tg1: matches only action, has rank 2
+        tg1 = TopGame(steam_app_id="201", rank=2, genres=[action])
+        # tg2: matches free_to_play and gdr, has rank 1
+        tg2 = TopGame(steam_app_id="202", rank=1, genres=[free_to_play, gdr])
+        session.add_all([tg1, tg2])
+        session.commit()
+
+        # Common games list:
+        # Action playtime = 1000 mins -> log1p(1000) ~ 6.91
+        # Free to play + GDR playtime = 2 mins -> log1p(2) ~ 1.10
+        common = [
+            CommonGames(gameSteamId="101", requester_play_time=500, friend_play_time=500),
+            CommonGames(gameSteamId="102", requester_play_time=1, friend_play_time=1),
+        ]
+
+        recs, common_genres = recommendations_service.include_top_games(
+            common_games=common,
+            session=session,
+        )
+
+        # Expected:
+        # tg1: matches action (weight log1p(1000) ~ 6.91).
+        # tg2: matches free_to_play (weight log1p(2) ~ 1.10) + gdr (weight log1p(2) ~ 1.10) = 2.20.
+        # Even though tg2 has 2 matching genres and a better rank (1 vs 2),
+        # tg1 has a much higher playtime-weighted score (6.91 vs 2.20) and should be sorted first!
+        assert len(recs) == 2
+        assert recs[0].gameSteamId == "201" # tg1
+        assert recs[0].keys == [action]
+        assert recs[1].gameSteamId == "202" # tg2
+        assert recs[1].keys == [free_to_play, gdr]
+

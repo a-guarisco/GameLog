@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from src.users import user_service
 import uuid
 import httpx
+import math
 from sqlmodel import Session, select
 from src.games.schemas import RecommendationResponse, CommonGames, RecommendedTopGame
 from src.games import steam_fetcher_service
@@ -145,12 +146,20 @@ def include_top_games(
         ], []
 
     common_app_ids = {g.gameSteamId for g in common_games}
+    common_game_weights = {
+        g.gameSteamId: math.log1p(g.requester_play_time + g.friend_play_time)
+        for g in common_games
+    }
+
     games = session.exec(select(Game).where(Game.steam_app_id.in_(list(common_app_ids)))).all()
     computed_genres = {}
+    genre_weights = {}
     for g in games:
+        weight = common_game_weights.get(g.steam_app_id, 0.0)
         for genre in g.genres:
             if genre.id not in computed_genres:
                 computed_genres[genre.id] = genre
+            genre_weights[genre.id] = genre_weights.get(genre.id, 0.0) + weight
 
     if not computed_genres:
         return [], []
@@ -165,12 +174,13 @@ def include_top_games(
         tg_genres = tg.genres
         matching_genres = [genre for genre in tg_genres if genre.id in computed_genre_ids]
         if matching_genres:
-            candidates.append((len(matching_genres), tg, matching_genres))
+            score = sum(genre_weights[genre.id] for genre in matching_genres)
+            candidates.append((score, len(matching_genres), tg, matching_genres))
 
-    candidates.sort(key=lambda item: (-item[0], item[1].rank))
+    candidates.sort(key=lambda item: (-item[0], -item[1], item[2].rank))
 
     result_games = []
-    for _, tg, matching_genres in candidates[:list_length]:
+    for _, _, tg, matching_genres in candidates[:list_length]:
         result_games.append(
             RecommendedTopGame(
                 gameSteamId=tg.steam_app_id,
