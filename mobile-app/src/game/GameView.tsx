@@ -6,6 +6,7 @@ import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useGetGameStreak } from '@gamelog/api-manager/useApi';
+import { useStreakText } from '@gamelog/common/useStreakText';
 
 const GameView = () => {
   const route = useRoute<any>();
@@ -13,14 +14,7 @@ const GameView = () => {
   const playerID = '76561198077919169'; //FIX
   const { gameStreak, isLoadingGameStreak } = useGetGameStreak(gameItem.appid);
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameItem.appid);
-  const streakValue = gameStreak?.streak ?? 0;
-  let secondaryText = '0 day streak';
-
-  if (isLoadingGameStreak) {
-    secondaryText = 'Loading streak...';
-  } else if (streakValue > 0) {
-    secondaryText = `🔥 ${streakValue} day streak`;
-  }
+  const secondaryText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
 
   return (
     <Box className="flex-1 relative">

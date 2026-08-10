@@ -1,6 +1,7 @@
 import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
 import EndPoints, { getSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
+import { auth } from '@gamelog/auth/firebaseClient';
 
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
@@ -223,6 +224,61 @@ describe('ApiManager', () => {
     () => ApiManager.getGameGenres(appId),
     EndPoints.getGameGenres(appId)
   );
+
+  describe('authenticated backend streak endpoints', () => {
+    beforeEach(() => {
+      (auth as any).currentUser = {
+        getIdToken: jest.fn().mockResolvedValue('firebase-id-token'),
+      };
+    });
+
+    afterEach(() => {
+      (auth as any).currentUser = null;
+    });
+
+    it('fetches user streak with the current Firebase token', async () => {
+      const mockResponse = { streak: 7 };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.getStreakByUser();
+
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getStreakByUser(), {
+        headers: {
+          Authorization: 'Bearer firebase-id-token',
+        },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('fetches game streak with the current Firebase token', async () => {
+      const mockResponse = { streak: 3 };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.getStreakByGame(appId);
+
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getStreakByGame(appId), {
+        headers: {
+          Authorization: 'Bearer firebase-id-token',
+        },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('does not call streak endpoints without an active Firebase session', async () => {
+      (auth as any).currentUser = null;
+
+      await expect(ApiManager.getStreakByUser()).rejects.toThrow('No active Firebase user session');
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
 
   it('allows provider switching at runtime (currently all endpoints use steam)', async () => {
     setApiProvider('backend');

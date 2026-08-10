@@ -1,6 +1,7 @@
 import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
 import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
+import { auth } from '@gamelog/auth/firebaseClient';
 import type {
   GameGenres,
   GlobalAchievement,
@@ -23,7 +24,25 @@ async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
   return response.json();
 }
 
-export { getApiProvider, setApiProvider, isBackendProvider, fetchData };
+async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promise<T> {
+  const token = await auth.currentUser?.getIdToken();
+
+  if (!token) {
+    throw new Error(
+      'No active Firebase user session. Sign in before calling authenticated backend endpoints.'
+    );
+  }
+
+  return fetchData<T>(url, {
+    ...init,
+    headers: {
+      ...init?.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export { getApiProvider, setApiProvider, isBackendProvider, fetchData, fetchAuthenticatedData };
 export default {
   getGameNews: (appId: string, count: number, maxLength: number) =>
     fetchData(EndPoints.getNewsForApp(appId, count, maxLength)),
@@ -59,6 +78,7 @@ export default {
 
   getGameGenres: (appId: string) => fetchData<GameGenres>(EndPoints.getGameGenres(appId)),
 
-  getStreakByUser: () => fetchData<Streak>(EndPoints.getStreakByUser()),
-  getStreakByGame: (appId: string) => fetchData<Streak>(EndPoints.getStreakByGame(appId)),
+  getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
+  getStreakByGame: (appId: string) =>
+    fetchAuthenticatedData<Streak>(EndPoints.getStreakByGame(appId)),
 };

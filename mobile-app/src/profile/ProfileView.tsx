@@ -15,6 +15,7 @@ import ProfileStats from './ProfileStats';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
+import { useStreakText } from '@gamelog/common/useStreakText';
 
 const USER_ID = '76561198077919169';
 const TEMP_APPID = '236390';
@@ -36,11 +37,7 @@ const ProfileView = () => {
     isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo || isLoadingUserStreak;
   const player = playersInfo?.response?.players?.[0];
 
-  const streakText = (() => {
-    if (isLoadingUserStreak) return 'Loading streak...';
-    const streak = userStreak?.streak ?? 0;
-    return streak > 0 ? `🔥 ${streak} day streak` : '0 day streak';
-  })();
+  const streakText = useStreakText(userStreak?.streak, isLoadingUserStreak);
 
   const chartComponents = useMemo(
     () => [
