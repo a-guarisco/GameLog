@@ -4,6 +4,7 @@ import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi');
@@ -61,6 +62,7 @@ jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
 const mockUseGetGameGenreChartData = useGetGameGenreChartData as jest.Mock;
 const mockUseGetPlayersInfo = useGetPlayersInfo as jest.Mock;
+const mockUseGetUserStreak = useGetUserStreak as jest.Mock;
 
 const setupLoadedMocks = () => {
   mockUseGetOwnedGames.mockReturnValue({
@@ -77,6 +79,11 @@ const setupLoadedMocks = () => {
     playersInfo: { response: { players: [{ personaname: 'User' }] } },
     isLoadingPlayersInfo: false,
     errorPlayersInfo: null,
+  });
+  mockUseGetUserStreak.mockReturnValue({
+    userStreak: { streak: 5 },
+    isLoadingUserStreak: false,
+    errorUserStreak: null,
   });
 };
 
@@ -101,6 +108,11 @@ describe('ProfileView', () => {
       isLoadingPlayersInfo: false,
       errorPlayersInfo: null,
     });
+    mockUseGetUserStreak.mockReturnValue({
+      userStreak: null,
+      isLoadingUserStreak: false,
+      errorUserStreak: null,
+    });
 
     render(<ProfileView />);
 
@@ -124,6 +136,11 @@ describe('ProfileView', () => {
       playersInfo: null,
       isLoadingPlayersInfo: true,
       errorPlayersInfo: null,
+    });
+    mockUseGetUserStreak.mockReturnValue({
+      userStreak: null,
+      isLoadingUserStreak: false,
+      errorUserStreak: null,
     });
 
     render(<ProfileView />);
