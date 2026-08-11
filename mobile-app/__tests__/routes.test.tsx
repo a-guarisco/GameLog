@@ -38,10 +38,11 @@ describe('RootTabs structure', () => {
     const screens = Object.keys(RootTabs.config.screens);
     expect(screens).toContain('GameList');
     expect(screens).toContain('Profile');
+    expect(screens).toContain('Social');
   });
 
-  it('registers exactly 3 tabs', () => {
-    expect(Object.keys(RootTabs.config.screens)).toHaveLength(3);
+  it('registers exactly 4 tabs', () => {
+    expect(Object.keys(RootTabs.config.screens)).toHaveLength(4);
   });
 
   it('assigns GameListStack to the GameList tab', () => {
@@ -51,5 +52,10 @@ describe('RootTabs structure', () => {
   it('assigns the correct component to the Profile tab', () => {
     const Profile = jest.requireActual('@gamelog/profile/ProfileView').default;
     expect(RootTabs.config.screens.Profile.screen).toBe(Profile);
+  });
+
+  it('assigns the correct component to the Social tab', () => {
+    const Social = jest.requireActual('@gamelog/social/SocialView').default;
+    expect(RootTabs.config.screens.Social.screen).toBe(Social);
   });
 });
