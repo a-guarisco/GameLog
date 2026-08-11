@@ -26,13 +26,16 @@ export const UserCard: React.FC<UserCardProps> = ({
   const { user, friendship } = item;
   const status = friendship?.friendship_status;
   const friendshipId = friendship?.friendship_id;
+  const isFriend = status === 'accepted';
 
   const renderBadgeOrActions = () => {
     if (status === 'accepted') {
       return (
-        <HStack className="items-center space-x-2">
-          <Box className="bg-emerald-600/30 px-3 py-1 rounded-full border border-emerald-500/40">
-            <Text className="text-emerald-400 font-semibold text-xs uppercase">Friend</Text>
+        <HStack space="sm" className="items-center">
+          <Box className="bg-success-500/15 px-2 py-0.5 rounded-md">
+            <Text size="xs" className="font-bold uppercase text-success-700">
+              Friend
+            </Text>
           </Box>
           {onSelectRecommendations && (
             <Button
@@ -52,7 +55,7 @@ export const UserCard: React.FC<UserCardProps> = ({
 
     if (status === 'pending_incoming' && friendshipId) {
       return (
-        <HStack className="items-center space-x-2">
+        <HStack space="sm" className="items-center">
           {onAcceptFriend && (
             <Button
               size="xs"
@@ -83,16 +86,20 @@ export const UserCard: React.FC<UserCardProps> = ({
 
     if (status === 'pending_outgoing') {
       return (
-        <Box className="bg-amber-600/30 px-3 py-1 rounded-full border border-amber-500/40">
-          <Text className="text-amber-400 font-semibold text-xs uppercase">Request Sent</Text>
+        <Box className="bg-warning-500/15 px-2 py-0.5 rounded-md">
+          <Text size="xs" className="font-bold uppercase text-warning-700">
+            Request Sent
+          </Text>
         </Box>
       );
     }
 
     if (status === 'blocked') {
       return (
-        <Box className="bg-red-600/30 px-3 py-1 rounded-full border border-red-500/40">
-          <Text className="text-red-400 font-semibold text-xs uppercase">Blocked</Text>
+        <Box className="bg-error-500/15 px-2 py-0.5 rounded-md">
+          <Text size="xs" className="font-bold uppercase text-error-700">
+            Blocked
+          </Text>
         </Box>
       );
     }
@@ -115,20 +122,29 @@ export const UserCard: React.FC<UserCardProps> = ({
   };
 
   return (
-    <Box className="bg-background-200 p-4 rounded-xl mb-3 shadow-md border border-outline-100 flex-row items-center justify-between">
-      <HStack className="items-center space-x-3 flex-1 mr-2">
-        <Box className="w-10 h-10 rounded-full bg-primary-600 items-center justify-center border border-primary-400">
+    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200 shadow-md">
+      <HStack space="md" className="relative z-10 px-3 py-3 items-start">
+        <Box
+          className={`w-10 h-10 rounded-md items-center justify-center shrink-0 ${
+            isFriend ? 'bg-success-100' : 'bg-background-300'
+          }`}
+        >
           <Text className="text-white font-bold text-lg uppercase">
             {user.username ? user.username.charAt(0) : 'U'}
           </Text>
         </Box>
+
         <VStack className="flex-1">
-          <Text className="font-bold text-white text-base">{user.username}</Text>
-          <Text className="text-xs text-typography-400">Steam ID: {user.steam_id}</Text>
+          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+            {user.username}
+          </Text>
+          <Text size="xs" className="font-medium text-typography-400 mt-0.5">
+            Steam ID: {user.steam_id}
+          </Text>
+
+          <Box className="mt-2 items-start">{renderBadgeOrActions()}</Box>
         </VStack>
       </HStack>
-
-      <Box className="items-end">{renderBadgeOrActions()}</Box>
     </Box>
   );
 };

@@ -91,64 +91,65 @@ const SocialView: React.FC = () => {
       <HeaderGameImage appid={BANNER_APPID} />
       <ScrollablePage>
         {/* Banner Title Card */}
-        <Box className="bg-background-100 shadow-xl p-5 w-full items-center border-b border-outline-100">
-          <Text
-            size="3xl"
-            className="font-bold uppercase tracking-wider text-center text-white mb-1"
-          >
+        <Box className="bg-background-100 shadow-xl p-5 w-full items-center">
+          <Text size="3xl" className="font-bold uppercase text-center mb-1">
             Social Hub
           </Text>
-          <Text className="text-sm text-typography-400 text-center">
+          <Text size="sm" className="text-typography-400 text-center">
             Connect with friends, manage requests, and compare game recommendations
           </Text>
         </Box>
 
-        {/* Tab Switcher */}
-        <Box className="w-full max-w-xl px-4 pt-4">
-          <HStack className="bg-background-200 p-1.5 rounded-xl mb-4 border border-outline-100">
-            <Button
-              className={`flex-1 rounded-lg ${
-                activeTab === 'friends' ? 'bg-primary-600' : 'bg-transparent'
-              }`}
-              onPress={() => setActiveTab('friends')}
-              testID="friends-tab-btn"
-            >
-              <ButtonText
-                className={`font-semibold ${
-                  activeTab === 'friends' ? 'text-white' : 'text-typography-400'
+        <Box className="w-80% bg-background-100 shadow-xl pt-6">
+          {/* Tab Switcher */}
+          <Box className="mb-5 px-4">
+            <HStack className="bg-background-200 p-1.5 rounded-lg">
+              <Button
+                className={`flex-1 rounded-md ${
+                  activeTab === 'friends' ? 'bg-primary-600' : 'bg-transparent'
                 }`}
+                onPress={() => setActiveTab('friends')}
+                testID="friends-tab-btn"
               >
-                Friends ({acceptedFriends.length + pendingRequests.length})
-              </ButtonText>
-            </Button>
-            <Button
-              className={`flex-1 rounded-lg ${
-                activeTab === 'search' ? 'bg-primary-600' : 'bg-transparent'
-              }`}
-              onPress={() => setActiveTab('search')}
-              testID="search-tab-btn"
-            >
-              <ButtonText
-                className={`font-semibold ${
-                  activeTab === 'search' ? 'text-white' : 'text-typography-400'
+                <ButtonText
+                  size="xs"
+                  className={`font-bold uppercase ${
+                    activeTab === 'friends' ? 'text-white' : 'text-typography-400'
+                  }`}
+                >
+                  Friends ({acceptedFriends.length + pendingRequests.length})
+                </ButtonText>
+              </Button>
+              <Button
+                className={`flex-1 rounded-md ${
+                  activeTab === 'search' ? 'bg-primary-600' : 'bg-transparent'
                 }`}
+                onPress={() => setActiveTab('search')}
+                testID="search-tab-btn"
               >
-                Find Users
-              </ButtonText>
-            </Button>
-          </HStack>
+                <ButtonText
+                  size="xs"
+                  className={`font-bold uppercase ${
+                    activeTab === 'search' ? 'text-white' : 'text-typography-400'
+                  }`}
+                >
+                  Find Users
+                </ButtonText>
+              </Button>
+            </HStack>
 
-          {actionFeedback && (
-            <Box className="bg-primary-900/60 border border-primary-500 p-3 rounded-lg mb-3">
-              <Text className="text-xs text-primary-200 text-center font-medium">
-                {actionFeedback}
-              </Text>
-            </Box>
-          )}
+            {actionFeedback && (
+              <Box className="relative overflow-hidden rounded-lg mt-3 bg-background-200 shadow-md px-3 py-2">
+                <Text size="xs" className="text-primary-400 text-center font-medium">
+                  {actionFeedback}
+                </Text>
+              </Box>
+            )}
+          </Box>
 
           {/* Friends & Requests Tab */}
           {activeTab === 'friends' && (
-            <VStack className="w-full">
+            <VStack className="mb-4 px-4">
               {isLoadingFriendList ? (
                 <LoadingBox message="Loading friends..." className="py-10" />
               ) : errorFriendList ? (
@@ -160,8 +161,8 @@ const SocialView: React.FC = () => {
                 <>
                   {/* Pending Incoming Requests */}
                   {pendingRequests.length > 0 && (
-                    <Box className="mb-4">
-                      <Text className="text-base font-bold text-amber-400 uppercase tracking-wider mb-2">
+                    <Box className="mb-5">
+                      <Text size="sm" className="font-bold uppercase text-warning-700 mb-2">
                         Pending Friend Requests ({pendingRequests.length})
                       </Text>
                       {pendingRequests.map((item) => (
@@ -177,8 +178,8 @@ const SocialView: React.FC = () => {
                   )}
 
                   {/* Accepted Friends */}
-                  <Box className="mb-4">
-                    <Text className="text-base font-bold text-primary-400 uppercase tracking-wider mb-2">
+                  <Box className="mb-5">
+                    <Text size="sm" className="font-bold uppercase text-typography-400 mb-2">
                       Friends ({acceptedFriends.length})
                     </Text>
                     {acceptedFriends.length === 0 ? (
@@ -204,14 +205,14 @@ const SocialView: React.FC = () => {
 
           {/* Search Users Tab */}
           {activeTab === 'search' && (
-            <VStack className="w-full">
-              <Box className="mb-4">
+            <VStack className="mb-4 px-4">
+              <Box className="mb-5">
                 <TextInput
                   placeholder="Search users by username..."
                   placeholderTextColor="#9ca3af"
                   value={searchQuery}
                   onChangeText={setSearchQuery}
-                  className="bg-background-200 border border-outline-200 rounded-xl px-4 py-3 text-white"
+                  className="bg-background-200 rounded-lg px-4 py-3 text-white"
                   testID="user-search-input"
                 />
               </Box>
@@ -232,7 +233,7 @@ const SocialView: React.FC = () => {
                 <InfoBox message={`No users found matching "${searchQuery}".`} className="py-6" />
               ) : (
                 <VStack className="mb-4">
-                  <Text className="text-sm font-semibold text-typography-400 mb-2 uppercase">
+                  <Text size="sm" className="font-bold uppercase text-typography-400 mb-2">
                     Search Results ({searchResults.length})
                   </Text>
                   {searchResults.map((item) => (
