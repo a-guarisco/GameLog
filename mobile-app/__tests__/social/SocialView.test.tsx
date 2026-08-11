@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { SocialView } from '@gamelog/social/SocialView';
+import { SocialView } from '@gamelog/social/social-view/SocialView';
 import {
   useGetFriendList,
   useSearchUsers,

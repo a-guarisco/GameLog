@@ -1,4 +1,3 @@
-import React from 'react';
 import { Image, ScrollView } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';

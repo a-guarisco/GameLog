@@ -5,7 +5,7 @@ import GameListView from '@gamelog/game-list/GameListView';
 import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
-import SocialView from '@gamelog/social/SocialView';
+import SocialView from '@gamelog/social/social-view/SocialView';
 import {
   DevView,
   DevEnvView,
