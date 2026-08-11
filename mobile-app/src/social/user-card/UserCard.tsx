@@ -4,7 +4,9 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { UserAvatar } from './UserAvatar';
-import { UserCardStatusSection, UserCardActionHandlers } from './UserCardStatusSection';
+import { UserCardBadge } from './UserCardBadge';
+import { UserCardActions } from './UserCardActions';
+import { UserCardActionHandlers } from './userCardActionHandlers';
 
 interface UserCardProps extends UserCardActionHandlers {
   item: UserSearchResult;
@@ -27,14 +29,11 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
           <Text size="xs" className="font-medium text-typography-400 mt-0.5">
             Steam ID: {user.steam_id}
           </Text>
+          <UserCardBadge item={item} />
         </VStack>
 
         <Box className="items-end shrink-0">
-          <UserCardStatusSection
-            item={item}
-            handlers={handlers}
-            isActionLoading={isActionLoading}
-          />
+          <UserCardActions item={item} handlers={handlers} isActionLoading={isActionLoading} />
         </Box>
       </HStack>
     </Box>

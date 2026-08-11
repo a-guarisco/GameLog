@@ -3,7 +3,7 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { UserCard } from '../user-card/UserCard';
-import { UserCardActionHandlers } from '../user-card/UserCardStatusSection';
+import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 import { UserSearchInput } from './UserSearchInput';
 
 interface SearchUsersTabContentProps {
