@@ -55,7 +55,7 @@ describe('RootTabs structure', () => {
   });
 
   it('assigns the correct component to the Social tab', () => {
-    const Social = jest.requireActual('@gamelog/social/SocialView').default;
+    const Social = jest.requireActual('@gamelog/social/social-view/SocialView').default;
     expect(RootTabs.config.screens.Social.screen).toBe(Social);
   });
 });
