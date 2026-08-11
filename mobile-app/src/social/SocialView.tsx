@@ -11,7 +11,7 @@ import ScrollablePage from '@gamelog/common/ScrollablePage';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useGetFriendList, useSearchUsers } from '@gamelog/api-manager/useApi';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
-import { UserCard } from './UserCard';
+import { UserCard } from './user-card/UserCard';
 import { FriendRecommendationsView } from './FriendRecommendationsView';
 
 const BANNER_APPID = '730';
