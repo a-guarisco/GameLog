@@ -121,6 +121,15 @@ dev-android-run: emulator-bg
 	@echo "📱 [Android Native Build] Launching Expo Native Android Build (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
 	@npm --prefix mobile-app run android
 
+dev-android-clean: emulator-bg
+	@echo "🧹 [Android Native Build] Hard cleaning Gradle & CMake cache..."
+	@node -e "['mobile-app/android/.cxx', 'mobile-app/android/build', 'mobile-app/android/app/build'].forEach(p=>require('fs').rmSync(p,{recursive:true,force:true}))"
+	@echo "📱 [Android Native Build] Launching Expo (clean)..."
+	@npm --prefix mobile-app run android
+
+android-sha:
+	@echo "🔍 Estrazione impronta digitale (SHA-1) del Keystore di Debug..."
+	@cd mobile-app/android && ./gradlew :app:signingReport
 
 # ------------------------------------------------------------------------------
 # Services & Lifecycle Shortcuts
