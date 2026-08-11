@@ -6,7 +6,7 @@ import {
   getAuth,
   connectAuthEmulator,
   getReactNativePersistence,
-} from 'firebase/auth';
+} from '@firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getRequiredEnv = (value: string | undefined, name: string): string => {
