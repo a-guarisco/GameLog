@@ -81,7 +81,7 @@ endif
 
 
 dev-init:
-	@PYTHON="$(PYTHON)" ./scripts/dev-init.sh
+	@$(PYTHON) ./scripts/dev-init.py
 
 dev-init-internal: emulator-bg
 	@echo "🔄 [All Processes] Starting backend & resetting database (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
