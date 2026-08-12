@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel
@@ -88,4 +89,25 @@ class SteamFriend(BaseModel):
 
 class GetFriendListResponse(BaseModel):
     friends: list[SteamFriend]
+# endregion
+
+
+# region Notifications
+class RegisterDeviceRequest(BaseModel):
+    token: str
+    device_type: str = "android"
+
+
+class UnregisterDeviceRequest(BaseModel):
+    token: str
+
+
+class NotificationRead(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    title: str
+    body: str
+    data: dict | None = None
+    is_read: bool
+    created_at: datetime
 # endregion

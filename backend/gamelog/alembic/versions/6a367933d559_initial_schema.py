@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 2adab932e7c3
+Revision ID: 6a367933d559
 Revises: 
-Create Date: 2026-08-09 13:22:25.515011
+Create Date: 2026-08-12 19:09:11.628677
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2adab932e7c3'
+revision: str = '6a367933d559'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -61,6 +61,18 @@ def upgrade() -> None:
     op.create_index(op.f('ix_user_firebase_uid'), 'user', ['firebase_uid'], unique=False)
     op.create_index(op.f('ix_user_steam_id'), 'user', ['steam_id'], unique=False)
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=False)
+    op.create_table('devicetoken',
+    sa.Column('id', sa.Uuid(), nullable=False),
+    sa.Column('device_token', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('user_id', sa.Uuid(), nullable=False),
+    sa.Column('device_type', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_devicetoken_device_token'), 'devicetoken', ['device_token'], unique=True)
+    op.create_index(op.f('ix_devicetoken_user_id'), 'devicetoken', ['user_id'], unique=False)
     op.create_table('friendship',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('requester_id', sa.Uuid(), nullable=False),
@@ -80,6 +92,19 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['genre_id'], ['genre.id'], ),
     sa.PrimaryKeyConstraint('game_id', 'genre_id')
     )
+    op.create_table('notification',
+    sa.Column('id', sa.Uuid(), nullable=False),
+    sa.Column('user_id', sa.Uuid(), nullable=False),
+    sa.Column('title', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('body', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('data', sa.JSON(), nullable=True),
+    sa.Column('is_read', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_notification_is_read'), 'notification', ['is_read'], unique=False)
+    op.create_index(op.f('ix_notification_user_id'), 'notification', ['user_id'], unique=False)
     op.create_table('shelving',
     sa.Column('status', sa.Enum('shelved', 'to_be_played', 'playing', 'played', 'platinato', name='game_status'), nullable=False),
     sa.Column('owner_id', sa.Uuid(), nullable=False),
@@ -119,8 +144,14 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_steamrollingtime_created_at'), table_name='steamrollingtime')
     op.drop_table('steamrollingtime')
     op.drop_table('shelving')
+    op.drop_index(op.f('ix_notification_user_id'), table_name='notification')
+    op.drop_index(op.f('ix_notification_is_read'), table_name='notification')
+    op.drop_table('notification')
     op.drop_table('gamegenrelink')
     op.drop_table('friendship')
+    op.drop_index(op.f('ix_devicetoken_user_id'), table_name='devicetoken')
+    op.drop_index(op.f('ix_devicetoken_device_token'), table_name='devicetoken')
+    op.drop_table('devicetoken')
     op.drop_index(op.f('ix_user_username'), table_name='user')
     op.drop_index(op.f('ix_user_steam_id'), table_name='user')
     op.drop_index(op.f('ix_user_firebase_uid'), table_name='user')
