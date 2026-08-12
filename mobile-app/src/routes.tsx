@@ -5,6 +5,7 @@ import GameListView from '@gamelog/game-list/GameListView';
 import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
+import SocialView from '@gamelog/social/social-view/SocialView';
 import {
   DevView,
   DevEnvView,
@@ -89,6 +90,16 @@ export const RootTabs = createBottomTabNavigator({
       options: {
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
+        ),
+        headerShown: false,
+      },
+    },
+    Social: {
+      screen: SocialView,
+      options: {
+        title: 'Social',
+        tabBarIcon: ({ color, size, focused }) => (
+          <Ionicons name={focused ? 'people' : 'people-outline'} size={size} color={color} />
         ),
         headerShown: false,
       },

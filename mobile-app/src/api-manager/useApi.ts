@@ -36,7 +36,7 @@ export const useGetOwnedGames = (
 ) => {
   const fetchFunc = useCallback(
     () => ApiManager.getOwnedGames(playerID, includeSub, includeFreeGame),
-    [playerID, includeFreeGame]
+    [playerID, includeSub, includeFreeGame]
   );
 
   const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
@@ -96,13 +96,58 @@ export const useGetGameGenreChartData = (
   const fetchFunc = useCallback(async () => {
     const ownedGames = await ApiManager.getOwnedGames(userId, includeSub, includeFreeGame);
     return buildGenreChartData(ownedGames.response.games);
-  }, [userId]);
+  }, [userId, includeSub, includeFreeGame]);
 
   const { data, isLoading, error } = useAsyncFetch(fetchFunc);
   return {
     genreChartData: data ?? [],
     isLoadingGenreChart: isLoading,
     errorGenreChart: error,
+  };
+};
+
+export const useGetFriendList = () => {
+  const fetchFunc = useCallback(() => ApiManager.getFriendList(), []);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    friendList: data ?? [],
+    isLoadingFriendList: isLoading,
+    errorFriendList: error,
+    errorMessageFriendList: errorMessage,
+    refetchFriendList: refetch,
+  };
+};
+
+export const useSearchUsers = (query: string) => {
+  const fetchFunc = useCallback(() => {
+    if (!query.trim()) return Promise.resolve([]);
+    return ApiManager.searchUsers(query);
+  }, [query]);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    searchResults: data ?? [],
+    isLoadingSearch: isLoading,
+    errorSearch: error,
+    errorMessageSearch: errorMessage,
+    refetchSearch: refetch,
+  };
+};
+
+export const useGetFriendRecommendations = (friendId: string | null) => {
+  const fetchFunc = useCallback(() => {
+    if (!friendId) return Promise.resolve(null);
+    return ApiManager.getRecommendations(friendId);
+  }, [friendId]);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    recommendations: data,
+    isLoadingRecommendations: isLoading,
+    errorRecommendations: error,
+    errorMessageRecommendations: errorMessage,
+    refetchRecommendations: refetch,
   };
 };
 

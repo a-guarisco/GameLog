@@ -3,7 +3,8 @@ import { getApiProvider } from '@gamelog/api-manager/apiProvider';
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
-const BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
+const getBackendBaseUrl = (): string =>
+  process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
 
 const getSteamApiKey = (): string => {
   if (process.env.EXPO_PUBLIC_STEAM_API_KEY) {
@@ -76,27 +77,47 @@ const EndPoints = {
   },
 
   getStreakByUser: () => {
-    return `${BACKEND_BASE_URL}/games/streak_by_user`;
+    return `${getBackendBaseUrl()}/games/streak_by_user`;
   },
 
   getStreakByGame: (appId: string) => {
-    return `${BACKEND_BASE_URL}/games/streak_by_game?steam_app_id=${appId}`;
+    return `${getBackendBaseUrl()}/games/streak_by_game?steam_app_id=${appId}`;
   },
 
   getAuthOutcome: () => {
-    return `${BACKEND_BASE_URL}/me`;
+    return `${getBackendBaseUrl()}/me`;
   },
 
   getBackendHealth: () => {
-    return `${BACKEND_BASE_URL}/health`;
+    return `${getBackendBaseUrl()}/health`;
   },
 
   registerUser: () => {
-    return `${BACKEND_BASE_URL}/users/register`;
+    return `${getBackendBaseUrl()}/users/register`;
   },
 
   getUserMe: () => {
-    return `${BACKEND_BASE_URL}/users/me`;
+    return `${getBackendBaseUrl()}/users/me`;
+  },
+
+  searchUsers: (query: string) => {
+    return `${getBackendBaseUrl()}/users/search?q=${encodeURIComponent(query)}`;
+  },
+
+  getFriendList: () => {
+    return `${getBackendBaseUrl()}/users/friend_list`;
+  },
+
+  addFriend: () => {
+    return `${getBackendBaseUrl()}/users/add_friend`;
+  },
+
+  respondToFriend: () => {
+    return `${getBackendBaseUrl()}/users/respond_to_friend`;
+  },
+
+  getRecommendations: (friendId: string, includeTopGames: boolean = true) => {
+    return `${getBackendBaseUrl()}/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
   },
 };
 

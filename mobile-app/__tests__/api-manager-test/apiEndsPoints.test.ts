@@ -91,5 +91,15 @@ describe('apiEndsPoints', () => {
         'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=440&count=2&maxlength=300'
       );
     });
+
+    it('builds social backend endpoints correctly', () => {
+      expect(EndPoints.searchUsers('alex')).toBe('https://api.mydomain.dev/users/search?q=alex');
+      expect(EndPoints.getFriendList()).toBe('https://api.mydomain.dev/users/friend_list');
+      expect(EndPoints.addFriend()).toBe('https://api.mydomain.dev/users/add_friend');
+      expect(EndPoints.respondToFriend()).toBe('https://api.mydomain.dev/users/respond_to_friend');
+      expect(EndPoints.getRecommendations('user-123')).toBe(
+        'https://api.mydomain.dev/games/recommendations?friend=user-123&include_top_games=true'
+      );
+    });
   });
 });

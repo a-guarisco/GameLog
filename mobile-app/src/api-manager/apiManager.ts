@@ -14,6 +14,8 @@ import type {
   RecentPlayedGames,
   SteamNews,
   Streak,
+  UserSearchResult,
+  RecommendationResponse,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
@@ -45,7 +47,7 @@ async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promi
 export { getApiProvider, setApiProvider, isBackendProvider, fetchData, fetchAuthenticatedData };
 export default {
   getGameNews: (appId: string, count: number, maxLength: number) =>
-    fetchData(EndPoints.getNewsForApp(appId, count, maxLength)),
+    fetchData<SteamNews>(EndPoints.getNewsForApp(appId, count, maxLength)),
   getSchemaForGame: (appId: string) => fetchData<GameSchema>(EndPoints.getSchemaForGame(appId)),
   getGlobalAchievement: async (appId: string): Promise<GlobalAchievement> => {
     const globalAchievementsPromise = fetchData<GlobalAchievement>(
@@ -81,4 +83,22 @@ export default {
   getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
   getStreakByGame: (appId: string) =>
     fetchAuthenticatedData<Streak>(EndPoints.getStreakByGame(appId)),
+
+  searchUsers: (query: string) =>
+    fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),
+  getFriendList: () => fetchAuthenticatedData<UserSearchResult[]>(EndPoints.getFriendList()),
+  addFriend: (addresseeId: string) =>
+    fetchAuthenticatedData<{ message: string; friendship_id: string }>(EndPoints.addFriend(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ addressee_id: addresseeId }),
+    }),
+  respondToFriend: (friendshipId: string, action: 'ACCEPTED' | 'REJECTED' | 'BLOCKED') =>
+    fetchAuthenticatedData<{ message: string }>(EndPoints.respondToFriend(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ friendship_id: friendshipId, action }),
+    }),
+  getRecommendations: (friendId: string) =>
+    fetchAuthenticatedData<RecommendationResponse>(EndPoints.getRecommendations(friendId)),
 };

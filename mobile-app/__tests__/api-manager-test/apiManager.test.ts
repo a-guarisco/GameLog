@@ -205,8 +205,8 @@ describe('ApiManager', () => {
     'fetches owned premium games successfully',
     'handles owned games fetch failure',
     { response: { games: [] } },
-    () => ApiManager.getOwnedGames(steamId, false),
-    EndPoints.getOwnedGames(steamId, false)
+    () => ApiManager.getOwnedGames(steamId, false, false),
+    EndPoints.getOwnedGames(steamId, false, false)
   );
 
   testHelper(
@@ -277,6 +277,93 @@ describe('ApiManager', () => {
 
       await expect(ApiManager.getStreakByUser()).rejects.toThrow('No active Firebase user session');
       expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it('fetches search users with the current Firebase token', async () => {
+      const mockResponse = [
+        { user: { id: 'u1', username: 'alex', steam_id: '123' }, friendship: {} },
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.searchUsers('alex');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.searchUsers('alex'), {
+        headers: { Authorization: 'Bearer firebase-id-token' },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('fetches friend list with the current Firebase token', async () => {
+      const mockResponse = [
+        {
+          user: { id: 'u2', username: 'bob', steam_id: '456' },
+          friendship: { friendship_status: 'accepted' },
+        },
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.getFriendList();
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getFriendList(), {
+        headers: { Authorization: 'Bearer firebase-id-token' },
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('sends friend request with POST method and body', async () => {
+      const mockResponse = { message: 'Friend request sent', friendship_id: 'f1' };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.addFriend('u2');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.addFriend(), {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer firebase-id-token',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ addressee_id: 'u2' }),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('responds to friend request with POST method and body', async () => {
+      const mockResponse = { message: 'Friend request accepted' };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.respondToFriend('f1', 'ACCEPTED');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.respondToFriend(), {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer firebase-id-token',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ friendship_id: 'f1', action: 'ACCEPTED' }),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('fetches recommendations for a friend', async () => {
+      const mockResponse = { common_games: [], common_genres: [], top_games: [] };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.getRecommendations('u2');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getRecommendations('u2'), {
+        headers: { Authorization: 'Bearer firebase-id-token' },
+      });
+      expect(result).toEqual(mockResponse);
     });
   });
 
