@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Ionicons from '@react-native-vector-icons/ionicons';
-
 import GameListView from '@gamelog/game-list/GameListView';
 import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
@@ -15,21 +14,6 @@ import {
   PaletteView,
   FontsView,
 } from '@gamelog/dev';
-import GameBanner from '@gamelog/game/GameBanner';
-
-const renderGameBannerHeader = (route: any) => {
-  const gameItem = route?.params?.gameItem;
-  const appId = gameItem.appid;
-
-  if (!appId) {
-    console.log('No game data found in route params:', route?.params);
-    return null;
-  }
-
-  return (
-    <GameBanner appid={appId} title={gameItem?.name ?? 'Game'} streak={gameItem?.streak ?? 2} />
-  );
-};
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
@@ -42,15 +26,11 @@ export const GameListStack = createNativeStackNavigator({
     },
     Game: {
       screen: GameView,
-      options: ({ route }: any) => ({
-        header: () => renderGameBannerHeader(route),
-      }),
+      options: { headerShown: false },
     },
     AchievementsList: {
       screen: AchievementsListView,
-      options: ({ route }: any) => ({
-        header: () => renderGameBannerHeader(route),
-      }),
+      options: { headerShown: false },
     },
   },
 });
