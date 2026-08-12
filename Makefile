@@ -69,7 +69,10 @@ emulator-bg:
 	@echo "ℹ️  Firebase Auth Emulator auto-launch skipped (START_EMULATOR=false). Connecting to emulator on port 9099..."
 else
 emulator-bg:
-	@$(PYTHON) -c "import socket, subprocess; s = socket.socket(); open = (s.connect_ex(('127.0.0.1', 9099)) == 0); s.close(); print('🔥 Firebase Auth Emulator is already running on port 9099') if open else (print('🔥 Starting Firebase Auth Emulator in background...'), subprocess.Popen(['npx', 'firebase', 'emulators:start', '--only', 'auth', '--project', 'gamelog-40e10', '--import=./emulator-data', '--export-on-exit=./emulator-data'], shell=True))"
+	@$(PYTHON) backend/scripts/start_firebase_emulator.py
+
+
+
 
 
 endif
