@@ -13,6 +13,7 @@ import { SuccessBox, InfoBox } from '@gamelog/common/feedbacks';
 import { FirebaseTokenGenerator } from './FirebaseTokenGenerator';
 import { BackendTestAuth } from './BackendTestAuth';
 import { FirebaseSignUpTest } from './FirebaseSignUpTest';
+import { GoogleAuthTest } from './GoogleAuthTest';
 
 export const DevAuthView = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
@@ -81,6 +82,15 @@ export const DevAuthView = () => {
         >
           <Text className="text-sm font-semibold text-typography-0">Backend Auth Verification</Text>
           <BackendTestAuth className="w-full" />
+        </Card>
+
+        {/* Google OAuth2 Card */}
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">Google OAuth2 Sign-In</Text>
+          <GoogleAuthTest className="w-full" />
         </Card>
 
         {/* User Registration Pipeline Card */}
