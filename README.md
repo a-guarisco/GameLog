@@ -14,6 +14,7 @@ GameLog is a full-stack gaming statistics and tracking platform split into two m
   - [Option A: Local Firebase Auth Emulator Workflow (Recommended - No Console Access Required)](#option-a-local-firebase-auth-emulator-workflow-recommended---no-console-access-required)
   - [Option B: Live Firebase Cloud Project (Production Mode)](#option-b-live-firebase-cloud-project-production-mode)
 - [End-to-End Authentication Test Flow](#end-to-end-authentication-test-flow)
+- [Google Sign-In (OAuth2) Configuration](#google-sign-in-oauth2-configuration)
 - [Workspace Documentation Links](#workspace-documentation-links)
 
 ---
@@ -129,7 +130,7 @@ To validate authentication end-to-end from the mobile app to the backend:
 
 ---
 
-### Google Sign-In (OAuth2) Configuration
+## Google Sign-In (OAuth2) Configuration
 
 *(Note: Testing Google Sign-In requires a real Google account. Standard test accounts like `test@test.com` used in the End-to-End flow above will not work for this).*
 
