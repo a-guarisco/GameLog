@@ -29,8 +29,6 @@ class UserUpdate(SQLModel):
     username: str | None = Field(default=None, max_length=100)
     steam_id: str | None = Field(default=None, max_length=32)
     steam_api_key: str | None = Field(default=None, max_length=255)
-
-
 # endregion
 
 
@@ -43,8 +41,6 @@ class SteamRollingTimeCreate(SteamRollingTimeBase):
 class SteamRollingTimeRead(SteamRollingTimeBase):
     id: uuid.UUID
     user_id: uuid.UUID
-
-
 # endregion
 
 
@@ -80,6 +76,16 @@ class FriendshipResponseStatus(str, Enum):
 class FriendshipResponse(BaseModel):
     friendship_id: FriendshipBase.model_fields["id"].annotation
     action: FriendshipResponseStatus
+# endregion
 
 
+# region Steam Friends
+class SteamFriend(BaseModel):
+    steamid: str
+    relationship: str
+    friend_since: int
+
+
+class GetFriendListResponse(BaseModel):
+    friends: list[SteamFriend]
 # endregion

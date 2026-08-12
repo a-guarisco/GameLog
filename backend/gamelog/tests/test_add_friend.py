@@ -38,12 +38,11 @@ class TestSendFriendRequest:
     # Happy path
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_sends_friend_request_successfully(self, session):
+    def test_sends_friend_request_successfully(self, session):
         requester = make_user(session, firebase_uid="uid-req", username="requester", steam_id="100")
         addressee = make_user(session, firebase_uid="uid-addr", username="addressee", steam_id="200")
 
-        result = await send_friend_request(session, "uid-req", addressee.id)
+        result = send_friend_request(session, "uid-req", addressee.id)
 
         assert result["message"] == "Friend request sent"
         assert "friendship_id" in result
@@ -59,12 +58,11 @@ class TestSendFriendRequest:
     # Self-add
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_cannot_add_yourself(self, session):
+    def test_cannot_add_yourself(self, session):
         user = make_user(session, firebase_uid="uid-self", username="selfuser", steam_id="300")
 
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-self", user.id)
+            send_friend_request(session, "uid-self", user.id)
 
         assert exc_info.value.status_code == 400
         assert "yourself" in exc_info.value.detail.lower()
@@ -73,13 +71,12 @@ class TestSendFriendRequest:
     # Non-existing addressee
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_addressee_not_found(self, session):
+    def test_addressee_not_found(self, session):
         make_user(session, firebase_uid="uid-lonely", username="lonely", steam_id="400")
         fake_id = uuid.uuid4()
 
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-lonely", fake_id)
+            send_friend_request(session, "uid-lonely", fake_id)
 
         assert exc_info.value.status_code == 404
         assert "addressee" in exc_info.value.detail.lower()
@@ -88,17 +85,16 @@ class TestSendFriendRequest:
     # Duplicate pending (same direction)
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_duplicate_pending_same_direction(self, session):
+    def test_duplicate_pending_same_direction(self, session):
         make_user(session, firebase_uid="uid-dup-req", username="dupreq", steam_id="500")
         addressee = make_user(session, firebase_uid="uid-dup-addr", username="dupaddr", steam_id="600")
 
         # First request succeeds
-        await send_friend_request(session, "uid-dup-req", addressee.id)
+        send_friend_request(session, "uid-dup-req", addressee.id)
 
         # Second request should fail
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-dup-req", addressee.id)
+            send_friend_request(session, "uid-dup-req", addressee.id)
 
         assert exc_info.value.status_code == 409
         assert "pending" in exc_info.value.detail.lower()
@@ -107,17 +103,16 @@ class TestSendFriendRequest:
     # Duplicate pending (reverse direction)
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_duplicate_pending_reverse_direction(self, session):
+    def test_duplicate_pending_reverse_direction(self, session):
         user_a = make_user(session, firebase_uid="uid-rev-a", username="reva", steam_id="700")
         user_b = make_user(session, firebase_uid="uid-rev-b", username="revb", steam_id="800")
 
         # B sends request to A
-        await send_friend_request(session, "uid-rev-b", user_a.id)
+        send_friend_request(session, "uid-rev-b", user_a.id)
 
         # A tries to send request to B – should fail (pending already exists)
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-rev-a", user_b.id)
+            send_friend_request(session, "uid-rev-a", user_b.id)
 
         assert exc_info.value.status_code == 409
         assert "pending" in exc_info.value.detail.lower()
@@ -126,8 +121,7 @@ class TestSendFriendRequest:
     # Already accepted
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_already_accepted_friendship(self, session):
+    def test_already_accepted_friendship(self, session):
         requester = make_user(session, firebase_uid="uid-acc-req", username="accreq", steam_id="900")
         addressee = make_user(session, firebase_uid="uid-acc-addr", username="accaddr", steam_id="1000")
 
@@ -141,7 +135,7 @@ class TestSendFriendRequest:
         session.commit()
 
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-acc-req", addressee.id)
+            send_friend_request(session, "uid-acc-req", addressee.id)
 
         assert exc_info.value.status_code == 409
         assert "already friends" in exc_info.value.detail.lower()
@@ -150,8 +144,7 @@ class TestSendFriendRequest:
     # Blocked friendship (blocker can change mind and re-send)
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_blocked_by_requester(self, session):
+    def test_blocked_by_requester(self, session):
         requester = make_user(session, firebase_uid="uid-blk-req", username="blkreq", steam_id="1100")
         addressee = make_user(session, firebase_uid="uid-blk-addr", username="blkaddr", steam_id="1200")
 
@@ -165,7 +158,7 @@ class TestSendFriendRequest:
         session.add(friendship)
         session.commit()
 
-        result = await send_friend_request(session, "uid-blk-req", addressee.id)
+        result = send_friend_request(session, "uid-blk-req", addressee.id)
 
         assert result["message"] == "Friend request sent"
         # Verify the old friendship block was deleted
@@ -181,8 +174,7 @@ class TestSendFriendRequest:
     # Blocked friendship (addressee blocked requester)
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_blocked_by_addressee(self, session):
+    def test_blocked_by_addressee(self, session):
         user_a = make_user(session, firebase_uid="uid-blk-a", username="blka", steam_id="1300")
         user_b = make_user(session, firebase_uid="uid-blk-b", username="blkb", steam_id="1400")
 
@@ -198,7 +190,7 @@ class TestSendFriendRequest:
 
         # A tries to send request to B – should be blocked
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-blk-a", user_b.id)
+            send_friend_request(session, "uid-blk-a", user_b.id)
 
         assert exc_info.value.status_code == 403
         assert "cannot send" in exc_info.value.detail.lower()
@@ -207,12 +199,11 @@ class TestSendFriendRequest:
     # Requester not found
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_requester_not_found(self, session):
+    def test_requester_not_found(self, session):
         addressee = make_user(session, firebase_uid="uid-addr-only", username="addronly", steam_id="1500")
 
         with pytest.raises(HTTPException) as exc_info:
-            await send_friend_request(session, "uid-nonexistent", addressee.id)
+            send_friend_request(session, "uid-nonexistent", addressee.id)
 
         assert exc_info.value.status_code == 404
 

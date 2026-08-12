@@ -35,11 +35,12 @@ async def test_lifespan_scheduler_enabled():
     with (
         patch("src.core.scheduler.get_settings", return_value=mock_settings),
         patch("src.core.scheduler._scheduler_loop"),
+        patch("src.core.scheduler._scheduler_weekly_loop"),
         patch("src.core.scheduler.asyncio.create_task") as mock_create_task,
     ):
         async with lifespan(None):
             pass
-        mock_create_task.assert_called_once()
+        assert mock_create_task.call_count == 2
 
 
 @pytest.mark.anyio

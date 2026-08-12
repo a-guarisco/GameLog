@@ -36,15 +36,13 @@ class TestGetUserByFirebaseUid:
     # Happy path
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_returns_user_read_for_existing_user(self, session):
+    def test_returns_user_read_for_existing_user(self, session):
         make_user(session, firebase_uid="uid-1", username="alice", steam_id="111")
-        result = await get_user_by_firebase_uid(session, "uid-1")
+        result = get_user_by_firebase_uid(session, "uid-1")
         assert isinstance(result, UserRead)
         assert result.firebase_uid == "uid-1"
 
-    @pytest.mark.anyio
-    async def test_returned_values_match_stored_user(self, session):
+    def test_returned_values_match_stored_user(self, session):
         user = make_user(
             session,
             firebase_uid="uid-match",
@@ -52,7 +50,7 @@ class TestGetUserByFirebaseUid:
             steam_id="999",
             steam_api_key="MYKEY",
         )
-        result = await get_user_by_firebase_uid(session, "uid-match")
+        result = get_user_by_firebase_uid(session, "uid-match")
         assert result.id == user.id
         assert result.username == "bob"
         assert result.steam_id == "999"
@@ -61,36 +59,32 @@ class TestGetUserByFirebaseUid:
     # Not found
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_raises_404_when_user_not_found(self, session):
+    def test_raises_404_when_user_not_found(self, session):
         with pytest.raises(HTTPException) as exc_info:
-            await get_user_by_firebase_uid(session, "nonexistent-uid")
+            get_user_by_firebase_uid(session, "nonexistent-uid")
         assert exc_info.value.status_code == 404
         assert "not found" in exc_info.value.detail.lower()
 
-    @pytest.mark.anyio
-    async def test_raises_404_for_empty_uid_string(self, session):
+    def test_raises_404_for_empty_uid_string(self, session):
         with pytest.raises(HTTPException) as exc_info:
-            await get_user_by_firebase_uid(session, "")
+            get_user_by_firebase_uid(session, "")
         assert exc_info.value.status_code == 404
 
     # ------------------------------------------------------------------
     # Missing steam_id
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_raises_500_when_steam_id_is_empty_string(self, session):
+    def test_raises_500_when_steam_id_is_empty_string(self, session):
         user = User(firebase_uid="uid-no-steam", username="nosTeam", steam_id="", steam_api_key="K")
         session.add(user)
         session.commit()
 
         with pytest.raises(HTTPException) as exc_info:
-            await get_user_by_firebase_uid(session, "uid-no-steam")
+            get_user_by_firebase_uid(session, "uid-no-steam")
         assert exc_info.value.status_code == 500
         assert "steam" in exc_info.value.detail.lower()
 
-    @pytest.mark.anyio
-    async def test_raises_500_when_steam_id_is_none(self, session):
+    def test_raises_500_when_steam_id_is_none(self, session):
         # The DB schema has NOT NULL on steam_id so we can't INSERT NULL directly.
         # Instead, mock session.exec() to return a fake user with steam_id=None
         # to test the service's falsy guard independently of the DB constraint.
@@ -107,20 +101,19 @@ class TestGetUserByFirebaseUid:
         mock_result.first.return_value = fake_user
 
         with patch.object(session, "exec", return_value=mock_result), pytest.raises(HTTPException) as exc_info:
-            await get_user_by_firebase_uid(session, "uid-none-steam")
+            get_user_by_firebase_uid(session, "uid-none-steam")
         assert exc_info.value.status_code == 500
 
     # ------------------------------------------------------------------
     # Multiple users – correct one returned
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_returns_correct_user_among_many(self, session):
+    def test_returns_correct_user_among_many(self, session):
         make_user(session, firebase_uid="uid-a", username="alpha", steam_id="111")
         make_user(session, firebase_uid="uid-b", username="beta", steam_id="222")
         make_user(session, firebase_uid="uid-c", username="gamma", steam_id="333")
 
-        result = await get_user_by_firebase_uid(session, "uid-b")
+        result = get_user_by_firebase_uid(session, "uid-b")
         assert result.firebase_uid == "uid-b"
         assert result.username == "beta"
         assert result.steam_id == "222"
@@ -129,16 +122,14 @@ class TestGetUserByFirebaseUid:
     # Return type guarantee
     # ------------------------------------------------------------------
 
-    @pytest.mark.anyio
-    async def test_result_is_userread_not_orm_user(self, session):
+    def test_result_is_userread_not_orm_user(self, session):
         make_user(session, firebase_uid="uid-type", username="typetest", steam_id="555")
-        result = await get_user_by_firebase_uid(session, "uid-type")
+        result = get_user_by_firebase_uid(session, "uid-type")
         # UserRead is a pydantic model; User is the SQLModel ORM table class
         assert not isinstance(result, User)
         assert isinstance(result, UserRead)
 
-    @pytest.mark.anyio
-    async def test_id_field_is_uuid(self, session):
+    def test_id_field_is_uuid(self, session):
         make_user(session, firebase_uid="uid-uuid", username="uuidtest", steam_id="777")
-        result = await get_user_by_firebase_uid(session, "uid-uuid")
+        result = get_user_by_firebase_uid(session, "uid-uuid")
         assert isinstance(result.id, uuid.UUID)
