@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 from sqlalchemy import false
 from src.models.device_token import DeviceToken
 from src.models.notification import Notification
-from src.users.user_service import get_user_by_firebase_uid
+from src.users import user_service
 
 
 def register_device_token(
@@ -18,7 +18,7 @@ def register_device_token(
     """
     Register a new device token for the authenticated user that made the request.
     """
-    user = get_user_by_firebase_uid(session, firebase_uid)
+    user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
     existing_token = session.exec(
         select(DeviceToken).where(DeviceToken.device_token == token)
@@ -50,7 +50,7 @@ def unregister_device_token(session: Session, firebase_uid: str, token: str) -> 
     """
     Delete the token from the database if the authenticated user owns it.
     """
-    user = get_user_by_firebase_uid(session, firebase_uid)
+    user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
     existing_token = session.exec(
         select(DeviceToken).where(DeviceToken.device_token == token)
@@ -145,7 +145,7 @@ def get_user_notifications(
     """
     Fetch paginated notifications for the authenticated user.
     """
-    user = get_user_by_firebase_uid(session, firebase_uid)
+    user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
     statement = (
         select(Notification)
@@ -165,7 +165,7 @@ def mark_as_read(
     """
     Mark a single notification as read.
     """
-    user = get_user_by_firebase_uid(session, firebase_uid)
+    user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
     notification = session.get(Notification, notification_id)
     if not notification or notification.user_id != user.id:
@@ -181,11 +181,11 @@ def mark_as_read(
     return notification
 
 
-def mark_all_as_read(session: Session, firebase_uid: str) -> None:
+def mark_all_as_read(session: Session, firebase_uid: str) -> dict[str, str]:
     """
     Mark all notifications for the authenticated user as read.
     """
-    user = get_user_by_firebase_uid(session, firebase_uid)
+    user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
     statement = select(Notification).where(
         Notification.user_id == user.id,
@@ -197,4 +197,4 @@ def mark_all_as_read(session: Session, firebase_uid: str) -> None:
         session.add(notif)
     session.commit()
 
-    return None
+    return {"message": "All notifications marked as read"}
