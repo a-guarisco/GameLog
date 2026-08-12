@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
+import { Streak } from './dto';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
@@ -55,6 +56,35 @@ export const useGetPlayersInfo = (steamIds: string[]) => {
     playersInfo: data,
     isLoadingPlayersInfo: isLoading,
     errorPlayersInfo: error,
+  };
+};
+
+type StreakResponse = Streak | number | null;
+
+const normalizeStreak = (data: StreakResponse): Streak | null => {
+  if (data === null) return null;
+  return typeof data === 'number' ? { streak: data } : data;
+};
+
+export const useGetGameStreak = (gameID: string) => {
+  const fetchFunc = useCallback(() => ApiManager.getStreakByGame(gameID), [gameID]);
+
+  const { data, isLoading, error } = useAsyncFetch<Streak | number>(fetchFunc);
+  return {
+    gameStreak: normalizeStreak(data),
+    isLoadingGameStreak: isLoading,
+    errorGameStreak: error,
+  };
+};
+
+export const useGetUserStreak = () => {
+  const fetchFunc = useCallback(() => ApiManager.getStreakByUser(), []);
+
+  const { data, isLoading, error } = useAsyncFetch<Streak | number>(fetchFunc);
+  return {
+    userStreak: normalizeStreak(data),
+    isLoadingUserStreak: isLoading,
+    errorUserStreak: error,
   };
 };
 

@@ -5,6 +5,8 @@ import {
   useGetGlobalAchievement,
   useGetOwnedGames,
   useGetPlayersInfo,
+  useGetGameStreak,
+  useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -124,5 +126,45 @@ describe('useGetPlayersInfo', () => {
       error: 'errorPlayersInfo',
     },
     mockData: [{ steamid: 'steamId1', personaname: 'PlayerOne' }],
+  });
+});
+
+describe('useGetUserStreak', () => {
+  useTestApiHook({
+    useHook: useGetUserStreak,
+    apiMethod: 'getStreakByUser',
+    apiArgs: [],
+    expectedKeys: {
+      data: 'userStreak',
+      loading: 'isLoadingUserStreak',
+      error: 'errorUserStreak',
+    },
+    mockData: { streak: 5 },
+  });
+
+  it('normalizes numeric backend streak response to streak object', () => {
+    mockAsyncFetch({ data: 14 });
+    const { result } = renderHook(useGetUserStreak);
+    expect(result.current.userStreak).toEqual({ streak: 14 });
+  });
+});
+
+describe('useGetGameStreak', () => {
+  useTestApiHook({
+    useHook: () => useGetGameStreak('app-1'),
+    apiMethod: 'getStreakByGame',
+    apiArgs: ['app-1'],
+    expectedKeys: {
+      data: 'gameStreak',
+      loading: 'isLoadingGameStreak',
+      error: 'errorGameStreak',
+    },
+    mockData: { streak: 9 },
+  });
+
+  it('normalizes numeric backend streak response to streak object', () => {
+    mockAsyncFetch({ data: 8 });
+    const { result } = renderHook(() => useGetGameStreak('app-1'));
+    expect(result.current.gameStreak).toEqual({ streak: 8 });
   });
 });

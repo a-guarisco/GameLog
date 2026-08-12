@@ -5,13 +5,16 @@ import HeaderGameImage from '@gamelog/game/HeaderGameImage';
 import BannerInfo from '@gamelog/common/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
+import { useGetGameStreak } from '@gamelog/api-manager/useApi';
+import { useStreakText } from '@gamelog/common/useStreakText';
 
 const GameView = () => {
   const route = useRoute<any>();
   const { gameItem } = route.params;
   const playerID = '76561198077919169'; //FIX
+  const { gameStreak, isLoadingGameStreak } = useGetGameStreak(gameItem.appid);
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameItem.appid);
-  const secondaryText = gameItem.streak > 0 ? `🔥 ${gameItem.streak} day streak` : '0 day streak';
+  const secondaryText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
 
   return (
     <Box className="flex-1 relative">

@@ -5,6 +5,7 @@ import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
@@ -14,17 +15,29 @@ import ProfileStats from './ProfileStats';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
+import { useStreakText } from '@gamelog/common/useStreakText';
 
 const USER_ID = '76561198077919169';
 const TEMP_APPID = '236390';
 
 const ProfileView = () => {
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(USER_ID, false);
-  const { genreChartData, isLoadingGenreChart, errorGenreChart } =
-    useGetGameGenreChartData(USER_ID);
+  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(
+    USER_ID,
+    false,
+    false
+  );
+  const { genreChartData, isLoadingGenreChart, errorGenreChart } = useGetGameGenreChartData(
+    USER_ID,
+    false,
+    false
+  );
   const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
-  const isLoading = isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo;
+  const { userStreak, isLoadingUserStreak } = useGetUserStreak();
+  const isLoading =
+    isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo || isLoadingUserStreak;
   const player = playersInfo?.response?.players?.[0];
+
+  const streakText = useStreakText(userStreak?.streak, isLoadingUserStreak);
 
   const chartComponents = useMemo(
     () => [
@@ -32,7 +45,7 @@ const ProfileView = () => {
         key="BannerInfo"
         className="bg-background-100 shadow-xl"
         title={player?.personaname ?? 'Unknown User'}
-        secondaryText="🔥 10 day streak"
+        secondaryText={streakText}
         iconUrl={player?.avatarfull}
       />,
       <ProfileStats key="ProfileStats" />,
@@ -61,7 +74,7 @@ const ProfileView = () => {
         errorOwnedGames={errorOwnedGames}
       />,
     ],
-    [ownedGames, genreChartData, errorOwnedGames, errorGenreChart, player]
+    [ownedGames, genreChartData, errorOwnedGames, errorGenreChart, player, streakText]
   );
 
   if (isLoading) {

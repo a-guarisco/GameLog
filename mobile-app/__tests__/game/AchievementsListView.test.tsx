@@ -5,6 +5,7 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   getAllPlayerAchievementsPerApp: jest.fn(),
+  getStreakByGame: jest.fn().mockResolvedValue({ streak: 0 }),
 }));
 
 const mockRoute = {

@@ -9,3 +9,4 @@ export * from './ownedGames';
 export * from './recentPlayedGames';
 export * from './gameGenres';
 export * from './gameSchema';
+export * from './streak';
