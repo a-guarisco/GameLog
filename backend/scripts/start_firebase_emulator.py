@@ -33,7 +33,7 @@ def main():
     start_time = time.time()
     ready = False
     
-    while time.time() - start_time < 20:
+    while time.time() - start_time < 60:
         if is_port_open(9099):
             ready = True
             break
