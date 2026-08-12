@@ -12,7 +12,20 @@
           "package_name": "com.gamelog.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "799231800910-blsh6mejt76hhp6eg6ktogd0mrub31uu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gamelog.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "799231800910-coul5brdbsfglpgj41n2nsufedt1ju5p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB1GsCgLLiOMK8pA98vXRWgVruwGKu5fDI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "799231800910-coul5brdbsfglpgj41n2nsufedt1ju5p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -3,7 +3,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from src.models.game import GameBase
+from src.models.game import GameBase, Genre
 
 
 class GameCreate(GameBase):
@@ -12,6 +12,7 @@ class GameCreate(GameBase):
 
 class GameRead(GameBase):
     id: uuid.UUID
+    genres: list[Genre] = []
 
 
 """
@@ -22,12 +23,12 @@ Schemas from the Steam API GetOwnedGames response item
 class SteamGame(BaseModel):
     appid: int
     playtime_forever: int
-    playtime_windows_forever: int
-    playtime_mac_forever: int
-    playtime_linux_forever: int
-    playtime_deck_forever: int
-    rtime_last_played: int
-    playtime_disconnected: int
+    playtime_windows_forever: int = 0
+    playtime_mac_forever: int = 0
+    playtime_linux_forever: int = 0
+    playtime_deck_forever: int = 0
+    rtime_last_played: int = 0
+    playtime_disconnected: int = 0
 
 
 """
@@ -57,3 +58,27 @@ Schema from the backend in response to streak_by_user or streak_by_game
 
 class Streak(BaseModel):
     streak: int
+
+
+class CommonGames(BaseModel):
+    gameSteamId: str
+    requester_play_time: int
+    friend_play_time: int
+
+
+class RecommendedTopGame(BaseModel):
+    gameSteamId: str
+    keys: list[Genre]
+
+
+class RecommendationResponse(BaseModel):
+    common_games: list[CommonGames]
+    common_genres: list[Genre]
+    top_games: list[RecommendedTopGame]
+
+
+class SteamTopGame(BaseModel):
+    rank: int
+    appid: int
+
+

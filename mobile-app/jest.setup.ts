@@ -42,3 +42,19 @@ jest.mock('firebase/auth', () => ({
 if (!process.env.EXPO_PUBLIC_STEAM_API_KEY) {
   process.env.EXPO_PUBLIC_STEAM_API_KEY = 'test-steam-api-key';
 }
+
+jest.mock('@react-native-google-signin/google-signin', () => ({
+  GoogleSignin: {
+    configure: jest.fn(),
+    hasPlayServices: jest.fn(() => Promise.resolve(true)),
+    signIn: jest.fn(() =>
+      Promise.resolve({
+        data: {
+          idToken: 'mock-google-id-token',
+        },
+      })
+    ),
+    signOut: jest.fn(() => Promise.resolve()),
+    isSignedIn: jest.fn(() => Promise.resolve(false)),
+  },
+}));
