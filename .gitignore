@@ -25,6 +25,7 @@
 
 # Firebase debug logs
 firebase-debug.log
+firebase-emulator.log
 *-debug.log
 
 # Firebase Emulator

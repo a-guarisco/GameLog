@@ -169,7 +169,7 @@ db-shell:
 db-clean:
 	$(COMPOSE) down -v
 	$(COMPOSE) up -d
-	@python -c "import time; time.sleep(3)"
+	@$(PYTHON) -c "import time; time.sleep(3)"
 	@echo "✅ Database cleaned and recreated"
 
 db-snapshot:
@@ -182,6 +182,6 @@ db-snapshot:
 db-restore:
 	$(COMPOSE) down -v
 	$(COMPOSE) up -d
-	@python -c "import time; time.sleep(3)"
+	@$(PYTHON) -c "import time; time.sleep(3)"
 	$(COMPOSE) exec -T db psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(SNAPSHOT_DIR)/snapshot_latest.sql
 	@echo "✅ Database restored from snapshot"
