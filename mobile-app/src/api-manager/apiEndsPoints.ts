@@ -119,6 +119,14 @@ const EndPoints = {
   getRecommendations: (friendId: string, includeTopGames: boolean = true) => {
     return `${getBackendBaseUrl()}/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
   },
+
+  registerDeviceToken: () => {
+    return `${getBackendBaseUrl()}/notifications/register_device`;
+  },
+
+  unregisterDeviceToken: () => {
+    return `${getBackendBaseUrl()}/notifications/unregister_device`;
+  },
 };
 
 export { isBackendProvider, getSteamApiKey };

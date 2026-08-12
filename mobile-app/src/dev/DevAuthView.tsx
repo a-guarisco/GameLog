@@ -14,6 +14,7 @@ import { FirebaseTokenGenerator } from './FirebaseTokenGenerator';
 import { BackendTestAuth } from './BackendTestAuth';
 import { FirebaseSignUpTest } from './FirebaseSignUpTest';
 import { GoogleAuthTest } from './GoogleAuthTest';
+import { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest';
 
 export const DevAuthView = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
@@ -64,6 +65,17 @@ export const DevAuthView = () => {
           </Button>
 
           {sessionMessage ? <SuccessBox message={sessionMessage} /> : null}
+        </Card>
+
+        {/* FCM Push Notification Device Card */}
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">
+            FCM Device Push Registration
+          </Text>
+          <FirebaseDeviceNotificationTest className="w-full" />
         </Card>
 
         {/* Token Generator Card */}

@@ -101,4 +101,16 @@ export default {
     }),
   getRecommendations: (friendId: string) =>
     fetchAuthenticatedData<RecommendationResponse>(EndPoints.getRecommendations(friendId)),
+  registerDeviceToken: (token: string, deviceType: string = 'android') =>
+    fetchAuthenticatedData<{ id: string; device_token: string }>(EndPoints.registerDeviceToken(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, device_type: deviceType }),
+    }),
+  unregisterDeviceToken: (token: string) =>
+    fetchAuthenticatedData<void>(EndPoints.unregisterDeviceToken(), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    }),
 };

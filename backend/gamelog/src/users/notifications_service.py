@@ -106,7 +106,7 @@ def send_notification_to_user(
             multicast_msg = messaging.MulticastMessage(
                 notification=messaging.Notification(title=title, body=body),
                 data=string_data,
-                fids=tokens,
+                tokens=tokens,
             )
             response = messaging.send_each_for_multicast(multicast_msg)
 
@@ -115,10 +115,14 @@ def send_notification_to_user(
                 for idx, resp in enumerate(response.responses):
                     if not resp.success:
                         err_str = str(resp.exception) if resp.exception else ""
+                        print(
+                            f"[FCM Error] Failed to send push notification to token {tokens[idx]}: {err_str}",
+                            flush=True,
+                        )
                         if (
                             isinstance(resp.exception, messaging.UnregisteredError)
                             or "not-registered" in err_str.lower()
-                            or "invalid" in err_str.lower()
+                            or "unregistered" in err_str.lower()
                         ):
                             stale_tokens.append(tokens[idx])
 
@@ -128,6 +132,7 @@ def send_notification_to_user(
                             select(DeviceToken).where(DeviceToken.device_token == st)
                         ).first()
                         if st_obj:
+                            print(f"[FCM Info] Deleting unregistered stale token: {st}", flush=True)
                             session.delete(st_obj)
                     session.commit()
         except Exception as e:
