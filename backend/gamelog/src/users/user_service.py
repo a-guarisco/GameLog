@@ -1,5 +1,5 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from fastapi import HTTPException, status
 from sqlmodel import Session, or_, select
 from src.auth.schemas import AuthenticatedUser
@@ -8,7 +8,7 @@ from src.users import FriendshipInfo, UserSearchResult
 from src.users.schemas import FriendshipResponseStatus, UserRead, UserRegisterRequest
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
 from src.users.notifications_service import send_notification_to_user
-
+from src.games.game_service import get_daily_report
 
 def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     """

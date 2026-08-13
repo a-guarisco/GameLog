@@ -1,3 +1,4 @@
+from datetime import date
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
@@ -5,7 +6,7 @@ from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.games import game_service, recommendations_service
-from src.games.schemas import RecommendationResponse
+from src.games.schemas import DailyReport, RecommendationResponse
 
 router = APIRouter(prefix="/games", tags=["games"])
 
@@ -84,3 +85,15 @@ async def get_recommendations(
             common_genres=common_genres,
             top_games=top_games
         )
+
+
+def get_daily_report(
+    session: Session,
+    firebase_uid: str,
+    target_date: date | None = None,
+) -> DailyReport:
+    """
+    Generate an on-demand daily report for the user identified by firebase_uid on target_date (defaults to today).
+    Delegates calculation to game_service.get_daily_report.
+    """
+    return game_service.get_daily_report(session=session, user_id=firebase_uid, target_date=target_date)

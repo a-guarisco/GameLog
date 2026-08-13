@@ -219,7 +219,7 @@ def test_router_register_and_unregister_device(client, session):
     assert res.status_code == 201
 
     # Get notifications (should be empty initially)
-    res_get = client.get("/notifications")
+    res_get = client.get("/notifications/history")
     assert res_get.status_code == 200
     assert res_get.json() == []
 
@@ -241,8 +241,8 @@ def test_router_read_endpoints(client, session):
         body="Router Body",
     )
 
-    # Patch read
-    res_patch = client.patch(f"/notifications/{notif.id}/read")
+    # Post read
+    res_patch = client.post(f"/notifications/{notif.id}/read")
     assert res_patch.status_code == 200
     assert res_patch.json()["is_read"] is True
 
@@ -250,3 +250,4 @@ def test_router_read_endpoints(client, session):
     res_read_all = client.post("/notifications/read_all")
     assert res_read_all.status_code == 200
     assert res_read_all.json()["message"] == "All notifications marked as read"
+
