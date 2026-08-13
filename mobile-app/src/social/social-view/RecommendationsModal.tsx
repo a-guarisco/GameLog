@@ -29,3 +29,5 @@ export const RecommendationsModal: React.FC<RecommendationsModalProps> = ({
     </Modal>
   );
 };
+
+

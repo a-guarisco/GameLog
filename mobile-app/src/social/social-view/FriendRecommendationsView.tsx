@@ -169,8 +169,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
               {recommendations.common_games.map((cg, idx) => (
                 <Pressable
                   key={idx}
-                  onPress={() => handleGamePress(cg.gameSteamId, cg.requester_play_time)}
-                  testID={`common-game-item-${cg.gameSteamId}`}
+                  onPress={() => console.log('Go to game details for App ID:', cg.gameSteamId)}
                 >
                   <Card variant="elevated" className="relative mb-2 p-0">
                     <HStack space="md" className="px-3 py-3 items-center">
@@ -181,7 +180,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                       />
                       <VStack className="flex-1">
                         <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                          {gameNames[cg.gameSteamId] || `App ID: ${cg.gameSteamId}`}
+                          App ID: {cg.gameSteamId}
                         </Text>
                         <HStack space="md" className="mt-0.5">
                           <Text size="xs" className="font-medium text-typography-400">
@@ -218,10 +217,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                     Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)
                   }
                 >
-                  <Card
-                    variant="elevated"
-                    className="relative mb-2 p-0"
-                  >
+                  <Card variant="elevated" className="relative mb-2 p-0">
                     <HStack space="md" className="px-3 py-3 items-center">
                       <Image
                         source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}
@@ -230,7 +226,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                       />
                       <VStack className="flex-1">
                         <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                          {gameNames[tg.gameSteamId] || `App ID: ${tg.gameSteamId}`}
+                          App ID: {tg.gameSteamId}
                         </Text>
                         {tg.keys && tg.keys.length > 0 && (
                           <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
