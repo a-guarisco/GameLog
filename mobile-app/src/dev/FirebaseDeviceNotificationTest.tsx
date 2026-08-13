@@ -10,11 +10,11 @@ import { SuccessBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 // Configure notifications handler: shouldShowAlert = false as requested, so real OS system notifications handle closed/background app states
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: false,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-    shouldShowBanner: false,
-    shouldShowList: false,
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 

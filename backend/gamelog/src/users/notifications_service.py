@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from firebase_admin import messaging
 from sqlmodel import Session, select
 from sqlalchemy import false
+from sqlalchemy.exc import IntegrityError
 from src.models.device_token import DeviceToken
 from src.models.notification import Notification
 from src.users import user_service
@@ -25,13 +26,7 @@ def register_device_token(
     ).first()
 
     if existing_token:
-        existing_token.user_id = user.id
-        existing_token.device_type = device_type
-        existing_token.updated_at = datetime.now(UTC)
-        session.add(existing_token)
-        session.commit()
-        session.refresh(existing_token)
-        return existing_token
+        return _update_existing_token(session, existing_token, user.id, device_type)
 
     new_device_token = DeviceToken(
         device_token=token,
@@ -41,9 +36,26 @@ def register_device_token(
         updated_at=datetime.now(UTC),
     )
     session.add(new_device_token)
-    session.commit()
-    session.refresh(new_device_token)
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        existing_token = session.exec(
+            select(DeviceToken).where(DeviceToken.device_token == token)
+        ).first()
+        if existing_token:
+            return _update_existing_token(session, existing_token, user.id, device_type)
+        raise session.refresh(new_device_token)
     return new_device_token
+
+def _update_existing_token(session: Session, existing_token: DeviceToken, user_id: uuid.UUID, device_type: str) -> DeviceToken:
+    existing_token.user_id = user_id
+    existing_token.device_type = device_type
+    existing_token.updated_at = datetime.now(UTC)
+    session.add(existing_token)
+    session.commit()
+    session.refresh(existing_token)
+    return existing_token
 
 
 def unregister_device_token(session: Session, firebase_uid: str, token: str) -> None:
