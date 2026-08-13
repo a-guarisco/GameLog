@@ -52,7 +52,7 @@ def unregister_device(
 
 
 @router.get(
-    "",
+    "/history",
     response_model=list[NotificationRead],
     summary="Get notification history for authenticated user",
 )
@@ -70,7 +70,7 @@ def get_notifications(
     )
 
 
-@router.patch(
+@router.post(
     "/{notification_id}/read",
     response_model=NotificationRead,
     summary="Mark a specific notification as read",
