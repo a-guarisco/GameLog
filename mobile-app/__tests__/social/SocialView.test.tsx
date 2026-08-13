@@ -17,6 +17,17 @@ jest.mock('@gamelog/game/HeaderGameImage', () => {
   };
 });
 
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
+  };
+});
+
 const mockUseGetFriendList = useGetFriendList as jest.Mock;
 const mockUseSearchUsers = useSearchUsers as jest.Mock;
 const mockUseGetFriendRecommendations = useGetFriendRecommendations as jest.Mock;
@@ -221,6 +232,39 @@ describe('SocialView', () => {
 
     fireEvent.press(screen.getByText('Recommendations'));
     expect(screen.getByText('Recommendations')).toBeTruthy();
+  });
+
+  it('navigates to GameView when clicking a common game in recommendations modal', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: {
+        common_games: [{ gameSteamId: '730', requester_play_time: 1200, friend_play_time: 600 }],
+        common_genres: [],
+        top_games: [],
+      },
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+    expect(screen.getByText('App ID: 730')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('common-game-item-730'));
+
+    expect(screen.queryByText('Recommendations')).toBeNull();
+    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+      screen: 'Game',
+      params: {
+        gameItem: expect.objectContaining({
+          appid: '730',
+          name: 'App ID: 730',
+        }),
+      },
+    });
   });
 });
 

@@ -1,4 +1,6 @@
 import { Image, ScrollView, Pressable, Linking } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -18,6 +20,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
   friendItem,
   onClose,
 }) => {
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const friendId = friendItem.user.id;
   const friendName = friendItem.user.username;
 
@@ -31,6 +34,20 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
   const formatHours = (minutes: number) => {
     const hrs = Math.round(minutes / 60);
     return `${hrs}h`;
+  };
+
+  const handleGamePress = (gameSteamId: string, requesterPlayTime: number) => {
+    onClose();
+    navigation.navigate('GameList', {
+      screen: 'Game',
+      params: {
+        gameItem: {
+          appid: gameSteamId,
+          name: `App ID: ${gameSteamId}`,
+          playtime_forever: requesterPlayTime || 0,
+        },
+      },
+    });
   };
 
   return (
@@ -76,42 +93,40 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                 Common Games Played
               </Text>
               {recommendations.common_games.map((cg, idx) => (
-                  <Pressable
+                <Pressable
                   key={idx}
-                  onPress={() => console.log("Go to game details for App ID:", cg.gameSteamId)}
-                  >
-                    <Box
-                        key={idx}
-                        className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
-                    >
-                      <HStack space="md" className="px-3 py-3 items-center">
-                        <Image
-                            source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
-                            className="w-16 h-16 rounded-md bg-background-300 shrink-0"
-                            resizeMode="cover"
-                        />
-                        <VStack className="flex-1">
-                          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                            App ID: {cg.gameSteamId}
+                  onPress={() => handleGamePress(cg.gameSteamId, cg.requester_play_time)}
+                  testID={`common-game-item-${cg.gameSteamId}`}
+                >
+                  <Box className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md">
+                    <HStack space="md" className="px-3 py-3 items-center">
+                      <Image
+                        source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
+                        className="w-16 h-16 rounded-md bg-background-300 shrink-0"
+                        resizeMode="cover"
+                      />
+                      <VStack className="flex-1">
+                        <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+                          App ID: {cg.gameSteamId}
+                        </Text>
+                        <HStack space="md" className="mt-0.5">
+                          <Text size="xs" className="font-medium text-typography-400">
+                            You:{' '}
+                            <Text size="xs" className="font-bold text-success-700">
+                              {formatHours(cg.requester_play_time)}
+                            </Text>
                           </Text>
-                          <HStack space="md" className="mt-0.5">
-                            <Text size="xs" className="font-medium text-typography-400">
-                              You:{' '}
-                              <Text size="xs" className="font-bold text-success-700">
-                                {formatHours(cg.requester_play_time)}
-                              </Text>
+                          <Text size="xs" className="font-medium text-typography-400">
+                            {friendName}:{' '}
+                            <Text size="xs" className="font-bold text-warning-700">
+                              {formatHours(cg.friend_play_time)}
                             </Text>
-                            <Text size="xs" className="font-medium text-typography-400">
-                              {friendName}:{' '}
-                              <Text size="xs" className="font-bold text-warning-700">
-                                {formatHours(cg.friend_play_time)}
-                              </Text>
-                            </Text>
-                          </HStack>
-                        </VStack>
-                      </HStack>
-                    </Box>
-                  </Pressable>
+                          </Text>
+                        </HStack>
+                      </VStack>
+                    </HStack>
+                  </Box>
+                </Pressable>
               ))}
             </VStack>
           )}
