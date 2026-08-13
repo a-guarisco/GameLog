@@ -1,4 +1,4 @@
-import { Image, ScrollView } from 'react-native';
+import { Image, ScrollView, Pressable, Linking } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -76,37 +76,42 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                 Common Games Played
               </Text>
               {recommendations.common_games.map((cg, idx) => (
-                <Box
+                  <Pressable
                   key={idx}
-                  className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
-                >
-                  <HStack space="md" className="px-3 py-3 items-center">
-                    <Image
-                      source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
-                      className="w-16 h-16 rounded-md bg-background-300 shrink-0"
-                      resizeMode="cover"
-                    />
-                    <VStack className="flex-1">
-                      <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                        App ID: {cg.gameSteamId}
-                      </Text>
-                      <HStack space="md" className="mt-0.5">
-                        <Text size="xs" className="font-medium text-typography-400">
-                          You:{' '}
-                          <Text size="xs" className="font-bold text-success-700">
-                            {formatHours(cg.requester_play_time)}
+                  onPress={() => console.log("Go to game details for App ID:", cg.gameSteamId)}
+                  >
+                    <Box
+                        key={idx}
+                        className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
+                    >
+                      <HStack space="md" className="px-3 py-3 items-center">
+                        <Image
+                            source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
+                            className="w-16 h-16 rounded-md bg-background-300 shrink-0"
+                            resizeMode="cover"
+                        />
+                        <VStack className="flex-1">
+                          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+                            App ID: {cg.gameSteamId}
                           </Text>
-                        </Text>
-                        <Text size="xs" className="font-medium text-typography-400">
-                          {friendName}:{' '}
-                          <Text size="xs" className="font-bold text-warning-700">
-                            {formatHours(cg.friend_play_time)}
-                          </Text>
-                        </Text>
+                          <HStack space="md" className="mt-0.5">
+                            <Text size="xs" className="font-medium text-typography-400">
+                              You:{' '}
+                              <Text size="xs" className="font-bold text-success-700">
+                                {formatHours(cg.requester_play_time)}
+                              </Text>
+                            </Text>
+                            <Text size="xs" className="font-medium text-typography-400">
+                              {friendName}:{' '}
+                              <Text size="xs" className="font-bold text-warning-700">
+                                {formatHours(cg.friend_play_time)}
+                              </Text>
+                            </Text>
+                          </HStack>
+                        </VStack>
                       </HStack>
-                    </VStack>
-                  </HStack>
-                </Box>
+                    </Box>
+                  </Pressable>
               ))}
             </VStack>
           )}
@@ -136,28 +141,34 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                 Recommended Top Games
               </Text>
               {recommendations.top_games.map((tg, idx) => (
-                <Box
+                  <Pressable
                   key={idx}
-                  className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
-                >
-                  <HStack space="md" className="px-3 py-3 items-center">
-                    <Image
-                      source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}
-                      className="w-16 h-16 rounded-md bg-background-300 shrink-0"
-                      resizeMode="cover"
-                    />
-                    <VStack className="flex-1">
-                      <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                        App ID: {tg.gameSteamId}
-                      </Text>
-                      {tg.keys && tg.keys.length > 0 && (
-                        <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
-                          Tags: {tg.keys.map((k) => k.description || k.id).join(', ')}
-                        </Text>
-                      )}
-                    </VStack>
-                  </HStack>
-                </Box>
+                  onPress={() => Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)}
+                  >
+                    <Box
+                        key={idx}
+                        className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
+                    >
+                      <HStack space="md" className="px-3 py-3 items-center">
+                        <Image
+                            source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}
+                            className="w-16 h-16 rounded-md bg-background-300 shrink-0"
+                            resizeMode="cover"
+                        />
+                        <VStack className="flex-1">
+                          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+                            App ID: {tg.gameSteamId}
+                          </Text>
+                          {tg.keys && tg.keys.length > 0 && (
+                              <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
+                                Tags: {tg.keys.map((k) => k.description || k.id).join(', ')}
+                              </Text>
+                          )}
+                        </VStack>
+                      </HStack>
+                    </Box>
+                  </Pressable>
+
               ))}
             </VStack>
           )}

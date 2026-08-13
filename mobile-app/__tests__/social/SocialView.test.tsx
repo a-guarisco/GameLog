@@ -168,4 +168,60 @@ describe('SocialView', () => {
     expect(screen.getByText('Shared Genres')).toBeTruthy();
     expect(screen.getByText('Action')).toBeTruthy();
   });
+
+  it('closes recommendations modal when clicking outside the card on the backdrop', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('recommendations-modal-backdrop'));
+    expect(screen.queryByText('Recommendations')).toBeNull();
+  });
+
+  it('closes recommendations modal when clicking the Close button', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('close-recommendations-btn'));
+    expect(screen.queryByText('Recommendations')).toBeNull();
+  });
+
+  it('does not close recommendations modal when clicking inside the pop-up card', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+
+    fireEvent.press(screen.getByText('Recommendations'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+  });
 });
+
+
