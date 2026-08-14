@@ -105,25 +105,27 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
 
   return (
     <Box className="relative overflow-hidden rounded-lg bg-background-100 shadow-xl p-5 h-4/5 flex-col">
-      <HStack className="justify-between items-center mb-4">
-        <VStack>
-          <Text size="xl" className="font-bold uppercase">
+      <Box className="relative mb-4 items-center">
+        <VStack className="items-center px-8">
+          <Text size="2xl" className="font-bold uppercase text-primary-700">
             Recommendations
           </Text>
-          <Text size="xs" className="text-typography-400 mt-0.5">
+          <Text size="sm" className="text-typography-400 mt-0.5">
             Based on common activity with {friendName}
           </Text>
         </VStack>
-        <Button
-          size="xs"
-          variant="outline"
-          action="secondary"
-          onPress={onClose}
-          testID="close-recommendations-btn"
-        >
-          <ButtonText>Close</ButtonText>
-        </Button>
-      </HStack>
+        <Box className="absolute right-0 top-0">
+          <Button
+            size="xs"
+            variant="outline"
+            action="secondary"
+            onPress={onClose}
+            testID="close-recommendations-btn"
+          >
+            <ButtonText>Close</ButtonText>
+          </Button>
+        </Box>
+      </Box>
 
       {isLoadingRecommendations ? (
         <LoadingBox message={`Analyzing games for ${friendName}...`} className="py-8" />
@@ -139,10 +141,28 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
         <InfoBox message={`No recommendation data available for ${friendName}.`} className="py-6" />
       ) : (
         <ScrollView className="flex-1 space-y-4">
+          {/* Common Genres Section */}
+          {recommendations.common_genres && recommendations.common_genres.length > 0 && (
+            <VStack className="mb-4">
+              <Text size="md" className="font-bold uppercase text-typography-400 mb-2 text-center">
+                Shared Genres
+              </Text>
+              <HStack className="flex-wrap gap-2 justify-center">
+                {recommendations.common_genres.map((genre, idx) => (
+                  <Box key={idx} className="bg-primary-500/15 px-2 py-0.5 rounded-md">
+                    <Text size="xs" className="font-bold uppercase text-primary-700">
+                      {genre.description || genre.id}
+                    </Text>
+                  </Box>
+                ))}
+              </HStack>
+            </VStack>
+          )}
+
           {/* Common Games Section */}
           {recommendations.common_games && recommendations.common_games.length > 0 && (
             <VStack className="mb-4">
-              <Text size="sm" className="font-bold uppercase text-typography-400 mb-2">
+              <Text size="md" className="font-bold uppercase text-typography-400 mb-2 text-center">
                 Common Games Played
               </Text>
               {recommendations.common_games.map((cg, idx) => (
@@ -175,7 +195,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                               {formatHours(cg.friend_play_time)}
                             </Text>
                           </Text>
-                        </HStack>
+                          </HStack>
                       </VStack>
                     </HStack>
                   </Box>
@@ -184,28 +204,10 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
             </VStack>
           )}
 
-          {/* Common Genres Section */}
-          {recommendations.common_genres && recommendations.common_genres.length > 0 && (
-            <VStack className="mb-4">
-              <Text size="sm" className="font-bold uppercase text-typography-400 mb-2">
-                Shared Genres
-              </Text>
-              <HStack className="flex-wrap gap-2">
-                {recommendations.common_genres.map((genre, idx) => (
-                  <Box key={idx} className="bg-primary-500/15 px-2 py-0.5 rounded-md">
-                    <Text size="xs" className="font-bold uppercase text-primary-700">
-                      {genre.description || genre.id}
-                    </Text>
-                  </Box>
-                ))}
-              </HStack>
-            </VStack>
-          )}
-
           {/* Top Games Section */}
           {recommendations.top_games && recommendations.top_games.length > 0 && (
             <VStack className="mb-2">
-              <Text size="sm" className="font-bold uppercase text-typography-400 mb-2">
+              <Text size="md" className="font-bold uppercase text-typography-400 mb-2 text-center">
                 Recommended Top Games
               </Text>
               {recommendations.top_games.map((tg, idx) => (
