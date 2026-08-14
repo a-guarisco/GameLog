@@ -29,6 +29,17 @@ export const useGetGlobalAchievement = (gameID: string) => {
   };
 };
 
+export const useGetGameBasicInfo = (gameID: string) => {
+  const fetchFunc = useCallback(() => ApiManager.getGameBasicInfo(gameID), [gameID]);
+
+  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  return {
+    gameBasicInfo: data,
+    isLoadingGameBasicInfo: isLoading,
+    errorGameBasicInfo: error,
+  };
+};
+
 export const useGetOwnedGames = (
   playerID: string,
   includeSub: boolean,

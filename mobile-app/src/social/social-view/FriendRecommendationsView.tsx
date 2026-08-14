@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Image, ScrollView, Pressable, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,6 +10,7 @@ import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { useGetFriendRecommendations } from '@gamelog/api-manager/useApi';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
+import ApiManager from '@gamelog/api-manager/apiManager';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 
 interface FriendRecommendationsViewProps {
@@ -31,19 +33,70 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
     errorMessageRecommendations,
   } = useGetFriendRecommendations(friendId);
 
+  const [gameNames, setGameNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!recommendations) return;
+
+    const appIds: string[] = [];
+    if (recommendations.common_games) {
+      recommendations.common_games.forEach((cg) => {
+        if (cg.gameSteamId) appIds.push(String(cg.gameSteamId));
+      });
+    }
+    if (recommendations.top_games) {
+      recommendations.top_games.forEach((tg) => {
+        if (tg.gameSteamId) appIds.push(String(tg.gameSteamId));
+      });
+    }
+
+    if (appIds.length === 0) return;
+
+    let isMounted = true;
+
+    const fetchGameNames = async () => {
+      const results = await Promise.allSettled(
+        appIds.map(async (appId) => {
+          const response = await ApiManager.getGameBasicInfo(appId);
+          return { appId, name: response?.[appId]?.data?.name };
+        })
+      );
+
+      if (!isMounted) return;
+
+      const newNames: Record<string, string> = {};
+      results.forEach((res) => {
+        if (res.status === 'fulfilled' && res.value.name) {
+          newNames[res.value.appId] = res.value.name;
+        }
+      });
+
+      if (Object.keys(newNames).length > 0) {
+        setGameNames((prev) => ({ ...prev, ...newNames }));
+      }
+    };
+
+    fetchGameNames();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [recommendations]);
+
   const formatHours = (minutes: number) => {
     const hrs = Math.round(minutes / 60);
     return `${hrs}h`;
   };
 
   const handleGamePress = (gameSteamId: string, requesterPlayTime: number) => {
+    const displayName = gameNames[gameSteamId] || `App ID: ${gameSteamId}`;
     onClose();
     navigation.navigate('GameList', {
       screen: 'Game',
       params: {
         gameItem: {
           appid: gameSteamId,
-          name: `App ID: ${gameSteamId}`,
+          name: displayName,
           playtime_forever: requesterPlayTime || 0,
         },
       },
@@ -107,7 +160,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                       />
                       <VStack className="flex-1">
                         <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                          App ID: {cg.gameSteamId}
+                          {gameNames[cg.gameSteamId] || `App ID: ${cg.gameSteamId}`}
                         </Text>
                         <HStack space="md" className="mt-0.5">
                           <Text size="xs" className="font-medium text-typography-400">
@@ -156,34 +209,33 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                 Recommended Top Games
               </Text>
               {recommendations.top_games.map((tg, idx) => (
-                  <Pressable
+                <Pressable
                   key={idx}
                   onPress={() => Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)}
+                >
+                  <Box
+                    key={idx}
+                    className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
                   >
-                    <Box
-                        key={idx}
-                        className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
-                    >
-                      <HStack space="md" className="px-3 py-3 items-center">
-                        <Image
-                            source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}
-                            className="w-16 h-16 rounded-md bg-background-300 shrink-0"
-                            resizeMode="cover"
-                        />
-                        <VStack className="flex-1">
-                          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
-                            App ID: {tg.gameSteamId}
+                    <HStack space="md" className="px-3 py-3 items-center">
+                      <Image
+                        source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}
+                        className="w-16 h-16 rounded-md bg-background-300 shrink-0"
+                        resizeMode="cover"
+                      />
+                      <VStack className="flex-1">
+                        <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+                          {gameNames[tg.gameSteamId] || `App ID: ${tg.gameSteamId}`}
+                        </Text>
+                        {tg.keys && tg.keys.length > 0 && (
+                          <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
+                            Tags: {tg.keys.map((k) => k.description || k.id).join(', ')}
                           </Text>
-                          {tg.keys && tg.keys.length > 0 && (
-                              <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
-                                Tags: {tg.keys.map((k) => k.description || k.id).join(', ')}
-                              </Text>
-                          )}
-                        </VStack>
-                      </HStack>
-                    </Box>
-                  </Pressable>
-
+                        )}
+                      </VStack>
+                    </HStack>
+                  </Box>
+                </Pressable>
               ))}
             </VStack>
           )}

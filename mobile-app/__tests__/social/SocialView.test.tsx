@@ -266,6 +266,55 @@ describe('SocialView', () => {
       },
     });
   });
+
+  it('fetches game name via getGameGenres and displays it in recommendations modal', async () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: {
+        common_games: [{ gameSteamId: '730', requester_play_time: 1200, friend_play_time: 600 }],
+        common_genres: [],
+        top_games: [{ gameSteamId: '570', keys: [] }],
+      },
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    mockApiManager.getGameGenres.mockImplementation((appId: string) => {
+      if (appId === '730') {
+        return Promise.resolve({
+          '730': { success: true, data: { name: 'Counter-Strike 2' } },
+        } as any);
+      }
+      if (appId === '570') {
+        return Promise.resolve({
+          '570': { success: true, data: { name: 'Dota 2' } },
+        } as any);
+      }
+      return Promise.resolve({} as any);
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Counter-Strike 2')).toBeTruthy();
+      expect(screen.getByText('Dota 2')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId('common-game-item-730'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+      screen: 'Game',
+      params: {
+        gameItem: expect.objectContaining({
+          appid: '730',
+          name: 'Counter-Strike 2',
+        }),
+      },
+    });
+  });
 });
 
 

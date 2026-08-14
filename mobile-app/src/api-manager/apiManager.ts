@@ -3,6 +3,7 @@ import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import { auth } from '@gamelog/auth/firebaseClient';
 import type {
+  GameBasicInfo,
   GameGenres,
   GlobalAchievement,
   GameSchema,
@@ -79,6 +80,8 @@ export default {
     fetchData<RecentPlayedGames>(EndPoints.getRecentPlayedGames(steamId, count)),
 
   getGameGenres: (appId: string) => fetchData<GameGenres>(EndPoints.getGameGenres(appId)),
+
+  getGameBasicInfo: (appId: string) => fetchData<GameBasicInfo>(EndPoints.getGameBasicInfo(appId)),
 
   getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
   getStreakByGame: (appId: string) =>

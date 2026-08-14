@@ -8,6 +8,7 @@ export * from './playerStats';
 export * from './ownedGames';
 export * from './recentPlayedGames';
 export * from './gameGenres';
+export * from './gameBasicInfo';
 export * from './gameSchema';
 export * from './streak';
 export * from './userSocial';
