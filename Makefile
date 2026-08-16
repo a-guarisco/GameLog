@@ -88,8 +88,6 @@ dev-init-internal: emulator-bg
 	@make -C backend db-reset USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 	@echo "🔑 [All Processes] Seeding Firebase test accounts..."
 	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
-	@echo "🌱 [All Processes] Seeding PostgreSQL database..."
-	@make -C backend seed USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
 	@npm --prefix mobile-app run start:fresh
 
