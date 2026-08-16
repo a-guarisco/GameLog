@@ -28,7 +28,7 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Config, Friendship, FriendshipStatus, Game, GameStatus, Genre, GameGenreLink, Shelving, SteamRollingTime, User, TopGame, TopGameGenreLink, Notification
+from src.models import Config, Friendship, FriendshipStatus, Game, GameStatus, Genre, GameGenreLink, Shelving, SteamRollingTime, User, TopGame, TopGameGenreLink, Notification, DeviceToken
 
 # Fixed UUIDs for predictable database referencing in unit tests and manual API verification.
 DEMO_USER_1_ID = UUID("11111111-1111-1111-1111-111111111111")
@@ -291,6 +291,7 @@ def seed_database() -> None:
         session.exec(delete(TopGame))
         session.exec(delete(Genre))
         session.exec(delete(Notification))
+        session.exec(delete(DeviceToken))
         session.exec(delete(User))
         session.exec(delete(Config))
         session.flush()
