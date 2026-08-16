@@ -6,7 +6,7 @@ import httpx
 from fastapi import HTTPException
 from sqlmodel import Session, select
 from src.games import steam_fetcher_service
-from src.games.schemas import DayByDayPlaytime, SteamGame
+from src.games.schemas import DailyGameReport, DailyReport, DayByDayPlaytime, SteamGame
 from src.models import Game, GameStatus, Genre, Shelving, SteamRollingTime, User
 
 
@@ -57,12 +57,15 @@ def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days
     return _compute_daily_playtimes(steam_rolling_times, days)
 
 
-def get_streak(session: Session, user_id: str, steam_app_id: str | None) -> int:
+def get_streak(session: Session, user_id: str, steam_app_id: str | None, target_date: date | None = None) -> int:
     """
     Return the streak of consecutive days the specified user has played the specified game (by steam_app_id)
     """
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
-    daily_playtimes = _compute_daily_playtimes(steam_rolling_times, days=-1)
+    if target_date is not None:
+        steam_rolling_times = [r for r in steam_rolling_times if r.created_at <= target_date]
+
+    daily_playtimes = _compute_daily_playtimes(steam_rolling_times, days=-1, end_date=target_date)
 
     if not daily_playtimes:
         return 0
@@ -79,6 +82,41 @@ def get_streak(session: Session, user_id: str, steam_app_id: str | None) -> int:
             break
 
     return streak
+
+
+def get_daily_report(session: Session, user_id: str, target_date: date | None = None) -> DailyReport:
+    """
+    Generate an on-demand daily report for the user on target_date (defaults to today).
+    Scans SteamRollingTime entries and returns a DailyReport containing DailyGameReport for games played on target_date.
+    """
+    if target_date is None:
+        target_date = date.today()
+
+    all_rolling = _get_steam_rolling_by_user(session, user_id)
+    rolling_up_to_target = [r for r in all_rolling if r.created_at <= target_date]
+
+    records_by_game = defaultdict(list)
+    for record in rolling_up_to_target:
+        records_by_game[record.steam_app_id].append(record)
+
+    game_reports: list[DailyGameReport] = []
+
+    for steam_app_id, records in records_by_game.items():
+        daily_playtimes = _compute_daily_playtimes(records, days=-1, end_date=target_date)
+        today_entry = next((dp for dp in daily_playtimes if dp.date == target_date), None)
+        today_play_time = today_entry.playtime_minutes if today_entry else 0
+
+        if today_play_time > 0:
+            streak = get_streak(session, user_id, steam_app_id, target_date=target_date)
+            game_reports.append(
+                DailyGameReport(
+                    app_id=steam_app_id,
+                    today_play_time=today_play_time,
+                    streak=streak,
+                )
+            )
+
+    return DailyReport(date=target_date, game_reports=game_reports)
 
 
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
@@ -137,7 +175,11 @@ def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id
         .order_by(SteamRollingTime.created_at.desc())
     ).first()
 
-def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], days: int) -> list[DayByDayPlaytime]:
+def _compute_daily_playtimes(
+    steam_rolling_times: Sequence[SteamRollingTime],
+    days: int,
+    end_date: date | None = None,
+) -> list[DayByDayPlaytime]:
     records_by_game = defaultdict(list)
     for record in steam_rolling_times:
         records_by_game[record.steam_app_id].append(record)
@@ -159,34 +201,36 @@ def _compute_daily_playtimes(steam_rolling_times: Sequence[SteamRollingTime], da
             if earliest_date is None or record.created_at < earliest_date:
                 earliest_date = record.created_at
 
-    today = date.today()
+    if end_date is None:
+        end_date = date.today()
 
     if earliest_date is None:
-        # No records at all for the specified user. If days is -1 return a single day (today),
+        # No records at all for the specified user. If days is -1 return a single day (end_date),
         # otherwise return the requested number of days
         if days == -1:
-            return [DayByDayPlaytime(date=today, playtime_minutes=0)]
+            return [DayByDayPlaytime(date=end_date, playtime_minutes=0)]
         num_days = days
-        start_date = today - timedelta(days=num_days - 1)
+        start_date = end_date - timedelta(days=num_days - 1)
     elif days == -1:
-        # Return everything from earliest record to today
+        # Return everything from earliest record to end_date
         start_date = earliest_date
-        num_days = (today - start_date).days + 1
+        num_days = max(0, (end_date - start_date).days + 1)
     else:
-        # Return the last N days; if fewer days exist, return everything
-        candidate_start = today - timedelta(days=days - 1)
+        # Return the last N days up to end_date
+        candidate_start = end_date - timedelta(days=days - 1)
         if candidate_start > earliest_date:
             start_date = candidate_start
         else:
             start_date = earliest_date
-        num_days = (today - start_date).days + 1
+        num_days = max(0, (end_date - start_date).days + 1)
 
     result = []
     for i in range(num_days):
-        target_date = start_date + timedelta(days=i)
-        result.append(DayByDayPlaytime(date=target_date, playtime_minutes=daily_totals.get(target_date, 0)))
+        target_d = start_date + timedelta(days=i)
+        result.append(DayByDayPlaytime(date=target_d, playtime_minutes=daily_totals.get(target_d, 0)))
 
     return result
+
 
 
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:

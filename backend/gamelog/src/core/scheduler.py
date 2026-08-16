@@ -1,17 +1,15 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, time, timedelta
-
 import httpx
 from fastapi import FastAPI
 from sqlmodel import Session, select
-
 from src.core.database import engine, wait_for_db_and_migrate
 from src.core.settings import get_settings
 from src.games import game_service, steam_fetcher_service
 from src.models import User, TopGame, Genre
 from src.models.config import Config
-
+from src.users import notifications_service
 
 async def _run_daily_job_async() -> None:
     print("Running midnight cronjob", flush=True)
@@ -26,6 +24,12 @@ async def _run_daily_job_async() -> None:
                 async def _process_user(user_db: User) -> None:
                     try:
                         await game_service.update_user_shelving_steamrolling_async(session, user_db, client=client)
+                        notifications_service.send_notification_to_user(
+                            session=session,
+                            target_user_id=user_db.id,
+                            title="Your game report is ready!",
+                            body="Open your profile page to see the games you have played in the last day"
+                        )
                     except Exception as user_err:
                         print(f"Error processing user {user_db.username}: {user_err}", flush=True)
 

@@ -40,6 +40,9 @@ DEMO_USER_5_ID = UUID("55555555-5555-5555-5555-555555555555")
 DEMO_GAME_CS2_ID = UUID("66666666-6666-6666-6666-666666666666")
 DEMO_GAME_DOTA_ID = UUID("77777777-7777-7777-7777-777777777777")
 DEMO_GAME_RDR2_ID = UUID("88888888-8888-8888-8888-888888888888")
+DEMO_GAME_GTAV_ID = UUID("99999999-9999-9999-9999-999999999999")
+DEMO_GAME_ELDEN_RING_ID = UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+
 
 GENRES_DATA = [
     {'id': '1', 'description': 'Action'},
@@ -129,6 +132,14 @@ def _games() -> list[Game]:
             id=DEMO_GAME_RDR2_ID,
             steam_app_id="1174180",  # Red Dead Redemption 2
         ),
+        Game(
+            id=DEMO_GAME_GTAV_ID,
+            steam_app_id="271590",  # Grand Theft Auto V
+        ),
+        Game(
+            id=DEMO_GAME_ELDEN_RING_ID,
+            steam_app_id="1245620",  # Elden Ring
+        ),
     ]
 
 
@@ -137,6 +148,8 @@ def _shelvings() -> list[Shelving]:
     return [
         Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_RDR2_ID, status=GameStatus.TO_BE_PLAYED),
+        Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_GTAV_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_ELDEN_RING_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=DEMO_USER_2_ID, game_id=DEMO_GAME_DOTA_ID, status=GameStatus.SHELVED),
         Shelving(owner_id=DEMO_USER_3_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYED),
         Shelving(owner_id=DEMO_USER_4_ID, game_id=DEMO_GAME_RDR2_ID, status=GameStatus.PLAYING),
@@ -181,7 +194,7 @@ def _rolling_times() -> list[SteamRollingTime]:
         record_date = today - timedelta(days=day_offset)
         is_baseline = day_offset == 14
         if not is_baseline:
-            playtime_increment = [0, 60, 90, 0, 15, 30, 45, 0, 0, 120, 10, 0, 35, 50, 0][14 - day_offset]
+            playtime_increment = [0, 60, 90, 0, 15, 30, 45, 0, 0, 120, 10, 0, 35, 50, 60][14 - day_offset]
             rdr2_playtime += playtime_increment
 
         records.append(
@@ -190,6 +203,44 @@ def _rolling_times() -> list[SteamRollingTime]:
                 user_id=DEMO_USER_1_ID,
                 steam_app_id="1174180",
                 last_day_playtime=rdr2_playtime,
+                created_at=record_date,
+            )
+        )
+
+    # Seed GTA V (271590) rolling playtime for test-01 (DEMO_USER_1_ID)
+    gtav_playtime = 1500
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = day_offset == 14
+        if not is_baseline:
+            playtime_increment = [20, 30, 40, 50, 0, 60, 70, 80, 0, 45, 60, 30, 90, 100, 90][14 - day_offset]
+            gtav_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_1_ID,
+                steam_app_id="271590",
+                last_day_playtime=gtav_playtime,
+                created_at=record_date,
+            )
+        )
+
+    # Seed Elden Ring (1245620) rolling playtime for test-01 (DEMO_USER_1_ID)
+    elden_playtime = 800
+    for day_offset in range(14, -1, -1):
+        record_date = today - timedelta(days=day_offset)
+        is_baseline = day_offset == 14
+        if not is_baseline:
+            playtime_increment = [45, 60, 0, 30, 90, 120, 0, 40, 50, 60, 80, 100, 110, 90, 120][14 - day_offset]
+            elden_playtime += playtime_increment
+
+        records.append(
+            SteamRollingTime(
+                id=uuid4(),
+                user_id=DEMO_USER_1_ID,
+                steam_app_id="1245620",
+                last_day_playtime=elden_playtime,
                 created_at=record_date,
             )
         )
@@ -219,7 +270,7 @@ def _rolling_times() -> list[SteamRollingTime]:
         record_date = today - timedelta(days=day_offset)
         is_baseline = day_offset == 14
         if not is_baseline:
-            playtime_increment = [10, 15, 0, 20, 5, 0, 30, 0, 10, 0, 20, 25, 0, 10, 5][14 - day_offset]
+            playtime_increment = [10, 15, 0, 20, 5, 0, 30, 0, 10, 0, 20, 25, 0, 10, 25][14 - day_offset]
             test01_dota_playtime += playtime_increment
 
         records.append(
@@ -252,6 +303,7 @@ def _rolling_times() -> list[SteamRollingTime]:
         )
 
     return records
+
 
 
 def _friendships() -> list[Friendship]:
