@@ -133,7 +133,7 @@ dev-android-clean: emulator-bg
 	@npm --prefix mobile-app run android
 
 android-sha:
-	@echo "🔍 Estrazione impronta digitale (SHA-1) del Keystore di Debug..."
+	@echo "🔍 Extracting SHA-1 fingerprint from Debug Keystore..."
 	@cd mobile-app/android && ./gradlew :app:signingReport
 
 # ------------------------------------------------------------------------------
