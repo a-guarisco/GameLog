@@ -36,7 +36,7 @@ export const GameListStack = createNativeStackNavigator({
   },
 });
 
-export const TestingStack = createNativeStackNavigator({
+export const DevStack = createNativeStackNavigator({
   screens: {
     TestingMain: {
       screen: DevView,
@@ -71,7 +71,7 @@ export const TestingStack = createNativeStackNavigator({
 
 export const RootTabs = createBottomTabNavigator({
   screens: {
-    GameList: {
+    GameListTab: {
       screen: GameListStack,
       options: {
         headerShown: false,
@@ -85,7 +85,7 @@ export const RootTabs = createBottomTabNavigator({
         ),
       },
     },
-    Profile: {
+    ProfileTab: {
       screen: ProfileView,
       options: {
         tabBarIcon: ({ color, size, focused }) => (
@@ -94,7 +94,7 @@ export const RootTabs = createBottomTabNavigator({
         headerShown: false,
       },
     },
-    Social: {
+    SocialTab: {
       screen: SocialView,
       options: {
         title: 'Social',
@@ -104,8 +104,8 @@ export const RootTabs = createBottomTabNavigator({
         headerShown: false,
       },
     },
-    ComponentLibrary: {
-      screen: TestingStack,
+    DevTab: {
+      screen: DevStack,
       options: {
         title: 'Dev',
         tabBarIcon: ({ color, size, focused }) => (
