@@ -49,7 +49,7 @@ help:
 	@echo "Database Workflows & Setup:"
 	@echo "  make setup               - Initial setup: start services, migrate DB, insert seed data"
 	@echo "  make db-reset            - Reset DB volume, apply migrations and seed data in one step"
-	@echo "  make db-fresh-baseline   - Wipe old migration files, clean DB, create fresh baseline revision & seed"
+	@echo "  make db-fresh-baseline   - Wipe old migration files, clean DB, create fresh baseline revision"
 	@echo ""
 	@echo "Database Migrations & Seed:"
 	@echo "  make migrate             - Apply pending Alembic migrations to DB"
@@ -113,14 +113,13 @@ setup: up migrate seed
 db-reset: db-clean migrate seed
 
 db-fresh-baseline:
-	@$(PYTHON) -c "import sys; ans = input('⚠️  ATTENZIONE: Questo comando eliminerà TUTTE le migrazioni in alembic/versions/ e resetterà il DB! Continuare? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operazione annullata." && exit 1)
-	@echo "🗑️ Eliminazione vecchie migrazioni in alembic/versions/..."
+	@$(PYTHON) -c "import sys; ans = input('⚠️  WARNING: This command will delete ALL migrations in alembic/versions/ and reset the DB! Continue? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operation cancelled." && exit 1)
+	@echo "🗑️ Deleting old migrations in alembic/versions/..."
 	rm -f gamelog/alembic/versions/*.py
 	$(MAKE) db-clean
 	$(MAKE) revision m="$(if $(m),$(m),initial_schema)"
-	$(MAKE) migrate
-	$(MAKE) seed
-	@echo "✅ Nuova migrazione baseline creata e DB azzerato/popolato con successo!"
+	@echo "✅ New baseline migration created successfully! Run 'make db-reset' to apply and populate the DB."
+	@echo "⚠️  MEMO: Make sure to update 'seed.py' to support any new tables before running 'make db-reset'!"
 
 # ==============================================================================
 # 🗄️ DATABASE MIGRATIONS & SEED

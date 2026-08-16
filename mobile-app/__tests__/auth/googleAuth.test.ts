@@ -32,7 +32,6 @@ describe('googleAuth module', () => {
     );
   });
 
-
   it('executes signInWithGoogle flow', async () => {
     const user = await signInWithGoogle();
     expect(GoogleSignin.hasPlayServices).toHaveBeenCalled();

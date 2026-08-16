@@ -6,9 +6,6 @@ const GOOGLE_WEB_CLIENT_ID =
   process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
   '799231800910-coul5brdbsfglpgj41n2nsufedt1ju5p.apps.googleusercontent.com';
 
-
-
-
 export const configureGoogleAuth = (): void => {
   GoogleSignin.configure({
     webClientId: GOOGLE_WEB_CLIENT_ID,
@@ -16,8 +13,6 @@ export const configureGoogleAuth = (): void => {
     offlineAccess: false,
   });
 };
-
-
 
 export const signInWithGoogle = async (): Promise<User> => {
   configureGoogleAuth();
