@@ -267,7 +267,7 @@ describe('SocialView', () => {
     });
   });
 
-  it('fetches game name via getGameGenres and displays it in recommendations modal', async () => {
+  it('fetches game name via getGameBasicInfo and displays it in recommendations modal', async () => {
     mockUseGetFriendRecommendations.mockReturnValue({
       recommendations: {
         common_games: [{ gameSteamId: '730', requester_play_time: 1200, friend_play_time: 600 }],
@@ -280,7 +280,7 @@ describe('SocialView', () => {
       refetchRecommendations: jest.fn(),
     });
 
-    mockApiManager.getGameGenres.mockImplementation((appId: string) => {
+    mockApiManager.getGameBasicInfo.mockImplementation((appId: string) => {
       if (appId === '730') {
         return Promise.resolve({
           '730': { success: true, data: { name: 'Counter-Strike 2' } },
