@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, datetime
 import uuid
 
 from pydantic import BaseModel
@@ -47,7 +47,7 @@ Schema from the backend response to playtime_by_user or playtime_by_game
 
 
 class DayByDayPlaytime(BaseModel):
-    date: datetime.date
+    date: date
     playtime_minutes: int
 
 
@@ -82,3 +82,12 @@ class SteamTopGame(BaseModel):
     appid: int
 
 
+class DailyGameReport(BaseModel):
+    app_id: str
+    today_play_time: int
+    streak: int
+
+
+class DailyReport(BaseModel):
+    date: date
+    game_reports: list[DailyGameReport]

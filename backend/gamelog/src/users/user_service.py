@@ -1,15 +1,13 @@
 import uuid
-from datetime import UTC, datetime
-
+from datetime import UTC, date, datetime
 from fastapi import HTTPException, status
 from sqlmodel import Session, or_, select
-
 from src.auth.schemas import AuthenticatedUser
 from src.models import Friendship, FriendshipStatus, User
 from src.users import FriendshipInfo, UserSearchResult
 from src.users.schemas import FriendshipResponseStatus, UserRead, UserRegisterRequest
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
-
+from src.users import notifications_service
 
 def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     """
@@ -194,6 +192,13 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
     session.add(friendship)
     session.commit()
     session.refresh(friendship)
+    notifications_service.send_notification_to_user(
+        session=session,
+        target_user_id=addressee_id,
+        title="New Friend Request",
+        body=f"{requester.username} wants to add you as a friend.",
+        data={"friendship_id": str(friendship.id)},
+    )
     return {"message": "Friend request sent", "friendship_id": str(friendship.id)}
 
 
@@ -224,6 +229,13 @@ def respond_to_friend_request(
             friendship.updated_at = datetime.now(UTC)
             session.add(friendship)
             session.commit()
+            notifications_service.send_notification_to_user(
+                session=session,
+                target_user_id=friendship.requester_id,
+                title="New Friend Added",
+                body=f"{addressee.username} accepted your friend request.",
+                data={"friendship_id": str(friendship.id)},
+            )
             return {"message": "Friend request accepted"}
 
         case FriendshipResponseStatus.REJECTED:

@@ -10,3 +10,4 @@ export { BackendTestAuth } from './BackendTestAuth';
 export { ExpoEnvInfo } from './ExpoEnvInfo';
 export { FirebaseSignUpTest } from './FirebaseSignUpTest';
 export { GoogleAuthTest } from './GoogleAuthTest';
+export { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest';
