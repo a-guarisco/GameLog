@@ -196,7 +196,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                               {formatHours(cg.friend_play_time)}
                             </Text>
                           </Text>
-                          </HStack>
+                        </HStack>
                       </VStack>
                     </HStack>
                   </Card>
