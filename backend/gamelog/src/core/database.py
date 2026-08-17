@@ -1,12 +1,12 @@
-from collections.abc import Generator
 import time
+from collections.abc import Generator
 from pathlib import Path
 
-from alembic import command
 from alembic.config import Config
 from sqlalchemy.exc import OperationalError
 from sqlmodel import Session, create_engine
 
+from alembic import command
 from src.core.settings import get_settings
 
 settings = get_settings()
@@ -36,7 +36,7 @@ def wait_for_db_and_migrate() -> None:
     while retries > 0:
         try:
             # Attempt to connect to the database
-            with engine.connect() as conn:
+            with engine.connect():
                 print("Database connection successful.", flush=True)
                 break
         except OperationalError as e:
@@ -65,4 +65,3 @@ def wait_for_db_and_migrate() -> None:
     except Exception as e:
         print(f"Error running database migrations: {e}", flush=True)
         raise
-

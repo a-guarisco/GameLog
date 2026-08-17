@@ -19,6 +19,7 @@ app.include_router(games_router)
 app.include_router(users_router)
 app.include_router(notifications_router)
 
+
 @app.get("/hello")
 def hello_world():
     return {"message": "Hello, World!"}

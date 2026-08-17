@@ -316,5 +316,3 @@ describe('SocialView', () => {
     });
   });
 });
-
-

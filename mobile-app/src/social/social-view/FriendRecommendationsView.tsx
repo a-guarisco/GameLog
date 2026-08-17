@@ -195,7 +195,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                               {formatHours(cg.friend_play_time)}
                             </Text>
                           </Text>
-                          </HStack>
+                        </HStack>
                       </VStack>
                     </HStack>
                   </Box>
@@ -213,7 +213,9 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
               {recommendations.top_games.map((tg, idx) => (
                 <Pressable
                   key={idx}
-                  onPress={() => Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)}
+                  onPress={() =>
+                    Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)
+                  }
                 >
                   <Box
                     key={idx}
