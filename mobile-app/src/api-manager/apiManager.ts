@@ -19,6 +19,8 @@ import type {
   RecentPlayedGames,
   SteamNews,
   Streak,
+  UserRead,
+  UserRegisterRequest,
   UserSearchResult,
   RecommendationResponse,
 } from '@gamelog/api-manager/dto';
@@ -111,6 +113,13 @@ export default {
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),
   getFriendList: () => fetchAuthenticatedData<UserSearchResult[]>(EndPoints.getFriendList()),
+  getUserMe: () => fetchAuthenticatedData<UserRead>(EndPoints.getUserMe()),
+  registerUser: (data: UserRegisterRequest) =>
+    fetchAuthenticatedData<UserRead>(EndPoints.registerUser(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }),
   addFriend: (addresseeId: string) =>
     fetchAuthenticatedData<{ message: string; friendship_id: string }>(EndPoints.addFriend(), {
       method: 'POST',

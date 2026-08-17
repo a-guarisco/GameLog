@@ -2,6 +2,13 @@ export type FriendshipStatus = 'pending_outgoing' | 'pending_incoming' | 'accept
 
 export interface UserRead {
   id: string;
+  firebase_uid: string;
+  username: string;
+  steam_id: string;
+  has_steam_api_key: boolean;
+}
+
+export interface UserRegisterRequest {
   username: string;
   steam_id: string;
   steam_api_key?: string;
