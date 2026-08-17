@@ -16,6 +16,9 @@ import {
   FontsView,
 } from '@gamelog/dev';
 
+import LoginScreen from '@gamelog/onboarding/LoginScreen';
+import ProfileSetupScreen from '@gamelog/onboarding/ProfileSetupScreen';
+
 export const GameListStack = createNativeStackNavigator({
   screens: {
     HomePage: {
@@ -75,7 +78,7 @@ export const RootTabs = createBottomTabNavigator({
       screen: GameListStack,
       options: {
         headerShown: false,
-        title: 'Game List',
+        title: 'Games',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
             name={focused ? 'game-controller' : 'game-controller-outline'}
@@ -88,6 +91,7 @@ export const RootTabs = createBottomTabNavigator({
     ProfileTab: {
       screen: ProfileView,
       options: {
+        title: 'Profile',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
         ),
@@ -112,6 +116,24 @@ export const RootTabs = createBottomTabNavigator({
           <Ionicons name={focused ? 'construct' : 'construct-outline'} size={size} color={color} />
         ),
       },
+    },
+  },
+});
+
+export const AuthNavigator = createNativeStackNavigator({
+  screens: {
+    Login: {
+      screen: LoginScreen,
+      options: { headerShown: false },
+    },
+  },
+});
+
+export const OnboardingNavigator = createNativeStackNavigator({
+  screens: {
+    ProfileSetup: {
+      screen: ProfileSetupScreen,
+      options: { headerShown: false },
     },
   },
 });
