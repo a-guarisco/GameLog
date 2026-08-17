@@ -360,7 +360,7 @@ def seed_database() -> None:
         for user in _users():
             session.add(user)
 
-        # Seed the 3 demo games using fixed IDs and assigning resolved genres
+        # Seed the 5 demo games using fixed IDs and assigning resolved genres
         game_cs2 = Game(
             id=DEMO_GAME_CS2_ID,
             steam_app_id="730",
@@ -376,10 +376,22 @@ def seed_database() -> None:
             steam_app_id="1174180",
             genres=[genre_instances["1"], genre_instances["25"]]
         )
+        game_gtav = Game(
+            id=DEMO_GAME_GTAV_ID,
+            steam_app_id="271590",
+            genres=[genre_instances["1"], genre_instances["25"]]
+        )
+        game_elden_ring = Game(
+            id=DEMO_GAME_ELDEN_RING_ID,
+            steam_app_id="1245620",
+            genres=[genre_instances["1"], genre_instances["3"]]
+        )
 
         session.add(game_cs2)
         session.add(game_dota)
         session.add(game_rdr2)
+        session.add(game_gtav)
+        session.add(game_elden_ring)
 
         # Seed realistic Top Games
         for tg in TOP_GAMES_DATA:

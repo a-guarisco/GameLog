@@ -84,16 +84,21 @@ def get_streak(session: Session, user_id: str, steam_app_id: str | None, target_
     return streak
 
 
-def get_daily_report(session: Session, user_id: str, target_date: date | None = None) -> DailyReport:
+def get_daily_report(session: Session, user_id: str, start_date: date | None = None, end_date: date | None = None) -> DailyReport:
     """
-    Generate an on-demand daily report for the user on target_date (defaults to today).
-    Scans SteamRollingTime entries and returns a DailyReport containing DailyGameReport for games played on target_date.
+    Generate an on-demand daily report for the user between start_date and end_date (defaults to today).
+    Scans SteamRollingTime entries and returns a DailyReport containing DailyGameReport for games played between start_date and end_date.
     """
-    if target_date is None:
-        target_date = date.today()
+    if start_date is None:
+        start_date = date.today()
+    if end_date is None:
+        end_date = date.today()
+
+    if start_date > end_date:
+        raise HTTPException(status_code=400, detail="Start date must be before end date.")
 
     all_rolling = _get_steam_rolling_by_user(session, user_id)
-    rolling_up_to_target = [r for r in all_rolling if r.created_at <= target_date]
+    rolling_up_to_target = [r for r in all_rolling if r.created_at <= end_date]
 
     records_by_game = defaultdict(list)
     for record in rolling_up_to_target:
@@ -102,21 +107,21 @@ def get_daily_report(session: Session, user_id: str, target_date: date | None = 
     game_reports: list[DailyGameReport] = []
 
     for steam_app_id, records in records_by_game.items():
-        daily_playtimes = _compute_daily_playtimes(records, days=-1, end_date=target_date)
-        today_entry = next((dp for dp in daily_playtimes if dp.date == target_date), None)
-        today_play_time = today_entry.playtime_minutes if today_entry else 0
+        daily_playtimes = _compute_daily_playtimes(records, days=-1, end_date=end_date)
+        range_play_time = sum(dp.playtime_minutes for dp in daily_playtimes if start_date <= dp.date <= end_date)
 
-        if today_play_time > 0:
-            streak = get_streak(session, user_id, steam_app_id, target_date=target_date)
+        if range_play_time > 0:
+            streak = get_streak(session, user_id, steam_app_id, target_date=end_date)
             game_reports.append(
                 DailyGameReport(
                     app_id=steam_app_id,
-                    today_play_time=today_play_time,
+                    today_play_time=range_play_time,
                     streak=streak,
                 )
             )
 
-    return DailyReport(date=target_date, game_reports=game_reports)
+    return DailyReport(date=end_date, game_reports=game_reports)
+
 
 
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
