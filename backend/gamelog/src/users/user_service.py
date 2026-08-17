@@ -58,6 +58,16 @@ def register_user(
             detail="Steam ID is already registered",
         )
 
+    if register_data.steam_api_key:
+        from src.games.steam_fetcher_service import validate_steam_credentials_sync
+
+        is_valid = validate_steam_credentials_sync(register_data.steam_id, register_data.steam_api_key)
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid Steam ID or Steam API Key",
+            )
+
     new_user = User(
         firebase_uid=auth_user.uid,
         username=register_data.username,

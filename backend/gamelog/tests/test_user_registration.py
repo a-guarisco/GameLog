@@ -15,7 +15,10 @@ def test_register_user_success(client: TestClient, session: Session):
         "steam_api_key": "MOCK_KEY_123",
     }
 
-    response = client.post("/users/register", json=payload)
+    from unittest.mock import patch
+
+    with patch("src.games.steam_fetcher_service.validate_steam_credentials_sync", return_value=True):
+        response = client.post("/users/register", json=payload)
 
     assert response.status_code == 201
     data = response.json()

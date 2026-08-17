@@ -33,3 +33,7 @@ class User(UserBase, table=True):
     received_friendships: list["Friendship"] = Relationship(
         sa_relationship_kwargs={"primaryjoin": "User.id==Friendship.addressee_id", "back_populates": "addressee"}
     )
+
+    @property
+    def has_steam_api_key(self) -> bool:
+        return bool(self.steam_api_key)

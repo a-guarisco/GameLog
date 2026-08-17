@@ -23,6 +23,7 @@ class UserRegisterRequest(SQLModel):
 
 class UserRead(UserBase):
     id: uuid.UUID
+    has_steam_api_key: bool = Field(default=False)
 
 
 class UserUpdate(SQLModel):

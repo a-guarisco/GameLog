@@ -4,7 +4,8 @@ from datetime import date
 from pydantic import BaseModel
 from sqlmodel import Field
 
-from src.models.game import GameBase, Genre
+from src.models import Genre
+from src.models.game import GameBase
 
 
 class GameCreate(GameBase):
