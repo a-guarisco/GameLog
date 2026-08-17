@@ -2,7 +2,7 @@ import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
-import { Input, InputField } from '@gamelog/common/gluestack/input';
+import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { ErrorBox } from '@gamelog/common/feedbacks';
 import { useProfileSetup } from './useProfileSetup';
 
@@ -35,49 +35,32 @@ export default function ProfileSetupScreen() {
           </Text>
 
           <Box className="gap-5 mb-8">
-            <Box>
-              <Text className="mb-2 font-medium">Username *</Text>
-              <Input className="h-12">
-                <InputField
-                  placeholder="Choose a username"
-                  value={username}
-                  onChangeText={setUsername}
-                  autoCapitalize="none"
-                />
-              </Input>
-            </Box>
+            <GLTextInput
+              label="Username *"
+              placeholder="Choose a username"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+            />
 
-            <Box>
-              <Text className="mb-2 font-medium">Steam ID *</Text>
-              <Input className="h-12">
-                <InputField
-                  placeholder="e.g. 76561197960287930"
-                  value={steamId}
-                  onChangeText={setSteamId}
-                  keyboardType="numeric"
-                />
-              </Input>
-              <Text size="xs" className="text-typography-400 mt-1">
-                Your 17-digit Steam ID64.
-              </Text>
-            </Box>
+            <GLTextInput
+              label="Steam ID *"
+              placeholder="e.g. 76561197960287930"
+              value={steamId}
+              onChangeText={setSteamId}
+              keyboardType="numeric"
+              helperText="Your 17-digit Steam ID64."
+            />
 
-            <Box>
-              <Text className="mb-2 font-medium">Steam API Key (Optional)</Text>
-              <Input className="h-12">
-                <InputField
-                  placeholder="Enter API Key to sync private games"
-                  value={steamApiKey}
-                  onChangeText={setSteamApiKey}
-                  autoCapitalize="none"
-                  secureTextEntry
-                />
-              </Input>
-              <Text size="xs" className="text-typography-400 mt-1">
-                Required only if you want to sync your Steam library automatically. You can add it
-                later in Settings.
-              </Text>
-            </Box>
+            <GLTextInput
+              label="Steam API Key (Optional)"
+              placeholder="Enter API Key to sync private games"
+              value={steamApiKey}
+              onChangeText={setSteamApiKey}
+              autoCapitalize="none"
+              secureTextEntry
+              helperText="Required only if you want to sync your Steam library automatically. You can add it later in Settings."
+            />
           </Box>
 
           <Button onPress={handleRegister} isDisabled={loading} className="w-full mb-4" size="xl">

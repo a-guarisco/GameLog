@@ -2,7 +2,7 @@ import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
-import { Input, InputField } from '@gamelog/common/gluestack/input';
+import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { ErrorBox, SuccessBox } from '@gamelog/common/feedbacks';
 import { Divider } from '@gamelog/common/gluestack/divider';
 import { useLogin } from './useLogin';
@@ -50,23 +50,19 @@ export default function LoginScreen() {
           </Box>
 
           <Box className="gap-4 mb-6">
-            <Input className="h-12">
-              <InputField
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-            </Input>
-            <Input className="h-12">
-              <InputField
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
-            </Input>
+            <GLTextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <GLTextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
           </Box>
 
           <Button onPress={handleEmailAuth} isDisabled={loading} className="w-full mb-4" size="lg">

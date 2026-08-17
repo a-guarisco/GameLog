@@ -1,5 +1,5 @@
-import { TextInput } from 'react-native';
-import { Box } from '@gamelog/common/gluestack/box';
+import React from 'react';
+import { GLTextInput } from '@gamelog/common/GLTextInput';
 
 interface UserSearchInputProps {
   value: string;
@@ -7,14 +7,11 @@ interface UserSearchInputProps {
 }
 
 export const UserSearchInput: React.FC<UserSearchInputProps> = ({ value, onChangeText }) => (
-  <Box className="mb-5">
-    <TextInput
-      placeholder="Search users by username..."
-      placeholderTextColor="#9ca3af"
-      value={value}
-      onChangeText={onChangeText}
-      className="bg-background-200 rounded-lg px-4 py-3 text-white"
-      testID="user-search-input"
-    />
-  </Box>
+  <GLTextInput
+    placeholder="Search users by username..."
+    value={value}
+    onChangeText={onChangeText}
+    containerClassName="mb-5"
+    testID="user-search-input"
+  />
 );

@@ -20,7 +20,7 @@ export const brand = {
     '900': '15 26 40',
     '950': '0 0 0',
   },
-  
+
   // SEMANTIC SCALE STRATEGY (0-950)
   // bg-0: Root App Background
   // bg-50: Elevated Surface (Card) Background
@@ -29,39 +29,39 @@ export const brand = {
   // bg-800/900: High contrast backgrounds or text
 
   bgLight: {
-    '0': '244 244 245',   // zinc-100: Root App Background (Darker to pop cards)
-    '50': '255 255 255',  // white: Card / Base Elevation
+    '0': '244 244 245', // zinc-100: Root App Background (Darker to pop cards)
+    '50': '255 255 255', // white: Card / Base Elevation
     '100': '228 228 231', // zinc-200: Card Hover / Muted bg
     '200': '212 212 216', // zinc-300: Light interactive background
     '300': '161 161 170', // zinc-400
     '400': '113 113 122', // zinc-500
-    '500': '82 82 91',    // zinc-600
-    '600': '63 63 70',    // zinc-700
-    '700': '39 39 42',    // zinc-800
-    '800': '24 24 27',    // zinc-900
-    '900': '9 9 11',      // zinc-950 (Tooltip bg)
-    '950': '0 0 0',       // black
+    '500': '82 82 91', // zinc-600
+    '600': '63 63 70', // zinc-700
+    '700': '39 39 42', // zinc-800
+    '800': '24 24 27', // zinc-900
+    '900': '9 9 11', // zinc-950 (Tooltip bg)
+    '950': '0 0 0', // black
   },
   outlineLight: {
-    '0': '255 255 255',   // white
-    '50': '228 228 231',  // zinc-200: Faint border
+    '0': '255 255 255', // white
+    '50': '228 228 231', // zinc-200: Faint border
     '100': '212 212 216', // zinc-300: Standard card border
     '200': '161 161 170', // zinc-400: Darker border / hover
     '300': '113 113 122', // zinc-500
-    '400': '82 82 91',    // zinc-600
-    '500': '63 63 70',    // zinc-700
-    '600': '39 39 42',    // zinc-800
-    '700': '24 24 27',    // zinc-900
-    '800': '9 9 11',      // zinc-950
-    '900': '0 0 0',       // black
+    '400': '82 82 91', // zinc-600
+    '500': '63 63 70', // zinc-700
+    '600': '39 39 42', // zinc-800
+    '700': '24 24 27', // zinc-900
+    '800': '9 9 11', // zinc-950
+    '900': '0 0 0', // black
     '950': '0 0 0',
   },
   typographyLight: {
-    '0': '9 9 11',        // zinc-950: Main Text / Heading
-    '50': '24 24 27',     // zinc-900: Standard Text / Body
-    '100': '39 39 42',    // zinc-800: Secondary Text
-    '200': '63 63 70',    // zinc-700: Tertiary Text
-    '300': '82 82 91',    // zinc-600: Dark placeholder
+    '0': '9 9 11', // zinc-950: Main Text / Heading
+    '50': '24 24 27', // zinc-900: Standard Text / Body
+    '100': '39 39 42', // zinc-800: Secondary Text
+    '200': '63 63 70', // zinc-700: Tertiary Text
+    '300': '82 82 91', // zinc-600: Dark placeholder
     '400': '113 113 122', // zinc-500: Placeholder / Muted
     '500': '161 161 170', // zinc-400
     '600': '212 212 216', // zinc-300
@@ -71,11 +71,11 @@ export const brand = {
     '950': '255 255 255', // white: Text on dark backgrounds
   },
   bgDark: {
-    '0': '0 0 0',         // black: Root App Background (Darker to pop cards)
-    '50': '24 24 27',     // zinc-900: Card / Base Elevation
-    '100': '39 39 42',    // zinc-800: Card Hover / Muted bg
-    '200': '63 63 70',    // zinc-700: Light interactive background
-    '300': '82 82 91',    // zinc-600
+    '0': '0 0 0', // black: Root App Background (Darker to pop cards)
+    '50': '24 24 27', // zinc-900: Card / Base Elevation
+    '100': '39 39 42', // zinc-800: Card Hover / Muted bg
+    '200': '63 63 70', // zinc-700: Light interactive background
+    '300': '82 82 91', // zinc-600
     '400': '113 113 122', // zinc-500
     '500': '161 161 170', // zinc-400
     '600': '212 212 216', // zinc-300
@@ -85,10 +85,10 @@ export const brand = {
     '950': '255 255 255', // white
   },
   outlineDark: {
-    '0': '9 9 11',        // zinc-950
-    '50': '39 39 42',     // zinc-800: Faint border
-    '100': '63 63 70',    // zinc-700: Standard card border
-    '200': '82 82 91',    // zinc-600: Light border / hover
+    '0': '9 9 11', // zinc-950
+    '50': '39 39 42', // zinc-800: Faint border
+    '100': '63 63 70', // zinc-700: Standard card border
+    '200': '82 82 91', // zinc-600: Light border / hover
     '300': '113 113 122', // zinc-500
     '400': '161 161 170', // zinc-400
     '500': '212 212 216', // zinc-300
@@ -99,18 +99,18 @@ export const brand = {
     '950': '255 255 255', // white
   },
   typographyDark: {
-    '0': '255 255 255',   // white: Main Text / Heading
-    '50': '250 250 250',  // zinc-50: Standard Text / Body
+    '0': '255 255 255', // white: Main Text / Heading
+    '50': '250 250 250', // zinc-50: Standard Text / Body
     '100': '244 244 245', // zinc-100: Secondary Text
     '200': '228 228 231', // zinc-200: Tertiary Text
     '300': '212 212 216', // zinc-300: Light placeholder
     '400': '161 161 170', // zinc-400: Placeholder / Muted
     '500': '113 113 122', // zinc-500
-    '600': '82 82 91',    // zinc-600
-    '700': '63 63 70',    // zinc-700
-    '800': '39 39 42',    // zinc-800
-    '900': '24 24 27',    // zinc-900
-    '950': '9 9 11',      // zinc-950: Black text on light backgrounds
+    '600': '82 82 91', // zinc-600
+    '700': '63 63 70', // zinc-700
+    '800': '39 39 42', // zinc-800
+    '900': '24 24 27', // zinc-900
+    '950': '9 9 11', // zinc-950: Black text on light backgrounds
   },
   info: {
     '0': '235 245 255',
