@@ -7,6 +7,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from src.models.shelving import Shelving
+    from src.models.top_game import TopGame
 
 
 class GameStatus(str, Enum):
@@ -23,6 +24,7 @@ class GameGenreLink(SQLModel, table=True):
 
 
 from src.models.top_game import TopGameGenreLink
+
 
 class Genre(SQLModel, table=True):
     id: str = Field(primary_key=True)
@@ -42,5 +44,3 @@ class Game(GameBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_shelvings: list["Shelving"] = Relationship(back_populates="game")
     genres: list[Genre] = Relationship(back_populates="games", link_model=GameGenreLink)
-
-

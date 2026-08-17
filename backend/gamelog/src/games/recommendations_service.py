@@ -1,21 +1,22 @@
-from fastapi import HTTPException
-from src.users import user_service
-import uuid
-import httpx
 import math
-from sqlmodel import Session, select
-from src.games.schemas import RecommendationResponse, CommonGames, RecommendedTopGame
+import uuid
+
+import httpx
+from fastapi import HTTPException
+from sqlmodel import Session, col, select
+
 from src.games import steam_fetcher_service
-from src.models import SteamRollingTime, User, Friendship, FriendshipStatus, TopGame, Game, Genre
+from src.games.schemas import CommonGames, RecommendedTopGame
+from src.models import Friendship, FriendshipStatus, Game, Genre, SteamRollingTime, TopGame, User
+from src.users import user_service
+
 
 def _get_latest_rolling_times(user_id: uuid.UUID, session: Session) -> dict[str, SteamRollingTime]:
     """
     Retrieves the latest SteamRollingTime entries for a user from the DB.
     """
     rolling_records = session.exec(
-        select(SteamRollingTime)
-        .where(SteamRollingTime.user_id == user_id)
-        .order_by(SteamRollingTime.created_at.desc())
+        select(SteamRollingTime).where(SteamRollingTime.user_id == user_id).order_by(col(SteamRollingTime.created_at).desc())
     ).all()
 
     latest = {}
@@ -71,11 +72,8 @@ def get_recommendations_of_friend(
 
     friendship = session.exec(
         select(Friendship).where(
-            (
-                (Friendship.requester_id == auth_user.id) & (Friendship.addressee_id == friend_id)
-            ) | (
-                (Friendship.requester_id == friend_id) & (Friendship.addressee_id == auth_user.id)
-            )
+            ((Friendship.requester_id == auth_user.id) & (Friendship.addressee_id == friend_id))
+            | ((Friendship.requester_id == friend_id) & (Friendship.addressee_id == auth_user.id))
         )
     ).first()
 
@@ -130,28 +128,16 @@ async def get_recommendations_of_steam(
     friend_playtimes = {str(game.appid): game.playtime_forever for game in steam_friend_games_list.games}
     return _build_recommendation_responses(auth_latest, friend_playtimes)
 
-def include_top_games(
-        common_games: list[CommonGames],
-        session: Session,
-        list_length: int = 10
-) -> tuple[list[RecommendedTopGame], list[Genre]]:
+
+def include_top_games(common_games: list[CommonGames], session: Session, list_length: int = 10) -> tuple[list[RecommendedTopGame], list[Genre]]:
     if not common_games:
-        top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc()).limit(list_length)).all()
-        return [
-            RecommendedTopGame(
-                gameSteamId=tg.steam_app_id,
-                keys=[]
-            )
-            for tg in top_games
-        ], []
+        top_games = session.exec(select(TopGame).order_by(col(TopGame.rank).asc()).limit(list_length)).all()
+        return [RecommendedTopGame(gameSteamId=tg.steam_app_id, keys=[]) for tg in top_games], []
 
     common_app_ids = {g.gameSteamId for g in common_games}
-    common_game_weights = {
-        g.gameSteamId: math.log1p(g.requester_play_time + g.friend_play_time)
-        for g in common_games
-    }
+    common_game_weights = {g.gameSteamId: math.log1p(g.requester_play_time + g.friend_play_time) for g in common_games}
 
-    games = session.exec(select(Game).where(Game.steam_app_id.in_(list(common_app_ids)))).all()
+    games = session.exec(select(Game).where(col(Game.steam_app_id).in_(list(common_app_ids)))).all()
     computed_genres = {}
     genre_weights = {}
     for g in games:
@@ -164,8 +150,8 @@ def include_top_games(
     if not computed_genres:
         return [], []
 
-    top_games = session.exec(select(TopGame).order_by(TopGame.rank.asc())).all()
-    
+    top_games = session.exec(select(TopGame).order_by(col(TopGame.rank).asc())).all()
+
     candidates = []
     computed_genre_ids = set(computed_genres.keys())
     for tg in top_games:
@@ -189,4 +175,3 @@ def include_top_games(
         )
 
     return result_games, list(computed_genres.values())
-

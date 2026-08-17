@@ -5,7 +5,6 @@ from enum import Enum
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
-from src.games.schemas import DailyGameReport, DailyReport
 from src.models.friendship import FriendshipBase
 from src.models.steam_rolling_time import SteamRollingTimeBase
 from src.models.user import UserBase
@@ -31,6 +30,8 @@ class UserUpdate(SQLModel):
     username: str | None = Field(default=None, max_length=100)
     steam_id: str | None = Field(default=None, max_length=32)
     steam_api_key: str | None = Field(default=None, max_length=255)
+
+
 # endregion
 
 
@@ -43,6 +44,8 @@ class SteamRollingTimeCreate(SteamRollingTimeBase):
 class SteamRollingTimeRead(SteamRollingTimeBase):
     id: uuid.UUID
     user_id: uuid.UUID
+
+
 # endregion
 
 
@@ -55,7 +58,7 @@ class FriendshipStatus(str, Enum):
 
 
 class FriendshipInfo(BaseModel):
-    friendship_id: FriendshipBase.model_fields["id"].annotation | None = None
+    friendship_id: uuid.UUID | None = None
     friendship_status: FriendshipStatus | None = None
     friendship_requester_id: uuid.UUID | None = None
 
@@ -76,8 +79,10 @@ class FriendshipResponseStatus(str, Enum):
 
 
 class FriendshipResponse(BaseModel):
-    friendship_id: FriendshipBase.model_fields["id"].annotation
+    friendship_id: uuid.UUID
     action: FriendshipResponseStatus
+
+
 # endregion
 
 
@@ -90,6 +95,8 @@ class SteamFriend(BaseModel):
 
 class GetFriendListResponse(BaseModel):
     friends: list[SteamFriend]
+
+
 # endregion
 
 
@@ -111,4 +118,6 @@ class NotificationRead(BaseModel):
     data: dict | None = None
     is_read: bool
     created_at: datetime
+
+
 # endregion
