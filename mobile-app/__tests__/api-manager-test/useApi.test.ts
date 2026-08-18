@@ -9,6 +9,7 @@ import {
   useGetUserStreak,
   useGetNumberOfCurrentPlayers,
   useGetGameNews,
+  useGetGameGuides,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -204,5 +205,20 @@ describe('useGetGameNews', () => {
     renderHook(() => useGetGameNews('730', 3));
     mockUseAsyncFetch.mock.calls[0][0]();
     expect(mockApiManager.getGameNews).toHaveBeenCalledWith('730', 3, 1);
+  });
+});
+
+describe('useGetGameGuides', () => {
+  useTestApiHook({
+    useHook: () => useGetGameGuides('730'),
+    apiMethod: 'getGameGuides',
+    // Five guides from the first cursor: the panel shows one short page.
+    apiArgs: ['730', '*', 5],
+    expectedKeys: {
+      data: 'gameGuides',
+      loading: 'isLoadingGameGuides',
+      error: 'errorGameGuides',
+    },
+    mockData: { response: { total: 812, publishedfiledetails: [] } },
   });
 });

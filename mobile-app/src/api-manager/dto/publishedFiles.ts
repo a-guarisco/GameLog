@@ -15,6 +15,11 @@ export interface PublishedFileDetails {
   image_height: number;
   time_created: number;
   file_type: number;
+  /** Guides only. Mixes topics ("Walkthroughs") with the guide's supported languages. */
+  tags?: { tag: string; display_name: string }[];
+  views?: number;
+  lifetime_favorited?: number;
+  num_comments_public?: number;
 }
 
 export interface PublishedFiles {
