@@ -1,52 +1,58 @@
 import { render, screen } from '@testing-library/react-native';
 import ProfileStats from '@gamelog/profile/ProfileStats';
+import type { OwnedGames } from '@gamelog/api-manager/dto';
 
-jest.mock('@gamelog/common/gluestack/box', () => {
-  const { View } = jest.requireActual('react-native');
-  return { Box: ({ children, ...props }: any) => <View {...props}>{children}</View> };
-});
+const buildGame = (overrides: Record<string, unknown> = {}) =>
+  ({
+    appid: '236390',
+    name: 'War Thunder',
+    playtime_forever: 86280,
+    img_icon_url: '',
+    has_community_visible_stats: true,
+    playtime_windows_forever: 86280,
+    playtime_mac_forever: 0,
+    playtime_linux_forever: 0,
+    playtime_deck_forever: 0,
+    rtime_last_played: 1785334609,
+    ...overrides,
+  }) as OwnedGames['response']['games'][0];
 
-jest.mock('@gamelog/common/StatTile', () => {
-  const { View, Text } = jest.requireActual('react-native');
-  return {
-    StatTile: ({ value, label }: { value: string; label: string }) => (
-      <View testID="stat-tile">
-        <Text testID="stat-value">{value}</Text>
-        <Text testID="stat-label">{label}</Text>
-      </View>
-    ),
-  };
-});
+const OWNED_GAMES: OwnedGames = {
+  response: {
+    game_count: 160,
+    games: [buildGame({ playtime_2weeks: 240 }), buildGame({ appid: '730', name: 'CS2' })],
+  },
+};
 
 describe('ProfileStats', () => {
-  it('renders exactly three stat tiles', () => {
-    render(<ProfileStats />);
-    expect(screen.getAllByTestId('stat-tile')).toHaveLength(3);
+  it('renders the three band labels', () => {
+    render(<ProfileStats ownedGames={OWNED_GAMES} />);
+
+    ['Owned', '2 weeks', 'Total'].forEach((label) => expect(screen.getByText(label)).toBeTruthy());
   });
 
-  it('renders the "Games Owned" tile with value 160', () => {
-    render(<ProfileStats />);
-    expect(screen.getByText('Games Owned')).toBeTruthy();
+  it('shows the library size reported by Steam', () => {
+    render(<ProfileStats ownedGames={OWNED_GAMES} />);
+
     expect(screen.getByText('160')).toBeTruthy();
   });
 
-  it('renders the "Played in Last 2 Weeks" tile with value 18', () => {
-    render(<ProfileStats />);
-    expect(screen.getByText('Played in Last 2 Weeks')).toBeTruthy();
-    expect(screen.getByText('18')).toBeTruthy();
+  it('counts only the games played in the last two weeks', () => {
+    render(<ProfileStats ownedGames={OWNED_GAMES} />);
+
+    expect(screen.getByText('1')).toBeTruthy();
   });
 
-  it('renders the "Games Completed" tile with value 10', () => {
-    render(<ProfileStats />);
-    expect(screen.getByText('Games Completed')).toBeTruthy();
-    expect(screen.getByText('10')).toBeTruthy();
+  it('sums lifetime playtime into grouped hours', () => {
+    render(<ProfileStats ownedGames={OWNED_GAMES} />);
+
+    expect(screen.getByText('2,876 h')).toBeTruthy();
   });
 
-  it('renders all three labels', () => {
-    render(<ProfileStats />);
-    const labels = screen.getAllByTestId('stat-label').map((el) => el.props.children);
-    expect(labels).toEqual(
-      expect.arrayContaining(['Games Owned', 'Played in Last 2 Weeks', 'Games Completed'])
-    );
+  it('renders zeroes rather than blanks when there is no library', () => {
+    render(<ProfileStats ownedGames={null} />);
+
+    expect(screen.getAllByText('0')).toHaveLength(2);
+    expect(screen.getByText('0 h')).toBeTruthy();
   });
 });
