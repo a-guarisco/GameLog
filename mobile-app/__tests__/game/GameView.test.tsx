@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
+import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -41,5 +42,28 @@ describe('GameView', () => {
     render(<GameView />);
 
     expect(screen.getByText('Mock Achievements for 123')).toBeTruthy();
+  });
+
+  it('renders the game name once, in the title block below the artwork', () => {
+    render(<GameView />);
+
+    expect(screen.getByText('Test Game')).toBeTruthy();
+  });
+
+  it('shows the live player count and streak under the title', () => {
+    render(<GameView />);
+
+    expect(screen.getByText('0 playing now')).toBeTruthy();
+    // The streak request is still in flight on first render, so match either state.
+    expect(screen.getByText(/streak/i)).toBeTruthy();
+  });
+
+  it('shows the last played date including the year', () => {
+    render(<GameView />);
+
+    const lastPlayed = formatShortDateWithYear(1620000000);
+
+    expect(screen.getByText(lastPlayed)).toBeTruthy();
+    expect(lastPlayed).toContain('2021');
   });
 });

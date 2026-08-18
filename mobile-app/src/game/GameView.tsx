@@ -5,6 +5,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import GameHero from '@gamelog/game/GameHero';
+import GameTitleBlock from '@gamelog/game/GameTitleBlock';
 import GameStatBand from '@gamelog/game/GameStatBand';
 import GameCapturesStrip, { GameCapture } from '@gamelog/game/GameCapturesStrip';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
@@ -17,7 +18,7 @@ import {
   useGetNumberOfCurrentPlayers,
 } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
-import { formatMinutesToHoursShort, formatShortDate } from '@gamelog/utils/formatUtils';
+import { formatMinutesToHoursShort, formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
 
 /** Steam leaves short_description empty on plenty of screenshots, hence the fallback. */
@@ -90,7 +91,7 @@ const GameView = () => {
       value: gameItem.playtime_2weeks ? formatMinutesToHoursShort(gameItem.playtime_2weeks) : '—',
       label: '2 weeks',
     },
-    { value: formatShortDate(gameItem.rtime_last_played), label: 'Last played' },
+    { value: formatShortDateWithYear(gameItem.rtime_last_played), label: 'Last played' },
   ];
 
   return (
@@ -99,15 +100,11 @@ const GameView = () => {
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        <GameHero
-          appid={gameItem.appid}
-          name={gameItem.name}
-          livePlayers={livePlayers}
-          streakText={streakText}
-          onBack={() => navigation.goBack()}
-        />
+        <GameHero appid={gameItem.appid} name={gameItem.name} onBack={() => navigation.goBack()} />
 
-        <VStack space="xl" className="pt-5">
+        <VStack space="xl" className="pt-3">
+          <GameTitleBlock name={gameItem.name} livePlayers={livePlayers} streakText={streakText} />
+
           <Box className="px-4">
             <GameStatBand stats={stats} />
           </Box>
