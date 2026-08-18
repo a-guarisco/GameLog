@@ -12,12 +12,12 @@ import ScrollablePage from '@gamelog/common/ScrollablePage';
 import BackButton from '@gamelog/common/BackButton';
 import GameStatBand from '@gamelog/common/StatBand';
 import ProgressTrack from '@gamelog/common/ProgressTrack';
-import GameCapturesStrip, { GameCapture } from '@gamelog/game/GameCapturesStrip';
+import GameScreenshotsStrip, { GameScreenshot } from '@gamelog/game/GameScreenshotsStrip';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
 import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';
 import useAchievementsData from '@gamelog/game/useAchievementsData';
 import {
-  useGetGameCaptures,
+  useGetGameScreenshots,
   useGetGameStreak,
   useGetGlobalAchievement,
   useGetNumberOfCurrentPlayers,
@@ -29,7 +29,7 @@ import { toHex } from '@gamelog/theme/themeHelpers';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
 
 /** Steam leaves short_description empty on plenty of screenshots, hence the fallback. */
-const toGameCaptures = (files: PublishedFileDetails[]): GameCapture[] =>
+const toGameScreenshots = (files: PublishedFileDetails[]): GameScreenshot[] =>
   files.map((file) => ({
     id: file.publishedfileid,
     imageUrl: file.image_url,
@@ -89,8 +89,13 @@ const GameView = () => {
     globalAchievements
   );
 
-  const { captures, totalCaptures, loadMoreCaptures, isLoadingCaptures, isLoadingMoreCaptures } =
-    useGetGameCaptures(gameItem.appid);
+  const {
+    screenshots,
+    totalScreenshots,
+    loadMoreScreenshots,
+    isLoadingScreenshots,
+    isLoadingMoreScreenshots,
+  } = useGetGameScreenshots(gameItem.appid);
 
   const { currentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
@@ -138,12 +143,12 @@ const GameView = () => {
               />
             </Box>
 
-            <GameCapturesStrip
-              captures={toGameCaptures(captures)}
-              totalCount={totalCaptures}
-              isLoading={isLoadingCaptures}
-              isLoadingMore={isLoadingMoreCaptures}
-              onEndReached={loadMoreCaptures}
+            <GameScreenshotsStrip
+              screenshots={toGameScreenshots(screenshots)}
+              totalCount={totalScreenshots}
+              isLoading={isLoadingScreenshots}
+              isLoadingMore={isLoadingMoreScreenshots}
+              onEndReached={loadMoreScreenshots}
             />
 
             <Box className="px-4">
