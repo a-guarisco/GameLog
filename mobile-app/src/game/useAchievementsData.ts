@@ -6,13 +6,17 @@ import mergeGlobalPersonalAchievements from './mergeGlobalPersonalAchievements';
 const useAchievementsData = (
   gameID: string,
   playerID: string,
-  globalAchievements: GlobalAchievement
+  globalAchievements: GlobalAchievement | null | undefined
 ) => {
   const { personalAchievements, isLoadingPlayerAchievement, errorPlayerAchievement } =
     useGetPlayerAchievementsPerApp(gameID, playerID);
 
   const mergedAchievements = useMemo(
-    () => mergeGlobalPersonalAchievements(globalAchievements, personalAchievements ?? undefined),
+    () =>
+      mergeGlobalPersonalAchievements(
+        globalAchievements ?? undefined,
+        personalAchievements ?? undefined
+      ),
     [globalAchievements, personalAchievements]
   );
 

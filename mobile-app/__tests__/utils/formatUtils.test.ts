@@ -1,4 +1,9 @@
-import { formatAchievementName, formatMinutesToHours } from '@gamelog/utils/formatUtils';
+import {
+  formatAchievementName,
+  formatMinutesToHours,
+  formatShortDate,
+  formatThousands,
+} from '@gamelog/utils/formatUtils';
 
 describe('formatAchievementName', () => {
   it('replaces underscores with spaces', () => {
@@ -25,5 +30,24 @@ describe('formatMinutesToHours', () => {
 
   it('handles large values', () => {
     expect(formatMinutesToHours(600)).toBe('10h 0m');
+  });
+});
+
+describe('formatShortDate', () => {
+  it('renders a steam unix timestamp as month and day', () => {
+    const timestamp = 1784660983;
+    expect(formatShortDate(timestamp)).toBe(
+      new Date(timestamp * 1000).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+      })
+    );
+  });
+});
+
+describe('formatThousands', () => {
+  it('groups thousands and leaves short numbers alone', () => {
+    expect(formatThousands(412249)).toBe('412,249');
+    expect(formatThousands(999)).toBe('999');
   });
 });
