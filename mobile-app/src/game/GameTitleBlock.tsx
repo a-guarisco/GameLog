@@ -25,8 +25,8 @@ const Chip = ({ children, className = '' }: { children: React.ReactNode; classNa
 const GameTitleBlock = ({ name, livePlayers, streakText }: GameTitleBlockProps) => (
   <VStack space="sm" className="items-center px-4">
     <Text
-      size="3xl"
-      className="text-center font-bold text-typography-0"
+      size="4xl"
+      className="text-center font-bold text-typography-0 pt-8 pb-2"
       style={{ letterSpacing: -0.5 }}
       numberOfLines={2}
     >
