@@ -2,6 +2,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
+import Chip from '@gamelog/common/game/Chip';
 import { formatThousands } from '@gamelog/utils/formatUtils';
 
 interface GameTitleBlockProps {
@@ -9,12 +10,6 @@ interface GameTitleBlockProps {
   livePlayers: number;
   streakText: string;
 }
-
-const Chip = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <HStack className={`items-center rounded-full border px-3 py-1.5 ${className}`} space="xs">
-    {children}
-  </HStack>
-);
 
 /**
  * Title, live player count and streak live below the artwork rather than on top of it:
