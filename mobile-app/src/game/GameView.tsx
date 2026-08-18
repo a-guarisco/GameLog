@@ -102,7 +102,7 @@ const GameView = () => {
       >
         <GameHero appid={gameItem.appid} name={gameItem.name} onBack={() => navigation.goBack()} />
 
-        <VStack space="xl" className="pt-3">
+        <VStack space="xl">
           <GameTitleBlock name={gameItem.name} livePlayers={livePlayers} streakText={streakText} />
 
           <Box className="px-4">
