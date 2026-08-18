@@ -91,6 +91,16 @@ const EndPoints = {
     return `${STEAM_BASE_URL}IPublishedFileService/QueryFiles/v1/?key=${getSteamApiKey()}&query_type=3&appid=${appId}&filetype=4&cursor=${encodeURIComponent(cursor)}&numperpage=${numPerPage}&return_short_description=true&return_previews=true`;
   },
 
+  /**
+   * Community guides for an app. creator_appid 766 is the Steam Community app that
+   * publishes them, query_type 12 is "ranked by trend", filetype 11 is a guide, and
+   * the required English tag keeps the panel readable. Cursor works as above.
+   */
+  queryPublishedGuides: (appId: string, cursor: string, numPerPage: number) => {
+    // TODO: use isBackendProvider() if backend endpoint differs
+    return `${STEAM_BASE_URL}IPublishedFileService/QueryFiles/v1/?key=${getSteamApiKey()}&creator_appid=766&query_type=12&appid=${appId}&filetype=11&requiredtags[0]=English&match_all_tags=true&cursor=${encodeURIComponent(cursor)}&numperpage=${numPerPage}&return_short_description=true`;
+  },
+
   getStreakByUser: () => {
     return `${getBackendBaseUrl()}/games/streak_by_user`;
   },

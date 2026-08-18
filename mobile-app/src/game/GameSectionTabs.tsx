@@ -7,9 +7,9 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
-import { useGetGameNews } from '@gamelog/api-manager/useApi';
-import type { SteamNewsItem } from '@gamelog/api-manager/dto';
-import { PLACEHOLDER_GUIDES, PLACEHOLDER_GUIDE_COUNT } from '@gamelog/game/gamePlaceholders';
+import { useGetGameGuides, useGetGameNews } from '@gamelog/api-manager/useApi';
+import type { PublishedFileDetails, SteamNewsItem } from '@gamelog/api-manager/dto';
+import { getGuideTopicTags, getGuideUrl } from '@gamelog/game/guideTags';
 import SeeAllLink from '@gamelog/game/SeeAllLink';
 
 type SectionId = 'achievements' | 'news' | 'guides';
@@ -94,55 +94,93 @@ const NewsPanel = ({ appid }: { appid: string }) => {
   );
 };
 
-const GuidesPanel = ({ appid }: { appid: string }) => (
-  <VStack space="sm" className="pt-4">
-    {PLACEHOLDER_GUIDES.map((guide) => (
-      <HStack
-        key={guide.id}
-        space="md"
-        className="rounded-xl border border-outline-100 bg-background-100 p-3 items-start"
-      >
-        <Box className="h-9 w-9 rounded-full bg-primary-500/20 border border-primary-400 items-center justify-center">
-          <Text size="sm" className="font-bold text-primary-100">
-            {guide.author.charAt(0).toUpperCase()}
-          </Text>
-        </Box>
-
-        <VStack className="flex-1" space="xs">
-          <Text size="sm" className="font-bold text-typography-0">
-            {guide.title}
-          </Text>
-          <Text size="xs" className="text-typography-300">
-            {guide.author} · {guide.authorGuideCount} guides
-          </Text>
-          <HStack space="md" className="items-center pt-0.5">
-            <HStack space="xs" className="items-center">
-              <Ionicons name="thumbs-up-outline" size={12} color="#8C8C8C" />
-              <Text size="2xs" className="text-typography-300">
-                {guide.votes}
-              </Text>
-            </HStack>
-            <HStack space="xs" className="items-center">
-              <Ionicons name="time-outline" size={12} color="#8C8C8C" />
-              <Text size="2xs" className="text-typography-300">
-                {guide.readMinutes} min
-              </Text>
-            </HStack>
-            <Box className="rounded-md bg-background-200 px-2 py-0.5">
-              <Text size="2xs" className="font-bold text-typography-200">
-                {guide.tag}
-              </Text>
-            </Box>
-          </HStack>
-        </VStack>
-      </HStack>
-    ))}
-    <SectionLink
-      label={`See all ${formatThousands(PLACEHOLDER_GUIDE_COUNT)} guides`}
-      url={`https://steamcommunity.com/app/${appid}/guides/`}
-    />
-  </VStack>
+const GuideStat = ({
+  icon,
+  value,
+}: {
+  icon: 'eye-outline' | 'star-outline' | 'chatbubble-outline';
+  value: number;
+}) => (
+  <HStack space="xs" className="items-center">
+    <Ionicons name={icon} size={12} color="#8C8C8C" />
+    <Text size="2xs" className="text-typography-300">
+      {formatThousands(value)}
+    </Text>
+  </HStack>
 );
+
+const GuideCard = ({ guide }: { guide: PublishedFileDetails }) => (
+  <Pressable
+    onPress={() => openExternalUrl(getGuideUrl(guide.publishedfileid))}
+    accessibilityRole="link"
+    accessibilityLabel={guide.title}
+    testID={`guide-item-${guide.publishedfileid}`}
+    className="rounded-xl border border-outline-100 bg-background-100 p-3"
+  >
+    <VStack space="xs">
+      <Text size="sm" className="font-bold text-typography-0">
+        {guide.title}
+      </Text>
+
+      {!!guide.short_description && (
+        <Text size="xs" className="leading-5 text-typography-300" numberOfLines={2}>
+          {guide.short_description}
+        </Text>
+      )}
+
+      <HStack space="xs" className="flex-wrap items-center pt-0.5">
+        {getGuideTopicTags(guide).map((tag) => (
+          <Box key={tag} className="rounded-md bg-background-200 px-2 py-0.5">
+            <Text size="2xs" className="font-bold text-typography-200">
+              {tag}
+            </Text>
+          </Box>
+        ))}
+      </HStack>
+
+      <HStack space="md" className="items-center pt-0.5">
+        <GuideStat icon="eye-outline" value={guide.views ?? 0} />
+        <GuideStat icon="star-outline" value={guide.lifetime_favorited ?? 0} />
+        <GuideStat icon="chatbubble-outline" value={guide.num_comments_public ?? 0} />
+      </HStack>
+    </VStack>
+  </Pressable>
+);
+
+const GuidesPanel = ({ appid }: { appid: string }) => {
+  const { gameGuides, isLoadingGameGuides, errorGameGuides } = useGetGameGuides(appid);
+  const guides = gameGuides?.response?.publishedfiledetails ?? [];
+  const totalGuides = gameGuides?.response?.total ?? 0;
+
+  return (
+    <VStack space="sm" className="pt-4">
+      {isLoadingGameGuides && (
+        <Box className="items-center py-8">
+          <Spinner />
+        </Box>
+      )}
+
+      {!isLoadingGameGuides && errorGameGuides && (
+        <SectionMessage>Could not load guides</SectionMessage>
+      )}
+
+      {!isLoadingGameGuides && !errorGameGuides && guides.length === 0 && (
+        <SectionMessage>No guides yet</SectionMessage>
+      )}
+
+      {guides.map((guide) => (
+        <GuideCard key={guide.publishedfileid} guide={guide} />
+      ))}
+
+      <SectionLink
+        label={
+          totalGuides > 0 ? `See all ${formatThousands(totalGuides)} guides` : 'See all guides'
+        }
+        url={`https://steamcommunity.com/app/${appid}/guides/`}
+      />
+    </VStack>
+  );
+};
 
 interface GameSectionTabsProps {
   appid: string;
