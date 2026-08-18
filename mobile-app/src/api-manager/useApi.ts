@@ -151,6 +151,19 @@ export const useGetFriendRecommendations = (friendId: string | null) => {
   };
 };
 
+export const useGetNumberOfCurrentPlayers = (appId: string) => {
+  const fetchFunc = useCallback(() => ApiManager.getNumberOfCurrentPlayers(appId), [appId]);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    currentPlayers: data,
+    isLoadingCurrentPlayers: isLoading,
+    errorCurrentPlayers: error,
+    errorMessageCurrentPlayers: errorMessage,
+    refetchCurrentPlayers: refetch,
+  };
+};
+
 // export const useGetBackendHealth = () => {
 //   const fetchFunc = useCallback(() => ApiManager.getBackendHealth(), []);
 
