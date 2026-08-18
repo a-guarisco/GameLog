@@ -78,6 +78,9 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.getSchemaForGame('730')).toBe(
         'https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=abc123&appid=730'
       );
+      expect(EndPoints.getNumberOfCurrentPlayers('730')).toBe(
+        'https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=730'
+      );
     });
   });
 
