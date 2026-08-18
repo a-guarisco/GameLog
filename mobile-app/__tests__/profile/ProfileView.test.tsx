@@ -42,10 +42,6 @@ jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, default: () => <View testID="total-hours-pie-chart" /> };
 });
-jest.mock('@gamelog/common/charts/os-share/OsShareChart', () => {
-  const { View } = jest.requireActual('react-native');
-  return { __esModule: true, default: () => <View testID="os-share-chart" /> };
-});
 jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, default: () => <View testID="genre-radar-chart" /> };
@@ -293,12 +289,11 @@ describe('ProfileView — loaded', () => {
     expect(screen.getByText('0 h')).toBeTruthy();
   });
 
-  it('plots the backend playtime history on the time tab', () => {
+  it('plots the backend playtime history on the overview tab', () => {
     jest.useFakeTimers().setSystemTime(new Date(2026, 7, 18, 10, 30));
     setupLoadedMocks();
 
     render(<ProfileView />);
-    fireEvent.press(screen.getByTestId('profile-tab-time'));
 
     // 90 + 150 minutes over the window, and the busiest day fills the plot.
     expect(screen.getByText('4h 0m')).toBeTruthy();
@@ -323,8 +318,9 @@ describe('ProfileView — loaded', () => {
 
     render(<ProfileView />);
 
-    fireEvent.press(screen.getByTestId('profile-tab-time'));
     expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('profile-tab-time'));
     expect(screen.getByTestId('profile-hours-per-game')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
 
@@ -332,6 +328,6 @@ describe('ProfileView — loaded', () => {
     expect(screen.getByTestId('genre-radar-chart')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('profile-tab-platforms'));
-    expect(screen.getByTestId('os-share-chart')).toBeTruthy();
+    expect(screen.getByTestId('profile-platform-split')).toBeTruthy();
   });
 });

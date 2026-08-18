@@ -20,8 +20,9 @@ import ProfileStats from './ProfileStats';
 import ProfileSectionTabs from './ProfileSectionTabs';
 import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './profileSelectors';
 import { getPlaytimeTrend } from './playtimeTrendSelectors';
+import { getPlatformSplit } from './platformSplitSelectors';
 
-const USER_ID = '76561198077919169';
+const USER_ID = '76561198159652025';
 /** Stands in for the hero artwork until the library says which game deserves it. */
 const FALLBACK_APPID = '236390';
 
@@ -53,6 +54,7 @@ const ProfileView = () => {
 
   const mostPlayedGame = useMemo(() => getMostPlayedGame(ownedGames), [ownedGames]);
   const topGames = useMemo(() => getTopGamesByHours(ownedGames), [ownedGames]);
+  const platformSplit = useMemo(() => getPlatformSplit(ownedGames), [ownedGames]);
   const playtimeTrend = useMemo(
     () => getPlaytimeTrend(playtimeByUser, RECENT_PLAYTIME_DAYS),
     [playtimeByUser]
@@ -95,6 +97,7 @@ const ProfileView = () => {
                 topGames={topGames}
                 playtimeTrend={playtimeTrend}
                 errorPlaytimeTrend={errorPlaytimeByUser}
+                platformSplit={platformSplit}
                 ownedGames={ownedGames}
                 errorOwnedGames={errorOwnedGames}
                 genreChartData={genreChartData}
