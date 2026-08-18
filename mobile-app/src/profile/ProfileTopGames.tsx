@@ -1,9 +1,9 @@
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import ProgressTrack from '@gamelog/common/game/ProgressTrack';
-import SectionCard from '@gamelog/common/game/SectionCard';
-import SectionState from '@gamelog/common/game/SectionState';
+import ProgressTrack from '@gamelog/common/ProgressTrack';
+import SectionCard from '@gamelog/common/SectionCard';
+import SectionState from '@gamelog/common/SectionState';
 import type { TopGame } from './profileSelectors';
 
 interface ProfileTopGamesProps {

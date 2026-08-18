@@ -3,7 +3,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Avatar, AvatarFallbackText, AvatarImage } from '@gamelog/common/gluestack/avatar';
-import Chip from '@gamelog/common/game/Chip';
+import Chip from '@gamelog/common/Chip';
 
 interface ProfileIdentityProps {
   name: string;

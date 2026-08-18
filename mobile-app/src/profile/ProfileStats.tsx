@@ -1,4 +1,4 @@
-import GameStatBand from '@gamelog/common/game/GameStatBand';
+import StatBand from '@gamelog/common/StatBand';
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 import { getProfileStats } from './profileSelectors';
 
@@ -10,6 +10,6 @@ const ProfileStats = ({
   ownedGames?: OwnedGames | null;
   /** Minutes played across the library in the last two weeks, from the backend report. */
   recentMinutes?: number;
-}) => <GameStatBand stats={getProfileStats(ownedGames, recentMinutes)} />;
+}) => <StatBand stats={getProfileStats(ownedGames, recentMinutes)} />;
 
 export default ProfileStats;
