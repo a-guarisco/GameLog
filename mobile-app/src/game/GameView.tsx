@@ -7,7 +7,8 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import GameHero from '@gamelog/game/GameHero';
 import GameTitleBlock from '@gamelog/game/GameTitleBlock';
-import GameStatBand from '@gamelog/game/GameStatBand';
+import GameStatBand from '@gamelog/common/game/GameStatBand';
+import ProgressTrack from '@gamelog/common/game/ProgressTrack';
 import GameCapturesStrip, { GameCapture } from '@gamelog/game/GameCapturesStrip';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
 import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';
@@ -64,13 +65,7 @@ const AchievementsSummary = ({
           <Ionicons name="chevron-forward" size={14} color={toHex(brand.primary['300'])} />
         </HStack>
       </HStack>
-      <Box className="h-1.5 w-full overflow-hidden rounded-full bg-background-200">
-        <Box
-          testID="achievements-summary-fill"
-          className="h-full rounded-full bg-primary-400"
-          style={{ width: `${completionPercent}%` }}
-        />
-      </Box>
+      <ProgressTrack percent={completionPercent} testID="achievements-summary-fill" />
     </VStack>
   </Pressable>
 );
