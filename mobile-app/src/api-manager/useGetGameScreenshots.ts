@@ -1,41 +1,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { PublishedFileDetails, PublishedFiles } from './dto';
-import { filterValidCaptures, mergeUniqueCaptures } from './gameCapturesUtils';
+import { filterValidScreenshots, mergeUniqueScreenshots } from './gameScreenshotsUtils';
 
-export type GameCapturesFetcher = (
+export type GameScreenshotsFetcher = (
   appId: string,
   cursor: string,
   pageSize: number
 ) => Promise<PublishedFiles>;
 
-export interface UseGetGameCapturesResult {
-  captures: PublishedFileDetails[];
-  totalCaptures: number;
-  hasMoreCaptures: boolean;
-  loadMoreCaptures: () => void;
-  isLoadingCaptures: boolean;
-  isLoadingMoreCaptures: boolean;
-  errorCaptures: boolean;
-  errorMessageCaptures: string | null;
+export interface UseGetGameScreenshotsResult {
+  screenshots: PublishedFileDetails[];
+  totalScreenshots: number;
+  hasMoreScreenshots: boolean;
+  loadMoreScreenshots: () => void;
+  isLoadingScreenshots: boolean;
+  isLoadingMoreScreenshots: boolean;
+  errorScreenshots: boolean;
+  errorMessageScreenshots: string | null;
 }
 
-export const CAPTURES_PAGE_SIZE = 50;
-export const FIRST_CAPTURES_CURSOR = '*';
+export const SCREENSHOTS_PAGE_SIZE = 50;
+export const FIRST_SCREENSHOTS_CURSOR = '*';
 
-export const useGetGameCaptures = (
+export const useGetGameScreenshots = (
   appId: string,
-  pageSize: number = CAPTURES_PAGE_SIZE,
-  fetcher: GameCapturesFetcher = ApiManager.getGameCaptures
-): UseGetGameCapturesResult => {
-  const [captures, setCaptures] = useState<PublishedFileDetails[]>([]);
+  pageSize: number = SCREENSHOTS_PAGE_SIZE,
+  fetcher: GameScreenshotsFetcher = ApiManager.getGameScreenshots
+): UseGetGameScreenshotsResult => {
+  const [screenshots, setScreenshots] = useState<PublishedFileDetails[]>([]);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const cursorRef = useRef(FIRST_CAPTURES_CURSOR);
+  const cursorRef = useRef(FIRST_SCREENSHOTS_CURSOR);
   const isFetchingRef = useRef(false);
   const isMountedRef = useRef(true);
   const requestIdRef = useRef(0);
@@ -52,7 +52,7 @@ export const useGetGameCaptures = (
       if (isFetchingRef.current) return;
       isFetchingRef.current = true;
 
-      const isFirstPage = cursor === FIRST_CAPTURES_CURSOR;
+      const isFirstPage = cursor === FIRST_SCREENSHOTS_CURSOR;
       if (isFirstPage) setIsLoading(true);
       else setIsLoadingMore(true);
 
@@ -60,18 +60,18 @@ export const useGetGameCaptures = (
         const { response } = await fetcher(appId, cursor, pageSize);
         if (!isMountedRef.current || requestId !== requestIdRef.current) return;
 
-        const page = filterValidCaptures(response.publishedfiledetails);
+        const page = filterValidScreenshots(response.publishedfiledetails);
         const nextCursor = response.next_cursor;
 
         setTotal(response.total ?? 0);
-        setCaptures((previous) => mergeUniqueCaptures(previous, page));
+        setScreenshots((previous) => mergeUniqueScreenshots(previous, page));
 
         cursorRef.current = nextCursor ?? cursor;
         setHasMore(page.length > 0 && !!nextCursor && nextCursor !== cursor);
         setErrorMessage(null);
       } catch (err: unknown) {
         if (!isMountedRef.current || requestId !== requestIdRef.current) return;
-        console.error('Error fetching game captures:', err);
+        console.error('Error fetching game screenshots:', err);
         setErrorMessage(
           err instanceof Error ? err.message : 'An error occurred while fetching screenshots.'
         );
@@ -90,27 +90,27 @@ export const useGetGameCaptures = (
   useEffect(() => {
     requestIdRef.current += 1;
     isFetchingRef.current = false;
-    cursorRef.current = FIRST_CAPTURES_CURSOR;
-    setCaptures([]);
+    cursorRef.current = FIRST_SCREENSHOTS_CURSOR;
+    setScreenshots([]);
     setTotal(0);
     setHasMore(true);
     setErrorMessage(null);
-    loadPage(FIRST_CAPTURES_CURSOR, requestIdRef.current);
+    loadPage(FIRST_SCREENSHOTS_CURSOR, requestIdRef.current);
   }, [loadPage]);
 
-  const loadMoreCaptures = useCallback(() => {
+  const loadMoreScreenshots = useCallback(() => {
     if (isFetchingRef.current || !hasMore) return;
     loadPage(cursorRef.current, requestIdRef.current);
   }, [hasMore, loadPage]);
 
   return {
-    captures,
-    totalCaptures: total,
-    hasMoreCaptures: hasMore,
-    loadMoreCaptures,
-    isLoadingCaptures: isLoading,
-    isLoadingMoreCaptures: isLoadingMore,
-    errorCaptures: !!errorMessage,
-    errorMessageCaptures: errorMessage,
+    screenshots,
+    totalScreenshots: total,
+    hasMoreScreenshots: hasMore,
+    loadMoreScreenshots,
+    isLoadingScreenshots: isLoading,
+    isLoadingMoreScreenshots: isLoadingMore,
+    errorScreenshots: !!errorMessage,
+    errorMessageScreenshots: errorMessage,
   };
 };

@@ -1,5 +1,5 @@
 import { PublishedFileDetails } from '@gamelog/api-manager/dto';
-import { filterValidCaptures, mergeUniqueCaptures } from '@gamelog/api-manager/gameCapturesUtils';
+import { filterValidScreenshots, mergeUniqueScreenshots } from '@gamelog/api-manager/gameScreenshotsUtils';
 
 const buildFile = (
   id: string,
@@ -18,10 +18,10 @@ const buildFile = (
   file_type: 5,
 });
 
-describe('gameCapturesUtils', () => {
-  describe('filterValidCaptures', () => {
+describe('gameScreenshotsUtils', () => {
+  describe('filterValidScreenshots', () => {
     it('returns empty array when details is undefined', () => {
-      expect(filterValidCaptures(undefined)).toEqual([]);
+      expect(filterValidScreenshots(undefined)).toEqual([]);
     });
 
     it('filters out files without an image_url', () => {
@@ -30,17 +30,17 @@ describe('gameCapturesUtils', () => {
         buildFile('2', ''),
         buildFile('3', 'http://example.com/3.jpg'),
       ];
-      const result = filterValidCaptures(input);
+      const result = filterValidScreenshots(input);
       expect(result.map((f) => f.publishedfileid)).toEqual(['1', '3']);
     });
   });
 
-  describe('mergeUniqueCaptures', () => {
+  describe('mergeUniqueScreenshots', () => {
     it('appends non-duplicate incoming items to existing items', () => {
       const existing = [buildFile('1'), buildFile('2')];
       const incoming = [buildFile('2'), buildFile('3')];
 
-      const result = mergeUniqueCaptures(existing, incoming);
+      const result = mergeUniqueScreenshots(existing, incoming);
       expect(result.map((f) => f.publishedfileid)).toEqual(['1', '2', '3']);
     });
   });

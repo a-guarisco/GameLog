@@ -194,8 +194,8 @@ export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT)
   };
 };
 
-export { useGetGameCaptures } from './useGetGameCaptures';
-export type { GameCapturesFetcher, UseGetGameCapturesResult } from './useGetGameCaptures';
+export { useGetGameScreenshots } from './useGetGameScreenshots';
+export type { GameScreenshotsFetcher, UseGetGameScreenshotsResult } from './useGetGameScreenshots';
 
 // export const useGetBackendHealth = () => {
 //   const fetchFunc = useCallback(() => ApiManager.getBackendHealth(), []);
