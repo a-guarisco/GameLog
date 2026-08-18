@@ -13,6 +13,14 @@ export const formatDate = (timestamp: number) => new Date(timestamp * 1000).toLo
 export const formatShortDate = (timestamp: number) =>
   new Date(timestamp * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
+/** "Mar 16, 2026" — the year matters once a date is old enough to be ambiguous. */
+export const formatShortDateWithYear = (timestamp: number) =>
+  new Date(timestamp * 1000).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
 /** Explicit grouping: toLocaleString() silently drops separators where Intl data is missing. */
 export const formatThousands = (value: number): string =>
   value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
