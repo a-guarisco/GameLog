@@ -1,13 +1,11 @@
-from datetime import date
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, status
 from sqlmodel import Session
 
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.users import FriendshipRequest, FriendshipResponse, UserSearchResult, user_service
-from src.users.schemas import DailyReport, UserRead, UserRegisterRequest
-from src.games import game_service
+from src.users.schemas import UserRead, UserRegisterRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -69,17 +67,3 @@ def get_current_user_profile(
     db: Session = Depends(get_db),
 ):
     return user_service.get_user_by_firebase_uid(db, auth_user.uid)
-
-
-@router.get(
-    "/report",
-    response_model=DailyReport,
-    summary="Get the daily report for the current user",
-    status_code=200,
-)
-def get_daily_report(
-    date: date | None = Query(None, description="Date for the report (YYYY-MM-DD)"),
-    auth_user: AuthenticatedUser = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    return game_service.get_daily_report(db, auth_user.uid, target_date=date)

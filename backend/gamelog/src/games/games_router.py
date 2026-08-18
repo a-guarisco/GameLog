@@ -1,6 +1,6 @@
 from datetime import date
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
@@ -87,13 +87,20 @@ async def get_recommendations(
         )
 
 
+@router.get(
+    "/report",
+    response_model=DailyReport,
+    summary="Get the daily report for the current user",
+    status_code=200,
+)
 def get_daily_report(
-    session: Session,
-    firebase_uid: str,
-    target_date: date | None = None,
+    start_date: date | None = Query(None, description="Start date for the report (YYYY-MM-DD)"),
+    end_date: date | None = Query(None, description="End date for the report (YYYY-MM-DD)"),
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> DailyReport:
     """
-    Generate an on-demand daily report for the user identified by firebase_uid on target_date (defaults to today).
-    Delegates calculation to game_service.get_daily_report.
+    Generate an on-demand daily report for the user identified by firebase_uid between start_date and end_date (defaults to today).
     """
-    return game_service.get_daily_report(session=session, user_id=firebase_uid, target_date=target_date)
+    return game_service.get_daily_report(session=db, user_id=auth_user.uid, start_date=start_date, end_date=end_date)
+
