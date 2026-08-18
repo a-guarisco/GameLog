@@ -30,8 +30,7 @@ const CaptureTile = ({ capture }: { capture: GameCapture }) => (
       <Image
         source={{ uri: capture.imageUrl }}
         alt={capture.caption}
-        className="w-full"
-        style={{ height: 99 }}
+        className="w-full h-32"
         resizeMode="cover"
       />
     </Box>

@@ -21,11 +21,10 @@ const GameHero = ({ appid, name, onBack }: GameHeroProps) => {
   const { height: screenHeight } = useWindowDimensions();
   const heroHeight = Math.max(screenHeight * 0.26, 220) + insets.top;
 
+  // No padding on the container: the artwork is absolutely positioned, and padding on the
+  // parent shrinks it, which left a strip of background showing under the image.
   return (
-    <Box
-      className="w-full overflow-hidden bg-background-200"
-      style={{ height: heroHeight, paddingTop: insets.top }}
-    >
+    <Box className="w-full overflow-hidden bg-background-200" style={{ height: heroHeight }}>
       {/* className, not style: gluestack's Image drops the style prop on native. */}
       <Image
         size="none"

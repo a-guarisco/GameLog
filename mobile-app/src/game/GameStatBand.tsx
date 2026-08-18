@@ -9,22 +9,19 @@ export type GameStat = {
 };
 
 /**
- * A third of the screen is not enough for a full date on one line, so values get two
- * lines inside a fixed-height slot — that keeps the labels aligned across columns
- * whether the value wraps or not.
+ * A third of the screen is not enough for a full date on one line, so values may wrap
+ * onto a second line. Columns stretch to the tallest one and the label is pinned to the
+ * bottom, so labels stay aligned across columns without padding out short values.
  */
 const GameStatBand = ({ stats }: { stats: GameStat[] }) => (
   <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-100">
     {stats.map((stat, index) => (
       <HStack key={stat.label} className="flex-1">
         {index > 0 && <Box className="w-px bg-outline-100" />}
-        <VStack className="flex-1 px-3 py-3" space="xs">
-          {/* 48px == two lines of text-base, so a wrapped value is never clipped. */}
-          <Box className="min-h-12 justify-start">
-            <Text size="md" className="font-bold text-typography-0" numberOfLines={2}>
-              {stat.value}
-            </Text>
-          </Box>
+        <VStack className="flex-1 justify-between px-3 py-3" space="xs">
+          <Text size="md" className="font-bold text-typography-0" numberOfLines={2}>
+            {stat.value}
+          </Text>
           <Text
             size="2xs"
             className="font-bold uppercase text-typography-300"
