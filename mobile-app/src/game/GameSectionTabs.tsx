@@ -9,7 +9,7 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { useGetGameGuides, useGetGameNews } from '@gamelog/api-manager/useApi';
 import type { PublishedFileDetails, SteamNewsItem } from '@gamelog/api-manager/dto';
 import { getGuideTopicTags, getGuideUrl } from '@gamelog/game/guideTags';
-import SeeAllLink from '@gamelog/common/game/SeeAllLink';
+import SeeAllLink from '@gamelog/common/SeeAllLink';
 import SectionState from '@gamelog/common/SectionState';
 import Chip from '@gamelog/common/Chip';
 
