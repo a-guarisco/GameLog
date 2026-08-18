@@ -102,7 +102,7 @@ export default {
   /** Playtime per game between two inclusive `YYYY-MM-DD` dates. */
   getPlaytimeReport: (startDate: string, endDate: string) =>
     fetchAuthenticatedData<DailyReport>(EndPoints.getPlaytimeReport(startDate, endDate)),
-  /** Per-day playtime across the whole library, for the trailing `days` window. */
+
   getPlaytimeByUser: (days: number) =>
     fetchAuthenticatedData<PlaytimeByUser>(EndPoints.getPlaytimeByUser(days)),
 
