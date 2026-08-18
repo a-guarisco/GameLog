@@ -1,12 +1,15 @@
-import { Pressable, ScrollView } from 'react-native';
+import { Pressable } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import GameHero from '@gamelog/game/GameHero';
-import GameTitleBlock from '@gamelog/game/GameTitleBlock';
+import HeaderGameImage from '@gamelog/game/HeaderGameImage';
+import GameStatusChips from '@gamelog/game/GameStatusChips';
+import BannerInfo from '@gamelog/common/BannerInfo';
+import ScrollablePage from '@gamelog/common/ScrollablePage';
+import BackButton from '@gamelog/common/game/BackButton';
 import GameStatBand from '@gamelog/common/game/GameStatBand';
 import ProgressTrack from '@gamelog/common/game/ProgressTrack';
 import GameCapturesStrip, { GameCapture } from '@gamelog/game/GameCapturesStrip';
@@ -111,51 +114,55 @@ const GameView = () => {
   ];
 
   return (
-    <Box className="flex-1 bg-background-0">
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 32 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <GameHero appid={gameItem.appid} name={gameItem.name} onBack={() => navigation.goBack()} />
+    <Box className="flex-1 relative">
+      <HeaderGameImage appid={gameItem.appid} />
 
-        <VStack space="xl">
-          <GameTitleBlock name={gameItem.name} livePlayers={livePlayers} streakText={streakText} />
+      <ScrollablePage>
+        {/* No icon or streak chip here — the streak already has its own chip below. */}
+        <BannerInfo className="bg-background-100 shadow-xl" title={gameItem.name} />
 
-          <Box className="px-4">
-            <GameStatBand stats={stats} />
-          </Box>
+        <Box className="bg-background-100 shadow-xl pt-6 pb-6">
+          <VStack space="xl">
+            <GameStatusChips livePlayers={livePlayers} streakText={streakText} />
 
-          <Box className="px-4">
-            <AchievementsSummary
-              unlockedCount={unlockedCount}
-              totalCount={totalCount}
-              completionPercent={completionPercent}
-              onPress={openAchievementsList}
+            <Box className="px-4">
+              <GameStatBand stats={stats} />
+            </Box>
+
+            <Box className="px-4">
+              <AchievementsSummary
+                unlockedCount={unlockedCount}
+                totalCount={totalCount}
+                completionPercent={completionPercent}
+                onPress={openAchievementsList}
+              />
+            </Box>
+
+            <GameCapturesStrip
+              captures={toGameCaptures(captures)}
+              totalCount={totalCaptures}
+              isLoading={isLoadingCaptures}
+              isLoadingMore={isLoadingMoreCaptures}
+              onEndReached={loadMoreCaptures}
             />
-          </Box>
 
-          <GameCapturesStrip
-            captures={toGameCaptures(captures)}
-            totalCount={totalCaptures}
-            isLoading={isLoadingCaptures}
-            isLoadingMore={isLoadingMoreCaptures}
-            onEndReached={loadMoreCaptures}
-          />
+            <Box className="px-4">
+              <GameSectionTabs
+                appid={gameItem.appid}
+                achievementsSlot={
+                  <GlobalAchievementsPreview
+                    gameID={gameItem.appid}
+                    playerID={playerID}
+                    gameItem={gameItem}
+                  />
+                }
+              />
+            </Box>
+          </VStack>
+        </Box>
+      </ScrollablePage>
 
-          <Box className="px-4">
-            <GameSectionTabs
-              appid={gameItem.appid}
-              achievementsSlot={
-                <GlobalAchievementsPreview
-                  gameID={gameItem.appid}
-                  playerID={playerID}
-                  gameItem={gameItem}
-                />
-              }
-            />
-          </Box>
-        </VStack>
-      </ScrollView>
+      <BackButton onPress={() => navigation.goBack()} testID="game-back" />
     </Box>
   );
 };
