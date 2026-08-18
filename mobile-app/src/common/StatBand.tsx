@@ -9,7 +9,7 @@ export type GameStat = {
 };
 
 const StatBand = ({ stats }: { stats: GameStat[] }) => (
-  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200">
+  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200 shadow-md">
     {stats.map((stat, index) => (
       <HStack key={stat.label} className="flex-1">
         {index > 0 && <Box className="w-px bg-outline-100" />}
