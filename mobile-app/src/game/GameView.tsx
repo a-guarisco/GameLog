@@ -1,5 +1,6 @@
-import { ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -19,6 +20,8 @@ import {
 } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import { formatMinutesToHoursShort, formatShortDateWithYear } from '@gamelog/utils/formatUtils';
+import { brand } from '@gamelog/theme/theme';
+import { toHex } from '@gamelog/theme/themeHelpers';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
 
 /** Steam leaves short_description empty on plenty of screenshots, hence the fallback. */
@@ -29,37 +32,47 @@ const toGameCaptures = (files: PublishedFileDetails[]): GameCapture[] =>
     caption: file.short_description || file.title || 'Community screenshot',
   }));
 
+/** Tapping the summary opens the full list, same destination as the section's "see all". */
 const AchievementsSummary = ({
   unlockedCount,
   totalCount,
   completionPercent,
+  onPress,
 }: {
   unlockedCount: number;
   totalCount: number;
   completionPercent: number;
+  onPress: () => void;
 }) => (
-  <VStack space="sm">
-    <HStack className="items-center justify-between">
-      <Text size="sm" className="font-bold text-typography-0">
-        Achievements
-      </Text>
-      <Text size="sm" className="font-bold text-typography-200">
-        {unlockedCount} / {totalCount} · {completionPercent}%
-      </Text>
-    </HStack>
-    <Box
-      className="h-1.5 w-full overflow-hidden rounded-full bg-background-200"
-      accessibilityRole="progressbar"
-      accessibilityLabel={`${unlockedCount} of ${totalCount} achievements unlocked`}
-      accessibilityValue={{ min: 0, max: 100, now: completionPercent }}
-    >
-      <Box
-        testID="achievements-summary-fill"
-        className="h-full rounded-full bg-primary-400"
-        style={{ width: `${completionPercent}%` }}
-      />
-    </Box>
-  </VStack>
+  <Pressable
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel={`Achievements, ${unlockedCount} of ${totalCount} unlocked, ${completionPercent} percent. View all achievements`}
+    accessibilityValue={{ min: 0, max: 100, now: completionPercent }}
+    testID="achievements-summary"
+    hitSlop={{ top: 8, bottom: 8 }}
+  >
+    <VStack space="sm">
+      <HStack className="items-center justify-between">
+        <Text size="sm" className="font-bold text-typography-0">
+          Achievements
+        </Text>
+        <HStack space="xs" className="items-center">
+          <Text size="sm" className="font-bold text-typography-200">
+            {unlockedCount} / {totalCount} · {completionPercent}%
+          </Text>
+          <Ionicons name="chevron-forward" size={14} color={toHex(brand.primary['300'])} />
+        </HStack>
+      </HStack>
+      <Box className="h-1.5 w-full overflow-hidden rounded-full bg-background-200">
+        <Box
+          testID="achievements-summary-fill"
+          className="h-full rounded-full bg-primary-400"
+          style={{ width: `${completionPercent}%` }}
+        />
+      </Box>
+    </VStack>
+  </Pressable>
 );
 
 const GameView = () => {
@@ -83,6 +96,14 @@ const GameView = () => {
 
   const { currentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
+
+  const openAchievementsList = () =>
+    navigation.navigate('AchievementsList', {
+      globalAchievements,
+      gameID: gameItem.appid,
+      playerID,
+      gameItem,
+    });
 
   //todo this come from BE
   const stats = [
@@ -114,6 +135,7 @@ const GameView = () => {
               unlockedCount={unlockedCount}
               totalCount={totalCount}
               completionPercent={completionPercent}
+              onPress={openAchievementsList}
             />
           </Box>
 
