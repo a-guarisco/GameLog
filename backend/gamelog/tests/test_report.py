@@ -170,7 +170,7 @@ class TestDailyReportRouter:
         assert data["game_reports"][0]["today_play_time"] == 50
         assert data["game_reports"][0]["streak"] == 1
 
-    def test_get_daily_report_with_date_query_param(self, client: TestClient, session: Session):
+    def test_get_daily_report_with_date_range_query_params(self, client: TestClient, session: Session):
         me = make_user(session, firebase_uid="firebase-uid-1", username="routeruser2", steam_id="104")
         d_start = "2026-08-01"
         d_end = "2026-08-02"
