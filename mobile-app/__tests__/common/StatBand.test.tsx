@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import GameStatBand from '@gamelog/common/game/GameStatBand';
+import StatBand from '@gamelog/common/StatBand';
 
 const stats = [
   { value: '120h', label: 'Total' },
@@ -7,9 +7,9 @@ const stats = [
   { value: 'Mar 16, 2026', label: 'Last played' },
 ];
 
-describe('GameStatBand', () => {
+describe('StatBand', () => {
   it('renders every stat value and label', () => {
-    render(<GameStatBand stats={stats} />);
+    render(<StatBand stats={stats} />);
 
     stats.forEach((stat) => {
       expect(screen.getByText(stat.value)).toBeTruthy();
@@ -18,19 +18,19 @@ describe('GameStatBand', () => {
   });
 
   it('lets a long value wrap onto a second line instead of truncating it', () => {
-    render(<GameStatBand stats={stats} />);
+    render(<StatBand stats={stats} />);
 
     expect(screen.getByText('Mar 16, 2026').props.numberOfLines).toBe(2);
   });
 
   it('keeps labels on a single line', () => {
-    render(<GameStatBand stats={stats} />);
+    render(<StatBand stats={stats} />);
 
     expect(screen.getByText('Last played').props.numberOfLines).toBe(1);
   });
 
   it('renders nothing when there are no stats', () => {
-    render(<GameStatBand stats={[]} />);
+    render(<StatBand stats={[]} />);
 
     expect(screen.queryByText('Total')).toBeNull();
   });

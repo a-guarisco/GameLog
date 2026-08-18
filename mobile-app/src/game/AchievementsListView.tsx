@@ -12,7 +12,7 @@ import { useGetGameStreak } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import useAchievementsData from './useAchievementsData';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
-import BackButton from '@gamelog/common/game/BackButton';
+import BackButton from '@gamelog/common/BackButton';
 import AchievementsProgressBar from './AchievementsProgressBar';
 
 type AchievementsListViewProps = {

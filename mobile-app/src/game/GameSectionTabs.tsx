@@ -11,7 +11,7 @@ import type { PublishedFileDetails, SteamNewsItem } from '@gamelog/api-manager/d
 import { getGuideTopicTags, getGuideUrl } from '@gamelog/game/guideTags';
 import SeeAllLink from '@gamelog/common/game/SeeAllLink';
 import SectionState from '@gamelog/common/game/SectionState';
-import Chip from '@gamelog/common/game/Chip';
+import Chip from '@gamelog/common/Chip';
 
 type SectionId = 'achievements' | 'news' | 'guides';
 
