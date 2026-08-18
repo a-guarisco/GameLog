@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
-import { PublishedFileDetails, Streak } from './dto';
+import { Streak } from './dto';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
@@ -175,12 +175,9 @@ export const useGetNumberOfCurrentPlayers = (appId: string) => {
   };
 };
 
-/** Both feed panels under the game tabs show the same short list. */
 const GAME_FEED_COUNT = 5;
-/** The news panel renders titles only, so `contents` is truncated to the smallest payload. */
 const GAME_NEWS_MAX_LENGTH = 1;
 
-/** Steam has no cursor for news: `count` is the whole feed the panel gets. */
 export const useGetGameNews = (appId: string, count: number = GAME_FEED_COUNT) => {
   const fetchFunc = useCallback(
     () => ApiManager.getGameNews(appId, count, GAME_NEWS_MAX_LENGTH),
@@ -196,10 +193,6 @@ export const useGetGameNews = (appId: string, count: number = GAME_FEED_COUNT) =
   };
 };
 
-/**
- * Community guides for a game. The panel shows one short page, so the cursor stays at
- * the first one — paging is wired into the endpoint should a full guides screen land.
- */
 export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT) => {
   const fetchFunc = useCallback(() => ApiManager.getGameGuides(appId, '*', count), [appId, count]);
 
@@ -212,107 +205,8 @@ export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT)
   };
 };
 
-const CAPTURES_PAGE_SIZE = 50;
-const FIRST_CAPTURES_CURSOR = '*';
-
-/**
- * Community screenshots for a game, paged through Steam's opaque cursor.
- * useAsyncFetch is not used here because pages have to accumulate across calls
- * instead of replacing the previous result.
- */
-export const useGetGameCaptures = (appId: string, pageSize: number = CAPTURES_PAGE_SIZE) => {
-  const [captures, setCaptures] = useState<PublishedFileDetails[]>([]);
-  const [total, setTotal] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const cursorRef = useRef(FIRST_CAPTURES_CURSOR);
-  const isFetchingRef = useRef(false);
-  const isMountedRef = useRef(true);
-  // Bumped whenever the game changes, so a page that resolves late cannot append
-  // another game's screenshots to the list.
-  const requestIdRef = useRef(0);
-
-  useEffect(
-    () => () => {
-      isMountedRef.current = false;
-    },
-    []
-  );
-
-  const loadPage = useCallback(
-    async (cursor: string, requestId: number) => {
-      if (isFetchingRef.current) return;
-      isFetchingRef.current = true;
-
-      const isFirstPage = cursor === FIRST_CAPTURES_CURSOR;
-      if (isFirstPage) setIsLoading(true);
-      else setIsLoadingMore(true);
-
-      try {
-        const { response } = await ApiManager.getGameCaptures(appId, cursor, pageSize);
-        if (!isMountedRef.current || requestId !== requestIdRef.current) return;
-
-        // Screenshots without an image_url cannot be rendered, so they never reach the UI.
-        const page = (response.publishedfiledetails ?? []).filter((file) => !!file.image_url);
-        const nextCursor = response.next_cursor;
-
-        setTotal(response.total ?? 0);
-        setCaptures((previous) => {
-          const seen = new Set(previous.map((file) => file.publishedfileid));
-          return [...previous, ...page.filter((file) => !seen.has(file.publishedfileid))];
-        });
-        // Steam echoes the same cursor back once the result set is exhausted.
-        cursorRef.current = nextCursor ?? cursor;
-        setHasMore(page.length > 0 && !!nextCursor && nextCursor !== cursor);
-        setErrorMessage(null);
-      } catch (err: unknown) {
-        if (!isMountedRef.current || requestId !== requestIdRef.current) return;
-        console.error('Error fetching game captures:', err);
-        setErrorMessage(
-          err instanceof Error ? err.message : 'An error occurred while fetching screenshots.'
-        );
-        setHasMore(false);
-      } finally {
-        isFetchingRef.current = false;
-        if (isMountedRef.current && requestId === requestIdRef.current) {
-          setIsLoading(false);
-          setIsLoadingMore(false);
-        }
-      }
-    },
-    [appId, pageSize]
-  );
-
-  useEffect(() => {
-    requestIdRef.current += 1;
-    isFetchingRef.current = false;
-    cursorRef.current = FIRST_CAPTURES_CURSOR;
-    setCaptures([]);
-    setTotal(0);
-    setHasMore(true);
-    setErrorMessage(null);
-    loadPage(FIRST_CAPTURES_CURSOR, requestIdRef.current);
-  }, [loadPage]);
-
-  const loadMoreCaptures = useCallback(() => {
-    if (isFetchingRef.current || !hasMore) return;
-    loadPage(cursorRef.current, requestIdRef.current);
-  }, [hasMore, loadPage]);
-
-  return {
-    captures,
-    totalCaptures: total,
-    hasMoreCaptures: hasMore,
-    loadMoreCaptures,
-    isLoadingCaptures: isLoading,
-    isLoadingMoreCaptures: isLoadingMore,
-    errorCaptures: !!errorMessage,
-    errorMessageCaptures: errorMessage,
-  };
-};
+export { useGetGameCaptures } from './useGetGameCaptures';
+export type { GameCapturesFetcher, UseGetGameCapturesResult } from './useGetGameCaptures';
 
 // export const useGetBackendHealth = () => {
 //   const fetchFunc = useCallback(() => ApiManager.getBackendHealth(), []);

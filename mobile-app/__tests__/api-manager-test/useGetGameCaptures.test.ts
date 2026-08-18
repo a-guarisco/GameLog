@@ -104,4 +104,15 @@ describe('useGetGameCaptures', () => {
     expect(result.current.hasMoreCaptures).toBe(false);
     consoleError.mockRestore();
   });
+
+  it('uses custom fetcher when provided (Dependency Inversion)', async () => {
+    const customFetcher = jest.fn().mockResolvedValue(buildPage(['99'], 'cursor-custom'));
+
+    const { result } = renderHook(() => useGetGameCaptures('413150', 20, customFetcher));
+
+    await waitFor(() => expect(result.current.isLoadingCaptures).toBe(false));
+    expect(customFetcher).toHaveBeenCalledWith('413150', '*', 20);
+    expect(mockApiManager.getGameCaptures).not.toHaveBeenCalled();
+    expect(result.current.captures.map((c) => c.publishedfileid)).toEqual(['99']);
+  });
 });
