@@ -81,6 +81,13 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.getNumberOfCurrentPlayers('730')).toBe(
         'https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=730'
       );
+      expect(EndPoints.queryPublishedFiles('413150', '*', 50)).toBe(
+        'https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/?key=abc123&query_type=3&appid=413150&filetype=4&cursor=*&numperpage=50&return_short_description=true&return_previews=true'
+      );
+      // Steam cursors contain characters that have to survive the query string.
+      expect(EndPoints.queryPublishedFiles('413150', 'AoIIQolaZ3/H+yOhw=', 20)).toContain(
+        'cursor=AoIIQolaZ3%2FH%2ByOhw%3D'
+      );
     });
   });
 
