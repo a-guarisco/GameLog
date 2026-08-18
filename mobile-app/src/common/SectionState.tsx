@@ -36,4 +36,3 @@ const SectionState = ({
 };
 
 export default SectionState;
-
