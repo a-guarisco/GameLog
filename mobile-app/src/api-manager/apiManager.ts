@@ -4,6 +4,7 @@ import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievem
 import { auth } from '@gamelog/auth/firebaseClient';
 import type {
   CurrentPlayers,
+  DailyReport,
   GameGenres,
   GlobalAchievement,
   GameSchema,
@@ -95,6 +96,10 @@ export default {
   getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
   getStreakByGame: (appId: string) =>
     fetchAuthenticatedData<Streak>(EndPoints.getStreakByGame(appId)),
+
+  /** Playtime per game between two inclusive `YYYY-MM-DD` dates. */
+  getPlaytimeReport: (startDate: string, endDate: string) =>
+    fetchAuthenticatedData<DailyReport>(EndPoints.getPlaytimeReport(startDate, endDate)),
 
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),

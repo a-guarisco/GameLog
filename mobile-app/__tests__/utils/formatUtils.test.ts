@@ -4,6 +4,7 @@ import {
   formatShortDate,
   formatShortDateWithYear,
   formatThousands,
+  toIsoDate,
 } from '@gamelog/utils/formatUtils';
 
 describe('formatAchievementName', () => {
@@ -64,6 +65,22 @@ describe('formatShortDateWithYear', () => {
 
     expect(formatShortDateWithYear(timestamp)).toContain(year);
     expect(formatShortDate(timestamp)).not.toContain(year);
+  });
+});
+
+describe('toIsoDate', () => {
+  it('formats a date from its local calendar fields', () => {
+    expect(toIsoDate(new Date(2026, 7, 18, 23, 45))).toBe('2026-08-18');
+  });
+
+  it('zero-pads single-digit months and days', () => {
+    expect(toIsoDate(new Date(2026, 0, 5))).toBe('2026-01-05');
+  });
+
+  it('keeps the local day late in the evening, where toISOString() would roll over', () => {
+    const late = new Date(2026, 11, 31, 23, 59);
+
+    expect(toIsoDate(late)).toBe('2026-12-31');
   });
 });
 

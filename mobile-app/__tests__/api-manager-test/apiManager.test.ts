@@ -280,6 +280,30 @@ describe('ApiManager', () => {
       expect(result).toEqual(mockResponse);
     });
 
+    it('fetches the playtime report with the current Firebase token', async () => {
+      const mockResponse = {
+        date: '2026-08-18',
+        game_reports: [{ app_id: '440', today_play_time: 120, streak: 2 }],
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.getPlaytimeReport('2026-08-05', '2026-08-18');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        EndPoints.getPlaytimeReport('2026-08-05', '2026-08-18'),
+        {
+          headers: {
+            Authorization: 'Bearer firebase-id-token',
+          },
+        }
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
     it('does not call streak endpoints without an active Firebase session', async () => {
       (auth as any).currentUser = null;
 

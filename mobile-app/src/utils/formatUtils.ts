@@ -21,6 +21,15 @@ export const formatShortDateWithYear = (timestamp: number) =>
     day: 'numeric',
   });
 
+/**
+ * "2026-08-18" from local calendar fields. `toISOString()` is not usable here: it converts
+ * to UTC first, which lands on the wrong day for anyone east or west of it late enough.
+ */
+export const toIsoDate = (value: Date): string =>
+  `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(
+    value.getDate()
+  ).padStart(2, '0')}`;
+
 /** Explicit grouping: toLocaleString() silently drops separators where Intl data is missing. */
 export const formatThousands = (value: number): string =>
   value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

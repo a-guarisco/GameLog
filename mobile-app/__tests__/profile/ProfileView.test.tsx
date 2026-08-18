@@ -4,6 +4,7 @@ import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetPlaytimeReport,
   useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
 
@@ -49,6 +50,7 @@ const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
 const mockUseGetGameGenreChartData = useGetGameGenreChartData as jest.Mock;
 const mockUseGetPlayersInfo = useGetPlayersInfo as jest.Mock;
 const mockUseGetUserStreak = useGetUserStreak as jest.Mock;
+const mockUseGetPlaytimeReport = useGetPlaytimeReport as jest.Mock;
 
 const buildGame = (overrides: Record<string, unknown> = {}) => ({
   appid: '236390',
@@ -100,6 +102,18 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
     isLoadingUserStreak: false,
     errorUserStreak: null,
   });
+  mockUseGetPlaytimeReport.mockReturnValue({
+    playtimeReport: {
+      date: '2026-08-18',
+      game_reports: [
+        { app_id: '236390', today_play_time: 240, streak: 3 },
+        { app_id: '730', today_play_time: 60, streak: 1 },
+      ],
+    },
+    isLoadingPlaytimeReport: false,
+    errorPlaytimeReport: null,
+    ...overrides.playtimeReport,
+  });
 };
 
 const setupLoadingMocks = (loading: Record<string, boolean>) => {
@@ -122,6 +136,11 @@ const setupLoadingMocks = (loading: Record<string, boolean>) => {
     userStreak: null,
     isLoadingUserStreak: !!loading.userStreak,
     errorUserStreak: null,
+  });
+  mockUseGetPlaytimeReport.mockReturnValue({
+    playtimeReport: null,
+    isLoadingPlaytimeReport: !!loading.playtimeReport,
+    errorPlaytimeReport: null,
   });
 };
 
@@ -148,6 +167,14 @@ describe('ProfileView — loading', () => {
 
   it('shows LoadingBox while the streak is loading', () => {
     setupLoadingMocks({ userStreak: true });
+
+    render(<ProfileView />);
+
+    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+  });
+
+  it('shows LoadingBox while the two-week playtime report is loading', () => {
+    setupLoadingMocks({ playtimeReport: true });
 
     render(<ProfileView />);
 
@@ -216,6 +243,26 @@ describe('ProfileView — loaded', () => {
     expect(screen.getByText('160')).toBeTruthy();
     expect(screen.getByText('Owned')).toBeTruthy();
     expect(screen.getByText('Total')).toBeTruthy();
+  });
+
+  it('sums the whole playtime report into the two-week stat', () => {
+    setupLoadedMocks();
+
+    render(<ProfileView />);
+
+    // 240 + 60 minutes across the two reported games.
+    expect(screen.getByText('2 weeks')).toBeTruthy();
+    expect(screen.getByText('5 h')).toBeTruthy();
+  });
+
+  it('falls back to zero hours when the report comes back empty', () => {
+    setupLoadedMocks({
+      playtimeReport: { playtimeReport: { date: '2026-08-18', game_reports: [] } },
+    });
+
+    render(<ProfileView />);
+
+    expect(screen.getByText('0 h')).toBeTruthy();
   });
 
   it('opens on the overview tab with the top games ranked', () => {

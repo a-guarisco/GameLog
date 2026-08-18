@@ -109,6 +109,14 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/games/streak_by_game?steam_app_id=${appId}`;
   },
 
+  /**
+   * Per-game playtime aggregated over an inclusive date window. Both bounds are required
+   * here: the backend defaults them to today, which collapses the report to a single day.
+   */
+  getPlaytimeReport: (startDate: string, endDate: string) => {
+    return `${getBackendBaseUrl()}/games/report?start_date=${startDate}&end_date=${endDate}`;
+  },
+
   getAuthOutcome: () => {
     return `${getBackendBaseUrl()}/me`;
   },

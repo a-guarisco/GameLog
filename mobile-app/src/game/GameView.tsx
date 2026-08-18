@@ -21,7 +21,9 @@ import {
   useGetGameStreak,
   useGetGlobalAchievement,
   useGetNumberOfCurrentPlayers,
+  useGetPlaytimeReport,
 } from '@gamelog/api-manager/useApi';
+import { getReportMinutesForGame } from '@gamelog/common/playtimeReportSelectors';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import { formatMinutesToHoursShort, formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 import { brand } from '@gamelog/theme/theme';
@@ -95,6 +97,9 @@ const GameView = () => {
   const { currentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
 
+  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
+  const recentMinutes = getReportMinutesForGame(playtimeReport, gameItem.appid);
+
   const openAchievementsList = () =>
     navigation.navigate('AchievementsList', {
       globalAchievements,
@@ -103,11 +108,12 @@ const GameView = () => {
       gameItem,
     });
 
-  //todo this come from BE
+  // The two-week window comes from the backend report; lifetime and last played are
+  // still whatever Steam handed the list that navigated here.
   const stats = [
     { value: formatMinutesToHoursShort(gameItem.playtime_forever), label: 'Total' },
     {
-      value: gameItem.playtime_2weeks ? formatMinutesToHoursShort(gameItem.playtime_2weeks) : '—',
+      value: isLoadingPlaytimeReport ? '—' : formatMinutesToHoursShort(recentMinutes),
       label: '2 weeks',
     },
     { value: formatShortDateWithYear(gameItem.rtime_last_played), label: 'Last played' },

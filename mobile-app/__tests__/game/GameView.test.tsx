@@ -1,9 +1,33 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
+import { useGetPlaytimeReport } from '@gamelog/api-manager/useApi';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
+
+// Only the playtime report is stubbed: every other hook is left to run against the
+// mocked fetch layer, as the rest of this suite already relies on.
+jest.mock('@gamelog/api-manager/useApi', () => ({
+  ...jest.requireActual('@gamelog/api-manager/useApi'),
+  useGetPlaytimeReport: jest.fn(),
+}));
+
+const mockUseGetPlaytimeReport = useGetPlaytimeReport as jest.Mock;
+
+const mockReport = (state: Record<string, unknown> = {}) =>
+  mockUseGetPlaytimeReport.mockReturnValue({
+    playtimeReport: {
+      date: '2026-08-18',
+      game_reports: [
+        { app_id: '123', today_play_time: 195, streak: 2 },
+        { app_id: '999', today_play_time: 600, streak: 5 },
+      ],
+    },
+    isLoadingPlaytimeReport: false,
+    errorPlaytimeReport: null,
+    ...state,
+  });
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -40,6 +64,7 @@ jest.mock('@gamelog/game/GlobalAchievementsPreview', () => {
 describe('GameView', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockReport();
   });
 
   it('renders without crashing', () => {
@@ -81,6 +106,31 @@ describe('GameView', () => {
 
     expect(screen.getByText(lastPlayed)).toBeTruthy();
     expect(lastPlayed).toContain('2021');
+  });
+
+  it('takes the two-week hours from this game’s entry in the backend report', () => {
+    render(<GameView />);
+
+    expect(screen.getByText('2 weeks')).toBeTruthy();
+    // 195 minutes for app 123, truncated to whole hours; app 999 must not leak in.
+    expect(screen.getByText('3h')).toBeTruthy();
+    expect(screen.queryByText('10h')).toBeNull();
+  });
+
+  it('shows no two-week hours for a game absent from the report', () => {
+    mockReport({ playtimeReport: { date: '2026-08-18', game_reports: [] } });
+
+    render(<GameView />);
+
+    expect(screen.getByText('0h')).toBeTruthy();
+  });
+
+  it('holds the two-week tile at a dash while the report is in flight', () => {
+    mockReport({ playtimeReport: null, isLoadingPlaytimeReport: true });
+
+    render(<GameView />);
+
+    expect(screen.getByText('—')).toBeTruthy();
   });
 
   it('opens the achievements list when the achievements progress summary is pressed', () => {
