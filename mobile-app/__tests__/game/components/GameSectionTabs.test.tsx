@@ -1,14 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Linking, Text } from 'react-native';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
-import { useGetGameNews } from '@gamelog/api-manager/useApi';
+import { useGetGameGuides, useGetGameNews } from '@gamelog/api-manager/useApi';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetGameNews: jest.fn(),
+  useGetGameGuides: jest.fn(),
 }));
 
 const mockUseGetGameNews = useGetGameNews as jest.Mock;
+const mockUseGetGameGuides = useGetGameGuides as jest.Mock;
 
 const buildNewsItem = (overrides: Record<string, unknown> = {}) => ({
   gid: '1839676055882690',
@@ -36,10 +38,52 @@ const mockNews = (
     errorMessageGameNews: null,
   });
 
+const buildGuide = (overrides: Record<string, unknown> = {}) => ({
+  publishedfileid: '633984426',
+  creator: '76561198028922089',
+  consumer_appid: 236390,
+  title: 'Stardew Valley 100% Achievement Guide',
+  short_description: 'An achievement that empowers those who earn it.',
+  image_url: '',
+  preview_url: 'https://images.steamusercontent.com/ugc/448482024255283561/A2490/',
+  image_width: 550,
+  image_height: 550,
+  time_created: 1457433495,
+  file_type: 9,
+  tags: [
+    { tag: 'Gameplay Basics', display_name: 'Gameplay Basics' },
+    { tag: 'english', display_name: 'English' },
+    { tag: 'Walkthroughs', display_name: 'Walkthroughs' },
+    { tag: 'Loot', display_name: 'Loot' },
+    { tag: 'Crafting', display_name: 'Crafting' },
+  ],
+  views: 88013,
+  lifetime_favorited: 7179,
+  num_comments_public: 223,
+  ...overrides,
+});
+
+const mockGuides = (
+  publishedfiledetails: ReturnType<typeof buildGuide>[],
+  state: { isLoading?: boolean; error?: boolean; total?: number } = {}
+) =>
+  mockUseGetGameGuides.mockReturnValue({
+    gameGuides: {
+      response: {
+        total: state.total ?? publishedfiledetails.length,
+        publishedfiledetails,
+      },
+    },
+    isLoadingGameGuides: state.isLoading ?? false,
+    errorGameGuides: state.error ?? false,
+    errorMessageGameGuides: null,
+  });
+
 describe('GameSectionTabs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockNews([buildNewsItem()]);
+    mockGuides([buildGuide()], { total: 812 });
   });
 
   const renderTabs = () =>
@@ -64,7 +108,7 @@ describe('GameSectionTabs', () => {
 
     fireEvent.press(screen.getByTestId('game-tab-guides'));
     expect(screen.queryByText('You can now play Stardew Valley in VR')).toBeNull();
-    expect(screen.getByText('Crew skill order that actually matters')).toBeTruthy();
+    expect(screen.getByText('Stardew Valley 100% Achievement Guide')).toBeTruthy();
   });
 
   it('links each panel out to the right Steam page for the app', () => {
@@ -76,7 +120,7 @@ describe('GameSectionTabs', () => {
     expect(openURL).toHaveBeenCalledWith('https://store.steampowered.com/news/app/236390');
 
     fireEvent.press(screen.getByTestId('game-tab-guides'));
-    fireEvent.press(screen.getByText('See all 1,204 guides'));
+    fireEvent.press(screen.getByText('See all 812 guides'));
     expect(openURL).toHaveBeenCalledWith('https://steamcommunity.com/app/236390/guides/');
 
     openURL.mockRestore();
@@ -160,6 +204,83 @@ describe('GameSectionTabs', () => {
       openNewsTab();
 
       expect(screen.getByText('No news yet')).toBeTruthy();
+    });
+  });
+
+  describe('guides panel', () => {
+    const openGuidesTab = () => {
+      renderTabs();
+      fireEvent.press(screen.getByTestId('game-tab-guides'));
+    };
+
+    it('asks for the guides of the current game', () => {
+      openGuidesTab();
+
+      expect(mockUseGetGameGuides).toHaveBeenCalledWith('236390');
+    });
+
+    it('shows the title, the description and the counts of every guide', () => {
+      openGuidesTab();
+
+      expect(screen.getByText('Stardew Valley 100% Achievement Guide')).toBeTruthy();
+      expect(screen.getByText('An achievement that empowers those who earn it.')).toBeTruthy();
+      expect(screen.getByText('88,013')).toBeTruthy();
+      expect(screen.getByText('7,179')).toBeTruthy();
+      expect(screen.getByText('223')).toBeTruthy();
+    });
+
+    it('shows the first three tags and never a language one', () => {
+      openGuidesTab();
+
+      expect(screen.getByText('Gameplay Basics')).toBeTruthy();
+      expect(screen.getByText('Walkthroughs')).toBeTruthy();
+      expect(screen.getByText('Loot')).toBeTruthy();
+      expect(screen.queryByText('English')).toBeNull();
+      expect(screen.queryByText('Crafting')).toBeNull();
+    });
+
+    it('leaves out the description when steam sends an empty one', () => {
+      mockGuides([buildGuide({ short_description: '' })]);
+      openGuidesTab();
+
+      expect(screen.queryByText('An achievement that empowers those who earn it.')).toBeNull();
+      expect(screen.getByText('Stardew Valley 100% Achievement Guide')).toBeTruthy();
+    });
+
+    it('opens the steam page of the guide that was pressed', () => {
+      const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+      openGuidesTab();
+
+      fireEvent.press(screen.getByTestId('guide-item-633984426'));
+
+      expect(openURL).toHaveBeenCalledWith(
+        'https://steamcommunity.com/sharedfiles/filedetails/?id=633984426'
+      );
+      openURL.mockRestore();
+    });
+
+    it('reports a failed request and an empty feed', () => {
+      mockGuides([], { error: true });
+      openGuidesTab();
+      expect(screen.getByText('Could not load guides')).toBeTruthy();
+
+      screen.unmount();
+      mockGuides([]);
+      openGuidesTab();
+      expect(screen.getByText('No guides yet')).toBeTruthy();
+      expect(screen.getByText('See all guides')).toBeTruthy();
+    });
+
+    it('survives a payload with no response block', () => {
+      mockUseGetGameGuides.mockReturnValue({
+        gameGuides: null,
+        isLoadingGameGuides: false,
+        errorGameGuides: false,
+        errorMessageGameGuides: null,
+      });
+      openGuidesTab();
+
+      expect(screen.getByText('No guides yet')).toBeTruthy();
     });
   });
 });
