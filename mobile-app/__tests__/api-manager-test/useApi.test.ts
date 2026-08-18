@@ -8,6 +8,7 @@ import {
   useGetGameStreak,
   useGetUserStreak,
   useGetNumberOfCurrentPlayers,
+  useGetGameNews,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -181,5 +182,27 @@ describe('useGetNumberOfCurrentPlayers', () => {
       error: 'errorCurrentPlayers',
     },
     mockData: { response: { player_count: 652862, result: 1 } },
+  });
+});
+
+describe('useGetGameNews', () => {
+  useTestApiHook({
+    useHook: () => useGetGameNews('730'),
+    apiMethod: 'getGameNews',
+    // Five items, and contents truncated to 1 char because the panel renders titles only.
+    apiArgs: ['730', 5, 1],
+    expectedKeys: {
+      data: 'gameNews',
+      loading: 'isLoadingGameNews',
+      error: 'errorGameNews',
+    },
+    mockData: { appnews: { appid: 730, newsitems: [], count: 0 } },
+  });
+
+  it('lets a caller ask for a different number of items', () => {
+    mockAsyncFetch();
+    renderHook(() => useGetGameNews('730', 3));
+    mockUseAsyncFetch.mock.calls[0][0]();
+    expect(mockApiManager.getGameNews).toHaveBeenCalledWith('730', 3, 1);
   });
 });
