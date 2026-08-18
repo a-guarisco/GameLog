@@ -4,16 +4,10 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 
 interface BackButtonProps {
   onPress: () => void;
-  /** Position/colour overrides; the default floats it over a banner. */
   className?: string;
   testID?: string;
 }
 
-/**
- * Floating back arrow for the screens that hide the native header. It positions itself
- * under the notch and sits above the page content, so it only needs a sibling slot in
- * the screen's outermost Box.
- */
 const BackButton = ({ onPress, className = '', testID = 'back-button' }: BackButtonProps) => {
   const insets = useSafeAreaInsets();
 

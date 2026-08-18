@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import { Text } from '@gamelog/common/gluestack/text';
-import Chip from '@gamelog/common/game/Chip';
+import Chip from '@gamelog/common/Chip';
 
 describe('Chip', () => {
   it('renders its children', () => {
