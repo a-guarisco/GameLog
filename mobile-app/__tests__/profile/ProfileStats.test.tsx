@@ -20,7 +20,7 @@ const buildGame = (overrides: Record<string, unknown> = {}) =>
 const OWNED_GAMES: OwnedGames = {
   response: {
     game_count: 160,
-    games: [buildGame({ playtime_2weeks: 240 }), buildGame({ appid: '730', name: 'CS2' })],
+    games: [buildGame(), buildGame({ appid: '730', name: 'CS2' })],
   },
 };
 
@@ -37,10 +37,10 @@ describe('ProfileStats', () => {
     expect(screen.getByText('160')).toBeTruthy();
   });
 
-  it('counts only the games played in the last two weeks', () => {
-    render(<ProfileStats ownedGames={OWNED_GAMES} />);
+  it('shows the two-week hours reported by the backend', () => {
+    render(<ProfileStats ownedGames={OWNED_GAMES} recentMinutes={240} />);
 
-    expect(screen.getByText('1')).toBeTruthy();
+    expect(screen.getByText('4 h')).toBeTruthy();
   });
 
   it('sums lifetime playtime into grouped hours', () => {
@@ -52,7 +52,7 @@ describe('ProfileStats', () => {
   it('renders zeroes rather than blanks when there is no library', () => {
     render(<ProfileStats ownedGames={null} />);
 
-    expect(screen.getAllByText('0')).toHaveLength(2);
-    expect(screen.getByText('0 h')).toBeTruthy();
+    expect(screen.getByText('0')).toBeTruthy();
+    expect(screen.getAllByText('0 h')).toHaveLength(2);
   });
 });

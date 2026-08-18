@@ -6,8 +6,10 @@ import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetPlaytimeReport,
   useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
+import { getReportTotalMinutes } from '@gamelog/common/playtimeReportSelectors';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useStreakText } from '@gamelog/common/useStreakText';
@@ -33,9 +35,14 @@ const ProfileView = () => {
   );
   const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
   const { userStreak, isLoadingUserStreak } = useGetUserStreak();
+  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
 
   const isLoading =
-    isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo || isLoadingUserStreak;
+    isLoadingOwnedGames ||
+    isLoadingGenreChart ||
+    isLoadingPlayersInfo ||
+    isLoadingUserStreak ||
+    isLoadingPlaytimeReport;
   const player = playersInfo?.response?.players?.[0];
   const streakText = useStreakText(userStreak?.streak, isLoadingUserStreak);
 
@@ -68,7 +75,10 @@ const ProfileView = () => {
         <Box className="bg-background-100 pb-6 shadow-xl">
           <VStack space="xl" className="pt-6">
             <Box className="px-4">
-              <ProfileStats ownedGames={ownedGames} />
+              <ProfileStats
+                ownedGames={ownedGames}
+                recentMinutes={getReportTotalMinutes(playtimeReport)}
+              />
             </Box>
 
             <Box className="px-4">

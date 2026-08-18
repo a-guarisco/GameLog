@@ -13,3 +13,4 @@ export * from './streak';
 export * from './userSocial';
 export * from './currentPlayers';
 export * from './publishedFiles';
+export * from './dailyReport';

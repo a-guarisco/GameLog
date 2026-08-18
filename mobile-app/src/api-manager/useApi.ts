@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
+import { toIsoDate } from '@gamelog/utils/formatUtils';
 import { PublishedFileDetails, Streak } from './dto';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
@@ -85,6 +86,40 @@ export const useGetUserStreak = () => {
     userStreak: normalizeStreak(data),
     isLoadingUserStreak: isLoading,
     errorUserStreak: error,
+  };
+};
+
+/** The window the "2 weeks" stat bands report on, in days including today. */
+export const RECENT_PLAYTIME_DAYS = 14;
+
+/** The last `days` days ending today, both bounds inclusive — so days=14 spans today and 13 before it. */
+const getRecentDateRange = (days: number) => {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - (days - 1));
+
+  return { startDate: toIsoDate(start), endDate: toIsoDate(end) };
+};
+
+/**
+ * Per-game playtime over a trailing window, from the backend's own rolling snapshots.
+ * Steam's `playtime_2weeks` covers the same ground but is only present on the recently
+ * played payload, and only ever for its own fixed window.
+ */
+export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
+  const { startDate, endDate } = useMemo(() => getRecentDateRange(days), [days]);
+
+  const fetchFunc = useCallback(
+    () => ApiManager.getPlaytimeReport(startDate, endDate),
+    [startDate, endDate]
+  );
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    playtimeReport: data,
+    isLoadingPlaytimeReport: isLoading,
+    errorPlaytimeReport: error,
+    errorMessagePlaytimeReport: errorMessage,
   };
 };
 

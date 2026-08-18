@@ -10,6 +10,7 @@ import {
   useGetNumberOfCurrentPlayers,
   useGetGameNews,
   useGetGameGuides,
+  useGetPlaytimeReport,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -183,6 +184,39 @@ describe('useGetNumberOfCurrentPlayers', () => {
       error: 'errorCurrentPlayers',
     },
     mockData: { response: { player_count: 652862, result: 1 } },
+  });
+});
+
+describe('useGetPlaytimeReport', () => {
+  // Fixed clock so the trailing window resolves to known bounds.
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 7, 18, 10, 30));
+  });
+  afterAll(() => jest.useRealTimers());
+
+  useTestApiHook({
+    useHook: () => useGetPlaytimeReport(),
+    apiMethod: 'getPlaytimeReport',
+    // 14 days inclusive of today: 2026-08-05 through 2026-08-18.
+    apiArgs: ['2026-08-05', '2026-08-18'],
+    expectedKeys: {
+      data: 'playtimeReport',
+      loading: 'isLoadingPlaytimeReport',
+      error: 'errorPlaytimeReport',
+    },
+    mockData: {
+      date: '2026-08-18',
+      game_reports: [{ app_id: '730', today_play_time: 90, streak: 1 }],
+    },
+  });
+
+  it('honours a custom window length', () => {
+    mockAsyncFetch();
+    renderHook(() => useGetPlaytimeReport(7));
+
+    mockUseAsyncFetch.mock.calls[0][0]();
+
+    expect(mockApiManager.getPlaytimeReport).toHaveBeenCalledWith('2026-08-12', '2026-08-18');
   });
 });
 

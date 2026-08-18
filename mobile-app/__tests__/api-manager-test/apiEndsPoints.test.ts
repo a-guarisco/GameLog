@@ -114,5 +114,11 @@ describe('apiEndsPoints', () => {
         'https://api.mydomain.dev/games/recommendations?friend=user-123&include_top_games=true'
       );
     });
+
+    it('builds the playtime report endpoint with both date bounds', () => {
+      expect(EndPoints.getPlaytimeReport('2026-08-05', '2026-08-18')).toBe(
+        'https://api.mydomain.dev/games/report?start_date=2026-08-05&end_date=2026-08-18'
+      );
+    });
   });
 });

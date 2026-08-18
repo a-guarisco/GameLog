@@ -15,17 +15,22 @@ export const getMostPlayedGame = (ownedGames?: OwnedGames | null): GameItem | nu
   );
 
 /**
- * Owned / recently played / total hours. `game_count` is the authoritative library size —
- * `games` can be shorter when the payload is filtered — so it wins when Steam sends it.
+ * Owned / hours in the last two weeks / lifetime hours. `game_count` is the authoritative
+ * library size — `games` can be shorter when the payload is filtered — so it wins when
+ * Steam sends it. `recentMinutes` comes from the backend playtime report, since Steam's
+ * owned-games payload carries no recent window.
  */
-export const getProfileStats = (ownedGames?: OwnedGames | null): GameStat[] => {
+export const getProfileStats = (
+  ownedGames?: OwnedGames | null,
+  recentMinutes: number = 0
+): GameStat[] => {
   const games = getGames(ownedGames);
   const ownedCount = ownedGames?.response?.game_count ?? games.length;
   const totalHours = toHours(games.reduce((sum, game) => sum + (game.playtime_forever ?? 0), 0));
 
   return [
     { value: formatThousands(ownedCount), label: 'Owned' },
-    { value: formatThousands(playedRecently), label: '2 weeks' },
+    { value: `${formatThousands(toHours(recentMinutes))} h`, label: '2 weeks' },
     { value: `${formatThousands(totalHours)} h`, label: 'Total' },
   ];
 };

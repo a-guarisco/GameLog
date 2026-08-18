@@ -52,16 +52,32 @@ describe('getProfileStats', () => {
   it('reports owned, recently played and total hours', () => {
     const stats = getProfileStats(
       buildOwnedGames([
-        buildGame({ appid: '730', playtime_forever: 60, playtime_2weeks: 30 }),
+        buildGame({ appid: '730', playtime_forever: 60 }),
         buildGame({ appid: '570', playtime_forever: 120 }),
-      ])
+      ]),
+      150
     );
 
     expect(stats).toEqual([
       { value: '2', label: 'Owned' },
-      { value: '1', label: '2 weeks' },
+      { value: '2 h', label: '2 weeks' },
       { value: '3 h', label: 'Total' },
     ]);
+  });
+
+  it('truncates the two-week window to whole hours and groups thousands', () => {
+    const library = buildOwnedGames([buildGame()]);
+
+    expect(getProfileStats(library, 59)[1]).toEqual({ value: '0 h', label: '2 weeks' });
+    expect(getProfileStats(library, 119)[1]).toEqual({ value: '1 h', label: '2 weeks' });
+    expect(getProfileStats(library, 60 * 1234)[1]).toEqual({ value: '1,234 h', label: '2 weeks' });
+  });
+
+  it('reports no recent hours when the report has not been passed in', () => {
+    expect(getProfileStats(buildOwnedGames([buildGame()]))[1]).toEqual({
+      value: '0 h',
+      label: '2 weeks',
+    });
   });
 
   it('prefers the authoritative game_count over the returned page of games', () => {
@@ -87,7 +103,7 @@ describe('getProfileStats', () => {
   it('falls back to zeroes when there is no library', () => {
     expect(getProfileStats(null)).toEqual([
       { value: '0', label: 'Owned' },
-      { value: '0', label: '2 weeks' },
+      { value: '0 h', label: '2 weeks' },
       { value: '0 h', label: 'Total' },
     ]);
   });
