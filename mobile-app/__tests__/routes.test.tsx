@@ -6,7 +6,6 @@ jest.mock('react-native-safe-area-context', () =>
 jest.mock('@react-native-vector-icons/ionicons', () => 'Ionicons');
 jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 
-jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => () => null);
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => () => null);
 jest.mock('@gamelog/common/charts/os-share/OsShareChart', () => () => null);
 jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => () => null);

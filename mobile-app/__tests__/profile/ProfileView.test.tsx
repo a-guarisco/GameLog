@@ -4,11 +4,20 @@ import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetPlaytimeByUser,
   useGetPlaytimeReport,
   useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
 
-jest.mock('@gamelog/api-manager/useApi');
+jest.mock('@gamelog/api-manager/useApi', () => ({
+  ...jest.requireActual('@gamelog/api-manager/useApi'),
+  useGetOwnedGames: jest.fn(),
+  useGetGameGenreChartData: jest.fn(),
+  useGetPlayersInfo: jest.fn(),
+  useGetUserStreak: jest.fn(),
+  useGetPlaytimeReport: jest.fn(),
+  useGetPlaytimeByUser: jest.fn(),
+}));
 
 jest.mock('@gamelog/game/HeaderGameImage', () => {
   const { View } = jest.requireActual('react-native');
@@ -29,10 +38,6 @@ jest.mock('@gamelog/common/feedbacks/LoadingBox', () => {
   };
 });
 
-jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => {
-  const { View } = jest.requireActual('react-native');
-  return { __esModule: true, default: () => <View testID="total-hours-chart" /> };
-});
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, default: () => <View testID="total-hours-pie-chart" /> };
@@ -51,6 +56,7 @@ const mockUseGetGameGenreChartData = useGetGameGenreChartData as jest.Mock;
 const mockUseGetPlayersInfo = useGetPlayersInfo as jest.Mock;
 const mockUseGetUserStreak = useGetUserStreak as jest.Mock;
 const mockUseGetPlaytimeReport = useGetPlaytimeReport as jest.Mock;
+const mockUseGetPlaytimeByUser = useGetPlaytimeByUser as jest.Mock;
 
 const buildGame = (overrides: Record<string, unknown> = {}) => ({
   appid: '236390',
@@ -114,6 +120,15 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
     errorPlaytimeReport: null,
     ...overrides.playtimeReport,
   });
+  mockUseGetPlaytimeByUser.mockReturnValue({
+    playtimeByUser: [
+      { date: '2026-08-17', playtime_minutes: 90 },
+      { date: '2026-08-18', playtime_minutes: 150 },
+    ],
+    isLoadingPlaytimeByUser: false,
+    errorPlaytimeByUser: null,
+    ...overrides.playtimeByUser,
+  });
 };
 
 const setupLoadingMocks = (loading: Record<string, boolean>) => {
@@ -141,6 +156,11 @@ const setupLoadingMocks = (loading: Record<string, boolean>) => {
     playtimeReport: null,
     isLoadingPlaytimeReport: !!loading.playtimeReport,
     errorPlaytimeReport: null,
+  });
+  mockUseGetPlaytimeByUser.mockReturnValue({
+    playtimeByUser: null,
+    isLoadingPlaytimeByUser: !!loading.playtimeByUser,
+    errorPlaytimeByUser: null,
   });
 };
 
@@ -175,6 +195,14 @@ describe('ProfileView — loading', () => {
 
   it('shows LoadingBox while the two-week playtime report is loading', () => {
     setupLoadingMocks({ playtimeReport: true });
+
+    render(<ProfileView />);
+
+    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+  });
+
+  it('shows LoadingBox while the day-by-day playtime history is loading', () => {
+    setupLoadingMocks({ playtimeByUser: true });
 
     render(<ProfileView />);
 
@@ -265,6 +293,20 @@ describe('ProfileView — loaded', () => {
     expect(screen.getByText('0 h')).toBeTruthy();
   });
 
+  it('plots the backend playtime history on the time tab', () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 7, 18, 10, 30));
+    setupLoadedMocks();
+
+    render(<ProfileView />);
+    fireEvent.press(screen.getByTestId('profile-tab-time'));
+
+    // 90 + 150 minutes over the window, and the busiest day fills the plot.
+    expect(screen.getByText('4h 0m')).toBeTruthy();
+    expect(screen.getByTestId('profile-trend-bar-2026-08-18')).toBeTruthy();
+    expect(screen.getByText('Played 2 of 14 days.')).toBeTruthy();
+    jest.useRealTimers();
+  });
+
   it('opens on the overview tab with the top games ranked', () => {
     setupLoadedMocks();
 
@@ -282,7 +324,8 @@ describe('ProfileView — loaded', () => {
     render(<ProfileView />);
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
-    expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
+    expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+    expect(screen.getByTestId('profile-hours-per-game')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('profile-tab-genres'));

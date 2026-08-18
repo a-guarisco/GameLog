@@ -120,5 +120,17 @@ describe('apiEndsPoints', () => {
         'https://api.mydomain.dev/games/report?start_date=2026-08-05&end_date=2026-08-18'
       );
     });
+
+    it('builds the day-by-day playtime endpoint with its window', () => {
+      expect(EndPoints.getPlaytimeByUser(14)).toBe(
+        'https://api.mydomain.dev/games/playtime_by_user?days=14'
+      );
+    });
+
+    it('passes -1 through as the all-history window', () => {
+      expect(EndPoints.getPlaytimeByUser(-1)).toBe(
+        'https://api.mydomain.dev/games/playtime_by_user?days=-1'
+      );
+    });
   });
 });

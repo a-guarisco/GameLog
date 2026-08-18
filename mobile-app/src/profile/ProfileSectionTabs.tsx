@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import SectionTabs, { SectionTab } from '@gamelog/common/game/SectionTabs';
-import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 import ProfileTopGames from './ProfileTopGames';
+import ProfileHoursPerGame from './ProfileHoursPerGame';
+import ProfilePlaytimeTrend from './ProfilePlaytimeTrend';
 import type { TopGame } from './profileSelectors';
+import type { PlaytimeTrend } from './playtimeTrendSelectors';
 
 type ProfileSectionId = 'overview' | 'time' | 'genres' | 'platforms';
 
@@ -21,6 +23,9 @@ const TABS: SectionTab<ProfileSectionId>[] = [
 
 interface ProfileSectionTabsProps {
   topGames: TopGame[];
+  /** Day-by-day playtime for the time panel, already shaped by the page. */
+  playtimeTrend: PlaytimeTrend;
+  errorPlaytimeTrend?: unknown;
   ownedGames?: OwnedGames | null;
   errorOwnedGames?: unknown;
   genreChartData?: any[];
@@ -33,6 +38,8 @@ interface ProfileSectionTabsProps {
  */
 const ProfileSectionTabs = ({
   topGames,
+  playtimeTrend,
+  errorPlaytimeTrend,
   ownedGames,
   errorOwnedGames,
   genreChartData,
@@ -56,13 +63,15 @@ const ProfileSectionTabs = ({
           </Box>
         )}
 
+        {/* When the library played is the question, the answer is two shapes: when, and on what. */}
         {activeTab === 'time' && (
           <VStack space="md" className="w-full items-center">
-            <TotalHoursChart
-              ownedGames={ownedGames}
-              isLoadingOwnedGames={false}
-              errorOwnedGames={errorOwnedGames}
-            />
+            <Box className="w-full">
+              <ProfilePlaytimeTrend trend={playtimeTrend} hasError={!!errorPlaytimeTrend} />
+            </Box>
+            <Box className="w-full">
+              <ProfileHoursPerGame games={topGames} hasError={!!errorOwnedGames} />
+            </Box>
             <TotalHoursPieChart
               ownedGames={ownedGames}
               isLoadingOwnedGames={false}

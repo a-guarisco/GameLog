@@ -14,3 +14,4 @@ export * from './userSocial';
 export * from './currentPlayers';
 export * from './publishedFiles';
 export * from './dailyReport';
+export * from './playtimeByUser';

@@ -123,6 +123,22 @@ export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
   };
 };
 
+/**
+ * Per-day playtime across the library. The daily report answers "which games", this answers
+ * "which days" � the profile trend needs the second, and only the backend has it.
+ */
+export const useGetPlaytimeByUser = (days: number = RECENT_PLAYTIME_DAYS) => {
+  const fetchFunc = useCallback(() => ApiManager.getPlaytimeByUser(days), [days]);
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    playtimeByUser: data,
+    isLoadingPlaytimeByUser: isLoading,
+    errorPlaytimeByUser: error,
+    errorMessagePlaytimeByUser: errorMessage,
+  };
+};
+
 export const useGetGameGenreChartData = (
   userId: string,
   includeSub: boolean,
