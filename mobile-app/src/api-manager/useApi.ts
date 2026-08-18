@@ -175,12 +175,13 @@ export const useGetNumberOfCurrentPlayers = (appId: string) => {
   };
 };
 
-/** Steam has no cursor for news: `count` is the whole feed the panel gets. */
-const GAME_NEWS_COUNT = 5;
+/** Both feed panels under the game tabs show the same short list. */
+const GAME_FEED_COUNT = 5;
 /** The news panel renders titles only, so `contents` is truncated to the smallest payload. */
 const GAME_NEWS_MAX_LENGTH = 1;
 
-export const useGetGameNews = (appId: string, count: number = GAME_NEWS_COUNT) => {
+/** Steam has no cursor for news: `count` is the whole feed the panel gets. */
+export const useGetGameNews = (appId: string, count: number = GAME_FEED_COUNT) => {
   const fetchFunc = useCallback(
     () => ApiManager.getGameNews(appId, count, GAME_NEWS_MAX_LENGTH),
     [appId, count]
@@ -192,6 +193,22 @@ export const useGetGameNews = (appId: string, count: number = GAME_NEWS_COUNT) =
     isLoadingGameNews: isLoading,
     errorGameNews: error,
     errorMessageGameNews: errorMessage,
+  };
+};
+
+/**
+ * Community guides for a game. The panel shows one short page, so the cursor stays at
+ * the first one — paging is wired into the endpoint should a full guides screen land.
+ */
+export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT) => {
+  const fetchFunc = useCallback(() => ApiManager.getGameGuides(appId, '*', count), [appId, count]);
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    gameGuides: data,
+    isLoadingGameGuides: isLoading,
+    errorGameGuides: error,
+    errorMessageGameGuides: errorMessage,
   };
 };
 

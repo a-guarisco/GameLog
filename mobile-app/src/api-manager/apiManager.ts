@@ -91,6 +91,10 @@ export default {
   getGameCaptures: (appId: string, cursor: string = '*', numPerPage: number = 50) =>
     fetchData<PublishedFiles>(EndPoints.queryPublishedFiles(appId, cursor, numPerPage)),
 
+  /** Community guides for a game. Same cursor contract as getGameCaptures. */
+  getGameGuides: (appId: string, cursor: string = '*', numPerPage: number = 50) =>
+    fetchData<PublishedFiles>(EndPoints.queryPublishedGuides(appId, cursor, numPerPage)),
+
   getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
   getStreakByGame: (appId: string) =>
     fetchAuthenticatedData<Streak>(EndPoints.getStreakByGame(appId)),

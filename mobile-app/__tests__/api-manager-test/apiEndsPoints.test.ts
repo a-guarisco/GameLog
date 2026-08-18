@@ -88,6 +88,9 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.queryPublishedFiles('413150', 'AoIIQolaZ3/H+yOhw=', 20)).toContain(
         'cursor=AoIIQolaZ3%2FH%2ByOhw%3D'
       );
+      expect(EndPoints.queryPublishedGuides('413150', '*', 5)).toBe(
+        'https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/?key=abc123&creator_appid=766&query_type=12&appid=413150&filetype=11&requiredtags[0]=English&match_all_tags=true&cursor=*&numperpage=5&return_short_description=true'
+      );
     });
   });
 
