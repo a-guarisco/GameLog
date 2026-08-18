@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import GameStatBand from '@gamelog/game/GameStatBand';
+import GameStatBand from '@gamelog/common/game/GameStatBand';
 
 const stats = [
   { value: '120h', label: 'Total' },

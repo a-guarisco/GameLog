@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
-import SeeAllLink from '@gamelog/game/SeeAllLink';
+import SeeAllLink from '@gamelog/common/game/SeeAllLink';
 import { Key } from 'react';
 
 interface Props {

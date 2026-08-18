@@ -4,7 +4,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Image } from '@gamelog/common/gluestack/image';
-import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { SectionSpinner } from '@gamelog/common/game/SectionState';
 import { formatThousands } from '@gamelog/utils/formatUtils';
 
 export type GameCapture = {
@@ -72,9 +72,7 @@ const GameCapturesStrip = ({
       </HStack>
 
       {isLoading && captures.length === 0 ? (
-        <Box className="h-[99px] items-center justify-center px-4">
-          <Spinner />
-        </Box>
+        <SectionSpinner className="h-[99px] items-center justify-center px-4" />
       ) : (
         <ScrollView
           horizontal
@@ -87,9 +85,7 @@ const GameCapturesStrip = ({
             <CaptureTile key={capture.id} capture={capture} />
           ))}
           {isLoadingMore && (
-            <Box className="h-[99px] w-16 items-center justify-center">
-              <Spinner />
-            </Box>
+            <SectionSpinner className="h-[99px] w-16 items-center justify-center" />
           )}
         </ScrollView>
       )}
