@@ -13,6 +13,7 @@ import type {
   PlayersInfo,
   PlayerStats,
   PublishedFiles,
+  PublishedFiles,
   RecentPlayedGames,
   SteamNews,
   Streak,
