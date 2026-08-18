@@ -85,6 +85,16 @@ const EndPoints = {
     return `${STEAM_BASE_URL}ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${appId}`;
   },
 
+  /**
+   * Community-published files for an app. query_type 3 is "ranked by trend",
+   * filetype 4 is screenshots. `cursor` is the opaque token Steam hands back as
+   * `next_cursor`; '*' asks for the first page.
+   */
+  queryPublishedFiles: (appId: string, cursor: string, numPerPage: number) => {
+    // TODO: use isBackendProvider() if backend endpoint differs
+    return `${STEAM_BASE_URL}IPublishedFileService/QueryFiles/v1/?key=${getSteamApiKey()}&query_type=3&appid=${appId}&filetype=4&cursor=${encodeURIComponent(cursor)}&numperpage=${numPerPage}&return_short_description=true&return_previews=true`;
+  },
+
   getStreakByUser: () => {
     return `${getBackendBaseUrl()}/games/streak_by_user`;
   },

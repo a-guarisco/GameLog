@@ -13,6 +13,7 @@ import type {
   PlayerFriends,
   PlayersInfo,
   PlayerStats,
+  PublishedFiles,
   RecentPlayedGames,
   SteamNews,
   Streak,
@@ -85,6 +86,10 @@ export default {
   getGameGenres: (appId: string) => fetchData<GameGenres>(EndPoints.getGameGenres(appId)),
 
   getGameBasicInfo: (appId: string) => fetchData<GameBasicInfo>(EndPoints.getGameBasicInfo(appId)),
+
+  /** Community screenshots for a game. Pass the previous `next_cursor` to page forward. */
+  getGameCaptures: (appId: string, cursor: string = '*', numPerPage: number = 50) =>
+    fetchData<PublishedFiles>(EndPoints.queryPublishedFiles(appId, cursor, numPerPage)),
 
   getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
   getStreakByGame: (appId: string) =>
