@@ -8,19 +8,16 @@ import { toHex } from '@gamelog/theme/themeHelpers';
 interface SeeAllLinkProps {
   label: string;
   onPress: () => void;
-  /** 'link' for anything that leaves the app, 'button' for in-app navigation. */
   accessibilityRole?: 'link' | 'button';
   testID?: string;
 }
 
-/** Shared "see all" affordance that closes every feed section on the game view. */
 const SeeAllLink = ({ label, onPress, accessibilityRole = 'link', testID }: SeeAllLinkProps) => (
   <Pressable
     onPress={onPress}
     accessibilityRole={accessibilityRole}
     accessibilityLabel={label}
     testID={testID}
-    // The row is short, so the touch target is padded out to stay thumb-sized.
     hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}
     className="self-end"
   >

@@ -90,7 +90,6 @@ const AchievementsListView = ({ route }: any) => {
   return (
     <Box className="flex-1 relative">
       {content}
-      {/* Outside the state branches, so it is there while loading and on error too. */}
       <BackButton onPress={() => navigation.goBack()} testID="achievements-back" />
     </Box>
   );
