@@ -1,6 +1,8 @@
 import { PublishedFileDetails } from './dto';
 
-export const filterValidScreenshots = (details?: PublishedFileDetails[]): PublishedFileDetails[] => {
+export const filterValidScreenshots = (
+  details?: PublishedFileDetails[]
+): PublishedFileDetails[] => {
   if (!details) return [];
   return details.filter((file) => !!file.image_url);
 };

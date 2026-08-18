@@ -1,5 +1,8 @@
 import { PublishedFileDetails } from '@gamelog/api-manager/dto';
-import { filterValidScreenshots, mergeUniqueScreenshots } from '@gamelog/api-manager/gameScreenshotsUtils';
+import {
+  filterValidScreenshots,
+  mergeUniqueScreenshots,
+} from '@gamelog/api-manager/gameScreenshotsUtils';
 
 const buildFile = (
   id: string,

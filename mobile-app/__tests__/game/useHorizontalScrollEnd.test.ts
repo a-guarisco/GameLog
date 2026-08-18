@@ -2,7 +2,10 @@ import { renderHook } from '@testing-library/react-native';
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import useHorizontalScrollEnd from '@gamelog/game/useHorizontalScrollEnd';
 
-const createScrollEvent = (x: number, contentWidth: number): NativeSyntheticEvent<NativeScrollEvent> => ({
+const createScrollEvent = (
+  x: number,
+  contentWidth: number
+): NativeSyntheticEvent<NativeScrollEvent> => ({
   nativeEvent: {
     contentOffset: { x, y: 0 },
     layoutMeasurement: { width: 400, height: 100 },

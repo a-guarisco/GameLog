@@ -12,14 +12,18 @@ jest.mock('@gamelog/api-manager/useApi', () => ({
     isLoadingScreenshots: false,
     isLoadingMoreScreenshots: false,
   })),
-  useGetNumberOfCurrentPlayers: jest.fn(() => ({ currentPlayers: { response: { player_count: 1234 } } })),
+  useGetNumberOfCurrentPlayers: jest.fn(() => ({
+    currentPlayers: { response: { player_count: 1234 } },
+  })),
 }));
 
-jest.mock('@gamelog/game/useAchievementsData', () => jest.fn(() => ({
-  unlockedCount: 10,
-  totalCount: 20,
-  completionPercent: 50,
-})));
+jest.mock('@gamelog/game/useAchievementsData', () =>
+  jest.fn(() => ({
+    unlockedCount: 10,
+    totalCount: 20,
+    completionPercent: 50,
+  }))
+);
 
 describe('useGameViewData', () => {
   const gameItem = {
