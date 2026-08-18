@@ -81,10 +81,10 @@ describe('GlobalAchievementsPreview', () => {
     render(<GlobalAchievementsPreview gameID={'123'} playerID="player1" />);
 
     await waitFor(() => {
-      expect(screen.getByText('See more →')).toBeTruthy();
+      expect(screen.getByText('See more')).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('See more →'));
+    fireEvent.press(screen.getByText('See more'));
 
     expect(mockNavigate).toHaveBeenCalledWith('AchievementsList', {
       globalAchievements: mockData,
