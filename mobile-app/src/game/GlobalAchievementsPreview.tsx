@@ -1,13 +1,11 @@
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import { HStack } from '@gamelog/common/gluestack/hstack';
 import AchievementItem from '@gamelog/game/AchievementItem';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { Box } from '@gamelog/common/gluestack/box';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Text } from '@gamelog/common/gluestack/text';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 import { useGetGlobalAchievement } from '@gamelog/api-manager/useApi';
+import SeeAllLink from '@gamelog/game/SeeAllLink';
 import { Key } from 'react';
 
 interface Props {
@@ -31,13 +29,7 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
   const totalCount = achievements.length;
 
   return (
-    <Box className="rounded-lg bg-background-100 p-5 w-full shadow-lg">
-      <HStack className="items-center justify-center mb-4" space="sm">
-        <Text size="2xl" className="font-bold tracking-widest uppercase text-center">
-          Global Achievements
-        </Text>
-      </HStack>
-
+    <Box className="w-full">
       {isLoadingGlobalAchievements ? (
         <LoadingBox className="mb-4" message="Loading achievements..." />
       ) : errorGlobalAchievements ? (
@@ -64,7 +56,9 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
         </VStack>
       )}
 
-      <Button
+      <SeeAllLink
+        label={totalCount > 3 ? `See all ${totalCount} achievements` : 'See more'}
+        accessibilityRole="button"
         onPress={() =>
           navigation.navigate('AchievementsList', {
             globalAchievements,
@@ -73,12 +67,7 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
             gameItem,
           })
         }
-        className="w-full rounded-lg py-2"
-      >
-        <ButtonText className="font-bold uppercase">
-          {totalCount > 3 ? `See all ${totalCount} achievements →` : 'See more →'}
-        </ButtonText>
-      </Button>
+      />
     </Box>
   );
 }
