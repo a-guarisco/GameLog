@@ -11,7 +11,7 @@ import BannerInfo from '@gamelog/common/BannerInfo';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import BackButton from '@gamelog/common/BackButton';
 import GameStatBand from '@gamelog/common/StatBand';
-import ProgressTrack from '@gamelog/common/game/ProgressTrack';
+import ProgressTrack from '@gamelog/common/ProgressTrack';
 import GameCapturesStrip, { GameCapture } from '@gamelog/game/GameCapturesStrip';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
 import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';

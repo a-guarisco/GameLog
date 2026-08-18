@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import SectionState, { SectionMessage, SectionSpinner } from '@gamelog/common/game/SectionState';
+import SectionState, { SectionMessage, SectionSpinner } from '@gamelog/common/SectionState';
 
 const messages = { errorMessage: 'Could not load news', emptyMessage: 'No news yet' };
 

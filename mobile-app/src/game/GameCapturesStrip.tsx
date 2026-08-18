@@ -4,7 +4,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Image } from '@gamelog/common/gluestack/image';
-import { SectionSpinner } from '@gamelog/common/game/SectionState';
+import { SectionSpinner } from '@gamelog/common/SectionState';
 import { formatThousands } from '@gamelog/utils/formatUtils';
 
 export type GameCapture = {

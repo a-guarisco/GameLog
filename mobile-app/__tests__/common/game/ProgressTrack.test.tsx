@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import ProgressTrack from '@gamelog/common/game/ProgressTrack';
+import ProgressTrack from '@gamelog/common/ProgressTrack';
 
 describe('ProgressTrack', () => {
   it('sizes the fill to the percentage', () => {
