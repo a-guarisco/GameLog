@@ -14,25 +14,6 @@ export const INFO_GRADIENT_TIERS: { frontColor: string; gradientColor: string }[
   { frontColor: `rgb(${brand.info['900']})`, gradientColor: `rgb(${brand.info['500']})` },
 ];
 
-export const OS_COLORS: Record<string, { color: string; gradientCenterColor: string }> = {
-  Windows: {
-    color: `rgb(${brand.info['700']})`,
-    gradientCenterColor: `rgb(${brand.info['500']})`,
-  },
-  Mac: {
-    color: `rgb(${brand.info['400']})`,
-    gradientCenterColor: `rgb(${brand.info['200']})`,
-  },
-  Linux: {
-    color: `rgb(${brand.info['900']})`,
-    gradientCenterColor: `rgb(${brand.info['700']})`,
-  },
-  'Steam Deck': {
-    color: `rgb(${brand.info['200']})`,
-    gradientCenterColor: `rgb(${brand.info['100']})`,
-  },
-};
-
 export const getPercentileInfoGradient = (
   value: number,
   min: number,

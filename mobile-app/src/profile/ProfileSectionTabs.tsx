@@ -4,13 +4,14 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import SectionTabs, { SectionTab } from '@gamelog/common/game/SectionTabs';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
-import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 import ProfileTopGames from './ProfileTopGames';
 import ProfileHoursPerGame from './ProfileHoursPerGame';
 import ProfilePlaytimeTrend from './ProfilePlaytimeTrend';
+import ProfilePlatformSplit from './ProfilePlatformSplit';
 import type { TopGame } from './profileSelectors';
 import type { PlaytimeTrend } from './playtimeTrendSelectors';
+import type { PlatformSplit } from './platformSplitSelectors';
 
 type ProfileSectionId = 'overview' | 'time' | 'genres' | 'platforms';
 
@@ -26,6 +27,8 @@ interface ProfileSectionTabsProps {
   /** Day-by-day playtime for the time panel, already shaped by the page. */
   playtimeTrend: PlaytimeTrend;
   errorPlaytimeTrend?: unknown;
+  /** Lifetime hours per platform for the platforms panel, already shaped by the page. */
+  platformSplit: PlatformSplit;
   ownedGames?: OwnedGames | null;
   errorOwnedGames?: unknown;
   genreChartData?: any[];
@@ -40,6 +43,7 @@ const ProfileSectionTabs = ({
   topGames,
   playtimeTrend,
   errorPlaytimeTrend,
+  platformSplit,
   ownedGames,
   errorOwnedGames,
   genreChartData,
@@ -57,18 +61,16 @@ const ProfileSectionTabs = ({
       />
 
       <VStack className="items-center pt-4">
+        {/* Recent activity first: the landing panel should answer "what have I been up to". */}
         {activeTab === 'overview' && (
-          <Box className="w-full">
+          <VStack space="md" className="w-full">
+            <ProfilePlaytimeTrend trend={playtimeTrend} hasError={!!errorPlaytimeTrend} />
             <ProfileTopGames games={topGames} hasError={!!errorOwnedGames} />
-          </Box>
+          </VStack>
         )}
 
-        {/* When the library played is the question, the answer is two shapes: when, and on what. */}
         {activeTab === 'time' && (
           <VStack space="md" className="w-full items-center">
-            <Box className="w-full">
-              <ProfilePlaytimeTrend trend={playtimeTrend} hasError={!!errorPlaytimeTrend} />
-            </Box>
             <Box className="w-full">
               <ProfileHoursPerGame games={topGames} hasError={!!errorOwnedGames} />
             </Box>
@@ -89,11 +91,9 @@ const ProfileSectionTabs = ({
         )}
 
         {activeTab === 'platforms' && (
-          <OsShareChart
-            ownedGames={ownedGames}
-            isLoadingOwnedGames={false}
-            errorOwnedGames={errorOwnedGames}
-          />
+          <Box className="w-full">
+            <ProfilePlatformSplit split={platformSplit} hasError={!!errorOwnedGames} />
+          </Box>
         )}
       </VStack>
     </Box>

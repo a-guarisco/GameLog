@@ -4,7 +4,6 @@ import {
   getPercentileInfoGradient,
   getTopGames,
   INFO_GRADIENT_TIERS,
-  OS_COLORS,
 } from '@gamelog/common/charts/chartsHelpers';
 
 jest.mock('@gamelog/theme/theme', () => ({
@@ -38,15 +37,6 @@ describe('INFO_GRADIENT_TIERS', () => {
     INFO_GRADIENT_TIERS.forEach((tier) => {
       expect(tier).toHaveProperty('frontColor');
       expect(tier).toHaveProperty('gradientColor');
-    });
-  });
-});
-
-describe('OS_COLORS', () => {
-  it('contains entries for all expected platforms', () => {
-    ['Windows', 'Mac', 'Linux', 'Steam Deck'].forEach((os) => {
-      expect(OS_COLORS[os]).toHaveProperty('color');
-      expect(OS_COLORS[os]).toHaveProperty('gradientCenterColor');
     });
   });
 });
