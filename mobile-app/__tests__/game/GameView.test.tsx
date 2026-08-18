@@ -3,10 +3,12 @@ import GameView from '@gamelog/game/GameView';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 
 const mockNavigate = jest.fn();
+const mockGoBack = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
+    goBack: mockGoBack,
     setOptions: jest.fn(),
   }),
   useRoute: jest.fn(() => ({
@@ -50,10 +52,18 @@ describe('GameView', () => {
     expect(screen.getByText('Mock Achievements for 123')).toBeTruthy();
   });
 
-  it('renders the game name once, in the title block below the artwork', () => {
+  it('renders the game name once, in the banner bar under the artwork', () => {
     render(<GameView />);
 
-    expect(screen.getByText('Test Game')).toBeTruthy();
+    expect(screen.getAllByText('Test Game')).toHaveLength(1);
+  });
+
+  it('goes back from the floating back button', () => {
+    render(<GameView />);
+
+    fireEvent.press(screen.getByTestId('game-back'));
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1);
   });
 
   it('shows the live player count and streak under the title', () => {

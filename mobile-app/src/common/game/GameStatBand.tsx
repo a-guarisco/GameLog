@@ -14,7 +14,7 @@ export type GameStat = {
  * bottom, so labels stay aligned across columns without padding out short values.
  */
 const GameStatBand = ({ stats }: { stats: GameStat[] }) => (
-  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-100">
+  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200">
     {stats.map((stat, index) => (
       <HStack key={stat.label} className="flex-1">
         {index > 0 && <Box className="w-px bg-outline-100" />}

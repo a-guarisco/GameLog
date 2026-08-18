@@ -1,6 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import ApiManager from '@gamelog/api-manager/apiManager';
+
+const mockGoBack = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ goBack: mockGoBack, navigate: jest.fn() }),
+}));
 
 jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
 jest.mock('@gamelog/api-manager/apiManager', () => ({
@@ -69,5 +75,23 @@ describe('AchievementsListView', () => {
     await waitFor(() => {
       expect(screen.getByText(/Achievements for\s*game1/)).toBeTruthy();
     });
+  });
+
+  it('goes back to the game view from the floating back button', async () => {
+    (ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mockResolvedValueOnce({});
+    render(<AchievementsListView route={mockRoute} />);
+
+    fireEvent.press(await screen.findByTestId('achievements-back'));
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the back button on screen while the achievements are still loading', () => {
+    (ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mockReturnValueOnce(
+      new Promise(() => {})
+    );
+    render(<AchievementsListView route={mockRoute} />);
+
+    expect(screen.getByTestId('achievements-back')).toBeTruthy();
   });
 });

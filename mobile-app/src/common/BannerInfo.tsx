@@ -21,14 +21,17 @@ const BannerInfo = ({
   return (
     <Box className={`w-full px-4 py-3 justify-center ${className ?? ''}`}>
       <HStack className="items-center w-full justify-between">
+        {/* The slot stays even without an icon, so the title keeps its centred position. */}
         <Box className="flex-1 flex-row justify-start items-center">
-          <Avatar
-            size="lg"
-            className="-mt-7 border-2 border-background-100 shadow-md bg-background-300"
-          >
-            <AvatarFallbackText>{title}</AvatarFallbackText>
-            <AvatarImage source={{ uri: iconUrl }} alt={`${title} icon`} resizeMode="cover" />
-          </Avatar>
+          {!!iconUrl && (
+            <Avatar
+              size="lg"
+              className="-mt-7 border-2 border-background-100 shadow-md bg-background-300"
+            >
+              <AvatarFallbackText>{title}</AvatarFallbackText>
+              <AvatarImage source={{ uri: iconUrl }} alt={`${title} icon`} resizeMode="cover" />
+            </Avatar>
+          )}
         </Box>
 
         <Text
