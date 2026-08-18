@@ -106,7 +106,7 @@ const GuideCard = ({ guide }: { guide: PublishedFileDetails }) => (
     accessibilityRole="link"
     accessibilityLabel={guide.title}
     testID={`guide-item-${guide.publishedfileid}`}
-    className="rounded-xl border border-outline-100 bg-background-100 p-3"
+    className="rounded-xl border border-outline-100 bg-background-200 p-3"
   >
     <VStack space="xs">
       <Text size="sm" className="font-bold text-typography-0">
@@ -121,7 +121,7 @@ const GuideCard = ({ guide }: { guide: PublishedFileDetails }) => (
 
       <HStack space="xs" className="flex-wrap items-center pt-0.5">
         {getGuideTopicTags(guide).map((tag) => (
-          <Chip key={tag} variant="tag" className="bg-background-200">
+          <Chip key={tag} variant="tag" className="bg-background-300">
             <Text size="2xs" className="font-bold text-typography-200">
               {tag}
             </Text>
