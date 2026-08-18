@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import BackButton from '@gamelog/common/game/BackButton';
+import BackButton from '@gamelog/common/BackButton';
 
 describe('BackButton', () => {
   it('calls onPress when tapped', () => {

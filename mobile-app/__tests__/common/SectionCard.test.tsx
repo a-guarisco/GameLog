@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import { Text } from '@gamelog/common/gluestack/text';
-import SectionCard from '@gamelog/common/game/SectionCard';
+import SectionCard from '@gamelog/common/SectionCard';
 
 describe('SectionCard', () => {
   it('renders its children', () => {

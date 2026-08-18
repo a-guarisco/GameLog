@@ -1,7 +1,7 @@
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import Chip from '@gamelog/common/game/Chip';
+import Chip from '@gamelog/common/Chip';
 import { formatThousands } from '@gamelog/utils/formatUtils';
 
 interface GameStatusChipsProps {

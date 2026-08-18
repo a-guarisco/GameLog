@@ -13,8 +13,8 @@ export type GameStat = {
  * onto a second line. Columns stretch to the tallest one and the label is pinned to the
  * bottom, so labels stay aligned across columns without padding out short values.
  */
-const GameStatBand = ({ stats }: { stats: GameStat[] }) => (
-  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200">
+const StatBand = ({ stats }: { stats: GameStat[] }) => (
+  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200 shadow-md">
     {stats.map((stat, index) => (
       <HStack key={stat.label} className="flex-1">
         {index > 0 && <Box className="w-px bg-outline-100" />}
@@ -36,4 +36,4 @@ const GameStatBand = ({ stats }: { stats: GameStat[] }) => (
   </HStack>
 );
 
-export default GameStatBand;
+export default StatBand;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import SectionTabs, { SectionTab } from '@gamelog/common/game/SectionTabs';
+import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 import type { OwnedGames } from '@gamelog/api-manager/dto';

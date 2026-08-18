@@ -2,8 +2,8 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import SectionCard from '@gamelog/common/game/SectionCard';
-import SectionState from '@gamelog/common/game/SectionState';
+import SectionCard from '@gamelog/common/SectionCard';
+import SectionState from '@gamelog/common/SectionState';
 import type { PlaytimeTrend } from './playtimeTrendSelectors';
 
 /** Plot height in px. Fixed so an idle week and a busy one occupy the same slot on the page. */

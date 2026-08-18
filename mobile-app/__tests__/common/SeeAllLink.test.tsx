@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import SeeAllLink from '@gamelog/common/game/SeeAllLink';
+import SeeAllLink from '@gamelog/common/SeeAllLink';
 
 describe('SeeAllLink', () => {
   it('renders the label and reports presses', () => {

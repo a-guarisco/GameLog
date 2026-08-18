@@ -12,7 +12,7 @@ import { useGetGameStreak } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import useAchievementsData from './useAchievementsData';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
-import BackButton from '@gamelog/common/game/BackButton';
+import BackButton from '@gamelog/common/BackButton';
 import AchievementsProgressBar from './AchievementsProgressBar';
 
 type AchievementsListViewProps = {
@@ -90,7 +90,6 @@ const AchievementsListView = ({ route }: any) => {
   return (
     <Box className="flex-1 relative">
       {content}
-      {/* Outside the state branches, so it is there while loading and on error too. */}
       <BackButton onPress={() => navigation.goBack()} testID="achievements-back" />
     </Box>
   );

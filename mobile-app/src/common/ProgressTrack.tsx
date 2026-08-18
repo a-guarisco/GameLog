@@ -9,7 +9,7 @@ interface ProgressTrackProps {
   testID?: string;
 }
 
-/** Slim rounded progress bar shared by the game sections. */
+/** Slim rounded progress bar shared by the game and profile sections. */
 const ProgressTrack = ({
   percent,
   className = '',

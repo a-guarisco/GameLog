@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import SectionTabs, { SectionTab } from '@gamelog/common/game/SectionTabs';
+import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 
 type TabId = 'overview' | 'time' | 'genres';
 

@@ -14,7 +14,6 @@ const VARIANT_CLASSES: Record<ChipVariant, string> = {
 interface ChipProps {
   children: ReactNode;
   variant?: ChipVariant;
-  /** Background/border colours, e.g. "border-primary-500 bg-primary-500". */
   className?: string;
   testID?: string;
 }

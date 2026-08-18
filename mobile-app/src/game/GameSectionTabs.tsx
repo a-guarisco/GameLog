@@ -1,17 +1,17 @@
 import { ReactNode, useState } from 'react';
 import { Linking, Pressable } from 'react-native';
-import Ionicons from '@react-native-vector-icons/ionicons';
 import { Box } from '@gamelog/common/gluestack/box';
 import { formatShortDate, formatThousands } from '@gamelog/utils/formatUtils';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
+import SeeAllLink from '@gamelog/common/SeeAllLink';
 import { useGetGameGuides, useGetGameNews } from '@gamelog/api-manager/useApi';
 import type { PublishedFileDetails, SteamNewsItem } from '@gamelog/api-manager/dto';
 import { getGuideTopicTags, getGuideUrl } from '@gamelog/game/guideTags';
-import SeeAllLink from '@gamelog/common/game/SeeAllLink';
-import SectionState from '@gamelog/common/game/SectionState';
-import Chip from '@gamelog/common/game/Chip';
+import SectionState from '@gamelog/common/SectionState';
+import Chip from '@gamelog/common/Chip';
+import Ionicons from '@react-native-vector-icons/ionicons';
 
 type SectionId = 'achievements' | 'news' | 'guides';
 

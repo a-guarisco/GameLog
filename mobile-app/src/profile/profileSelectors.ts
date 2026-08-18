@@ -1,5 +1,5 @@
 import type { GameItem, OwnedGames } from '@gamelog/api-manager/dto';
-import type { GameStat } from '@gamelog/common/game/GameStatBand';
+import type { GameStat } from '@gamelog/common/StatBand';
 import { formatMinutesToHoursShort, formatThousands } from '@gamelog/utils/formatUtils';
 
 const getGames = (ownedGames?: OwnedGames | null): GameItem[] => ownedGames?.response?.games ?? [];
