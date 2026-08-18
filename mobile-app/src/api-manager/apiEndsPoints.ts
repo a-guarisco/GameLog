@@ -117,6 +117,14 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/games/report?start_date=${startDate}&end_date=${endDate}`;
   },
 
+  /**
+   * The user's per-day playtime summed across the library. `days` is a trailing window
+   * ending today; the backend treats -1 as "all history".
+   */
+  getPlaytimeByUser: (days: number) => {
+    return `${getBackendBaseUrl()}/games/playtime_by_user?days=${days}`;
+  },
+
   getAuthOutcome: () => {
     return `${getBackendBaseUrl()}/me`;
   },

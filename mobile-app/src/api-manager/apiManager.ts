@@ -5,6 +5,7 @@ import { auth } from '@gamelog/auth/firebaseClient';
 import type {
   CurrentPlayers,
   DailyReport,
+  PlaytimeByUser,
   GameGenres,
   GlobalAchievement,
   GameSchema,
@@ -100,6 +101,9 @@ export default {
   /** Playtime per game between two inclusive `YYYY-MM-DD` dates. */
   getPlaytimeReport: (startDate: string, endDate: string) =>
     fetchAuthenticatedData<DailyReport>(EndPoints.getPlaytimeReport(startDate, endDate)),
+  /** Per-day playtime across the whole library, for the trailing `days` window. */
+  getPlaytimeByUser: (days: number) =>
+    fetchAuthenticatedData<PlaytimeByUser>(EndPoints.getPlaytimeByUser(days)),
 
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),

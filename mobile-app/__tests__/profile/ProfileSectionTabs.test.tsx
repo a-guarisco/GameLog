@@ -1,17 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import ProfileSectionTabs from '@gamelog/profile/ProfileSectionTabs';
 import type { TopGame } from '@gamelog/profile/profileSelectors';
+import { getPlaytimeTrend } from '@gamelog/profile/playtimeTrendSelectors';
 
-jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => {
+jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => {
   const { View } = jest.requireActual('react-native');
   return {
     __esModule: true,
-    default: (props: any) => <View testID="total-hours-chart" {...props} />,
+    default: (props: any) => <View testID="total-hours-pie-chart" {...props} />,
   };
-});
-jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => {
-  const { View } = jest.requireActual('react-native');
-  return { __esModule: true, default: () => <View testID="total-hours-pie-chart" /> };
 });
 jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
   const { View } = jest.requireActual('react-native');
@@ -31,10 +28,17 @@ const TOP_GAMES: TopGame[] = [
 
 const OWNED_GAMES = { response: { game_count: 1, games: [] } } as any;
 
+const TREND = getPlaytimeTrend(
+  [{ date: '2026-08-18', playtime_minutes: 120 }],
+  14,
+  new Date(2026, 7, 18)
+);
+
 const renderTabs = (overrides: Record<string, unknown> = {}) =>
   render(
     <ProfileSectionTabs
       topGames={TOP_GAMES}
+      playtimeTrend={TREND}
       ownedGames={OWNED_GAMES}
       genreChartData={[{ label: 'Action', value: 10 }]}
       {...overrides}
@@ -54,19 +58,48 @@ describe('ProfileSectionTabs', () => {
     renderTabs();
 
     expect(screen.getByTestId('profile-top-games')).toBeTruthy();
-    expect(screen.queryByTestId('total-hours-chart')).toBeNull();
+    expect(screen.queryByTestId('profile-playtime-trend')).toBeNull();
+    expect(screen.queryByTestId('profile-hours-per-game')).toBeNull();
     expect(screen.queryByTestId('genre-radar-chart')).toBeNull();
     expect(screen.queryByTestId('os-share-chart')).toBeNull();
   });
 
-  it('swaps in both playtime charts on the time tab', () => {
+  it('swaps in the trend, the per-game bars and the share donut on the time tab', () => {
     renderTabs();
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
 
-    expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
+    expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+    expect(screen.getByTestId('profile-hours-per-game')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
     expect(screen.queryByTestId('profile-top-games')).toBeNull();
+  });
+
+  it('ranks the per-game bars against the top game', () => {
+    renderTabs({
+      topGames: [
+        ...TOP_GAMES,
+        { appid: '730', name: 'Counter-Strike 2', hoursLabel: '206h', percentOfTop: 50 },
+      ],
+    });
+
+    fireEvent.press(screen.getByTestId('profile-tab-time'));
+
+    expect(screen.getByTestId('profile-hours-bar-236390').props.style).toEqual(
+      expect.objectContaining({ height: '100%' })
+    );
+    expect(screen.getByTestId('profile-hours-bar-730').props.style).toEqual(
+      expect.objectContaining({ height: '50%' })
+    );
+  });
+
+  it('reports a failed playtime history without blaming the library', () => {
+    renderTabs({ errorPlaytimeTrend: true });
+
+    fireEvent.press(screen.getByTestId('profile-tab-time'));
+
+    expect(screen.getByText('Could not load playtime history')).toBeTruthy();
+    expect(screen.getByTestId('profile-hours-per-game')).toBeTruthy();
   });
 
   it('swaps in the genre radar on the genres tab', () => {
@@ -105,7 +138,7 @@ describe('ProfileSectionTabs', () => {
     renderTabs({ errorOwnedGames: true });
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
-    const chart = screen.getByTestId('total-hours-chart');
+    const chart = screen.getByTestId('total-hours-pie-chart');
 
     expect(chart.props.isLoadingOwnedGames).toBe(false);
     expect(chart.props.errorOwnedGames).toBe(true);

@@ -6,8 +6,10 @@ import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetPlaytimeByUser,
   useGetPlaytimeReport,
   useGetUserStreak,
+  RECENT_PLAYTIME_DAYS,
 } from '@gamelog/api-manager/useApi';
 import { getReportTotalMinutes } from '@gamelog/common/playtimeReportSelectors';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
@@ -17,6 +19,7 @@ import ProfileIdentity from './ProfileIdentity';
 import ProfileStats from './ProfileStats';
 import ProfileSectionTabs from './ProfileSectionTabs';
 import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './profileSelectors';
+import { getPlaytimeTrend } from './playtimeTrendSelectors';
 
 const USER_ID = '76561198077919169';
 /** Stands in for the hero artwork until the library says which game deserves it. */
@@ -36,18 +39,24 @@ const ProfileView = () => {
   const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
   const { userStreak, isLoadingUserStreak } = useGetUserStreak();
   const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
+  const { playtimeByUser, isLoadingPlaytimeByUser, errorPlaytimeByUser } = useGetPlaytimeByUser();
 
   const isLoading =
     isLoadingOwnedGames ||
     isLoadingGenreChart ||
     isLoadingPlayersInfo ||
     isLoadingUserStreak ||
-    isLoadingPlaytimeReport;
+    isLoadingPlaytimeReport ||
+    isLoadingPlaytimeByUser;
   const player = playersInfo?.response?.players?.[0];
   const streakText = useStreakText(userStreak?.streak, isLoadingUserStreak);
 
   const mostPlayedGame = useMemo(() => getMostPlayedGame(ownedGames), [ownedGames]);
   const topGames = useMemo(() => getTopGamesByHours(ownedGames), [ownedGames]);
+  const playtimeTrend = useMemo(
+    () => getPlaytimeTrend(playtimeByUser, RECENT_PLAYTIME_DAYS),
+    [playtimeByUser]
+  );
 
   if (isLoading) {
     return (
@@ -84,6 +93,8 @@ const ProfileView = () => {
             <Box className="px-4">
               <ProfileSectionTabs
                 topGames={topGames}
+                playtimeTrend={playtimeTrend}
+                errorPlaytimeTrend={errorPlaytimeByUser}
                 ownedGames={ownedGames}
                 errorOwnedGames={errorOwnedGames}
                 genreChartData={genreChartData}
