@@ -2,6 +2,7 @@ import {
   formatAchievementName,
   formatMinutesToHours,
   formatShortDate,
+  formatShortDateWithYear,
   formatThousands,
 } from '@gamelog/utils/formatUtils';
 
@@ -42,6 +43,27 @@ describe('formatShortDate', () => {
         day: 'numeric',
       })
     );
+  });
+});
+
+describe('formatShortDateWithYear', () => {
+  it('renders a steam unix timestamp as month, day and year', () => {
+    const timestamp = 1784660983;
+    expect(formatShortDateWithYear(timestamp)).toBe(
+      new Date(timestamp * 1000).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    );
+  });
+
+  it('includes the year, unlike formatShortDate', () => {
+    const timestamp = 1784660983;
+    const year = new Date(timestamp * 1000).getFullYear().toString();
+
+    expect(formatShortDateWithYear(timestamp)).toContain(year);
+    expect(formatShortDate(timestamp)).not.toContain(year);
   });
 });
 
