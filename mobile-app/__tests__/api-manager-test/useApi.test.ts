@@ -7,6 +7,7 @@ import {
   useGetPlayersInfo,
   useGetGameStreak,
   useGetUserStreak,
+  useGetNumberOfCurrentPlayers,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -166,5 +167,19 @@ describe('useGetGameStreak', () => {
     mockAsyncFetch({ data: 8 });
     const { result } = renderHook(() => useGetGameStreak('app-1'));
     expect(result.current.gameStreak).toEqual({ streak: 8 });
+  });
+});
+
+describe('useGetNumberOfCurrentPlayers', () => {
+  useTestApiHook({
+    useHook: () => useGetNumberOfCurrentPlayers('730'),
+    apiMethod: 'getNumberOfCurrentPlayers',
+    apiArgs: ['730'],
+    expectedKeys: {
+      data: 'currentPlayers',
+      loading: 'isLoadingCurrentPlayers',
+      error: 'errorCurrentPlayers',
+    },
+    mockData: { response: { player_count: 652862, result: 1 } },
   });
 });
