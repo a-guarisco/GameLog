@@ -1,15 +1,12 @@
 import { Box } from '@gamelog/common/gluestack/box';
 
 interface ProgressTrackProps {
-  /** 0–100; values outside the range are clamped so the fill can never overflow the track. */
   percent: number;
-  /** Track sizing/colour overrides, e.g. "h-2". */
   className?: string;
   fillClassName?: string;
   testID?: string;
 }
 
-/** Slim rounded progress bar shared by the game sections. */
 const ProgressTrack = ({
   percent,
   className = '',

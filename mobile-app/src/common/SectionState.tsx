@@ -1,19 +1,15 @@
 import { Box } from '@gamelog/common/gluestack/box';
-import { Text } from '@gamelog/common/gluestack/text';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
+import { ErrorBox, InfoBox } from './feedbacks';
 
-/** Centred spinner for a section that is still loading. */
 export const SectionSpinner = ({ className = 'items-center py-8' }: { className?: string }) => (
   <Box className={className}>
     <Spinner />
   </Box>
 );
 
-/** One-line explanation shown in place of a section's content. */
 export const SectionMessage = ({ children }: { children: string }) => (
-  <Text size="xs" className="py-8 text-center text-typography-300">
-    {children}
-  </Text>
+  <InfoBox message={children} className="py-4" />
 );
 
 interface SectionStateProps {
@@ -22,14 +18,9 @@ interface SectionStateProps {
   isEmpty?: boolean;
   errorMessage: string;
   emptyMessage: string;
-  /** Overrides the spinner container, for sections that need a fixed-height slot. */
   loadingClassName?: string;
 }
 
-/**
- * The loading → error → empty chain every game section repeats. Renders nothing once
- * there is content to show, so it can sit above the list it guards.
- */
 const SectionState = ({
   isLoading = false,
   hasError = false,
@@ -39,9 +30,10 @@ const SectionState = ({
   loadingClassName,
 }: SectionStateProps) => {
   if (isLoading) return <SectionSpinner className={loadingClassName} />;
-  if (hasError) return <SectionMessage>{errorMessage}</SectionMessage>;
-  if (isEmpty) return <SectionMessage>{emptyMessage}</SectionMessage>;
+  if (hasError) return <ErrorBox errorMessage={errorMessage} className="py-4" />;
+  if (isEmpty) return <InfoBox message={emptyMessage} className="py-4" />;
   return null;
 };
 
 export default SectionState;
+
