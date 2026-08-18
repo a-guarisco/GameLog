@@ -6,11 +6,12 @@ import { formatShortDate, formatThousands } from '@gamelog/utils/formatUtils';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { useGetGameGuides, useGetGameNews } from '@gamelog/api-manager/useApi';
 import type { PublishedFileDetails, SteamNewsItem } from '@gamelog/api-manager/dto';
 import { getGuideTopicTags, getGuideUrl } from '@gamelog/game/guideTags';
-import SeeAllLink from '@gamelog/game/SeeAllLink';
+import SeeAllLink from '@gamelog/common/game/SeeAllLink';
+import SectionState from '@gamelog/common/game/SectionState';
+import Chip from '@gamelog/common/game/Chip';
 
 type SectionId = 'achievements' | 'news' | 'guides';
 
@@ -26,12 +27,6 @@ const openExternalUrl = (url: string) => {
 
 const SectionLink = ({ label, url }: { label: string; url: string }) => (
   <SeeAllLink label={label} onPress={() => openExternalUrl(url)} />
-);
-
-const SectionMessage = ({ children }: { children: string }) => (
-  <Text size="xs" className="py-8 text-center text-typography-300">
-    {children}
-  </Text>
 );
 
 /** Steam fills `author` with an email or nothing on syndicated feeds; the feed name reads better there. */
@@ -73,17 +68,13 @@ const NewsPanel = ({ appid }: { appid: string }) => {
 
   return (
     <VStack>
-      {isLoadingGameNews && (
-        <Box className="items-center py-8">
-          <Spinner />
-        </Box>
-      )}
-
-      {!isLoadingGameNews && errorGameNews && <SectionMessage>Could not load news</SectionMessage>}
-
-      {!isLoadingGameNews && !errorGameNews && newsItems.length === 0 && (
-        <SectionMessage>No news yet</SectionMessage>
-      )}
+      <SectionState
+        isLoading={isLoadingGameNews}
+        hasError={!!errorGameNews}
+        isEmpty={newsItems.length === 0}
+        errorMessage="Could not load news"
+        emptyMessage="No news yet"
+      />
 
       {newsItems.map((item, index) => (
         <NewsItemRow key={item.gid} item={item} isFirst={index === 0} />
@@ -130,11 +121,11 @@ const GuideCard = ({ guide }: { guide: PublishedFileDetails }) => (
 
       <HStack space="xs" className="flex-wrap items-center pt-0.5">
         {getGuideTopicTags(guide).map((tag) => (
-          <Box key={tag} className="rounded-md bg-background-200 px-2 py-0.5">
+          <Chip key={tag} variant="tag" className="bg-background-200">
             <Text size="2xs" className="font-bold text-typography-200">
               {tag}
             </Text>
-          </Box>
+          </Chip>
         ))}
       </HStack>
 
@@ -154,19 +145,13 @@ const GuidesPanel = ({ appid }: { appid: string }) => {
 
   return (
     <VStack space="sm" className="pt-4">
-      {isLoadingGameGuides && (
-        <Box className="items-center py-8">
-          <Spinner />
-        </Box>
-      )}
-
-      {!isLoadingGameGuides && errorGameGuides && (
-        <SectionMessage>Could not load guides</SectionMessage>
-      )}
-
-      {!isLoadingGameGuides && !errorGameGuides && guides.length === 0 && (
-        <SectionMessage>No guides yet</SectionMessage>
-      )}
+      <SectionState
+        isLoading={isLoadingGameGuides}
+        hasError={!!errorGameGuides}
+        isEmpty={guides.length === 0}
+        errorMessage="Could not load guides"
+        emptyMessage="No guides yet"
+      />
 
       {guides.map((guide) => (
         <GuideCard key={guide.publishedfileid} guide={guide} />
