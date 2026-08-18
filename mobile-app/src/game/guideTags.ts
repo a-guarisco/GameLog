@@ -40,7 +40,6 @@ const LANGUAGE_TAGS = new Set(
 
 export const MAX_GUIDE_TAGS = 3;
 
-/** The first few topical tags of a guide, languages left out. */
 export const getGuideTopicTags = (
   guide: PublishedFileDetails,
   limit: number = MAX_GUIDE_TAGS
