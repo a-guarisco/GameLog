@@ -76,6 +76,11 @@ const EndPoints = {
     return `${STEAM_BASE_URL}ISteamUserStats/GetSchemaForGame/v2/?key=${getSteamApiKey()}&appid=${appId}`;
   },
 
+  getNumberOfCurrentPlayers: (appId: string) => {
+    // TODO: use isBackendProvider() if backend endpoint differs
+    return `${STEAM_BASE_URL}ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${appId}`;
+  },
+
   getStreakByUser: () => {
     return `${getBackendBaseUrl()}/games/streak_by_user`;
   },

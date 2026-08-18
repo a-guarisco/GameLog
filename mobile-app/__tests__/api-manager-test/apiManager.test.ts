@@ -60,6 +60,14 @@ describe('ApiManager', () => {
     EndPoints.getSchemaForGame(appId)
   );
 
+  testHelper(
+    'fetches number of current players successfully',
+    'handles number of current players fetch failure',
+    { response: { player_count: 652862, result: 1 } },
+    () => ApiManager.getNumberOfCurrentPlayers(appId),
+    EndPoints.getNumberOfCurrentPlayers(appId)
+  );
+
   describe('getGlobalAchievement', () => {
     it('fetches global achievements and merges schema display name and description', async () => {
       const mockGlobalData = {

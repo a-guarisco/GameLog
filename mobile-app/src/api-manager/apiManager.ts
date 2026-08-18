@@ -3,6 +3,7 @@ import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import { auth } from '@gamelog/auth/firebaseClient';
 import type {
+  CurrentPlayers,
   GameGenres,
   GlobalAchievement,
   GameSchema,
@@ -46,6 +47,8 @@ async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promi
 
 export { getApiProvider, setApiProvider, isBackendProvider, fetchData, fetchAuthenticatedData };
 export default {
+  getNumberOfCurrentPlayers: (appId: string) =>
+    fetchData<CurrentPlayers>(EndPoints.getNumberOfCurrentPlayers(appId)),
   getGameNews: (appId: string, count: number, maxLength: number) =>
     fetchData<SteamNews>(EndPoints.getNewsForApp(appId, count, maxLength)),
   getSchemaForGame: (appId: string) => fetchData<GameSchema>(EndPoints.getSchemaForGame(appId)),
