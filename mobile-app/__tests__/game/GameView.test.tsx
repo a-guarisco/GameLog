@@ -1,10 +1,12 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 
+const mockNavigate = jest.fn();
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
-    navigate: jest.fn(),
+    navigate: mockNavigate,
     setOptions: jest.fn(),
   }),
   useRoute: jest.fn(() => ({
@@ -34,6 +36,10 @@ jest.mock('@gamelog/game/GlobalAchievementsPreview', () => {
 });
 
 describe('GameView', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders without crashing', () => {
     render(<GameView />);
   });
@@ -65,5 +71,16 @@ describe('GameView', () => {
 
     expect(screen.getByText(lastPlayed)).toBeTruthy();
     expect(lastPlayed).toContain('2021');
+  });
+
+  it('opens the achievements list when the achievements progress summary is pressed', () => {
+    render(<GameView />);
+
+    fireEvent.press(screen.getByTestId('achievements-summary'));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'AchievementsList',
+      expect.objectContaining({ gameID: '123' })
+    );
   });
 });
