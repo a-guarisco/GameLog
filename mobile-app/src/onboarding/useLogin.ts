@@ -32,28 +32,14 @@ export function useLogin() {
 
   const handleFacebookSignIn = async () => {
     setLoading(true);
-    setErrorCode(null);
-    try {
-      // Placeholder for Facebook OAuth provider setup
-      setErrorCode('auth/provider-setup-pending');
-    } catch (err: any) {
-      setErrorCode(err.code || 'auth/facebook-sign-in-failed');
-    } finally {
-      setLoading(false);
-    }
+    setErrorCode('auth/provider-setup-pending');
+    setLoading(false);
   };
 
   const handleGithubSignIn = async () => {
     setLoading(true);
-    setErrorCode(null);
-    try {
-      // Placeholder for GitHub OAuth provider setup
-      setErrorCode('auth/provider-setup-pending');
-    } catch (err: any) {
-      setErrorCode(err.code || 'auth/github-sign-in-failed');
-    } finally {
-      setLoading(false);
-    }
+    setErrorCode('auth/provider-setup-pending');
+    setLoading(false);
   };
 
   const handleEmailAuth = async () => {
