@@ -39,5 +39,6 @@ serviceAccountKey.json
 # Documentation
 docs/
 
-# Agent configuration
-.agents/
+# Python Coverage Reports
+.coverage
+htmlcov/
