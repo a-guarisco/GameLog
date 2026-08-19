@@ -24,6 +24,7 @@ import type {
   UserRegisterRequest,
   UserSearchResult,
   RecommendationResponse,
+  DailyReport,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
@@ -170,4 +171,6 @@ export default {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
     }),
+  getDailyReport: (startDate?: string, endDate?: string) =>
+    fetchAuthenticatedData<DailyReport>(EndPoints.getDailyReport(startDate, endDate)),
 };
