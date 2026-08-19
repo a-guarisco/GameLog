@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onIdTokenChanged, type User } from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
 import type { UserRead } from '@gamelog/api-manager/dto';
 
-export type AuthState = 'loading' | 'unauthenticated' | 'onboarding' | 'authenticated';
+export type AuthState = 'loading' | 'unauthenticated' | 'unverified' | 'onboarding' | 'authenticated';
 
 export const useAuthSession = () => {
   const [authState, setAuthState] = useState<AuthState>('loading');
@@ -31,9 +31,13 @@ export const useAuthSession = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onIdTokenChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (user) {
+        if (!user.emailVerified && user.providerData.some((p) => p.providerId === 'password')) {
+          setAuthState('unverified');
+          return;
+        }
         // We have a Firebase user, check if they exist in PostgreSQL
         await checkBackendRegistration(user);
       } else {
@@ -52,10 +56,30 @@ export const useAuthSession = () => {
     }
   };
 
+  const checkEmailVerification = async () => {
+    if (firebaseUser) {
+      setAuthState('loading');
+      await firebaseUser.reload();
+      const updatedUser = auth.currentUser;
+      setFirebaseUser(updatedUser);
+
+      // FORZA l'aggiornamento del token Firebase. 
+      // Questo invierà l'evento `onIdTokenChanged` a tutte le istanze del nostro hook in tutta l'app!
+      await updatedUser?.getIdToken(true);
+
+      if (updatedUser?.emailVerified || !updatedUser?.providerData.some((p) => p.providerId === 'password')) {
+        await checkBackendRegistration(updatedUser!);
+      } else {
+        setAuthState('unverified');
+      }
+    }
+  };
+
   return {
     authState,
     firebaseUser,
     backendUser,
     refreshBackendUser,
+    checkEmailVerification,
   };
 };

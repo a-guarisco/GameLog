@@ -18,6 +18,7 @@ import {
 
 import LoginScreen from '@gamelog/onboarding/LoginScreen';
 import ProfileSetupScreen from '@gamelog/onboarding/ProfileSetupScreen';
+import UnverifiedScreen from '@gamelog/onboarding/UnverifiedScreen';
 
 export const GameListStack = createNativeStackNavigator({
   screens: {
@@ -124,6 +125,15 @@ export const AuthNavigator = createNativeStackNavigator({
   screens: {
     Login: {
       screen: LoginScreen,
+      options: { headerShown: false },
+    },
+  },
+});
+
+export const UnverifiedNavigator = createNativeStackNavigator({
+  screens: {
+    Unverified: {
+      screen: UnverifiedScreen,
       options: { headerShown: false },
     },
   },

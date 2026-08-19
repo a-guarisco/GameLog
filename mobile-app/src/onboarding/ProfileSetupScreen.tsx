@@ -22,7 +22,7 @@ export default function ProfileSetupScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-background-0"
+      className="flex-1 bg-background-0 dark:bg-background-0"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, justifyContent: 'center' }}>
