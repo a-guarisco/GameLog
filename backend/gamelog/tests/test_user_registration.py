@@ -26,6 +26,33 @@ def test_register_user_success(client: TestClient, session: Session):
     assert data["username"] == "new_user_1"
     assert data["steam_id"] == "76561198999000001"
     assert "id" in data
+    import uuid
+    db_user = session.get(User, uuid.UUID(data["id"]))
+    assert db_user is not None
+    assert db_user.username == "new_user_1"
+    assert db_user.steam_id == "76561198999000001"
+    assert db_user.steam_api_key == "MOCK_KEY_123"
+
+    app.dependency_overrides.clear()
+
+
+def test_register_user_invalid_steam_credentials(client: TestClient, session: Session):
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid", email="newuser@test.com", email_verified=True)
+    payload = {
+        "username": "new_user_1",
+        "steam_id": "76561198999000001",
+        "steam_api_key": "MOCK_KEY_123",
+    }
+
+    from unittest.mock import patch
+
+    with patch("src.games.steam_fetcher_service.validate_steam_credentials_sync", return_value=False):
+        response = client.post("/users/register", json=payload)
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid Steam ID or Steam API Key"
+
+    app.dependency_overrides.clear()
 
 
 def test_register_user_unverified_email_raises_403(client: TestClient, session: Session):
