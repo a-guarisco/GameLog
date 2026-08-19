@@ -22,10 +22,11 @@ import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './pr
 import { getPlaytimeTrend } from './playtimeTrendSelectors';
 import { getPlatformSplit } from './platformSplitSelectors';
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
+import { ReportBox } from '../report/ReportBox';
 
 const ProfileView = () => {
   const USER_ID = getSteamId();
-  
+
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(
     USER_ID,
     false,
@@ -89,6 +90,10 @@ const ProfileView = () => {
                 ownedGames={ownedGames}
                 recentMinutes={getReportTotalMinutes(playtimeReport)}
               />
+            </Box>
+
+            <Box className="px-4">
+              <ReportBox />
             </Box>
 
             <Box className="px-4">
