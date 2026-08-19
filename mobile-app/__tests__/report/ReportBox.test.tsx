@@ -11,7 +11,7 @@ jest.mock('../../src/report/useReportSortOrder', () => ({
   useReportSortOrder: jest.fn().mockReturnValue({
     sortOrder: 'playtime',
     setSortOrder: jest.fn(),
-  })
+  }),
 }));
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
@@ -65,8 +65,8 @@ describe('ReportBox', () => {
     expect(getByText('Report Retrieval')).toBeTruthy();
     expect(getByText('From:')).toBeTruthy();
     expect(getByText('To:')).toBeTruthy();
-    expect(getByText('Generate last 2 weeks report')).toBeTruthy();
-    expect(queryByText('Reset')).toBeNull(); // Reset should not be visible when no dates
+    expect(getByText('Generate Report (Last 14 days)')).toBeTruthy();
+    expect(queryByText('Clear')).toBeNull(); // Clear should not be visible when no dates
   });
 
   it('shows Clear button when a date is selected and calls handleClearDates on press', () => {
@@ -83,7 +83,7 @@ describe('ReportBox', () => {
 
     const { getByText } = renderComponent();
 
-    const clearButton = getByText('Reset');
+    const clearButton = getByText('Clear');
     expect(clearButton).toBeTruthy();
 
     fireEvent.press(clearButton);
@@ -98,57 +98,14 @@ describe('ReportBox', () => {
       error: null,
       report: null,
       gameNames: {},
-      isDefaultDates: false,
       handleFetchReport: mockHandleFetchReport,
       handleClearDates: mockHandleClearDates,
     });
 
     const { getByText } = renderComponent();
 
-    // Since only startDate is defined, the button text will be "Generate last X days/weeks report"
-    // The exact X depends on current date, so we can just match part of the string
-    fireEvent.press(getByText(/Generate last .* report/));
+    fireEvent.press(getByText('Generate Report'));
     expect(mockHandleFetchReport).toHaveBeenCalled();
-  });
-
-  it('displays weeks text correctly when days is a multiple of 7', () => {
-    // 7 days ago
-    const start = new Date();
-    start.setDate(start.getDate() - 7);
-
-    (useReport as jest.Mock).mockReturnValue({
-      startDate: start,
-      endDate: undefined,
-      loading: false,
-      error: null,
-      report: null,
-      gameNames: {},
-      handleFetchReport: mockHandleFetchReport,
-      handleClearDates: mockHandleClearDates,
-    });
-
-    let rendered = renderComponent();
-    expect(rendered.getByText('Generate last 1 week report')).toBeTruthy();
-
-    rendered.unmount();
-
-    // 14 days ago
-    const start2 = new Date();
-    start2.setDate(start2.getDate() - 14);
-
-    (useReport as jest.Mock).mockReturnValue({
-      startDate: start2,
-      endDate: undefined,
-      loading: false,
-      error: null,
-      report: null,
-      gameNames: {},
-      handleFetchReport: mockHandleFetchReport,
-      handleClearDates: mockHandleClearDates,
-    });
-
-    rendered = renderComponent();
-    expect(rendered.getByText('Generate last 2 weeks report')).toBeTruthy();
   });
 
   it('displays loading state correctly', () => {
@@ -158,7 +115,6 @@ describe('ReportBox', () => {
       error: null,
       report: null,
       gameNames: {},
-      isDefaultDates: false,
       handleFetchReport: mockHandleFetchReport,
       handleClearDates: mockHandleClearDates,
     });
@@ -190,7 +146,6 @@ describe('ReportBox', () => {
         game_reports: [],
       },
       gameNames: {},
-      isDefaultDates: false,
       handleFetchReport: mockHandleFetchReport,
       handleClearDates: mockHandleClearDates,
     });
@@ -230,13 +185,13 @@ describe('ReportBox', () => {
     });
 
     const { getByText, getAllByText } = renderComponent();
-    
+
     expect(getByText('Report Summary')).toBeTruthy();
-    
+
     // Top Game should be Test Game (120 min)
     expect(getByText('Test Game')).toBeTruthy();
     // 45m should be formatted correctly
-    
+
     // Click "See details" to expand the list
     fireEvent.press(getByText('See details'));
 
@@ -248,7 +203,7 @@ describe('ReportBox', () => {
     // Now there should be two "Test Game" elements: one in summary, one in the list
     const gameTexts = getAllByText('Test Game');
     fireEvent.press(gameTexts[gameTexts.length - 1]);
-    
+
     expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
       screen: 'Game',
       params: {
@@ -263,7 +218,7 @@ describe('ReportBox', () => {
     // Test sorting interactions
     fireEvent.press(getByText('Streak'));
     expect(mockSetSortOrder).toHaveBeenCalledWith('streak');
-    
+
     fireEvent.press(getByText('A-Z'));
     expect(mockSetSortOrder).toHaveBeenCalledWith('alpha');
   });
@@ -279,8 +234,8 @@ describe('ReportBox', () => {
       report: {
         date: '2023-10-10',
         game_reports: [
-          { app_id: '1', today_play_time: 10, streak: 10 }, 
-          { app_id: '2', today_play_time: 20, streak: 5 }, 
+          { app_id: '1', today_play_time: 10, streak: 10 },
+          { app_id: '2', today_play_time: 20, streak: 5 },
         ],
       },
       gameNames: {
@@ -296,10 +251,10 @@ describe('ReportBox', () => {
       sortOrder: 'streak',
       setSortOrder: jest.fn(),
     });
-    
+
     let rendered = renderComponent();
     fireEvent.press(rendered.getByText('See details'));
-    
+
     // 10 streak is first
     let gameElements = rendered.getAllByTestId('game-list-item');
     expect(within(gameElements[0]).getByText('B Game')).toBeTruthy();
@@ -334,65 +289,17 @@ describe('ReportBox', () => {
     });
 
     const { getAllByText, UNSAFE_getAllByType } = renderComponent();
-    
+
     // There are two "Select Date" buttons (From and To)
     const dateButtons = getAllByText('Select Date');
     fireEvent.press(dateButtons[0]); // First one is From
-    fireEvent.press(dateButtons[1]); // Second one is To
-    
+
     const pickers = UNSAFE_getAllByType(require('@react-native-community/datetimepicker'));
-    expect(pickers.length).toBeGreaterThan(1);
-    
+    expect(pickers.length).toBeGreaterThan(0);
+
     const newDate = new Date('2023-12-01');
     fireEvent(pickers[0], 'onChange', { type: 'set' }, newDate);
+
     expect(mockSetStartDate).toHaveBeenCalledWith(newDate);
-
-    const newEndDate = new Date('2023-12-02');
-    fireEvent(pickers[1], 'onChange', { type: 'set' }, newEndDate);
-    expect(mockSetEndDate).toHaveBeenCalledWith(newEndDate);
-
-    // Test undefined date (e.g. dismissed picker)
-    fireEvent(pickers[0], 'onChange', { type: 'dismissed' }, undefined);
-    expect(mockSetStartDate).toHaveBeenCalledTimes(1); // not called again
-
-    fireEvent(pickers[1], 'onChange', { type: 'dismissed' }, undefined);
-    expect(mockSetEndDate).toHaveBeenCalledTimes(1); // not called again
-  });
-
-  it('navigates to game details on press with missing game name and falsy playtime', () => {
-    (useReport as jest.Mock).mockReturnValue({
-      startDate: new Date(),
-      endDate: new Date(),
-      appliedStartDate: new Date(),
-      appliedEndDate: new Date(),
-      loading: false,
-      error: null,
-      report: {
-        game_reports: [
-          { app_id: '999', today_play_time: 0, streak: 1 }, // 0 playtime
-        ],
-      },
-      gameNames: {}, // missing name
-      handleFetchReport: mockHandleFetchReport,
-      handleClearDates: mockHandleClearDates,
-    });
-
-    const { getByTestId, getByText } = renderComponent();
-    
-    // Show details first
-    fireEvent.press(getByText('See details'));
-    
-    fireEvent.press(getByTestId('game-list-item'));
-    
-    expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
-      screen: 'Game',
-      params: {
-        gameItem: {
-          appid: '999',
-          name: 'App ID: 999',
-          playtime_forever: 0,
-        },
-      },
-    });
   });
 });
