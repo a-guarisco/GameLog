@@ -42,3 +42,4 @@ docs/
 # Python Coverage Reports
 .coverage
 htmlcov/
+.agents/
