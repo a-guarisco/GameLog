@@ -1,3 +1,4 @@
+from datetime import date
 from fastapi import APIRouter, Depends, status
 from sqlmodel import Session
 
