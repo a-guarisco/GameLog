@@ -24,7 +24,7 @@ const testHelper = (
 
     const result = await apiFunction();
 
-    expect(mockFetch).toHaveBeenCalledWith(expectedUrl);
+    expect(mockFetch).toHaveBeenCalledWith(expectedUrl, expect.objectContaining({ headers: expect.objectContaining({ "Content-Type": "application/json" }) }));
     expect(result).toEqual(mockResponse);
   });
 
@@ -107,8 +107,8 @@ describe('ApiManager', () => {
 
       const result = await ApiManager.getGlobalAchievement(appId);
 
-      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getGlobalAchievementsForApp(appId));
-      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getSchemaForGame(appId));
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getGlobalAchievementsForApp(appId), expect.objectContaining({ headers: expect.objectContaining({ "Content-Type": "application/json" }) }));
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getSchemaForGame(appId), expect.objectContaining({ headers: expect.objectContaining({ "Content-Type": "application/json" }) }));
       expect(result).toEqual({
         achievementpercentages: {
           achievements: [
@@ -265,6 +265,7 @@ describe('ApiManager', () => {
       expect(mockFetch).toHaveBeenCalledWith(EndPoints.getStreakByUser(), {
         headers: {
           Authorization: 'Bearer firebase-id-token',
+          'Content-Type': 'application/json',
         },
       });
       expect(result).toEqual(mockResponse);
@@ -283,6 +284,7 @@ describe('ApiManager', () => {
       expect(mockFetch).toHaveBeenCalledWith(EndPoints.getStreakByGame(appId), {
         headers: {
           Authorization: 'Bearer firebase-id-token',
+          'Content-Type': 'application/json',
         },
       });
       expect(result).toEqual(mockResponse);
@@ -351,7 +353,7 @@ describe('ApiManager', () => {
 
       const result = await ApiManager.searchUsers('alex');
       expect(mockFetch).toHaveBeenCalledWith(EndPoints.searchUsers('alex'), {
-        headers: { Authorization: 'Bearer firebase-id-token' },
+        headers: { Authorization: 'Bearer firebase-id-token', 'Content-Type': 'application/json' },
       });
       expect(result).toEqual(mockResponse);
     });
@@ -370,7 +372,7 @@ describe('ApiManager', () => {
 
       const result = await ApiManager.getFriendList();
       expect(mockFetch).toHaveBeenCalledWith(EndPoints.getFriendList(), {
-        headers: { Authorization: 'Bearer firebase-id-token' },
+        headers: { Authorization: 'Bearer firebase-id-token', 'Content-Type': 'application/json' },
       });
       expect(result).toEqual(mockResponse);
     });
@@ -422,7 +424,7 @@ describe('ApiManager', () => {
 
       const result = await ApiManager.getRecommendations('u2');
       expect(mockFetch).toHaveBeenCalledWith(EndPoints.getRecommendations('u2'), {
-        headers: { Authorization: 'Bearer firebase-id-token' },
+        headers: { Authorization: 'Bearer firebase-id-token', 'Content-Type': 'application/json' },
       });
       expect(result).toEqual(mockResponse);
     });
@@ -440,7 +442,8 @@ describe('ApiManager', () => {
     // For now, all endpoints use Steam regardless of provider selection
     // Backend-specific endpoints will be implemented gradually as needed
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=false&include_played_free_games=false`
+      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=false&include_played_free_games=false`,
+      expect.objectContaining({ headers: expect.objectContaining({ 'Content-Type': 'application/json' }) })
     );
   });
 });
@@ -463,7 +466,7 @@ describe('fetchData', () => {
 
     const result = await fetchData<typeof payload>('https://example.dev/test');
 
-    expect(mockFetch).toHaveBeenCalledWith('https://example.dev/test');
+    expect(mockFetch).toHaveBeenCalledWith('https://example.dev/test', expect.objectContaining({ headers: expect.objectContaining({ 'Content-Type': 'application/json' }) }));
     expect(result).toEqual(payload);
   });
 
