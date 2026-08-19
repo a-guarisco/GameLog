@@ -2,14 +2,12 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { ErrorBox, InfoBox } from './feedbacks';
 
-/** Centred spinner for a section that is still loading. */
 export const SectionSpinner = ({ className = 'items-center py-8' }: { className?: string }) => (
   <Box className={className}>
     <Spinner />
   </Box>
 );
 
-/** One-line explanation shown in place of a section's content. */
 export const SectionMessage = ({ children }: { children: string }) => (
   <InfoBox message={children} className="py-4" />
 );
@@ -20,14 +18,9 @@ interface SectionStateProps {
   isEmpty?: boolean;
   errorMessage: string;
   emptyMessage: string;
-  /** Overrides the spinner container, for sections that need a fixed-height slot. */
   loadingClassName?: string;
 }
 
-/**
- * The loading → error → empty chain every section repeats. Renders nothing once there is
- * content to show, so it can sit above the list it guards.
- */
 const SectionState = ({
   isLoading = false,
   hasError = false,

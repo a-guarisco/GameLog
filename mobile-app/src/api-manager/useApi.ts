@@ -1,9 +1,9 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
 import { toIsoDate } from '@gamelog/utils/formatUtils';
-import { Streak } from './dto';
+import { PublishedFileDetails, Streak } from './dto';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
@@ -89,10 +89,8 @@ export const useGetUserStreak = () => {
   };
 };
 
-/** The window the "2 weeks" stat bands report on, in days including today. */
 export const RECENT_PLAYTIME_DAYS = 14;
 
-/** The last `days` days ending today, both bounds inclusive — so days=14 spans today and 13 before it. */
 const getRecentDateRange = (days: number) => {
   const end = new Date();
   const start = new Date();
@@ -101,11 +99,6 @@ const getRecentDateRange = (days: number) => {
   return { startDate: toIsoDate(start), endDate: toIsoDate(end) };
 };
 
-/**
- * Per-game playtime over a trailing window, from the backend's own rolling snapshots.
- * Steam's `playtime_2weeks` covers the same ground but is only present on the recently
- * played payload, and only ever for its own fixed window.
- */
 export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
   const { startDate, endDate } = useMemo(() => getRecentDateRange(days), [days]);
 
@@ -125,7 +118,7 @@ export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
 
 /**
  * Per-day playtime across the library. The daily report answers "which games", this answers
- * "which days" — the profile trend needs the second, and only the backend has it.
+ * "which days" � the profile trend needs the second, and only the backend has it.
  */
 export const useGetPlaytimeByUser = (days: number = RECENT_PLAYTIME_DAYS) => {
   const fetchFunc = useCallback(() => ApiManager.getPlaytimeByUser(days), [days]);

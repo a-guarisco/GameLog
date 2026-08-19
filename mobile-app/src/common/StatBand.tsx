@@ -8,11 +8,6 @@ export type GameStat = {
   label: string;
 };
 
-/**
- * A third of the screen is not enough for a full date on one line, so values may wrap
- * onto a second line. Columns stretch to the tallest one and the label is pinned to the
- * bottom, so labels stay aligned across columns without padding out short values.
- */
 const StatBand = ({ stats }: { stats: GameStat[] }) => (
   <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200 shadow-md">
     {stats.map((stat, index) => (

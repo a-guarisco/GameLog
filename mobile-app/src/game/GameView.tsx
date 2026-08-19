@@ -1,4 +1,5 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
@@ -6,12 +7,12 @@ import GameStatusChips from '@gamelog/game/GameStatusChips';
 import BannerInfo from '@gamelog/common/BannerInfo';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import BackButton from '@gamelog/common/BackButton';
-import StatBand from '@gamelog/common/StatBand';
+import GameStatBand from '@gamelog/common/StatBand';
 import AchievementsSummary from '@gamelog/game/AchievementsSummary';
 import GameScreenshotsStrip from '@gamelog/game/GameScreenshotsStrip';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
 import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';
-import { useGameViewData } from '@gamelog/game/useGameViewData';
+import useGameViewData from '@gamelog/game/useGameViewData';
 
 const GameView = () => {
   const route = useRoute<any>();
@@ -54,7 +55,7 @@ const GameView = () => {
             <GameStatusChips livePlayers={livePlayers} streakText={streakText} />
 
             <Box className="px-4">
-              <StatBand stats={stats} />
+              <GameStatBand stats={stats} />
             </Box>
 
             <Box className="px-4">
