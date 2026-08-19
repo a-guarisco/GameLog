@@ -36,10 +36,10 @@ class TestGetUserByFirebaseUid:
     # Happy path
     # ------------------------------------------------------------------
 
-    def test_returns_user_read_for_existing_user(self, session):
+    def test_returns_user_for_existing_user(self, session):
         make_user(session, firebase_uid="uid-1", username="alice", steam_id="111")
         result = get_user_by_firebase_uid(session, "uid-1")
-        assert isinstance(result, UserRead)
+        assert isinstance(result, User)
         assert result.firebase_uid == "uid-1"
 
     def test_returned_values_match_stored_user(self, session):
@@ -122,12 +122,11 @@ class TestGetUserByFirebaseUid:
     # Return type guarantee
     # ------------------------------------------------------------------
 
-    def test_result_is_userread_not_orm_user(self, session):
+    def test_result_is_orm_user(self, session):
         make_user(session, firebase_uid="uid-type", username="typetest", steam_id="555")
         result = get_user_by_firebase_uid(session, "uid-type")
-        # UserRead is a pydantic model; User is the SQLModel ORM table class
-        assert not isinstance(result, User)
-        assert isinstance(result, UserRead)
+        # Ensure it returns the ORM User model, not a UserRead
+        assert isinstance(result, User)
 
     def test_id_field_is_uuid(self, session):
         make_user(session, firebase_uid="uid-uuid", username="uuidtest", steam_id="777")
