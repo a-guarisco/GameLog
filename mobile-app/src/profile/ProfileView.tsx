@@ -22,7 +22,7 @@ import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './pr
 import { getPlaytimeTrend } from './playtimeTrendSelectors';
 import { getPlatformSplit } from './platformSplitSelectors';
 
-const USER_ID = '76561198159652025';
+const USER_ID = '76561198077919169';
 /** Stands in for the hero artwork until the library says which game deserves it. */
 const FALLBACK_APPID = '236390';
 
