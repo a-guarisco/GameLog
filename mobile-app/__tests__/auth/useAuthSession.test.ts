@@ -3,6 +3,7 @@ import { useAuthSession } from '../../src/auth/useAuthSession';
 import { onIdTokenChanged } from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
+import { setSteamId, setSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
 
 jest.mock('firebase/auth', () => ({
   onIdTokenChanged: jest.fn(),
@@ -14,6 +15,11 @@ jest.mock('@gamelog/auth/firebaseClient', () => ({
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   getUserMe: jest.fn(),
+}));
+
+jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+  setSteamId: jest.fn(),
+  setSteamApiKey: jest.fn(),
 }));
 
 describe('useAuthSession', () => {
@@ -77,8 +83,8 @@ describe('useAuthSession', () => {
     expect(result.current.firebaseUser).not.toBeNull();
   });
 
-  it('sets authenticated if backend returns user', async () => {
-    (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '123' });
+  it('sets authenticated and stores steam credentials if backend returns user', async () => {
+    (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '123', steam_id: 'steam123', steam_api_key: 'key123' });
     const { result } = renderHook(() => useAuthSession());
     
     await act(async () => {
@@ -86,7 +92,9 @@ describe('useAuthSession', () => {
     });
 
     expect(result.current.authState).toBe('authenticated');
-    expect(result.current.backendUser).toEqual({ id: '123' });
+    expect(result.current.backendUser).toEqual({ id: '123', steam_id: 'steam123', steam_api_key: 'key123' });
+    expect(setSteamId).toHaveBeenCalledWith('steam123');
+    expect(setSteamApiKey).toHaveBeenCalledWith('key123');
   });
 
   it('sets onboarding if backend returns 404 with error response', async () => {

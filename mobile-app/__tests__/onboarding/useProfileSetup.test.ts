@@ -3,6 +3,7 @@ import { useProfileSetup } from '../../src/onboarding/useProfileSetup';
 import { DeviceEventEmitter } from 'react-native';
 import apiManager from '@gamelog/api-manager/apiManager';
 import { auth } from '@gamelog/auth/firebaseClient';
+import { setSteamId, setSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   registerUser: jest.fn(),
@@ -12,6 +13,11 @@ jest.mock('@gamelog/auth/firebaseClient', () => ({
   auth: {
     signOut: jest.fn(),
   },
+}));
+
+jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+  setSteamId: jest.fn(),
+  setSteamApiKey: jest.fn(),
 }));
 
 describe('useProfileSetup', () => {
@@ -69,7 +75,7 @@ describe('useProfileSetup', () => {
       result.current.setSteamApiKey('APIKEY123');
     });
 
-    (apiManager.registerUser as jest.Mock).mockResolvedValueOnce({});
+    (apiManager.registerUser as jest.Mock).mockResolvedValueOnce({ steam_api_key: 'APIKEY123' });
 
     await act(async () => {
       await result.current.handleRegister();
@@ -80,6 +86,8 @@ describe('useProfileSetup', () => {
       steam_id: '123456',
       steam_api_key: 'APIKEY123',
     });
+    expect(setSteamId).toHaveBeenCalledWith('123456');
+    expect(setSteamApiKey).toHaveBeenCalledWith('APIKEY123');
     expect(emitSpy).toHaveBeenCalledWith('registrationSuccess');
     expect(result.current.loading).toBe(true); // Should remain true or we might not care since unmount happens
   });
@@ -103,6 +111,8 @@ describe('useProfileSetup', () => {
       steam_id: '123456',
       steam_api_key: undefined,
     });
+    expect(setSteamId).toHaveBeenCalledWith('123456');
+    expect(setSteamApiKey).not.toHaveBeenCalled();
   });
 
   it('handles apiManager error with response detail', async () => {

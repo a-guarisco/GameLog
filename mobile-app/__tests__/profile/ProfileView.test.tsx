@@ -8,6 +8,7 @@ import {
   useGetPlaytimeReport,
   useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
+import { getSteamId } from '@gamelog/api-manager/apiEndsPoints';
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
   ...jest.requireActual('@gamelog/api-manager/useApi'),
@@ -17,6 +18,10 @@ jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetUserStreak: jest.fn(),
   useGetPlaytimeReport: jest.fn(),
   useGetPlaytimeByUser: jest.fn(),
+}));
+
+jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+  getSteamId: jest.fn(),
 }));
 
 jest.mock('@gamelog/common/HeaderGameImage', () => {
@@ -127,6 +132,10 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
   });
 };
 
+beforeEach(() => {
+  (getSteamId as jest.Mock).mockReturnValue('123456789');
+});
+
 const setupLoadingMocks = (loading: Record<string, boolean>) => {
   mockUseGetOwnedGames.mockReturnValue({
     ownedGames: null,
@@ -214,6 +223,7 @@ describe('ProfileView — loaded', () => {
 
     render(<ProfileView />);
 
+    expect(getSteamId).toHaveBeenCalled();
     expect(screen.queryByTestId('profile-loading-box')).toBeNull();
     expect(screen.getByText('filopixel')).toBeTruthy();
     expect(screen.getByTestId('profile-streak-chip')).toBeTruthy();
