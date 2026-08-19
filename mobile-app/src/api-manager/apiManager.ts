@@ -24,6 +24,7 @@ import type {
   UserRegisterRequest,
   UserSearchResult,
   RecommendationResponse,
+  DailyReport,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {

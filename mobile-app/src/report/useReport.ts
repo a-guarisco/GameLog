@@ -5,12 +5,12 @@ import type { DailyReport } from '@gamelog/api-manager/dto/report';
 export function useReport() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<DailyReport | null>(null);
   const [gameNames, setGameNames] = useState<Record<string, string>>({});
-  
+
   const [appliedStartDate, setAppliedStartDate] = useState<Date | undefined>(undefined);
   const [appliedEndDate, setAppliedEndDate] = useState<Date | undefined>(undefined);
 
@@ -78,6 +78,7 @@ export function useReport() {
     setAppliedEndDate(undefined);
     setReport(null);
     setError(null);
+    setGameNames({});
   };
 
   return {
