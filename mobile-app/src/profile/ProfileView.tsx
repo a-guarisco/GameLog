@@ -93,6 +93,10 @@ const ProfileView = () => {
             </Box>
 
             <Box className="px-4">
+              <ReportBox />
+            </Box>
+
+            <Box className="px-4">
               <ProfileSectionTabs
                 topGames={topGames}
                 playtimeTrend={playtimeTrend}
