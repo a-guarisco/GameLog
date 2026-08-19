@@ -18,7 +18,10 @@ export const useAuthSession = () => {
       setBackendUser(response);
       setAuthState('authenticated');
     } catch (error: any) {
-      if (error instanceof Error && error.message.includes('404')) {
+      if (
+        error?.response?.status === 404 ||
+        (error instanceof Error && error.message.includes('404'))
+      ) {
         // User is not registered in the backend
         setBackendUser(null);
         setAuthState('onboarding');
