@@ -1,10 +1,10 @@
 import React, { forwardRef } from 'react';
-import { TextInput as RNTextInput, type ComponentProps } from 'react-native';
+import { TextInput as RNTextInput, type TextInputProps } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Input, InputField, InputSlot, InputIcon } from '@gamelog/common/gluestack/input';
 
-export interface GLTextInputProps extends ComponentProps<typeof InputField> {
+export interface GLTextInputProps extends TextInputProps {
   label?: string;
   helperText?: string;
   errorMessage?: string;
@@ -14,6 +14,7 @@ export interface GLTextInputProps extends ComponentProps<typeof InputField> {
   onRightIconPress?: () => void;
   isDisabled?: boolean;
   isInvalid?: boolean;
+  className?: string;
 }
 
 export const GLTextInput = forwardRef<RNTextInput, GLTextInputProps>(
@@ -38,14 +39,14 @@ export const GLTextInput = forwardRef<RNTextInput, GLTextInputProps>(
     return (
       <Box className={`w-full ${containerClassName}`}>
         {label ? (
-          <Text className="mb-2 font-medium text-typography-800 dark:text-typography-200">
+          <Text className="mb-2 font-medium text-typography-100">
             {label}
           </Text>
         ) : null}
         <Input
           isDisabled={isDisabled}
           isInvalid={hasError}
-          className="h-12 rounded-xl border border-outline-100 bg-background-50 dark:bg-background-50 focus:border-primary-500"
+          className="h-12 rounded-xl border border-outline-100 bg-background-50 focus:border-primary-500"
         >
           {LeftIcon ? (
             <InputSlot className="pl-3">
@@ -53,8 +54,8 @@ export const GLTextInput = forwardRef<RNTextInput, GLTextInputProps>(
             </InputSlot>
           ) : null}
           <InputField
-            ref={ref}
-            className={`text-typography-900 dark:text-typography-50 px-3 ${className}`}
+            ref={ref as any}
+            className={`text-typography-0 px-3 ${className}`}
             placeholderTextColor="#9ca3af"
             {...props}
           />

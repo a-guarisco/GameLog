@@ -74,7 +74,7 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
 
   return (
     <Box className={`w-full max-w-[320px] gap-2 self-center ${className ?? ''}`}>
-      <Button onPress={testAuthEndpoint} isDisabled={isLoading}>
+      <Button isOnCard onPress={testAuthEndpoint} isDisabled={isLoading}>
         <ButtonText>Test Backend Auth</ButtonText>
       </Button>
       {isLoading ? <LoadingBox message="Testing auth endpoint..." /> : null}

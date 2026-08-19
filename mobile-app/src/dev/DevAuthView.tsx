@@ -48,7 +48,7 @@ export const DevAuthView = () => {
         {/* Active Session & Clear Storage Card (Top) */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Active Session & Storage</Text>
 
@@ -60,7 +60,7 @@ export const DevAuthView = () => {
             }
           />
 
-          <Button onPress={handleSignOutAndClearStorage} className="w-full mt-1">
+          <Button isOnCard onPress={handleSignOutAndClearStorage} className="w-full mt-1">
             <ButtonText>Sign Out & Clear AsyncStorage</ButtonText>
           </Button>
 
@@ -70,7 +70,7 @@ export const DevAuthView = () => {
         {/* FCM Push Notification Device Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">
             FCM Device Push Registration
@@ -81,7 +81,7 @@ export const DevAuthView = () => {
         {/* Token Generator Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Firebase Token Generator</Text>
           <FirebaseTokenGenerator className="w-full" />
@@ -90,7 +90,7 @@ export const DevAuthView = () => {
         {/* Backend Auth Tester Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Backend Auth Verification</Text>
           <BackendTestAuth className="w-full" />
@@ -99,7 +99,7 @@ export const DevAuthView = () => {
         {/* Google OAuth2 Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Google OAuth2 Sign-In</Text>
           <GoogleAuthTest className="w-full" />
@@ -108,7 +108,7 @@ export const DevAuthView = () => {
         {/* User Registration Pipeline Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">
             User Sign Up & Email Verification

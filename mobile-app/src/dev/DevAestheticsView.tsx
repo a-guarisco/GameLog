@@ -1,6 +1,6 @@
 import { ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/core';
-import { NativeStackNavigationProp } from 'node_modules/@react-navigation/native-stack/lib/typescript/src/types';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useColorScheme } from 'nativewind';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -28,10 +28,10 @@ export const DevAestheticsView = () => {
         {/* Theme Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Theme Mode</Text>
-          <Button onPress={toggleTheme} className="w-full">
+          <Button isOnCard onPress={toggleTheme} className="w-full">
             <ButtonText>Toggle Theme : active = {isDarkMode ? 'Dark' : 'Light'}</ButtonText>
           </Button>
         </Card>
@@ -39,7 +39,7 @@ export const DevAestheticsView = () => {
         {/* Design Assets Navigation Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Design System References</Text>
           <Box className="gap-2">
@@ -65,7 +65,7 @@ export const DevAestheticsView = () => {
         {/* Feedback Previews Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">
             Feedback Component Sandbox

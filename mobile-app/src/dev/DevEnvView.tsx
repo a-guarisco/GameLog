@@ -14,7 +14,7 @@ export const DevEnvView = () => {
 
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2.5 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2.5  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">
             Runtime Config & Variables

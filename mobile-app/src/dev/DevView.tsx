@@ -1,7 +1,7 @@
 // Developer Dashboard Main Navigation View (Minimal, Generous Padding, Minimal Gap)
 import { Pressable, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/core';
-import { NativeStackNavigationProp } from 'node_modules/@react-navigation/native-stack/lib/typescript/src/types';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 import { Box } from '@gamelog/common/gluestack/box';
@@ -60,7 +60,7 @@ export const DevView = () => {
                 transform: [{ scale: pressed ? 0.98 : 1.0 }],
               })}
             >
-              <Card variant="elevated" className="w-full py-5 px-5 bg-background-50 rounded-md">
+              <Card variant="elevated" className="w-full py-5 px-5  rounded-md">
                 <HStack className="items-center justify-between">
                   <Text className="text-base font-semibold text-typography-0">{section.title}</Text>
                   <Ionicons name="chevron-forward-outline" size={20} color="#94A3B8" />
