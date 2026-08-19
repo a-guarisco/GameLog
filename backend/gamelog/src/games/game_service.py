@@ -125,7 +125,6 @@ def get_daily_report(session: Session, user_id: str, start_date: date | None = N
     return DailyReport(date=end_date, game_reports=game_reports)
 
 
-
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
     return session.exec(select(Game).where(Game.steam_app_id == steam_app_id)).first()
 

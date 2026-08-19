@@ -1,5 +1,6 @@
 import uuid
 from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 
@@ -99,4 +100,3 @@ def get_daily_report(
     Generate an on-demand daily report for the user identified by firebase_uid between start_date and end_date (defaults to today).
     """
     return game_service.get_daily_report(session=db, user_id=auth_user.uid, start_date=start_date, end_date=end_date)
-
