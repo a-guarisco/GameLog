@@ -7,54 +7,91 @@ import {
 } from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 
+export type AuthMode = 'signin' | 'signup';
+
 export function useLogin() {
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [authMode, setAuthMode] = useState<AuthMode>('signin');
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    setErrorMsg(null);
+    setErrorCode(null);
     try {
       await signInWithGoogle();
       // App state will automatically pick this up via onAuthStateChanged
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Google Sign-In failed';
-      setErrorMsg(msg);
+    } catch (err: any) {
+      setErrorCode(err.code || 'auth/google-sign-in-failed');
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setLoading(true);
+    setErrorCode(null);
+    try {
+      // Placeholder for Facebook OAuth provider setup
+      setErrorCode('auth/provider-setup-pending');
+    } catch (err: any) {
+      setErrorCode(err.code || 'auth/facebook-sign-in-failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGithubSignIn = async () => {
+    setLoading(true);
+    setErrorCode(null);
+    try {
+      // Placeholder for GitHub OAuth provider setup
+      setErrorCode('auth/provider-setup-pending');
+    } catch (err: any) {
+      setErrorCode(err.code || 'auth/github-sign-in-failed');
+    } finally {
       setLoading(false);
     }
   };
 
   const handleEmailAuth = async () => {
     if (!email || !password) {
-      setErrorMsg('Email and password are required');
+      setErrorCode('validation/missing-fields');
       return;
     }
+
+    if (authMode === 'signup' && password !== confirmPassword) {
+      setErrorCode('validation/password-mismatch');
+      return;
+    }
+
     setLoading(true);
-    setErrorMsg(null);
+    setErrorCode(null);
     setSuccessMsg(null);
 
     try {
-      if (isSignUp) {
+      if (authMode === 'signup') {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await sendEmailVerification(cred.user);
-        setSuccessMsg('Account created! Please check your email to verify before logging in.');
-        setIsSignUp(false); // Switch to login view
-        auth.signOut(); // Force sign out until verified
+        // We do NOT sign out. onAuthStateChanged will route them to UnverifiedScreen.
       } else {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        if (!cred.user.emailVerified) {
-          auth.signOut();
-          setErrorMsg('Please verify your email before logging in.');
-        }
-        // If verified, App state picks it up
+        await signInWithEmailAndPassword(auth, email, password);
+        // We do NOT check emailVerified here and sign out.
+        // onAuthStateChanged will pick up the user and route to UnverifiedScreen if needed.
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Authentication failed';
-      setErrorMsg(msg);
+    } catch (err: any) {
+      console.error('Firebase Auth Error:', err);
+      
+      let code = err.code;
+      // Se Firebase lancia un errore senza .code (es. nell'emulatore), lo estraiamo dal messaggio
+      if (!code && err.message) {
+        const match = err.message.match(/\((auth\/[^)]+)\)/);
+        if (match) code = match[1];
+      }
+      
+      setErrorCode(code || 'auth/network-request-failed');
     } finally {
       setLoading(false);
     }
@@ -62,15 +99,21 @@ export function useLogin() {
 
   return {
     loading,
-    errorMsg,
+    errorCode,
     successMsg,
     email,
     setEmail,
     password,
     setPassword,
-    isSignUp,
-    setIsSignUp,
+    confirmPassword,
+    setConfirmPassword,
+    authMode,
+    setAuthMode,
+    isSignUp: authMode === 'signup',
+    setIsSignUp: (val: boolean) => setAuthMode(val ? 'signup' : 'signin'),
     handleGoogleSignIn,
+    handleFacebookSignIn,
+    handleGithubSignIn,
     handleEmailAuth,
   };
 }
