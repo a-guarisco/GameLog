@@ -2,20 +2,27 @@ import { useState, useEffect } from 'react';
 import { onIdTokenChanged, type User } from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
-import type { UserRead } from '@gamelog/api-manager/dto';
+import { setSteamApiKey, setSteamId } from '@gamelog/api-manager/apiEndsPoints';
+import type { UserMeRead } from '@gamelog/api-manager/dto';
 
 export type AuthState = 'loading' | 'unauthenticated' | 'unverified' | 'onboarding' | 'authenticated';
 
 export const useAuthSession = () => {
   const [authState, setAuthState] = useState<AuthState>('loading');
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
-  const [backendUser, setBackendUser] = useState<UserRead | null>(null);
+  const [backendUser, setBackendUser] = useState<UserMeRead | null>(null);
 
   const checkBackendRegistration = async (user: User) => {
     try {
       // Fetch current user from backend
       const response = await apiManager.getUserMe();
       setBackendUser(response);
+      if (response.steam_api_key) {
+        setSteamApiKey(response.steam_api_key);
+      }
+      if (response.steam_id) {
+        setSteamId(response.steam_id);
+      }
       setAuthState('authenticated');
     } catch (error: any) {
       if (

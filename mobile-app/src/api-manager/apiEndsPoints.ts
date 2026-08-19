@@ -6,11 +6,26 @@ const STORE_BASE_URL = 'https://store.steampowered.com';
 const getBackendBaseUrl = (): string =>
   process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
 
+let _dynamicSteamApiKey = '';
+let _dynamicSteamId = '';
+
+export const setSteamApiKey = (key: string) => {
+  _dynamicSteamApiKey = key;
+};
+
+export const setSteamId = (id: string) => {
+  _dynamicSteamId = id;
+};
+
+export const getSteamId = (): string => {
+  return _dynamicSteamId;
+};
+
 const getSteamApiKey = (): string => {
-  if (process.env.EXPO_PUBLIC_STEAM_API_KEY) {
-    return process.env.EXPO_PUBLIC_STEAM_API_KEY;
+  if (_dynamicSteamApiKey) {
+    return _dynamicSteamApiKey;
   } else {
-    console.warn('STEAM API key is not set.');
+    console.warn('STEAM API key is not set. Please update your profile or sign in.');
     return '';
   }
 };

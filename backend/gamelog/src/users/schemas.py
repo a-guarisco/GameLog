@@ -25,6 +25,14 @@ class UserRead(UserBase):
     has_steam_api_key: bool = Field(default=False)
 
 
+class UserMeRead(UserRead):
+    steam_api_key: str
+
+
+class SteamApiKeyUpdateRequest(SQLModel):
+    steam_api_key: str = Field(max_length=255)
+
+
 class UserUpdate(SQLModel):
     firebase_uid: str | None = Field(default=None, max_length=255)
     username: str | None = Field(default=None, max_length=100)

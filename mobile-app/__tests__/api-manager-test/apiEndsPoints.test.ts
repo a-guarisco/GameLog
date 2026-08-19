@@ -1,29 +1,22 @@
-import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
+import EndPoints, { isBackendProvider, setSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
 import { setApiProvider } from '@gamelog/api-manager/apiManager';
 
 describe('apiEndsPoints', () => {
-  const originalSteamKey = process.env.EXPO_PUBLIC_STEAM_API_KEY;
   const originalBackendBaseUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.EXPO_PUBLIC_STEAM_API_KEY = 'abc123';
+    setSteamApiKey('abc123');
     process.env.EXPO_PUBLIC_BACKEND_BASE_URL = 'https://api.mydomain.dev';
   });
 
   afterEach(() => {
-    if (originalSteamKey === undefined) {
-      delete process.env.EXPO_PUBLIC_STEAM_API_KEY;
-    } else {
-      process.env.EXPO_PUBLIC_STEAM_API_KEY = originalSteamKey;
-    }
-
+    setSteamApiKey('');
     if (originalBackendBaseUrl === undefined) {
       delete process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
     } else {
       process.env.EXPO_PUBLIC_BACKEND_BASE_URL = originalBackendBaseUrl;
     }
-
     setApiProvider('steam');
   });
 

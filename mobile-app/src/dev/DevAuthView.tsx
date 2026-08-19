@@ -15,6 +15,7 @@ import { BackendTestAuth } from './BackendTestAuth';
 import { FirebaseSignUpTest } from './FirebaseSignUpTest';
 import { GoogleAuthTest } from './GoogleAuthTest';
 import { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest';
+import { SteamApiKeyUpdateTest } from './SteamApiKeyUpdateTest';
 
 export const DevAuthView = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
@@ -87,7 +88,16 @@ export const DevAuthView = () => {
           <FirebaseTokenGenerator className="w-full" />
         </Card>
 
-        {/* Backend Auth Tester Card */}
+        {/* Steam API Key Management Card */}
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">Steam API Key</Text>
+          <SteamApiKeyUpdateTest />
+        </Card>
+
+        {/* Backend & Environment Card */}
         <Card
           variant="elevated"
           className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"

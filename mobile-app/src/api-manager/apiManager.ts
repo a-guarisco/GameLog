@@ -20,6 +20,7 @@ import type {
   SteamNews,
   Streak,
   UserRead,
+  UserMeRead,
   UserRegisterRequest,
   UserSearchResult,
   RecommendationResponse,
@@ -130,12 +131,18 @@ export default {
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),
   getFriendList: () => fetchAuthenticatedData<UserSearchResult[]>(EndPoints.getFriendList()),
-  getUserMe: () => fetchAuthenticatedData<UserRead>(EndPoints.getUserMe()),
+  getUserMe: () => fetchAuthenticatedData<UserMeRead>(EndPoints.getUserMe()),
   registerUser: (data: UserRegisterRequest) =>
-    fetchAuthenticatedData<UserRead>(EndPoints.registerUser(), {
+    fetchAuthenticatedData<UserMeRead>(EndPoints.registerUser(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
+    }),
+  updateSteamApiKey: (apiKey: string) =>
+    fetchAuthenticatedData<UserMeRead>(`${EndPoints.getUserMe()}/steam-api-key`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ steam_api_key: apiKey }),
     }),
   addFriend: (addresseeId: string) =>
     fetchAuthenticatedData<{ message: string; friendship_id: string }>(EndPoints.addFriend(), {

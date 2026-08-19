@@ -21,11 +21,11 @@ import ProfileSectionTabs from './ProfileSectionTabs';
 import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './profileSelectors';
 import { getPlaytimeTrend } from './playtimeTrendSelectors';
 import { getPlatformSplit } from './platformSplitSelectors';
-
-const USER_ID = '76561198077919169';
-const FALLBACK_APPID = '236390';
+import { getSteamId } from '@gamelog/api-manager/apiEndsPoints';
 
 const ProfileView = () => {
+  const USER_ID = getSteamId();
+  
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(
     USER_ID,
     false,
@@ -71,7 +71,7 @@ const ProfileView = () => {
 
   return (
     <Box className="relative flex-1">
-      <HeaderGameImage appid={mostPlayedGame?.appid ?? FALLBACK_APPID} />
+      <HeaderGameImage appid={mostPlayedGame?.appid} />
 
       <ScrollablePage>
         <ProfileIdentity

@@ -232,7 +232,7 @@ describe('ProfileView — loaded', () => {
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-header-image').props.appid).toBe('236390');
+    expect(screen.getByTestId('profile-header-image').props.appid).toBeUndefined();
   });
 
   it('falls back to "Unknown User" when the player is missing', () => {
