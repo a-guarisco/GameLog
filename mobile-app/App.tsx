@@ -9,13 +9,14 @@ import '@gamelog/theme/global.css';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 import { getNavigationTheme } from '@gamelog/theme/themeHelpers';
 import useAppInit from '@gamelog/common/useAppInit';
-import { RootTabs, AuthNavigator, OnboardingNavigator } from '@gamelog/routes';
+import { RootTabs, AuthNavigator, OnboardingNavigator, UnverifiedNavigator } from '@gamelog/routes';
 import SplashScreen from '@gamelog/onboarding/SplashScreen';
 import { useAuthSession } from '@gamelog/auth/useAuthSession';
 
 const MainNavigation = createStaticNavigation(RootTabs);
 const AuthNavigation = createStaticNavigation(AuthNavigator);
 const OnboardingNavigation = createStaticNavigation(OnboardingNavigator);
+const UnverifiedNavigation = createStaticNavigation(UnverifiedNavigator);
 
 const App = () => {
   const { isReady } = useAppInit();
@@ -49,6 +50,8 @@ const App = () => {
     NavigationToRender = AuthNavigation;
   } else if (authState === 'onboarding') {
     NavigationToRender = OnboardingNavigation;
+  } else if (authState === 'unverified') {
+    NavigationToRender = UnverifiedNavigation;
   }
 
   return (
