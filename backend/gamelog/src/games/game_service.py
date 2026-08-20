@@ -96,6 +96,7 @@ def get_daily_report(session: Session, user_id: str, start_date: date | None = N
     if end_date is None:
         end_date = date.today()
 
+    if start_date > end_date:
         raise HTTPException(status_code=400, detail="Start date must be on or before end date.")
 
     all_rolling = _get_steam_rolling_by_user(session, user_id)
