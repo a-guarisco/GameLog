@@ -1,7 +1,7 @@
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
-import { NavigationContext } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
@@ -24,7 +24,7 @@ const TotalHoursChart = ({
   isLoadingOwnedGames = false,
   errorOwnedGames,
 }: TotalHoursChartProps) => {
-  const navigation = useContext(NavigationContext) as NativeStackNavigationProp<any> | undefined;
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const [chartWidth, setChartWidth] = useState(0);
   const isDark = useColorScheme() === 'dark';

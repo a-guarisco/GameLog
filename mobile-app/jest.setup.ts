@@ -91,3 +91,20 @@ jest.mock('@react-native-google-signin/google-signin', () => ({
     isSignedIn: jest.fn(() => Promise.resolve(false)),
   },
 }));
+
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
+  return {
+    ...actualNav,
+    useNavigation: jest.fn(() => ({
+      navigate: jest.fn(),
+      dispatch: jest.fn(),
+      goBack: jest.fn(),
+      addListener: jest.fn(() => jest.fn()),
+      isFocused: jest.fn(() => true),
+    })),
+    useRoute: jest.fn(() => ({
+      params: {},
+    })),
+  };
+});
