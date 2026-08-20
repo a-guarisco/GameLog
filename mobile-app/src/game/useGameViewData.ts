@@ -5,7 +5,9 @@ import {
   useGetGameStreak,
   useGetGlobalAchievement,
   useGetNumberOfCurrentPlayers,
+  useGetPlaytimeReport,
 } from '@gamelog/api-manager/useApi';
+import { getReportMinutesForGame } from '@gamelog/common/playtimeReportSelectors';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import { formatMinutesToHoursShort, formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
@@ -39,11 +41,14 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
 
   const { currentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
+  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
+  const recentMinutes = getReportMinutesForGame(playtimeReport, gameItem.appid);
 
   const stats = [
     { value: formatMinutesToHoursShort(gameItem.playtime_forever), label: 'Total' },
     {
-      value: gameItem.playtime_2weeks ? formatMinutesToHoursShort(gameItem.playtime_2weeks) : '—',
+      value:
+        isLoadingPlaytimeReport || !playtimeReport ? '—' : formatMinutesToHoursShort(recentMinutes),
       label: '2 weeks',
     },
     { value: formatShortDateWithYear(gameItem.rtime_last_played), label: 'Last played' },

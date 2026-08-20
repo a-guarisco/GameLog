@@ -22,7 +22,6 @@ const GameListView = ({ route }: any) => {
     sortBy,
     handleSortChange,
     searchQuery,
-    setSearchQuery,
   } = useGameList(playerID);
 
   return (

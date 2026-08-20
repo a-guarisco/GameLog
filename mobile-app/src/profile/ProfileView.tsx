@@ -1,24 +1,29 @@
 import { useMemo } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
+import { VStack } from '@gamelog/common/gluestack/vstack';
 import { LoadingBox } from '@gamelog/common/feedbacks/LoadingBox';
 import {
   useGetOwnedGames,
   useGetGameGenreChartData,
   useGetPlayersInfo,
+  useGetPlaytimeByUser,
+  useGetPlaytimeReport,
   useGetUserStreak,
+  RECENT_PLAYTIME_DAYS,
 } from '@gamelog/api-manager/useApi';
-import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
-import OsShareChart from '@gamelog/common/charts/os-share/OsShareChart';
-import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
-import BannerInfo from '@gamelog/common/BannerInfo';
-import ProfileStats from './ProfileStats';
-import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
+import { getReportTotalMinutes } from '@gamelog/common/playtimeReportSelectors';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useStreakText } from '@gamelog/common/useStreakText';
+import ProfileIdentity from './ProfileIdentity';
+import ProfileStats from './ProfileStats';
+import ProfileSectionTabs from './ProfileSectionTabs';
+import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './profileSelectors';
+import { getPlaytimeTrend } from './playtimeTrendSelectors';
+import { getPlatformSplit } from './platformSplitSelectors';
 
 const USER_ID = '76561198077919169';
-const TEMP_APPID = '236390';
+const FALLBACK_APPID = '236390';
 
 const ProfileView = () => {
   const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(
@@ -33,48 +38,25 @@ const ProfileView = () => {
   );
   const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
   const { userStreak, isLoadingUserStreak } = useGetUserStreak();
-  const isLoading =
-    isLoadingOwnedGames || isLoadingGenreChart || isLoadingPlayersInfo || isLoadingUserStreak;
-  const player = playersInfo?.response?.players?.[0];
+  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
+  const { playtimeByUser, isLoadingPlaytimeByUser, errorPlaytimeByUser } = useGetPlaytimeByUser();
 
+  const isLoading =
+    isLoadingOwnedGames ||
+    isLoadingGenreChart ||
+    isLoadingPlayersInfo ||
+    isLoadingUserStreak ||
+    isLoadingPlaytimeReport ||
+    isLoadingPlaytimeByUser;
+  const player = playersInfo?.response?.players?.[0];
   const streakText = useStreakText(userStreak?.streak, isLoadingUserStreak);
 
-  const chartComponents = useMemo(
-    () => [
-      <BannerInfo
-        key="BannerInfo"
-        className="bg-background-100 shadow-xl"
-        title={player?.personaname ?? 'Unknown User'}
-        secondaryText={streakText}
-        iconUrl={player?.avatarfull}
-      />,
-      <ProfileStats key="ProfileStats" />,
-      <TotalHoursChart
-        key="TotalHoursChart"
-        ownedGames={ownedGames}
-        isLoadingOwnedGames={false}
-        errorOwnedGames={errorOwnedGames}
-      />,
-      <TotalHoursPieChart
-        key="TotalHoursPieChart"
-        ownedGames={ownedGames}
-        isLoadingOwnedGames={false}
-        errorOwnedGames={errorOwnedGames}
-      />,
-      <GameGenreRadarChart
-        key="GameGenreRadarChart"
-        genreChartData={genreChartData}
-        isLoadingGenreChart={false}
-        errorGenreChart={errorGenreChart}
-      />,
-      <OsShareChart
-        key="OsShareChart"
-        ownedGames={ownedGames}
-        isLoadingOwnedGames={false}
-        errorOwnedGames={errorOwnedGames}
-      />,
-    ],
-    [ownedGames, genreChartData, errorOwnedGames, errorGenreChart, player, streakText]
+  const mostPlayedGame = useMemo(() => getMostPlayedGame(ownedGames), [ownedGames]);
+  const topGames = useMemo(() => getTopGamesByHours(ownedGames), [ownedGames]);
+  const platformSplit = useMemo(() => getPlatformSplit(ownedGames), [ownedGames]);
+  const playtimeTrend = useMemo(
+    () => getPlaytimeTrend(playtimeByUser, RECENT_PLAYTIME_DAYS),
+    [playtimeByUser]
   );
 
   if (isLoading) {
@@ -88,18 +70,41 @@ const ProfileView = () => {
   }
 
   return (
-    <Box className="flex-1 relative">
-      <HeaderGameImage appid={TEMP_APPID} />
+    <Box className="relative flex-1">
+      <HeaderGameImage appid={mostPlayedGame?.appid ?? FALLBACK_APPID} />
+
       <ScrollablePage>
-        {chartComponents.map((item) => (
-          <Box
-            key={item.key}
-            style={{ width: '100%', alignItems: 'center' }}
-            className="bg-background-100"
-          >
-            {item}
-          </Box>
-        ))}
+        <ProfileIdentity
+          name={player?.personaname ?? 'Unknown User'}
+          avatarUrl={player?.avatarfull}
+          streakText={streakText}
+          memberSinceLabel={getMemberSinceLabel(player?.timecreated)}
+          mostPlayedName={mostPlayedGame?.name}
+        />
+
+        <Box className="bg-background-100 pb-6 shadow-xl">
+          <VStack space="xl" className="pt-6">
+            <Box className="px-4">
+              <ProfileStats
+                ownedGames={ownedGames}
+                recentMinutes={getReportTotalMinutes(playtimeReport)}
+              />
+            </Box>
+
+            <Box className="px-4">
+              <ProfileSectionTabs
+                topGames={topGames}
+                playtimeTrend={playtimeTrend}
+                errorPlaytimeTrend={errorPlaytimeByUser}
+                platformSplit={platformSplit}
+                ownedGames={ownedGames}
+                errorOwnedGames={errorOwnedGames}
+                genreChartData={genreChartData}
+                errorGenreChart={errorGenreChart}
+              />
+            </Box>
+          </VStack>
+        </Box>
       </ScrollablePage>
     </Box>
   );

@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
+import { toIsoDate } from '@gamelog/utils/formatUtils';
 import { Streak } from './dto';
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
@@ -96,6 +97,49 @@ export const useGetUserStreak = () => {
     userStreak: normalizeStreak(data),
     isLoadingUserStreak: isLoading,
     errorUserStreak: error,
+  };
+};
+
+export const RECENT_PLAYTIME_DAYS = 14;
+
+const getRecentDateRange = (days: number) => {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - (days - 1));
+
+  return { startDate: toIsoDate(start), endDate: toIsoDate(end) };
+};
+
+export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
+  const { startDate, endDate } = useMemo(() => getRecentDateRange(days), [days]);
+
+  const fetchFunc = useCallback(
+    () => ApiManager.getPlaytimeReport(startDate, endDate),
+    [startDate, endDate]
+  );
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    playtimeReport: data,
+    isLoadingPlaytimeReport: isLoading,
+    errorPlaytimeReport: error,
+    errorMessagePlaytimeReport: errorMessage,
+  };
+};
+
+/**
+ * Per-day playtime across the library. The daily report answers "which games", this answers
+ * "which days" � the profile trend needs the second, and only the backend has it.
+ */
+export const useGetPlaytimeByUser = (days: number = RECENT_PLAYTIME_DAYS) => {
+  const fetchFunc = useCallback(() => ApiManager.getPlaytimeByUser(days), [days]);
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    playtimeByUser: data,
+    isLoadingPlaytimeByUser: isLoading,
+    errorPlaytimeByUser: error,
+    errorMessagePlaytimeByUser: errorMessage,
   };
 };
 

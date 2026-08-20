@@ -1,16 +1,23 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { useColorScheme } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
-import ChartWrapperCard from '../ChartWrapperCard';
+import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
+import { brand } from '@gamelog/theme/theme';
+import SectionCard from '@gamelog/common/SectionCard';
+import SectionState from '@gamelog/common/SectionState';
 import { BarData } from '../charts.type';
 import buildTotalHoursBarData from './buildTotalHoursBarData';
+
 interface TotalHoursChartProps {
   ownedGames?: any;
   isLoadingOwnedGames?: boolean;
   errorOwnedGames?: any;
 }
+
+const PRIMARY_400 = `rgb(${brand.primary['400']})`;
 
 const TotalHoursChart = ({
   ownedGames,
@@ -19,49 +26,77 @@ const TotalHoursChart = ({
 }: TotalHoursChartProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
+  const [chartWidth, setChartWidth] = useState(0);
+  const isDark = useColorScheme() === 'dark';
+  const theme = isDark ? rawConfig.dark : rawConfig.light;
+
   const barData: BarData[] = useMemo(() => {
-    return buildTotalHoursBarData(ownedGames);
+    const raw = buildTotalHoursBarData(ownedGames);
+    return raw.map((item) => ({ ...item, frontColor: PRIMARY_400, gradientColor: undefined }));
   }, [ownedGames]);
 
+  const hasError = !!errorOwnedGames;
+  const isEmpty = !hasError && barData.length === 0;
+  const showChart = !isLoadingOwnedGames && !hasError && !isEmpty;
+
+  const axisColor = `rgb(${theme['--color-typography-200']})`;
+
   return (
-    <ChartWrapperCard isLoading={isLoadingOwnedGames} error={!!errorOwnedGames}>
-      {({ cardWidth, theme }) => (
-        <Box style={{ width: cardWidth - 30, overflow: 'hidden' }}>
-          <BarChart
-            parentWidth={cardWidth - 30}
-            adjustToWidth
-            data={barData}
-            barWidth={40}
-            initialSpacing={10}
-            spacing={14}
-            isAnimated
-            showGradient
-            animationDuration={500}
-            barBorderRadius={4}
-            yAxisThickness={0}
-            yAxisLabelWidth={30}
-            yAxisTextStyle={{ color: `rgb(${theme['--color-typography-200']})`, fontSize: 10 }}
-            yAxisLabelSuffix="h"
-            xAxisType={'dashed'}
-            xAxisColor={`rgb(${theme['--color-typography-200']})`}
-            noOfSections={6}
-            maxValue={Math.max(...barData.map((d) => d.value))}
-            labelWidth={40}
-            xAxisLabelTextStyle={{
-              color: `rgb(${theme['--color-typography-200']})`,
-              textAlign: 'center',
-              fontSize: 10,
-            }}
-            onPress={(_item: BarData) => {
-              navigation.navigate('GameList', {
-                screen: 'Game',
-                params: { appid: _item.appid },
-              });
-            }}
-          />
+    <SectionCard label="Hours per game" testID="total-hours-chart">
+      <SectionState
+        isLoading={isLoadingOwnedGames}
+        hasError={hasError}
+        isEmpty={isEmpty}
+        errorMessage="Could not load playtime"
+        emptyMessage="No playtime recorded yet"
+      />
+
+      {!isLoadingOwnedGames && !hasError && !isEmpty && (
+        <Box
+          style={{ overflow: 'hidden' }}
+          onLayout={(e) => setChartWidth(e.nativeEvent.layout.width)}
+        >
+          {showChart && (
+            <BarChart
+              parentWidth={chartWidth || 370}
+              adjustToWidth
+              data={barData}
+              barWidth={40}
+              initialSpacing={10}
+              spacing={14}
+              isAnimated
+              animationDuration={500}
+              barBorderRadius={4}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              hideYAxisText
+              yAxisTextStyle={{ color: axisColor }}
+              xAxisType={'dashed'}
+              xAxisColor={axisColor}
+              noOfSections={4}
+              maxValue={Math.max(...barData.map((d) => d.value))}
+              labelWidth={40}
+              xAxisLabelTextStyle={{
+                color: axisColor,
+                textAlign: 'center',
+                fontSize: 10,
+                fontWeight: '700',
+                textTransform: 'uppercase',
+              }}
+              onPress={(item: any, index: number) => {
+                const appid = barData[index]?.appid ?? item?.appid;
+                if (appid) {
+                  navigation?.navigate('GameList', {
+                    screen: 'Game',
+                    params: { appid },
+                  });
+                }
+              }}
+            />
+          )}
         </Box>
       )}
-    </ChartWrapperCard>
+    </SectionCard>
   );
 };
 
