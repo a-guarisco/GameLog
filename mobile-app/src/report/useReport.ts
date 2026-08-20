@@ -78,7 +78,6 @@ export function useReport() {
     setAppliedEndDate(undefined);
     setReport(null);
     setError(null);
-    setGameNames({});
   };
 
   return {
