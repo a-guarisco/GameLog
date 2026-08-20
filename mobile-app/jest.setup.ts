@@ -36,6 +36,12 @@ jest.mock('expo-linear-gradient', () => {
   };
 });
 
+jest.mock('react-native-gifted-charts', () => {
+  return {
+    BarChart: 'BarChart',
+  };
+});
+
 jest.mock('@react-native-masked-view/masked-view', () => {
   const { View } = jest.requireActual('react-native');
   return View;

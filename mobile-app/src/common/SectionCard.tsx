@@ -3,14 +3,12 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 
 interface SectionCardProps {
-  /** Uppercase kicker above the card body; omitted when the body speaks for itself. */
   label?: string;
   children: ReactNode;
   className?: string;
   testID?: string;
 }
 
-/** Outlined block used for a single piece of content inside a section panel. */
 const SectionCard = ({ label, children, className = '', testID }: SectionCardProps) => (
   <VStack
     space="sm"

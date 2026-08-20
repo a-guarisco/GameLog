@@ -9,11 +9,6 @@ import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 import type { PlatformSplit } from './platformSplitSelectors';
 
-/**
- * One blue per rank rather than one per platform: the ramp then reads as an ordering, and
- * a row's glyph is the key to its segment in the bar above it. The class names are spelled
- * out because Tailwind only ever sees literal strings when it builds the stylesheet.
- */
 const RAMP = [
   { fill: 'bg-primary-500', hex: toHex(brand.primary['500']) },
   { fill: 'bg-primary-300', hex: toHex(brand.primary['300']) },
@@ -28,11 +23,6 @@ interface ProfilePlatformSplitProps {
   hasError?: boolean;
 }
 
-/**
- * Lifetime hours by platform: one stacked bar for the shape of the split, then a row per
- * platform for the numbers. A donut needed a legend to say the same thing and still hid
- * the 3% slices behind their own labels.
- */
 const ProfilePlatformSplit = ({ split, hasError = false }: ProfilePlatformSplitProps) => (
   <SectionCard label="Hours by platform" testID="profile-platform-split">
     <SectionState

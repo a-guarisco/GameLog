@@ -4,22 +4,14 @@ import { formatMinutesToHoursShort, formatThousands } from '@gamelog/utils/forma
 
 const getGames = (ownedGames?: OwnedGames | null): GameItem[] => ownedGames?.response?.games ?? [];
 
-/** Truncates like formatMinutesToHoursShort, so the band and the top-games rows never disagree. */
 const toHours = (minutes: number) => Math.floor(minutes / 60);
 
-/** The library's centrepiece: its artwork becomes the profile hero. */
 export const getMostPlayedGame = (ownedGames?: OwnedGames | null): GameItem | null =>
   getGames(ownedGames).reduce<GameItem | null>(
     (best, game) => (!best || game.playtime_forever > best.playtime_forever ? game : best),
     null
   );
 
-/**
- * Owned / hours in the last two weeks / lifetime hours. `game_count` is the authoritative
- * library size — `games` can be shorter when the payload is filtered — so it wins when
- * Steam sends it. `recentMinutes` comes from the backend playtime report, since Steam's
- * owned-games payload carries no recent window.
- */
 export const getProfileStats = (
   ownedGames?: OwnedGames | null,
   recentMinutes: number = 0
@@ -39,13 +31,11 @@ export interface TopGame {
   appid: string;
   name: string;
   hoursLabel: string;
-  /** 0–100, relative to the most played game so the longest bar always fills the track. */
   percentOfTop: number;
 }
 
 const TOP_GAMES_COUNT = 5;
 
-/** Never-played games are dropped: a row of empty tracks says nothing about a library. */
 export const getTopGamesByHours = (
   ownedGames?: OwnedGames | null,
   limit: number = TOP_GAMES_COUNT

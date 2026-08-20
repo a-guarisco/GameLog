@@ -1,7 +1,6 @@
 import type { PlaytimeByUser } from '@gamelog/api-manager/dto';
 import { formatMinutesToHours, toIsoDate } from '@gamelog/utils/formatUtils';
 
-/** Sunday-first, matching `Date.getDay()`. Two Ts and two Ss is what a 14-bar axis can afford. */
 const WEEKDAY_INITIALS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const WEEKDAY_NAMES = [
   'Sunday',
@@ -17,28 +16,21 @@ export interface TrendDay {
   /** ISO `YYYY-MM-DD`; doubles as the render key, so it is unique across the window. */
   date: string;
   minutes: number;
-  /** Single letter under the bar. */
   label: string;
-  /** Spoken by screen readers, where "T" would be useless. */
   accessibilityLabel: string;
-  /** 0–100, relative to the busiest day so the tallest bar always fills the plot. */
   percentOfPeak: number;
   isToday: boolean;
 }
 
 export interface PlaytimeTrend {
   days: TrendDay[];
-  /** Total across the window, e.g. "42h 36m". */
   totalLabel: string;
   /** "Tue · 4h 12m", or null when nothing was played. */
   peakLabel: string | null;
-  /** "12 of 14 days". */
   activeDaysLabel: string;
-  /** False when the window is empty or every day is zero — the caller shows a message instead. */
   hasPlaytime: boolean;
 }
 
-/** The last `days` days ending on `endDate`, oldest first — the axis is fixed-width by design. */
 const buildWindow = (days: number, endDate: Date): Date[] =>
   Array.from({ length: Math.max(0, days) }, (_, index) => {
     const day = new Date(endDate);
@@ -46,10 +38,6 @@ const buildWindow = (days: number, endDate: Date): Date[] =>
     return day;
   });
 
-/**
- * Sums duplicate entries rather than letting the last one win: the backend emits one row per
- * rolling snapshot, and two snapshots can land on the same calendar day.
- */
 const indexByDate = (series?: PlaytimeByUser | null): Map<string, number> => {
   const minutesByDate = new Map<string, number>();
 
@@ -62,11 +50,6 @@ const indexByDate = (series?: PlaytimeByUser | null): Map<string, number> => {
   return minutesByDate;
 };
 
-/**
- * Shapes the backend's day-by-day series into a fixed-width bar trend. Days the backend never
- * reported are rendered as zeros rather than dropped: a gap in the axis would read as a shorter
- * window instead of a day off.
- */
 export const getPlaytimeTrend = (
   series?: PlaytimeByUser | null,
   days: number = 14,

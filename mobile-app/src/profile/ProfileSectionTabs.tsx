@@ -8,7 +8,7 @@ import type { OwnedGames } from '@gamelog/api-manager/dto';
 import ProfileTopGames from './ProfileTopGames';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import ProfilePlaytimeTrend from './ProfilePlaytimeTrend';
-import ProfilePlatformSplit from './ProfilePlatformSplit';
+import ProfilePlatformSplit from './ProfilePlatformSplitChart';
 import type { TopGame } from './profileSelectors';
 import type { PlaytimeTrend } from './playtimeTrendSelectors';
 import type { PlatformSplit } from './platformSplitSelectors';
@@ -24,10 +24,8 @@ const TABS: SectionTab<ProfileSectionId>[] = [
 
 interface ProfileSectionTabsProps {
   topGames: TopGame[];
-  /** Day-by-day playtime for the time panel, already shaped by the page. */
   playtimeTrend: PlaytimeTrend;
   errorPlaytimeTrend?: unknown;
-  /** Lifetime hours per platform for the platforms panel, already shaped by the page. */
   platformSplit: PlatformSplit;
   ownedGames?: OwnedGames | null;
   errorOwnedGames?: unknown;
@@ -35,10 +33,6 @@ interface ProfileSectionTabsProps {
   errorGenreChart?: unknown;
 }
 
-/**
- * Four views onto the same library. The page gates on its own loading state, so every chart
- * is handed `isLoading={false}` and only has to render or fail.
- */
 const ProfileSectionTabs = ({
   topGames,
   playtimeTrend,
@@ -61,7 +55,6 @@ const ProfileSectionTabs = ({
       />
 
       <VStack className="items-center pt-4">
-        {/* Recent activity first: the landing panel should answer "what have I been up to". */}
         {activeTab === 'overview' && (
           <VStack space="md" className="w-full">
             <ProfilePlaytimeTrend trend={playtimeTrend} hasError={!!errorPlaytimeTrend} />

@@ -18,7 +18,8 @@
     "prettier:fix": "prettier --write '**/*.{ts,tsx}'",
     "lint": "expo lint -- --ext .ts,.tsx .",
     "lint:fix": "expo lint -- --ext .ts,.tsx . --fix",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "tests": "jest --watchAll=false"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
@@ -89,7 +90,7 @@
       "\\.css$": "./__mocks__/styleMock.js"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|nativewind|tailwind-variants|@gluestack-ui|@gluestack-style|react-native-css-interop|lucide-react-native)"
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|nativewind|tailwind-variants|@gluestack-ui|@gluestack-style|react-native-css-interop|lucide-react-native|gifted-charts-core)"
     ],
     "collectCoverage": true,
     "collectCoverageFrom": [

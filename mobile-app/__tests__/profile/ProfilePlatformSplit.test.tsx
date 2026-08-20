@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import ProfilePlatformSplit from '@gamelog/profile/ProfilePlatformSplit';
+import ProfilePlatformSplit from '@gamelog/profile/ProfilePlatformSplitChart';
 import type { PlatformSplit } from '@gamelog/profile/platformSplitSelectors';
 
 const SPLIT: PlatformSplit = {

@@ -101,9 +101,9 @@ describe('TotalHoursChart', () => {
     const { UNSAFE_getByType } = render(<TotalHoursChart ownedGames={OWNED_GAMES} />);
     const bar = UNSAFE_getByType('BarChart' as any);
 
-    expect(bar.props.xAxisColor).toBe('rgb(200,200,200)');
-    expect(bar.props.yAxisTextStyle.color).toBe('rgb(200,200,200)');
-    expect(bar.props.xAxisLabelTextStyle.color).toBe('rgb(200,200,200)');
+    expect(bar.props.xAxisColor).toBe('rgb(75 75 75)');
+    expect(bar.props.yAxisTextStyle.color).toBe('rgb(75 75 75)');
+    expect(bar.props.xAxisLabelTextStyle.color).toBe('rgb(75 75 75)');
   });
 
   it('sets parentWidth and container width to cardWidth - 30', () => {

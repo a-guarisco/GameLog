@@ -16,19 +16,6 @@ describe('ProfileIdentity', () => {
     expect(screen.getByText('filopixel')).toBeTruthy();
   });
 
-  it('names the game behind the header artwork', () => {
-    render(<ProfileIdentity {...PROPS} />);
-
-    expect(screen.getByTestId('profile-most-played')).toBeTruthy();
-    expect(screen.getByText(/War Thunder/)).toBeTruthy();
-  });
-
-  it('hides the caption when the library has no most played game', () => {
-    render(<ProfileIdentity {...PROPS} mostPlayedName={undefined} />);
-
-    expect(screen.queryByTestId('profile-most-played')).toBeNull();
-  });
-
   it('shows the streak in the accent chip', () => {
     render(<ProfileIdentity {...PROPS} />);
 
@@ -60,35 +47,5 @@ describe('ProfileIdentity', () => {
 
     expect(screen.queryByLabelText('filopixel avatar')).toBeNull();
     expect(screen.getByText('filopixel')).toBeTruthy();
-  });
-
-  it('carries its own scrim so the caption reads over bright artwork', () => {
-    render(<ProfileIdentity {...PROPS} />);
-
-    expect(screen.getByTestId('profile-most-played').props.className).toContain('bg-black/60');
-  });
-
-  it('keeps the caption out of flow so it cannot collide with the avatar', () => {
-    render(<ProfileIdentity {...PROPS} />);
-
-    // The rail is zero-height and the caption is absolutely placed clear of the avatar's top.
-    const { className } = screen.getByTestId('profile-most-played-rail').props;
-
-    expect(className).toContain('absolute');
-    expect(className).toContain('bottom-11');
-  });
-
-  it('centres the caption on the banner, like the rest of the identity block', () => {
-    render(<ProfileIdentity {...PROPS} />);
-
-    expect(screen.getByTestId('profile-most-played-rail').props.className).toContain(
-      'justify-center'
-    );
-  });
-
-  it('truncates a long game name instead of overflowing the artwork', () => {
-    render(<ProfileIdentity {...PROPS} mostPlayedName="The Witcher 3: Wild Hunt — Complete" />);
-
-    expect(screen.getByText(/The Witcher 3/).props.numberOfLines).toBe(1);
   });
 });

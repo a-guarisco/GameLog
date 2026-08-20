@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { fireEvent, render, screen } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
 import { useGetPlaytimeReport } from '@gamelog/api-manager/useApi';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';

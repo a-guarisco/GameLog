@@ -12,14 +12,9 @@ interface SectionTabsProps<Id extends string> {
   tabs: SectionTab<Id>[];
   activeId: Id;
   onChange: (id: Id) => void;
-  /** Prefixes each tab's testID, e.g. "profile-tab" → "profile-tab-genres". */
   testIDPrefix: string;
 }
 
-/**
- * Underlined tab bar shared by the sectioned views. Shape and state only — the panels
- * stay with the caller, so each view keeps its own content and data loading.
- */
 const SectionTabs = <Id extends string>({
   tabs,
   activeId,

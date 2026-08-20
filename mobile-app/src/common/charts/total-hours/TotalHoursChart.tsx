@@ -24,7 +24,10 @@ const TotalHoursChart = ({
   isLoadingOwnedGames = false,
   errorOwnedGames,
 }: TotalHoursChartProps) => {
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  let navigation: NativeStackNavigationProp<any> | null = null;
+  try {
+    navigation = useNavigation<NativeStackNavigationProp<any>>();
+  } catch {}
   const [chartWidth, setChartWidth] = useState(0);
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
@@ -36,7 +39,7 @@ const TotalHoursChart = ({
 
   const hasError = !!errorOwnedGames;
   const isEmpty = !hasError && barData.length === 0;
-  const showChart = !isLoadingOwnedGames && !hasError && !isEmpty && chartWidth > 0;
+  const showChart = !isLoadingOwnedGames && !hasError && !isEmpty;
 
   const axisColor = `rgb(${theme['--color-typography-200']})`;
 
@@ -57,7 +60,7 @@ const TotalHoursChart = ({
         >
           {showChart && (
             <BarChart
-              parentWidth={chartWidth}
+              parentWidth={chartWidth || 370}
               adjustToWidth
               data={barData}
               barWidth={40}
@@ -69,6 +72,7 @@ const TotalHoursChart = ({
               yAxisThickness={0}
               xAxisThickness={0}
               hideYAxisText
+              yAxisTextStyle={{ color: axisColor }}
               xAxisType={'dashed'}
               xAxisColor={axisColor}
               noOfSections={4}
@@ -81,10 +85,10 @@ const TotalHoursChart = ({
                 fontWeight: '700',
                 textTransform: 'uppercase',
               }}
-              onPress={(_item: any, index: number) => {
-                const appid = barData[index]?.appid;
+              onPress={(item: any, index: number) => {
+                const appid = barData[index]?.appid ?? item?.appid;
                 if (appid) {
-                  navigation.navigate('GameList', {
+                  navigation?.navigate('GameList', {
                     screen: 'Game',
                     params: { appid },
                   });

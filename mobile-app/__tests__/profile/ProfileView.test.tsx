@@ -225,7 +225,6 @@ describe('ProfileView — loaded', () => {
     render(<ProfileView />);
 
     expect(screen.getByTestId('profile-header-image').props.appid).toBe('236390');
-    expect(screen.getByTestId('profile-most-played')).toHaveTextContent(/War Thunder/);
   });
 
   it('falls back to the placeholder artwork for an empty library', () => {
@@ -234,7 +233,6 @@ describe('ProfileView — loaded', () => {
     render(<ProfileView />);
 
     expect(screen.getByTestId('profile-header-image').props.appid).toBe('236390');
-    expect(screen.queryByTestId('profile-most-played')).toBeNull();
   });
 
   it('falls back to "Unknown User" when the player is missing', () => {
@@ -321,7 +319,7 @@ describe('ProfileView — loaded', () => {
     expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
-    expect(screen.getByTestId('profile-hours-per-game')).toBeTruthy();
+    expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('profile-tab-genres'));

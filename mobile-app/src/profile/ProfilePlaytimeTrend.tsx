@@ -6,18 +6,15 @@ import SectionCard from '@gamelog/common/SectionCard';
 import SectionState from '@gamelog/common/SectionState';
 import type { PlaytimeTrend } from './playtimeTrendSelectors';
 
-/** Plot height in px. Fixed so an idle week and a busy one occupy the same slot on the page. */
+/** TODO: Make this dynamic based on the available space. */
 const PLOT_HEIGHT = 96;
-/** Keeps a played-but-barely day visible instead of collapsing it into the axis. */
 const MIN_BAR_PERCENT = 6;
 
 interface ProfilePlaytimeTrendProps {
   trend: PlaytimeTrend;
-  /** A failed series must not read as "you played nothing". */
   hasError?: boolean;
 }
 
-/** One bar's height is its share of the busiest day, so the tallest bar always fills the plot. */
 const TrendBar = ({
   percent,
   isToday,
@@ -27,7 +24,6 @@ const TrendBar = ({
   isToday: boolean;
   testID: string;
 }) => {
-  // A day off is a flat tick on the axis, not a bar of height zero that reads as missing.
   if (percent <= 0) {
     return <Box testID={testID} className="h-0.5 w-full rounded-full bg-background-300" />;
   }
@@ -41,11 +37,6 @@ const TrendBar = ({
   );
 };
 
-/**
- * Day-by-day playtime across the whole library, from the backend's own rolling snapshots.
- * Days the backend never reported are drawn as flat ticks rather than dropped, so the axis
- * stays a fixed window and a quiet week reads as a quiet week.
- */
 const ProfilePlaytimeTrend = ({ trend, hasError = false }: ProfilePlaytimeTrendProps) => (
   <SectionCard label={`Playtime · last ${trend.days.length} days`} testID="profile-playtime-trend">
     <SectionState

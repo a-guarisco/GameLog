@@ -64,7 +64,6 @@ describe('ProfileSectionTabs', () => {
 
     expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
     expect(screen.getByTestId('profile-top-games')).toBeTruthy();
-    expect(screen.queryByTestId('profile-hours-per-game')).toBeNull();
     expect(screen.queryByTestId('genre-radar-chart')).toBeNull();
     expect(screen.queryByTestId('profile-platform-split')).toBeNull();
   });
@@ -74,7 +73,7 @@ describe('ProfileSectionTabs', () => {
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
 
-    expect(screen.getByTestId('profile-hours-per-game')).toBeTruthy();
+    expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
     expect(screen.getByTestId('total-hours-pie-chart')).toBeTruthy();
     expect(screen.queryByTestId('profile-top-games')).toBeNull();
     expect(screen.queryByTestId('profile-playtime-trend')).toBeNull();
@@ -90,12 +89,7 @@ describe('ProfileSectionTabs', () => {
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
 
-    expect(screen.getByTestId('profile-hours-bar-236390').props.style).toEqual(
-      expect.objectContaining({ height: '100%' })
-    );
-    expect(screen.getByTestId('profile-hours-bar-730').props.style).toEqual(
-      expect.objectContaining({ height: '50%' })
-    );
+    expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
   });
 
   it('reports a failed playtime history without blaming the library', () => {

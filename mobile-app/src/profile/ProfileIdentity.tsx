@@ -9,50 +9,17 @@ interface ProfileIdentityProps {
   name: string;
   avatarUrl?: string;
   streakText: string;
-  /** "Since 2011"; hidden when Steam does not report an account creation date. */
   memberSinceLabel?: string | null;
-  /** Names the game whose artwork is behind the header. */
   mostPlayedName?: string;
 }
 
-/**
- * Avatar, name and status chips sitting under the header artwork. The avatar is pulled up with
- * a negative margin so it overlaps the banner the page renders behind the scroll view — the
- * same trick BannerInfo uses on the game views.
- */
 const ProfileIdentity = ({
   name,
   avatarUrl,
   streakText,
   memberSinceLabel,
-  mostPlayedName,
 }: ProfileIdentityProps) => (
   <>
-    {/*
-      A zero-height rail, so the caption never takes layout space the avatar would then be
-      pulled up through — the two used to collide mid-artwork. `bottom` clears the avatar's
-      top edge, and the chip carries its own scrim because artwork can be bright anywhere.
-    */}
-    {!!mostPlayedName && (
-      <Box className="h-0 w-full">
-        <Box
-          className="absolute bottom-11 left-4 right-4 flex-row justify-center"
-          testID="profile-most-played-rail"
-        >
-          <Chip variant="tag" className="shrink bg-black/60" testID="profile-most-played">
-            <Text
-              size="2xs"
-              className="font-bold uppercase text-white"
-              style={{ letterSpacing: 1 }}
-              numberOfLines={1}
-            >
-              Most played · {mostPlayedName}
-            </Text>
-          </Chip>
-        </Box>
-      </Box>
-    )}
-
     <VStack space="sm" className="items-center bg-background-100 px-5 shadow-xl">
       <Avatar size="xl" className="-mt-9 border-4 border-background-100 bg-background-300">
         <AvatarFallbackText>{name}</AvatarFallbackText>

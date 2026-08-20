@@ -8,11 +8,9 @@ import type { TopGame } from './profileSelectors';
 
 interface ProfileTopGamesProps {
   games: TopGame[];
-  /** A failed library fetch must not read as "you have played nothing". */
   hasError?: boolean;
 }
 
-/** The library's longest sessions, ranked against the top game so the first bar is always full. */
 const ProfileTopGames = ({ games, hasError = false }: ProfileTopGamesProps) => (
   <SectionCard label="Top games by hours" testID="profile-top-games">
     <SectionState
