@@ -1,13 +1,15 @@
 import uuid
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
+
 from fastapi import HTTPException, status
-from sqlmodel import Session, or_, select
+from sqlmodel import Session, col, or_, select
+
 from src.auth.schemas import AuthenticatedUser
 from src.models import Friendship, FriendshipStatus, User
-from src.users import FriendshipInfo, UserSearchResult
+from src.users import FriendshipInfo, UserSearchResult, notifications_service
 from src.users.schemas import FriendshipResponseStatus, UserRead, UserRegisterRequest
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
-from src.users import notifications_service
+
 
 def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     """
@@ -77,7 +79,7 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
     statement = (
         select(User, Friendship)
         .outerjoin(Friendship, _friendship_between_clause(current_user.id, User.id))
-        .where(User.username.ilike(f"%{query}%"), User.id != current_user.id)
+        .where(col(User.username).ilike(f"%{query}%"), col(User.id) != current_user.id)
     )
     results = session.exec(statement).all()
 

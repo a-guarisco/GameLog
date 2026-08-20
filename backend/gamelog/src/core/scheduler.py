@@ -1,15 +1,18 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, time, timedelta
+
 import httpx
 from fastapi import FastAPI
 from sqlmodel import Session, select
+
 from src.core.database import engine, wait_for_db_and_migrate
 from src.core.settings import get_settings
 from src.games import game_service, steam_fetcher_service
-from src.models import User, TopGame, Genre
+from src.models import Genre, TopGame, User
 from src.models.config import Config
 from src.users import notifications_service
+
 
 async def _run_daily_job_async() -> None:
     print("Running midnight cronjob", flush=True)
@@ -28,7 +31,7 @@ async def _run_daily_job_async() -> None:
                             session=session,
                             target_user_id=user_db.id,
                             title="Your game report is ready!",
-                            body="Open your profile page to see the games you have played in the last day"
+                            body="Open your profile page to see the games you have played in the last day",
                         )
                     except Exception as user_err:
                         print(f"Error processing user {user_db.username}: {user_err}", flush=True)
@@ -100,18 +103,18 @@ async def _run_weekly_top_games_job_async() -> None:
                     return
 
                 new_top_app_ids = {str(game.appid): game for game in top_games if game.appid}
-                
+
                 existing_top_games = session.exec(select(TopGame)).all()
                 existing_map = {tg.steam_app_id: tg for tg in existing_top_games}
-                
+
                 to_delete = [tg for tg_id, tg in existing_map.items() if tg_id not in new_top_app_ids]
                 for tg in to_delete:
                     session.delete(tg)
                 session.commit()
-                
+
                 for steam_app_id, game_data in new_top_app_ids.items():
                     rank = game_data.rank
-                    
+
                     if steam_app_id in existing_map:
                         existing_tg = existing_map[steam_app_id]
                         existing_tg.rank = rank
@@ -133,24 +136,24 @@ async def _run_weekly_top_games_job_async() -> None:
                             except Exception as e:
                                 print(f"Failed to fetch genres for {steam_app_id}: {e}", flush=True)
                                 break
-                        
+
                         if not genres_data:
                             continue
-                            
+
                         await asyncio.sleep(0.5)
 
                         new_tg = TopGame(steam_app_id=steam_app_id, rank=rank)
                         session.add(new_tg)
-                        
+
                         for genre_dict in genres_data:
                             genre_id = str(genre_dict.get("id"))
                             description = genre_dict.get("description", "")
-                            
+
                             genre = session.get(Genre, genre_id)
                             if not genre:
                                 genre = Genre(id=genre_id, description=description)
                                 session.add(genre)
-                                
+
                             new_tg.genres.append(genre)
                         session.commit()
 
@@ -160,7 +163,7 @@ async def _run_weekly_top_games_job_async() -> None:
                 else:
                     config = Config(key="last_top_games_update", value=datetime.now(UTC).isoformat())
                     session.add(config)
-                
+
                 session.commit()
                 print("Weekly top games job completed successfully.", flush=True)
         except Exception as e:
@@ -184,6 +187,7 @@ async def _scheduler_loop():
             await _run_daily_job_async()
     except Exception as e:
         import traceback
+
         print(f"ERROR in scheduler loop: {e}", flush=True)
         traceback.print_exc()
 
@@ -193,23 +197,24 @@ async def _scheduler_weekly_loop():
         print("Weekly scheduler loop started...", flush=True)
         if _should_run_top_games_catchup():
             await _run_weekly_top_games_job_async()
-            
+
         while True:
             now = datetime.now(UTC)
             days_until_tuesday = (1 - now.weekday()) % 7
             if days_until_tuesday == 0:
                 days_until_tuesday = 7
-            
+
             next_tuesday_date = now.date() + timedelta(days=days_until_tuesday)
             next_tuesday_midnight = datetime.combine(next_tuesday_date, time.min, tzinfo=UTC)
-            
+
             seconds_to_wait = (next_tuesday_midnight - now).total_seconds()
             print(f"Weekly scheduler sleeping for {seconds_to_wait} seconds until next Tuesday midnight...", flush=True)
-            
+
             await asyncio.sleep(seconds_to_wait)
             await _run_weekly_top_games_job_async()
     except Exception as e:
         import traceback
+
         print(f"ERROR in weekly scheduler loop: {e}", flush=True)
         traceback.print_exc()
 
@@ -220,9 +225,9 @@ async def lifespan(app: FastAPI):
     If no dev option is set (make up prod), then the scheduler will run on startup to catch up any missed updates since the last update.
     """
     print("Lifespan starting...", flush=True)
-    
+
     wait_for_db_and_migrate()
-    
+
     settings = get_settings()
     task = None
     weekly_task = None

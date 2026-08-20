@@ -16,8 +16,8 @@ os.environ.setdefault("RUN_SCHEDULER", "false")
 
 from src.games import steam_fetcher_service
 from src.games.schemas import GetOwnedGamesResponse
-from src.users.schemas import GetFriendListResponse
 from src.models import User
+from src.users.schemas import GetFriendListResponse
 from tests.conftest import make_user
 
 
@@ -55,8 +55,8 @@ class TestSteamFetcherGetOwnedGames:
                         "playtime_deck_forever": 0,
                         "rtime_last_played": 12346,
                         "playtime_disconnected": 0,
-                    }
-                ]
+                    },
+                ],
             }
         }
 
@@ -104,16 +104,8 @@ class TestSteamFetcherGetFriendList:
         payload = {
             "friendslist": {
                 "friends": [
-                    {
-                        "steamid": "76561197960265731",
-                        "relationship": "friend",
-                        "friend_since": 1400000000
-                    },
-                    {
-                        "steamid": "76561197960265738",
-                        "relationship": "friend",
-                        "friend_since": 1500000000
-                    }
+                    {"steamid": "76561197960265731", "relationship": "friend", "friend_since": 1400000000},
+                    {"steamid": "76561197960265738", "relationship": "friend", "friend_since": 1500000000},
                 ]
             }
         }
@@ -141,9 +133,7 @@ class TestSteamFetcherGetFriendList:
     @pytest.mark.anyio
     async def test_get_friend_list_empty_friends(self, session: Session):
         user = make_user(session, steam_api_key="FRIEND_KEY", steam_id="76561197960265730")
-        payload = {
-            "friendslist": {}
-        }
+        payload = {"friendslist": {}}
 
         with _mock_httpx_get(payload):
             response = await steam_fetcher_service.get_friend_list_from_steam_async(user)

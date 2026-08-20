@@ -1,10 +1,12 @@
 import uuid
 from datetime import UTC, datetime
+
 from fastapi import HTTPException, status
 from firebase_admin import messaging
-from sqlmodel import Session, select
 from sqlalchemy import false
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import Session, col, select
+
 from src.models.device_token import DeviceToken
 from src.models.notification import Notification
 from src.users import user_service
@@ -21,9 +23,7 @@ def register_device_token(
     """
     user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
-    existing_token = session.exec(
-        select(DeviceToken).where(DeviceToken.device_token == token)
-    ).first()
+    existing_token = session.exec(select(DeviceToken).where(DeviceToken.device_token == token)).first()
 
     if existing_token:
         return _update_existing_token(session, existing_token, user.id, device_type)
@@ -38,15 +38,15 @@ def register_device_token(
     session.add(new_device_token)
     try:
         session.commit()
+        session.refresh(new_device_token)
     except IntegrityError:
         session.rollback()
-        existing_token = session.exec(
-            select(DeviceToken).where(DeviceToken.device_token == token)
-        ).first()
+        existing_token = session.exec(select(DeviceToken).where(DeviceToken.device_token == token)).first()
         if existing_token:
             return _update_existing_token(session, existing_token, user.id, device_type)
-        raise session.refresh(new_device_token)
+        raise
     return new_device_token
+
 
 def _update_existing_token(session: Session, existing_token: DeviceToken, user_id: uuid.UUID, device_type: str) -> DeviceToken:
     existing_token.user_id = user_id
@@ -64,9 +64,7 @@ def unregister_device_token(session: Session, firebase_uid: str, token: str) -> 
     """
     user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
-    existing_token = session.exec(
-        select(DeviceToken).where(DeviceToken.device_token == token)
-    ).first()
+    existing_token = session.exec(select(DeviceToken).where(DeviceToken.device_token == token)).first()
 
     if not existing_token:
         raise HTTPException(
@@ -106,9 +104,7 @@ def send_notification_to_user(
     session.commit()
     session.refresh(new_notification)
 
-    device_tokens = session.exec(
-        select(DeviceToken).where(DeviceToken.user_id == target_user_id)
-    ).all()
+    device_tokens = session.exec(select(DeviceToken).where(DeviceToken.user_id == target_user_id)).all()
 
     if device_tokens:
         tokens = [dt.device_token for dt in device_tokens]
@@ -140,9 +136,7 @@ def send_notification_to_user(
 
                 if stale_tokens:
                     for st in stale_tokens:
-                        st_obj = session.exec(
-                            select(DeviceToken).where(DeviceToken.device_token == st)
-                        ).first()
+                        st_obj = session.exec(select(DeviceToken).where(DeviceToken.device_token == st)).first()
                         if st_obj:
                             print(f"[FCM Info] Deleting unregistered stale token: {st}", flush=True)
                             session.delete(st_obj)
@@ -164,13 +158,7 @@ def get_user_notifications(
     """
     user = user_service.get_user_by_firebase_uid(session, firebase_uid)
 
-    statement = (
-        select(Notification)
-        .where(Notification.user_id == user.id)
-        .order_by(Notification.created_at.desc())
-        .offset(offset)
-        .limit(limit)
-    )
+    statement = select(Notification).where(Notification.user_id == user.id).order_by(col(Notification.created_at).desc()).offset(offset).limit(limit)
     return list(session.exec(statement).all())
 
 

@@ -58,11 +58,7 @@ def test_unregister_device_token_success(session):
         token="token-to-delete",
     )
 
-    deleted = session.exec(
-        notifications_service.select(DeviceToken).where(
-            DeviceToken.device_token == "token-to-delete"
-        )
-    ).first()
+    deleted = session.exec(notifications_service.select(DeviceToken).where(DeviceToken.device_token == "token-to-delete")).first()
     assert deleted is None
 
 
@@ -191,19 +187,13 @@ def test_mark_as_read_not_found(session):
 
 def test_mark_all_as_read(session):
     user = make_user(session, firebase_uid="uid-1")
-    notifications_service.send_notification_to_user(
-        session=session, target_user_id=user.id, title="1", body="1"
-    )
-    notifications_service.send_notification_to_user(
-        session=session, target_user_id=user.id, title="2", body="2"
-    )
+    notifications_service.send_notification_to_user(session=session, target_user_id=user.id, title="1", body="1")
+    notifications_service.send_notification_to_user(session=session, target_user_id=user.id, title="2", body="2")
 
     res = notifications_service.mark_all_as_read(session=session, firebase_uid="uid-1")
     assert res["message"] == "All notifications marked as read"
 
-    notifs = notifications_service.get_user_notifications(
-        session=session, firebase_uid="uid-1"
-    )
+    notifs = notifications_service.get_user_notifications(session=session, firebase_uid="uid-1")
     assert all(n.is_read for n in notifs)
 
 
@@ -250,4 +240,3 @@ def test_router_read_endpoints(client, session):
     res_read_all = client.post("/notifications/read_all")
     assert res_read_all.status_code == 200
     assert res_read_all.json()["message"] == "All notifications marked as read"
-

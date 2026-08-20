@@ -6,6 +6,7 @@ import type {
   CurrentPlayers,
   DailyReport,
   PlaytimeByUser,
+  GameBasicInfo,
   GameGenres,
   GlobalAchievement,
   GameSchema,
@@ -85,6 +86,8 @@ export default {
     fetchData<RecentPlayedGames>(EndPoints.getRecentPlayedGames(steamId, count)),
 
   getGameGenres: (appId: string) => fetchData<GameGenres>(EndPoints.getGameGenres(appId)),
+
+  getGameBasicInfo: (appId: string) => fetchData<GameBasicInfo>(EndPoints.getGameBasicInfo(appId)),
 
   /** Community screenshots for a game. Pass the previous `next_cursor` to page forward. */
   getGameScreenshots: (appId: string, cursor: string = '*', numPerPage: number = 50) =>

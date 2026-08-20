@@ -1,7 +1,9 @@
 import warnings
+
 import httpx
-from src.models import User
+
 from src.games.schemas import GetOwnedGamesResponse, SteamGame, SteamTopGame
+from src.models import User
 from src.users.schemas import GetFriendListResponse, SteamFriend
 
 
@@ -29,16 +31,14 @@ async def get_friend_list_from_steam_async(
     client: httpx.AsyncClient | None = None,
 ) -> GetFriendListResponse:
     steam_api_key = _retrieve_steam_key(user)
-    url = (
-        "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/"
-        f"?key={steam_api_key}&steamid={user.steam_id}&relationship=friend"
-    )
+    url = f"https://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={steam_api_key}&steamid={user.steam_id}&relationship=friend"
 
     payload = await _get_steam_api_response(url, client)
     friends_list = payload.get("friendslist", {})
     return GetFriendListResponse(
         friends=[SteamFriend(**friend) for friend in friends_list.get("friends", [])],
     )
+
 
 async def _get_steam_api_response(
     url: str,
@@ -57,9 +57,8 @@ async def _get_steam_api_response(
         if should_close:
             await client.aclose()
 
-def _retrieve_steam_key(
-    user: User
-) -> str:
+
+def _retrieve_steam_key(user: User) -> str:
     steam_api_key = getattr(user, "steam_api_key", None)
     if not steam_api_key and hasattr(user, "__dict__"):
         steam_api_key = user.__dict__.get("steam_api_key")
@@ -89,8 +88,6 @@ async def get_most_played_games_from_steam_async(
     Returns the top 100 most played games on Steam.
     Each item is a dictionary containing at least 'appid' and 'rank'.
     """
-    url = f"https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
+    url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
     payload = await _get_steam_api_response(url, client)
     return [SteamTopGame(**game) for game in payload.get("response", {}).get("ranks", [])]
-
-

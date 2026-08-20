@@ -17,6 +17,17 @@ jest.mock('@gamelog/game/HeaderGameImage', () => {
   };
 });
 
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: mockNavigate,
+    }),
+  };
+});
+
 const mockUseGetFriendList = useGetFriendList as jest.Mock;
 const mockUseSearchUsers = useSearchUsers as jest.Mock;
 const mockUseGetFriendRecommendations = useGetFriendRecommendations as jest.Mock;
@@ -167,5 +178,141 @@ describe('SocialView', () => {
     expect(screen.getByText('Recommendations')).toBeTruthy();
     expect(screen.getByText('Shared Genres')).toBeTruthy();
     expect(screen.getByText('Action')).toBeTruthy();
+  });
+
+  it('closes recommendations modal when clicking outside the card on the backdrop', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('recommendations-modal-backdrop'));
+    expect(screen.queryByText('Recommendations')).toBeNull();
+  });
+
+  it('closes recommendations modal when clicking the Close button', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('close-recommendations-btn'));
+    expect(screen.queryByText('Recommendations')).toBeNull();
+  });
+
+  it('does not close recommendations modal when clicking inside the pop-up card', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+
+    fireEvent.press(screen.getByText('Recommendations'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+  });
+
+  it('navigates to GameView when clicking a common game in recommendations modal', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: {
+        common_games: [{ gameSteamId: '730', requester_play_time: 1200, friend_play_time: 600 }],
+        common_genres: [],
+        top_games: [],
+      },
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+    expect(screen.getByText('Recommendations')).toBeTruthy();
+    expect(screen.getByText('App ID: 730')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('common-game-item-730'));
+
+    expect(screen.queryByText('Recommendations')).toBeNull();
+    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+      screen: 'Game',
+      params: {
+        gameItem: expect.objectContaining({
+          appid: '730',
+          name: 'App ID: 730',
+        }),
+      },
+    });
+  });
+
+  it('fetches game name via getGameBasicInfo and displays it in recommendations modal', async () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: {
+        common_games: [{ gameSteamId: '730', requester_play_time: 1200, friend_play_time: 600 }],
+        common_genres: [],
+        top_games: [{ gameSteamId: '570', keys: [] }],
+      },
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+      refetchRecommendations: jest.fn(),
+    });
+
+    mockApiManager.getGameBasicInfo.mockImplementation((appId: string) => {
+      if (appId === '730') {
+        return Promise.resolve({
+          '730': { success: true, data: { name: 'Counter-Strike 2' } },
+        } as any);
+      }
+      if (appId === '570') {
+        return Promise.resolve({
+          '570': { success: true, data: { name: 'Dota 2' } },
+        } as any);
+      }
+      return Promise.resolve({} as any);
+    });
+
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Counter-Strike 2')).toBeTruthy();
+      expect(screen.getByText('Dota 2')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId('common-game-item-730'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+      screen: 'Game',
+      params: {
+        gameItem: expect.objectContaining({
+          appid: '730',
+          name: 'Counter-Strike 2',
+        }),
+      },
+    });
   });
 });

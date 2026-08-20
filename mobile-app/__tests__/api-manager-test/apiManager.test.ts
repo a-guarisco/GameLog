@@ -233,6 +233,14 @@ describe('ApiManager', () => {
     EndPoints.getGameGenres(appId)
   );
 
+  testHelper(
+    'fetches games basic info successfully',
+    'handles games basic info fetch failure',
+    { ['440']: { success: true, data: { name: 'Team Fortress 2', steam_appid: 440 } } },
+    () => ApiManager.getGameBasicInfo(appId),
+    EndPoints.getGameBasicInfo(appId)
+  );
+
   describe('authenticated backend streak endpoints', () => {
     beforeEach(() => {
       (auth as any).currentUser = {
