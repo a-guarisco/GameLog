@@ -10,6 +10,11 @@ jest.mock('@gamelog/api-manager/apiManager', () => ({
 describe('useReport', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('initializes with default values', () => {
@@ -104,6 +109,25 @@ describe('useReport', () => {
     expect(result.current.error).toBe('Network Error');
   });
 
+  it('handles fetch errors without a message correctly', async () => {
+    (apiManager.getDailyReport as jest.Mock).mockRejectedValueOnce({}); // No message
+
+    const { result } = renderHook(() => useReport());
+
+    act(() => {
+      result.current.setStartDate(new Date('2023-10-10'));
+      result.current.setEndDate(new Date('2023-10-10'));
+    });
+
+    await act(async () => {
+      await result.current.handleFetchReport();
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.report).toBeNull();
+    expect(result.current.error).toBe('Failed to fetch report');
+  });
+
   it('fetches default 14 days report if dates are missing', async () => {
     (apiManager.getDailyReport as jest.Mock).mockResolvedValueOnce({ date: 'Default Date', game_reports: [] });
 
@@ -134,6 +158,21 @@ describe('useReport', () => {
     });
 
     expect(apiManager.getDailyReport).toHaveBeenCalledWith('2023-10-01', '2023-10-10');
+  });
+
+  it('throws error when start date is after end date', async () => {
+    const { result } = renderHook(() => useReport());
+
+    act(() => {
+      result.current.setStartDate(new Date('2023-10-10'));
+      result.current.setEndDate(new Date('2023-10-01'));
+    });
+
+    await act(async () => {
+      await result.current.handleFetchReport();
+    });
+
+    expect(result.current.error).toBe('Start date must be before or equal to end date');
   });
 
   it('clears dates correctly', () => {

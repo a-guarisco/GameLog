@@ -19,26 +19,29 @@ export function useReport() {
     setError(null);
     setReport(null);
     try {
-      let finalStart = startDate;
-      let finalEnd = endDate || new Date();
+      const yesterday = new Date();
+      yesterday.setHours(0, 0, 0, 0);
+      yesterday.setDate(yesterday.getDate() - 1);
 
+      let finalStart = startDate;
+      let uiEndDate = endDate ? new Date(endDate) : new Date(yesterday);
+
+      // If no start date, default to exactly 14 days including end date
       if (!finalStart) {
-        finalEnd = new Date();
-        finalEnd.setDate(finalEnd.getDate() - 1); // Yesterday
-        
-        finalStart = new Date(finalEnd);
-        finalStart.setDate(finalStart.getDate() - 13); // 14 days total including yesterday
+        finalStart = new Date(uiEndDate);
+        finalStart.setDate(finalStart.getDate() - 13);
       }
 
-      if (finalStart > finalEnd) {
-        throw new Error('Start date cannot be after end date');
+      if (finalStart > uiEndDate) {
+        throw new Error('Start date must be before or equal to end date');
       }
 
       const formattedStart = finalStart.toISOString().split('T')[0];
-      const formattedEnd = finalEnd.toISOString().split('T')[0];
+      const formattedEnd = uiEndDate.toISOString().split('T')[0];
 
+      // Save exclusive UI date
       setAppliedStartDate(finalStart);
-      setAppliedEndDate(finalEnd);
+      setAppliedEndDate(uiEndDate);
 
       const data = await apiManager.getDailyReport(formattedStart, formattedEnd);
       setReport(data);
@@ -75,7 +78,6 @@ export function useReport() {
     setAppliedEndDate(undefined);
     setReport(null);
     setError(null);
-    setGameNames({});
   };
 
   return {
