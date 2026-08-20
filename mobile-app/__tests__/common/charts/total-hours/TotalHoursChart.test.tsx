@@ -118,7 +118,7 @@ describe('TotalHoursChart', () => {
 
     bar.props.onPress({ value: 10, appid: '42', name: 'Game A' });
 
-    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+    expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
       screen: 'Game',
       params: { gameItem: { appid: '42', name: 'Game A' } },
     });
