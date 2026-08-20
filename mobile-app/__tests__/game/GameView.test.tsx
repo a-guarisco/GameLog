@@ -1,9 +1,14 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
+import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
+
+const mockNavigate = jest.fn();
+const mockGoBack = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
-    navigate: jest.fn(),
+    navigate: mockNavigate,
+    goBack: mockGoBack,
     setOptions: jest.fn(),
   }),
   useRoute: jest.fn(() => ({
@@ -33,6 +38,10 @@ jest.mock('@gamelog/game/GlobalAchievementsPreview', () => {
 });
 
 describe('GameView', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders without crashing', () => {
     render(<GameView />);
   });
@@ -41,5 +50,47 @@ describe('GameView', () => {
     render(<GameView />);
 
     expect(screen.getByText('Mock Achievements for 123')).toBeTruthy();
+  });
+
+  it('renders the game name once, in the banner bar under the artwork', () => {
+    render(<GameView />);
+
+    expect(screen.getAllByText('Test Game')).toHaveLength(1);
+  });
+
+  it('goes back from the floating back button', () => {
+    render(<GameView />);
+
+    fireEvent.press(screen.getByTestId('game-back'));
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the live player count and streak under the title', () => {
+    render(<GameView />);
+
+    expect(screen.getByText('0 playing now')).toBeTruthy();
+    // The streak request is still in flight on first render, so match either state.
+    expect(screen.getByText(/streak/i)).toBeTruthy();
+  });
+
+  it('shows the last played date including the year', () => {
+    render(<GameView />);
+
+    const lastPlayed = formatShortDateWithYear(1620000000);
+
+    expect(screen.getByText(lastPlayed)).toBeTruthy();
+    expect(lastPlayed).toContain('2021');
+  });
+
+  it('opens the achievements list when the achievements progress summary is pressed', () => {
+    render(<GameView />);
+
+    fireEvent.press(screen.getByTestId('achievements-summary'));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'AchievementsList',
+      expect.objectContaining({ gameID: '123' })
+    );
   });
 });

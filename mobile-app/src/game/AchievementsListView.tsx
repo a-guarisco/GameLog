@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import AchievementItem from '@gamelog/game/AchievementItem';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -11,6 +12,7 @@ import { useGetGameStreak } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import useAchievementsData from './useAchievementsData';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
+import BackButton from '@gamelog/common/BackButton';
 import AchievementsProgressBar from './AchievementsProgressBar';
 
 type AchievementsListViewProps = {
@@ -20,6 +22,7 @@ type AchievementsListViewProps = {
 };
 
 const AchievementsListView = ({ route }: any) => {
+  const navigation = useNavigation<any>();
   const { globalAchievements, gameID, playerID } = route.params as AchievementsListViewProps;
   const { gameStreak, isLoadingGameStreak } = useGetGameStreak(gameID);
   const secondaryText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
@@ -36,7 +39,7 @@ const AchievementsListView = ({ route }: any) => {
 
   const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameID);
 
-  return isLoading ? (
+  const content = isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
   ) : error ? (
     <ErrorBox
@@ -44,7 +47,7 @@ const AchievementsListView = ({ route }: any) => {
       errorMessage="Failed to load achievements, please try again later."
     />
   ) : (
-    <Box className="flex-1 relative">
+    <>
       <HeaderGameImage appid={gameID} />
       <ScrollablePage>
         <BannerInfo
@@ -81,6 +84,13 @@ const AchievementsListView = ({ route }: any) => {
           </VStack>
         </Box>
       </ScrollablePage>
+    </>
+  );
+
+  return (
+    <Box className="flex-1 relative">
+      {content}
+      <BackButton onPress={() => navigation.goBack()} testID="achievements-back" />
     </Box>
   );
 };

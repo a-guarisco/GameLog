@@ -78,6 +78,19 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.getSchemaForGame('730')).toBe(
         'https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=abc123&appid=730'
       );
+      expect(EndPoints.getNumberOfCurrentPlayers('730')).toBe(
+        'https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=730'
+      );
+      expect(EndPoints.queryPublishedFiles('413150', '*', 50)).toBe(
+        'https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/?key=abc123&query_type=3&appid=413150&filetype=4&cursor=*&numperpage=50&return_short_description=true&return_previews=true'
+      );
+      // Steam cursors contain characters that have to survive the query string.
+      expect(EndPoints.queryPublishedFiles('413150', 'AoIIQolaZ3/H+yOhw=', 20)).toContain(
+        'cursor=AoIIQolaZ3%2FH%2ByOhw%3D'
+      );
+      expect(EndPoints.queryPublishedGuides('413150', '*', 5)).toBe(
+        'https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/?key=abc123&creator_appid=766&query_type=12&appid=413150&filetype=11&requiredtags[0]=English&match_all_tags=true&cursor=*&numperpage=5&return_short_description=true'
+      );
     });
   });
 

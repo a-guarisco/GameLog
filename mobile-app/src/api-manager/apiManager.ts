@@ -3,6 +3,7 @@ import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import { auth } from '@gamelog/auth/firebaseClient';
 import type {
+  CurrentPlayers,
   GameBasicInfo,
   GameGenres,
   GlobalAchievement,
@@ -12,6 +13,7 @@ import type {
   PlayerFriends,
   PlayersInfo,
   PlayerStats,
+  PublishedFiles,
   RecentPlayedGames,
   SteamNews,
   Streak,
@@ -47,6 +49,8 @@ async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promi
 
 export { getApiProvider, setApiProvider, isBackendProvider, fetchData, fetchAuthenticatedData };
 export default {
+  getNumberOfCurrentPlayers: (appId: string) =>
+    fetchData<CurrentPlayers>(EndPoints.getNumberOfCurrentPlayers(appId)),
   getGameNews: (appId: string, count: number, maxLength: number) =>
     fetchData<SteamNews>(EndPoints.getNewsForApp(appId, count, maxLength)),
   getSchemaForGame: (appId: string) => fetchData<GameSchema>(EndPoints.getSchemaForGame(appId)),
@@ -82,6 +86,14 @@ export default {
   getGameGenres: (appId: string) => fetchData<GameGenres>(EndPoints.getGameGenres(appId)),
 
   getGameBasicInfo: (appId: string) => fetchData<GameBasicInfo>(EndPoints.getGameBasicInfo(appId)),
+
+  /** Community screenshots for a game. Pass the previous `next_cursor` to page forward. */
+  getGameScreenshots: (appId: string, cursor: string = '*', numPerPage: number = 50) =>
+    fetchData<PublishedFiles>(EndPoints.queryPublishedFiles(appId, cursor, numPerPage)),
+
+  /** Community guides for a game. Same cursor contract as getGameCaptures. */
+  getGameGuides: (appId: string, cursor: string = '*', numPerPage: number = 50) =>
+    fetchData<PublishedFiles>(EndPoints.queryPublishedGuides(appId, cursor, numPerPage)),
 
   getStreakByUser: () => fetchAuthenticatedData<Streak>(EndPoints.getStreakByUser()),
   getStreakByGame: (appId: string) =>

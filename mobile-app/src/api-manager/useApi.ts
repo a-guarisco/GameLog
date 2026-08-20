@@ -162,6 +162,52 @@ export const useGetFriendRecommendations = (friendId: string | null) => {
   };
 };
 
+export const useGetNumberOfCurrentPlayers = (appId: string) => {
+  const fetchFunc = useCallback(() => ApiManager.getNumberOfCurrentPlayers(appId), [appId]);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    currentPlayers: data,
+    isLoadingCurrentPlayers: isLoading,
+    errorCurrentPlayers: error,
+    errorMessageCurrentPlayers: errorMessage,
+    refetchCurrentPlayers: refetch,
+  };
+};
+
+const GAME_FEED_COUNT = 5;
+const GAME_NEWS_MAX_LENGTH = 1;
+
+export const useGetGameNews = (appId: string, count: number = GAME_FEED_COUNT) => {
+  const fetchFunc = useCallback(
+    () => ApiManager.getGameNews(appId, count, GAME_NEWS_MAX_LENGTH),
+    [appId, count]
+  );
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    gameNews: data,
+    isLoadingGameNews: isLoading,
+    errorGameNews: error,
+    errorMessageGameNews: errorMessage,
+  };
+};
+
+export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT) => {
+  const fetchFunc = useCallback(() => ApiManager.getGameGuides(appId, '*', count), [appId, count]);
+
+  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  return {
+    gameGuides: data,
+    isLoadingGameGuides: isLoading,
+    errorGameGuides: error,
+    errorMessageGameGuides: errorMessage,
+  };
+};
+
+export { useGetGameScreenshots } from './useGetGameScreenshots';
+export type { GameScreenshotsFetcher, UseGetGameScreenshotsResult } from './useGetGameScreenshots';
+
 // export const useGetBackendHealth = () => {
 //   const fetchFunc = useCallback(() => ApiManager.getBackendHealth(), []);
 

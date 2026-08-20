@@ -7,6 +7,9 @@ import {
   useGetPlayersInfo,
   useGetGameStreak,
   useGetUserStreak,
+  useGetNumberOfCurrentPlayers,
+  useGetGameNews,
+  useGetGameGuides,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
 
@@ -166,5 +169,56 @@ describe('useGetGameStreak', () => {
     mockAsyncFetch({ data: 8 });
     const { result } = renderHook(() => useGetGameStreak('app-1'));
     expect(result.current.gameStreak).toEqual({ streak: 8 });
+  });
+});
+
+describe('useGetNumberOfCurrentPlayers', () => {
+  useTestApiHook({
+    useHook: () => useGetNumberOfCurrentPlayers('730'),
+    apiMethod: 'getNumberOfCurrentPlayers',
+    apiArgs: ['730'],
+    expectedKeys: {
+      data: 'currentPlayers',
+      loading: 'isLoadingCurrentPlayers',
+      error: 'errorCurrentPlayers',
+    },
+    mockData: { response: { player_count: 652862, result: 1 } },
+  });
+});
+
+describe('useGetGameNews', () => {
+  useTestApiHook({
+    useHook: () => useGetGameNews('730'),
+    apiMethod: 'getGameNews',
+    // Five items, and contents truncated to 1 char because the panel renders titles only.
+    apiArgs: ['730', 5, 1],
+    expectedKeys: {
+      data: 'gameNews',
+      loading: 'isLoadingGameNews',
+      error: 'errorGameNews',
+    },
+    mockData: { appnews: { appid: 730, newsitems: [], count: 0 } },
+  });
+
+  it('lets a caller ask for a different number of items', () => {
+    mockAsyncFetch();
+    renderHook(() => useGetGameNews('730', 3));
+    mockUseAsyncFetch.mock.calls[0][0]();
+    expect(mockApiManager.getGameNews).toHaveBeenCalledWith('730', 3, 1);
+  });
+});
+
+describe('useGetGameGuides', () => {
+  useTestApiHook({
+    useHook: () => useGetGameGuides('730'),
+    apiMethod: 'getGameGuides',
+    // Five guides from the first cursor: the panel shows one short page.
+    apiArgs: ['730', '*', 5],
+    expectedKeys: {
+      data: 'gameGuides',
+      loading: 'isLoadingGameGuides',
+      error: 'errorGameGuides',
+    },
+    mockData: { response: { total: 812, publishedfiledetails: [] } },
   });
 });

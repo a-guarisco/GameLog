@@ -57,7 +57,7 @@ describe('BannerInfo', () => {
     });
 
     it('uses title as avatar fallback text', () => {
-      const { getByTestId } = render(<BannerInfo title="Zelda" />);
+      const { getByTestId } = render(<BannerInfo title="Zelda" iconUrl={url} />);
       expect(getByTestId('avatar-fallback').props.children).toBe('Zelda');
     });
   });
@@ -99,14 +99,21 @@ describe('BannerInfo', () => {
   });
 
   describe('avatar', () => {
-    it('renders the Avatar component', () => {
-      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
+    it('renders the Avatar component when an icon is provided', () => {
+      const { getByTestId } = render(<BannerInfo {...defaultProps} iconUrl={url} />);
       expect(getByTestId('avatar')).toBeTruthy();
     });
 
-    it('renders AvatarImage with undefined uri when iconUrl is not provided', () => {
-      const { getByTestId } = render(<BannerInfo {...defaultProps} />);
-      expect(getByTestId('avatar-image').props.source).toEqual({ uri: undefined });
+    it('leaves the avatar out entirely when there is no iconUrl', () => {
+      const { queryByTestId } = render(<BannerInfo {...defaultProps} />);
+      expect(queryByTestId('avatar')).toBeNull();
+      expect(queryByTestId('avatar-image')).toBeNull();
+    });
+
+    it('keeps the title centred without an icon', () => {
+      const { getAllByTestId } = render(<BannerInfo {...defaultProps} />);
+      // The empty left slot survives so the centre column does not shift.
+      expect(getAllByTestId('banner-box').length).toBe(3);
     });
   });
 });
