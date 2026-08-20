@@ -92,7 +92,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
   const handleGamePress = (gameSteamId: string, requesterPlayTime: number) => {
     const displayName = gameNames[gameSteamId] || `App ID: ${gameSteamId}`;
     onClose();
-    navigation.navigate('GameList', {
+    navigation.navigate('GameListTab', {
       screen: 'Game',
       params: {
         gameItem: {

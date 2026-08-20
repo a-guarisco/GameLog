@@ -72,7 +72,7 @@ const TotalHoursChart = ({
               onPress={(item: any, index: number) => {
                 const gameItem = barData[index] ?? item;
                 if (gameItem && gameItem.appid) {
-                  navigation.navigate('GameList', {
+                  navigation.navigate('GameListTab', {
                     screen: 'Game',
                     params: { gameItem: { appid: gameItem.appid, name: gameItem.name } },
                   });
