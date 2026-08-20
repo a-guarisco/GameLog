@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
 import { useGetPlaytimeReport } from '@gamelog/api-manager/useApi';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
@@ -31,6 +32,8 @@ const mockReport = (state: Record<string, unknown> = {}) =>
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
     navigate: mockNavigate,
     goBack: mockGoBack,
     setOptions: jest.fn(),

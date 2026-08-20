@@ -5,9 +5,7 @@ import {
   useGetGameStreak,
   useGetGlobalAchievement,
   useGetNumberOfCurrentPlayers,
-  useGetPlaytimeReport,
 } from '@gamelog/api-manager/useApi';
-import { getReportMinutesForGame } from '@gamelog/common/playtimeReportSelectors';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import { formatMinutesToHoursShort, formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
@@ -42,16 +40,10 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
   const { currentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
 
-  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
-  const recentMinutes = getReportMinutesForGame(playtimeReport, gameItem.appid);
-
-  // The two-week window comes from the backend report, not Steam's `playtime_2weeks`: that
-  // field only ships on the recently-played payload, so the owned-games item this screen is
-  // navigated with never carries it. Lifetime and last played are still Steam's.
   const stats = [
     { value: formatMinutesToHoursShort(gameItem.playtime_forever), label: 'Total' },
     {
-      value: isLoadingPlaytimeReport ? '—' : formatMinutesToHoursShort(recentMinutes),
+      value: gameItem.playtime_2weeks ? formatMinutesToHoursShort(gameItem.playtime_2weeks) : '—',
       label: '2 weeks',
     },
     { value: formatShortDateWithYear(gameItem.rtime_last_played), label: 'Last played' },

@@ -1,5 +1,4 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Ionicons from '@react-native-vector-icons/ionicons';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';

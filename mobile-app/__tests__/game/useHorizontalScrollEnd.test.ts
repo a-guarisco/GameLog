@@ -2,10 +2,10 @@ import { renderHook } from '@testing-library/react-native';
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import useHorizontalScrollEnd from '@gamelog/game/useHorizontalScrollEnd';
 
-// Only nativeEvent is read by the hook, so the synthetic-event envelope is cast rather
-// than stubbed out in full.
-const createScrollEvent = (x: number, contentWidth: number) =>
-  ({
+const createScrollEvent = (
+  x: number,
+  contentWidth: number
+): NativeSyntheticEvent<NativeScrollEvent> => ({
   nativeEvent: {
     contentOffset: { x, y: 0 },
     layoutMeasurement: { width: 400, height: 100 },
@@ -13,7 +13,7 @@ const createScrollEvent = (x: number, contentWidth: number) =>
     zoomScale: 1,
     contentInset: { top: 0, left: 0, bottom: 0, right: 0 },
   },
-  }) as NativeSyntheticEvent<NativeScrollEvent>;
+});
 
 describe('useHorizontalScrollEnd', () => {
   it('does not invoke onEndReached if scroll distance to end exceeds threshold', () => {

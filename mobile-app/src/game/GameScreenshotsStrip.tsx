@@ -3,7 +3,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { SectionSpinner } from '@gamelog/common/SectionState';
 import ScreenshotTile, { GameScreenshot } from '@gamelog/game/ScreenshotTile';
 import GameScreenshotsHeader from '@gamelog/game/GameScreenshotsHeader';
-import { useHorizontalScrollEnd } from '@gamelog/game/useHorizontalScrollEnd';
+import useHorizontalScrollEnd from '@gamelog/game/useHorizontalScrollEnd';
 
 export type { GameScreenshot };
 
