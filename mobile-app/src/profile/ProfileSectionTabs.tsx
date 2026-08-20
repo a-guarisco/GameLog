@@ -6,7 +6,7 @@ import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPie
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 import ProfileTopGames from './ProfileTopGames';
-import ProfileHoursPerGame from './ProfileHoursPerGame';
+import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import ProfilePlaytimeTrend from './ProfilePlaytimeTrend';
 import ProfilePlatformSplit from './ProfilePlatformSplit';
 import type { TopGame } from './profileSelectors';
@@ -72,7 +72,11 @@ const ProfileSectionTabs = ({
         {activeTab === 'time' && (
           <VStack space="md" className="w-full items-center">
             <Box className="w-full">
-              <ProfileHoursPerGame games={topGames} hasError={!!errorOwnedGames} />
+              <TotalHoursChart
+                ownedGames={ownedGames}
+                isLoadingOwnedGames={false}
+                errorOwnedGames={errorOwnedGames}
+              />
             </Box>
             <TotalHoursPieChart
               ownedGames={ownedGames}
