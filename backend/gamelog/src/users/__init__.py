@@ -1,6 +1,4 @@
 from .schemas import (
-    DailyGameReport,
-    DailyReport,
     FriendshipInfo,
     FriendshipRequest,
     FriendshipResponse,
@@ -14,8 +12,6 @@ from .schemas import (
 from .shelving import ShelvingCreate, ShelvingRead, ShelvingStatusUpdate
 
 __all__ = [
-    "DailyGameReport",
-    "DailyReport",
     "FriendshipInfo",
     "FriendshipRequest",
     "FriendshipResponse",
@@ -29,4 +25,3 @@ __all__ = [
     "UserSearchResult",
     "UserUpdate",
 ]
-

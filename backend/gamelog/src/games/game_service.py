@@ -2,9 +2,11 @@ import uuid
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date, timedelta
+
 import httpx
 from fastapi import HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
+
 from src.games import steam_fetcher_service
 from src.games.schemas import DailyGameReport, DailyReport, DayByDayPlaytime, SteamGame
 from src.models import Game, GameStatus, Genre, Shelving, SteamRollingTime, User
@@ -94,6 +96,7 @@ def get_daily_report(session: Session, user_id: str, start_date: date | None = N
     if end_date is None:
         end_date = date.today()
 
+    if start_date > end_date:
         raise HTTPException(status_code=400, detail="Start date must be on or before end date.")
 
     all_rolling = _get_steam_rolling_by_user(session, user_id)
@@ -176,8 +179,9 @@ def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id
         select(SteamRollingTime)
         .where(SteamRollingTime.user_id == user_id)
         .where(SteamRollingTime.steam_app_id == steam_app_id)
-        .order_by(SteamRollingTime.created_at.desc())
+        .order_by(col(SteamRollingTime.created_at).desc())
     ).first()
+
 
 def _compute_daily_playtimes(
     steam_rolling_times: Sequence[SteamRollingTime],
@@ -236,7 +240,6 @@ def _compute_daily_playtimes(
     return result
 
 
-
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:
     from src.models import User as UserModel
 
@@ -248,4 +251,4 @@ def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str
     if steam_app_id is not None:
         query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
 
-    return session.exec(query.order_by(SteamRollingTime.created_at)).all()
+    return session.exec(query.order_by(col(SteamRollingTime.created_at))).all()

@@ -1,7 +1,8 @@
-from datetime import date, datetime
 import uuid
+from datetime import date
 
 from pydantic import BaseModel
+from sqlmodel import Field
 
 from src.models.game import GameBase, Genre
 
@@ -12,7 +13,7 @@ class GameCreate(GameBase):
 
 class GameRead(GameBase):
     id: uuid.UUID
-    genres: list[Genre] = []
+    genres: list[Genre] = Field(default_factory=list)
 
 
 """

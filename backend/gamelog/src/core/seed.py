@@ -28,7 +28,22 @@ from sqlalchemy import delete
 from sqlmodel import Session
 
 from src.core.database import engine
-from src.models import Config, Friendship, FriendshipStatus, Game, GameStatus, Genre, GameGenreLink, Shelving, SteamRollingTime, User, TopGame, TopGameGenreLink, Notification, DeviceToken
+from src.models import (
+    Config,
+    DeviceToken,
+    Friendship,
+    FriendshipStatus,
+    Game,
+    GameGenreLink,
+    GameStatus,
+    Genre,
+    Notification,
+    Shelving,
+    SteamRollingTime,
+    TopGame,
+    TopGameGenreLink,
+    User,
+)
 
 # Fixed UUIDs for predictable database referencing in unit tests and manual API verification.
 DEMO_USER_1_ID = UUID("11111111-1111-1111-1111-111111111111")
@@ -45,28 +60,128 @@ DEMO_GAME_ELDEN_RING_ID = UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
 
 
 GENRES_DATA = [
-    {'id': '1', 'description': 'Action'},
-    {'id': '37', 'description': 'Free To Play'},
-    {'id': '25', 'description': 'Adventure'},
-    {'id': '29', 'description': 'Massively Multiplayer'},
-    {'id': '2', 'description': 'Strategy'},
-    {'id': '4', 'description': 'Casual'},
-    {'id': '23', 'description': 'Indie'},
-    {'id': '51', 'description': 'Animation & Modeling'},
-    {'id': '53', 'description': 'Design & Illustration'},
-    {'id': '55', 'description': 'Photo Editing'},
-    {'id': '57', 'description': 'Utilities'},
-    {'id': '70', 'description': 'Early Access'},
-    {'id': '28', 'description': 'Simulation'},
-    {'id': '3', 'description': 'RPG'},
-    {'id': '18', 'description': 'Sports'},
-    {'id': '9', 'description': 'Racing'},
-    {'id': '56', 'description': 'Software Training'},
-    {'id': '58', 'description': 'Video Production'},
-    {'id': '52', 'description': 'Audio Production'}
+    {"id": "1", "description": "Action"},
+    {"id": "37", "description": "Free To Play"},
+    {"id": "25", "description": "Adventure"},
+    {"id": "29", "description": "Massively Multiplayer"},
+    {"id": "2", "description": "Strategy"},
+    {"id": "4", "description": "Casual"},
+    {"id": "23", "description": "Indie"},
+    {"id": "51", "description": "Animation & Modeling"},
+    {"id": "53", "description": "Design & Illustration"},
+    {"id": "55", "description": "Photo Editing"},
+    {"id": "57", "description": "Utilities"},
+    {"id": "70", "description": "Early Access"},
+    {"id": "28", "description": "Simulation"},
+    {"id": "3", "description": "RPG"},
+    {"id": "18", "description": "Sports"},
+    {"id": "9", "description": "Racing"},
+    {"id": "56", "description": "Software Training"},
+    {"id": "58", "description": "Video Production"},
+    {"id": "52", "description": "Audio Production"},
 ]
 
-TOP_GAMES_DATA = [{'steam_app_id': '730', 'rank': 1, 'genres': ['1', '37']}, {'steam_app_id': '578080', 'rank': 2, 'genres': ['1', '37', '25', '29']}, {'steam_app_id': '570', 'rank': 3, 'genres': ['1', '2', '37']}, {'steam_app_id': '431960', 'rank': 4, 'genres': ['4', '23', '51', '53', '55', '57']}, {'steam_app_id': '1172470', 'rank': 5, 'genres': ['1', '25', '37']}, {'steam_app_id': '2868840', 'rank': 6, 'genres': ['23', '2', '70']}, {'steam_app_id': '3241660', 'rank': 7, 'genres': ['1', '70']}, {'steam_app_id': '271590', 'rank': 8, 'genres': ['1', '25']}, {'steam_app_id': '322170', 'rank': 10, 'genres': ['1', '23']}, {'steam_app_id': '236390', 'rank': 11, 'genres': ['1', '37', '29', '28']}, {'steam_app_id': '359550', 'rank': 12, 'genres': ['1', '37']}, {'steam_app_id': '1808500', 'rank': 13, 'genres': ['1']}, {'steam_app_id': '2507950', 'rank': 14, 'genres': ['1', '37', '25', '29']}, {'steam_app_id': '2357570', 'rank': 15, 'genres': ['1', '37']}, {'steam_app_id': '2767030', 'rank': 16, 'genres': ['1', '37']}, {'steam_app_id': '252490', 'rank': 17, 'genres': ['1', '25', '23', '29', '3']}, {'steam_app_id': '381210', 'rank': 18, 'genres': ['1']}, {'steam_app_id': '1422450', 'rank': 19, 'genres': ['1']}, {'steam_app_id': '230410', 'rank': 20, 'genres': ['1', '3', '37']}, {'steam_app_id': '3405690', 'rank': 21, 'genres': ['28', '18']}, {'steam_app_id': '413150', 'rank': 22, 'genres': ['23', '3', '28']}, {'steam_app_id': '2807960', 'rank': 23, 'genres': ['1']}, {'steam_app_id': '553850', 'rank': 24, 'genres': ['1']}, {'steam_app_id': '1973530', 'rank': 25, 'genres': ['37']}, {'steam_app_id': '3240220', 'rank': 26, 'genres': ['1', '25', '9']}, {'steam_app_id': '105600', 'rank': 27, 'genres': ['1', '25', '23', '3']}, {'steam_app_id': '440', 'rank': 28, 'genres': ['1', '37']}, {'steam_app_id': '3321460', 'rank': 29, 'genres': ['1', '25']}, {'steam_app_id': '3041230', 'rank': 30, 'genres': ['1', '25', '70', '3']}, {'steam_app_id': '227300', 'rank': 31, 'genres': ['23', '28']}, {'steam_app_id': '1086940', 'rank': 32, 'genres': ['25', '3', '2']}, {'steam_app_id': '438100', 'rank': 33, 'genres': ['37', '25', '29', '4', '70', '28', '18']}, {'steam_app_id': '550', 'rank': 34, 'genres': ['1']}, {'steam_app_id': '394360', 'rank': 35, 'genres': ['28', '2']}, {'steam_app_id': '1203220', 'rank': 36, 'genres': ['1', '37', '25', '29']}, {'steam_app_id': '1938090', 'rank': 37, 'genres': ['1']}, {'steam_app_id': '1245620', 'rank': 38, 'genres': ['1', '3']}, {'steam_app_id': '284160', 'rank': 39, 'genres': ['9', '28', '70']}, {'steam_app_id': '322330', 'rank': 40, 'genres': ['1', '25', '2', '23', '28', '3']}, {'steam_app_id': '252950', 'rank': 41, 'genres': ['1', '23', '18', '9']}, {'steam_app_id': '1091500', 'rank': 42, 'genres': ['3']}, {'steam_app_id': '3892270', 'rank': 43, 'genres': ['25', '23', '28']}, {'steam_app_id': '3513350', 'rank': 44, 'genres': ['1', '37', '25', '3']}, {'steam_app_id': '3472040', 'rank': 45, 'genres': ['18']}, {'steam_app_id': '250900', 'rank': 46, 'genres': ['1']}, {'steam_app_id': '3124540', 'rank': 47, 'genres': ['1', '25', '23', '70']}, {'steam_app_id': '1174180', 'rank': 48, 'genres': ['1', '25']}, {'steam_app_id': '4000', 'rank': 49, 'genres': ['4', '23', '28']}, {'steam_app_id': '3105440', 'rank': 50, 'genres': ['3', '2', '70']}, {'steam_app_id': '1449850', 'rank': 51, 'genres': ['28', '2', '37']}, {'steam_app_id': '1222670', 'rank': 52, 'genres': ['37', '25', '4', '28']}, {'steam_app_id': '2344520', 'rank': 53, 'genres': ['1', '25', '4', '29', '3']}, {'steam_app_id': '739630', 'rank': 54, 'genres': ['1', '23', '70']}, {'steam_app_id': '108600', 'rank': 55, 'genres': ['23', '70', '28', '3']}, {'steam_app_id': '289070', 'rank': 56, 'genres': ['2']}, {'steam_app_id': '1364780', 'rank': 57, 'genres': ['1', '25']}, {'steam_app_id': '1281930', 'rank': 58, 'genres': ['1', '25', '23', '3', '37']}, {'steam_app_id': '221100', 'rank': 59, 'genres': ['1', '25', '29']}, {'steam_app_id': '1366800', 'rank': 60, 'genres': ['1', '25', '23', '56', '57']}, {'steam_app_id': '489830', 'rank': 61, 'genres': ['3']}, {'steam_app_id': '1905180', 'rank': 62, 'genres': ['57', '58']}, {'steam_app_id': '3419430', 'rank': 63, 'genres': ['4', '23', '29', '28', '37']}, {'steam_app_id': '1665460', 'rank': 64, 'genres': ['28', '18', '37']}, {'steam_app_id': '714010', 'rank': 65, 'genres': ['1', '37', '25', '4', '23', '28']}, {'steam_app_id': '440900', 'rank': 66, 'genres': ['1', '25', '29', '2', '28', '3']}, {'steam_app_id': '244210', 'rank': 67, 'genres': ['23', '28', '18', '9']}, {'steam_app_id': '291550', 'rank': 68, 'genres': ['1', '23', '37']}, {'steam_app_id': '4128580', 'rank': 69, 'genres': ['29', '2', '4', '23', '28', '18']}, {'steam_app_id': '2300320', 'rank': 70, 'genres': ['28']}, {'steam_app_id': '3564740', 'rank': 71, 'genres': ['1', '37', '25', '3']}, {'steam_app_id': '646570', 'rank': 72, 'genres': ['23', '2']}, {'steam_app_id': '3764200', 'rank': 73, 'genres': ['1', '25']}, {'steam_app_id': '1551360', 'rank': 74, 'genres': ['1', '25', '9', '28', '18']}, {'steam_app_id': '3527290', 'rank': 75, 'genres': ['1', '25', '23']}, {'steam_app_id': '2622380', 'rank': 76, 'genres': ['1', '3']}, {'steam_app_id': '2073850', 'rank': 77, 'genres': ['1', '37']}, {'steam_app_id': '2073620', 'rank': 78, 'genres': ['1', '37', '25', '29', '2', '3']}, {'steam_app_id': '1142710', 'rank': 79, 'genres': ['1', '2']}, {'steam_app_id': '261550', 'rank': 80, 'genres': ['1', '23', '3', '28', '2']}, {'steam_app_id': '294100', 'rank': 81, 'genres': ['23', '28', '2']}, {'steam_app_id': '2379780', 'rank': 82, 'genres': ['4', '23', '2']}, {'steam_app_id': '813780', 'rank': 83, 'genres': ['2']}, {'steam_app_id': '3551340', 'rank': 84, 'genres': ['28', '18', '2']}, {'steam_app_id': '3526710', 'rank': 85, 'genres': ['1', '2', '23', '28']}, {'steam_app_id': '594650', 'rank': 86, 'genres': ['1']}, {'steam_app_id': '960090', 'rank': 87, 'genres': ['2']}, {'steam_app_id': '251570', 'rank': 88, 'genres': ['1', '25', '2', '23', '28', '3']}, {'steam_app_id': '629520', 'rank': 89, 'genres': ['52', '57']}, {'steam_app_id': '892970', 'rank': 90, 'genres': ['1', '25', '23', '3', '70']}, {'steam_app_id': '1158310', 'rank': 91, 'genres': ['3', '28', '2']}, {'steam_app_id': '1144200', 'rank': 92, 'genres': ['1', '25', '23']}, {'steam_app_id': '4025700', 'rank': 93, 'genres': ['4', '28', '37']}, {'steam_app_id': '3164500', 'rank': 94, 'genres': ['1', '23', '28', '2', '70']}, {'steam_app_id': '3224770', 'rank': 96, 'genres': ['28', '18', '37']}, {'steam_app_id': '264710', 'rank': 97, 'genres': ['25', '23']}, {'steam_app_id': '945360', 'rank': 98, 'genres': ['4']}, {'steam_app_id': '2694490', 'rank': 99, 'genres': ['1', '25', '29', '3', '70']}, {'steam_app_id': '39210', 'rank': 100, 'genres': ['29', '3']}
+from typing import Any
+
+TOP_GAMES_DATA: list[dict[str, Any]] = [
+    {"steam_app_id": "730", "rank": 1, "genres": ["1", "37"]},
+    {"steam_app_id": "578080", "rank": 2, "genres": ["1", "37", "25", "29"]},
+    {"steam_app_id": "570", "rank": 3, "genres": ["1", "2", "37"]},
+    {"steam_app_id": "431960", "rank": 4, "genres": ["4", "23", "51", "53", "55", "57"]},
+    {"steam_app_id": "1172470", "rank": 5, "genres": ["1", "25", "37"]},
+    {"steam_app_id": "2868840", "rank": 6, "genres": ["23", "2", "70"]},
+    {"steam_app_id": "3241660", "rank": 7, "genres": ["1", "70"]},
+    {"steam_app_id": "271590", "rank": 8, "genres": ["1", "25"]},
+    {"steam_app_id": "322170", "rank": 10, "genres": ["1", "23"]},
+    {"steam_app_id": "236390", "rank": 11, "genres": ["1", "37", "29", "28"]},
+    {"steam_app_id": "359550", "rank": 12, "genres": ["1", "37"]},
+    {"steam_app_id": "1808500", "rank": 13, "genres": ["1"]},
+    {"steam_app_id": "2507950", "rank": 14, "genres": ["1", "37", "25", "29"]},
+    {"steam_app_id": "2357570", "rank": 15, "genres": ["1", "37"]},
+    {"steam_app_id": "2767030", "rank": 16, "genres": ["1", "37"]},
+    {"steam_app_id": "252490", "rank": 17, "genres": ["1", "25", "23", "29", "3"]},
+    {"steam_app_id": "381210", "rank": 18, "genres": ["1"]},
+    {"steam_app_id": "1422450", "rank": 19, "genres": ["1"]},
+    {"steam_app_id": "230410", "rank": 20, "genres": ["1", "3", "37"]},
+    {"steam_app_id": "3405690", "rank": 21, "genres": ["28", "18"]},
+    {"steam_app_id": "413150", "rank": 22, "genres": ["23", "3", "28"]},
+    {"steam_app_id": "2807960", "rank": 23, "genres": ["1"]},
+    {"steam_app_id": "553850", "rank": 24, "genres": ["1"]},
+    {"steam_app_id": "1973530", "rank": 25, "genres": ["37"]},
+    {"steam_app_id": "3240220", "rank": 26, "genres": ["1", "25", "9"]},
+    {"steam_app_id": "105600", "rank": 27, "genres": ["1", "25", "23", "3"]},
+    {"steam_app_id": "440", "rank": 28, "genres": ["1", "37"]},
+    {"steam_app_id": "3321460", "rank": 29, "genres": ["1", "25"]},
+    {"steam_app_id": "3041230", "rank": 30, "genres": ["1", "25", "70", "3"]},
+    {"steam_app_id": "227300", "rank": 31, "genres": ["23", "28"]},
+    {"steam_app_id": "1086940", "rank": 32, "genres": ["25", "3", "2"]},
+    {"steam_app_id": "438100", "rank": 33, "genres": ["37", "25", "29", "4", "70", "28", "18"]},
+    {"steam_app_id": "550", "rank": 34, "genres": ["1"]},
+    {"steam_app_id": "394360", "rank": 35, "genres": ["28", "2"]},
+    {"steam_app_id": "1203220", "rank": 36, "genres": ["1", "37", "25", "29"]},
+    {"steam_app_id": "1938090", "rank": 37, "genres": ["1"]},
+    {"steam_app_id": "1245620", "rank": 38, "genres": ["1", "3"]},
+    {"steam_app_id": "284160", "rank": 39, "genres": ["9", "28", "70"]},
+    {"steam_app_id": "322330", "rank": 40, "genres": ["1", "25", "2", "23", "28", "3"]},
+    {"steam_app_id": "252950", "rank": 41, "genres": ["1", "23", "18", "9"]},
+    {"steam_app_id": "1091500", "rank": 42, "genres": ["3"]},
+    {"steam_app_id": "3892270", "rank": 43, "genres": ["25", "23", "28"]},
+    {"steam_app_id": "3513350", "rank": 44, "genres": ["1", "37", "25", "3"]},
+    {"steam_app_id": "3472040", "rank": 45, "genres": ["18"]},
+    {"steam_app_id": "250900", "rank": 46, "genres": ["1"]},
+    {"steam_app_id": "3124540", "rank": 47, "genres": ["1", "25", "23", "70"]},
+    {"steam_app_id": "1174180", "rank": 48, "genres": ["1", "25"]},
+    {"steam_app_id": "4000", "rank": 49, "genres": ["4", "23", "28"]},
+    {"steam_app_id": "3105440", "rank": 50, "genres": ["3", "2", "70"]},
+    {"steam_app_id": "1449850", "rank": 51, "genres": ["28", "2", "37"]},
+    {"steam_app_id": "1222670", "rank": 52, "genres": ["37", "25", "4", "28"]},
+    {"steam_app_id": "2344520", "rank": 53, "genres": ["1", "25", "4", "29", "3"]},
+    {"steam_app_id": "739630", "rank": 54, "genres": ["1", "23", "70"]},
+    {"steam_app_id": "108600", "rank": 55, "genres": ["23", "70", "28", "3"]},
+    {"steam_app_id": "289070", "rank": 56, "genres": ["2"]},
+    {"steam_app_id": "1364780", "rank": 57, "genres": ["1", "25"]},
+    {"steam_app_id": "1281930", "rank": 58, "genres": ["1", "25", "23", "3", "37"]},
+    {"steam_app_id": "221100", "rank": 59, "genres": ["1", "25", "29"]},
+    {"steam_app_id": "1366800", "rank": 60, "genres": ["1", "25", "23", "56", "57"]},
+    {"steam_app_id": "489830", "rank": 61, "genres": ["3"]},
+    {"steam_app_id": "1905180", "rank": 62, "genres": ["57", "58"]},
+    {"steam_app_id": "3419430", "rank": 63, "genres": ["4", "23", "29", "28", "37"]},
+    {"steam_app_id": "1665460", "rank": 64, "genres": ["28", "18", "37"]},
+    {"steam_app_id": "714010", "rank": 65, "genres": ["1", "37", "25", "4", "23", "28"]},
+    {"steam_app_id": "440900", "rank": 66, "genres": ["1", "25", "29", "2", "28", "3"]},
+    {"steam_app_id": "244210", "rank": 67, "genres": ["23", "28", "18", "9"]},
+    {"steam_app_id": "291550", "rank": 68, "genres": ["1", "23", "37"]},
+    {"steam_app_id": "4128580", "rank": 69, "genres": ["29", "2", "4", "23", "28", "18"]},
+    {"steam_app_id": "2300320", "rank": 70, "genres": ["28"]},
+    {"steam_app_id": "3564740", "rank": 71, "genres": ["1", "37", "25", "3"]},
+    {"steam_app_id": "646570", "rank": 72, "genres": ["23", "2"]},
+    {"steam_app_id": "3764200", "rank": 73, "genres": ["1", "25"]},
+    {"steam_app_id": "1551360", "rank": 74, "genres": ["1", "25", "9", "28", "18"]},
+    {"steam_app_id": "3527290", "rank": 75, "genres": ["1", "25", "23"]},
+    {"steam_app_id": "2622380", "rank": 76, "genres": ["1", "3"]},
+    {"steam_app_id": "2073850", "rank": 77, "genres": ["1", "37"]},
+    {"steam_app_id": "2073620", "rank": 78, "genres": ["1", "37", "25", "29", "2", "3"]},
+    {"steam_app_id": "1142710", "rank": 79, "genres": ["1", "2"]},
+    {"steam_app_id": "261550", "rank": 80, "genres": ["1", "23", "3", "28", "2"]},
+    {"steam_app_id": "294100", "rank": 81, "genres": ["23", "28", "2"]},
+    {"steam_app_id": "2379780", "rank": 82, "genres": ["4", "23", "2"]},
+    {"steam_app_id": "813780", "rank": 83, "genres": ["2"]},
+    {"steam_app_id": "3551340", "rank": 84, "genres": ["28", "18", "2"]},
+    {"steam_app_id": "3526710", "rank": 85, "genres": ["1", "2", "23", "28"]},
+    {"steam_app_id": "594650", "rank": 86, "genres": ["1"]},
+    {"steam_app_id": "960090", "rank": 87, "genres": ["2"]},
+    {"steam_app_id": "251570", "rank": 88, "genres": ["1", "25", "2", "23", "28", "3"]},
+    {"steam_app_id": "629520", "rank": 89, "genres": ["52", "57"]},
+    {"steam_app_id": "892970", "rank": 90, "genres": ["1", "25", "23", "3", "70"]},
+    {"steam_app_id": "1158310", "rank": 91, "genres": ["3", "28", "2"]},
+    {"steam_app_id": "1144200", "rank": 92, "genres": ["1", "25", "23"]},
+    {"steam_app_id": "4025700", "rank": 93, "genres": ["4", "28", "37"]},
+    {"steam_app_id": "3164500", "rank": 94, "genres": ["1", "23", "28", "2", "70"]},
+    {"steam_app_id": "3224770", "rank": 96, "genres": ["28", "18", "37"]},
+    {"steam_app_id": "264710", "rank": 97, "genres": ["25", "23"]},
+    {"steam_app_id": "945360", "rank": 98, "genres": ["4"]},
+    {"steam_app_id": "2694490", "rank": 99, "genres": ["1", "25", "29", "3", "70"]},
+    {"steam_app_id": "39210", "rank": 100, "genres": ["29", "3"]},
 ]
 
 
@@ -305,7 +420,6 @@ def _rolling_times() -> list[SteamRollingTime]:
     return records
 
 
-
 def _friendships() -> list[Friendship]:
     """Returns sample friendships for manual testing."""
     return [
@@ -361,31 +475,11 @@ def seed_database() -> None:
             session.add(user)
 
         # Seed the 5 demo games using fixed IDs and assigning resolved genres
-        game_cs2 = Game(
-            id=DEMO_GAME_CS2_ID,
-            steam_app_id="730",
-            genres=[genre_instances["1"], genre_instances["37"]]
-        )
-        game_dota = Game(
-            id=DEMO_GAME_DOTA_ID,
-            steam_app_id="570",
-            genres=[genre_instances["1"], genre_instances["37"], genre_instances["2"]]
-        )
-        game_rdr2 = Game(
-            id=DEMO_GAME_RDR2_ID,
-            steam_app_id="1174180",
-            genres=[genre_instances["1"], genre_instances["25"]]
-        )
-        game_gtav = Game(
-            id=DEMO_GAME_GTAV_ID,
-            steam_app_id="271590",
-            genres=[genre_instances["1"], genre_instances["25"]]
-        )
-        game_elden_ring = Game(
-            id=DEMO_GAME_ELDEN_RING_ID,
-            steam_app_id="1245620",
-            genres=[genre_instances["1"], genre_instances["3"]]
-        )
+        game_cs2 = Game(id=DEMO_GAME_CS2_ID, steam_app_id="730", genres=[genre_instances["1"], genre_instances["37"]])
+        game_dota = Game(id=DEMO_GAME_DOTA_ID, steam_app_id="570", genres=[genre_instances["1"], genre_instances["37"], genre_instances["2"]])
+        game_rdr2 = Game(id=DEMO_GAME_RDR2_ID, steam_app_id="1174180", genres=[genre_instances["1"], genre_instances["25"]])
+        game_gtav = Game(id=DEMO_GAME_GTAV_ID, steam_app_id="271590", genres=[genre_instances["1"], genre_instances["25"]])
+        game_elden_ring = Game(id=DEMO_GAME_ELDEN_RING_ID, steam_app_id="1245620", genres=[genre_instances["1"], genre_instances["3"]])
 
         session.add(game_cs2)
         session.add(game_dota)
@@ -395,10 +489,11 @@ def seed_database() -> None:
 
         # Seed realistic Top Games
         for tg in TOP_GAMES_DATA:
+            tg_genres: list[str] = tg["genres"]
             top_game = TopGame(
                 steam_app_id=tg["steam_app_id"],
                 rank=tg["rank"],
-                genres=[genre_instances[gid] for gid in tg["genres"] if gid in genre_instances]
+                genres=[genre_instances[gid] for gid in tg_genres if gid in genre_instances],
             )
             session.add(top_game)
 

@@ -4,6 +4,8 @@ from sqlmodel import Session
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
+from src.games import game_service
+from src.games.schemas import DailyReport
 from src.users import FriendshipRequest, FriendshipResponse, UserSearchResult, user_service
 from src.users.schemas import UserRead, UserRegisterRequest
 
