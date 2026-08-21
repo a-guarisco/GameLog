@@ -59,7 +59,7 @@ export const GoogleAuthTest = ({ className }: { className?: string }) => {
       <InfoBox message={`Configured Web Client ID:\n${webClientId}\n\nPackage: com.gamelog.app`} />
 
       {lastUser ? (
-        <Box className="p-2.5 bg-background-100 rounded-md border border-outline-200 gap-1">
+        <Box className="p-2.5 rounded-md border border-outline-200 gap-1">
           <Text className="text-xs font-semibold text-typography-0">Current User Details:</Text>
           <Text className="text-xs text-typography-500">Name: {lastUser.displayName || 'N/A'}</Text>
           <Text className="text-xs text-typography-500">Email: {lastUser.email}</Text>
