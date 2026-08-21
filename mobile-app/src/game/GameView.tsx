@@ -1,4 +1,5 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Card } from '@gamelog/common/gluestack/card';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import HeaderGameImage from '@gamelog/game/HeaderGameImage';
@@ -47,9 +48,9 @@ const GameView = () => {
       <HeaderGameImage appid={gameItem.appid} />
 
       <ScrollablePage>
-        <BannerInfo className="bg-background-100 shadow-xl" title={gameItem.name} />
+        <BannerInfo className="bg-background-50 shadow-soft-1" title={gameItem.name} />
 
-        <Box className="bg-background-100 shadow-xl pt-6 pb-6">
+        <Card variant="elevated" className="pt-6 pb-6 rounded-none p-0">
           <VStack space="xl">
             <GameStatusChips livePlayers={livePlayers} streakText={streakText} />
 
@@ -87,7 +88,7 @@ const GameView = () => {
               />
             </Box>
           </VStack>
-        </Box>
+        </Card>
       </ScrollablePage>
 
       <BackButton onPress={() => navigation.goBack()} testID="game-back" />

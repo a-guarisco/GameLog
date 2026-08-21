@@ -47,7 +47,7 @@ export const GameOverviewStatsCard = ({ gameItem, onPress }: GameOverviewStatsCa
         className="flex-wrap"
       />
       <GameStatDivider />
-      <Text className="text-typography-400">ID: {appid}</Text>
+      <Text className="text-typography-200">ID: {appid}</Text>
     </GameHeaderCard>
   );
 };

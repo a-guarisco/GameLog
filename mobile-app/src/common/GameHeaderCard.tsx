@@ -23,8 +23,8 @@ export const GameHeaderCard = ({ name, appid, onPress, children }: GameHeaderCar
       accessibilityLabel={`View details for ${name}`}
     >
       <Card
-        variant="outline"
-        className="m-1 p-2 bg-background-100 border-outline-100 rounded-none overflow-hidden shadow-lg"
+        variant="elevated"
+        className="m-1 rounded-none overflow-hidden p-0"
       >
         <Text className="font-bold mb-2 text-typography-0" numberOfLines={1}>
           {name}
