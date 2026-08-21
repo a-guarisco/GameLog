@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
-import HeaderGameImage from '@gamelog/game/HeaderGameImage';
+import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useGetFriendList, useSearchUsers } from '@gamelog/api-manager/useApi';
 import { UserSearchResult } from '@gamelog/api-manager/dto';

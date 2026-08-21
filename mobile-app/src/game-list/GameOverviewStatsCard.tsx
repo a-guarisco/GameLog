@@ -1,6 +1,6 @@
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
+import { GameHeaderCard } from '@gamelog/game-list/GameHeaderCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import {
   formatDate,

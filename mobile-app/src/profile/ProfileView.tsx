@@ -11,8 +11,8 @@ import {
   useGetUserStreak,
   RECENT_PLAYTIME_DAYS,
 } from '@gamelog/api-manager/useApi';
-import { getReportTotalMinutes } from '@gamelog/common/playtimeReportSelectors';
-import HeaderGameImage from '@gamelog/game/HeaderGameImage';
+import { getReportTotalMinutes } from '@gamelog/common/selectPlaytimeReport';
+import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import ProfileIdentity from './ProfileIdentity';
