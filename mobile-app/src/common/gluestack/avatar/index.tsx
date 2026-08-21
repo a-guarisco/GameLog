@@ -2,7 +2,8 @@
 import React from 'react';
 import { createAvatar } from '@gluestack-ui/core/avatar/creator';
 
-import { View, Text, Image, Platform } from 'react-native';
+import { View, Image, Platform } from 'react-native';
+import { Text } from '../text';
 
 import { tva, withStyleContext, useStyleContext } from '@gluestack-ui/utils/nativewind-utils';
 
