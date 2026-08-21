@@ -51,13 +51,13 @@ const AchievementsListView = ({ route }: any) => {
       <HeaderGameImage appid={gameID} />
       <ScrollablePage>
         <BannerInfo
-          className="bg-background-100 shadow-xl"
+          className="bg-background-0"
           title={gameName}
           iconUrl={gameCapsuleImage}
           secondaryText={secondaryText}
         />
 
-        <Box className=" w-80% bg-background-100 shadow-xl pt-6">
+        <Box className=" w-80% bg-background-0 pt-6">
           <Box className="mb-5 px-4">
             <Text size="3xl" className="font-bold uppercase text-center mb-3">
               Achievements for {gameName}
