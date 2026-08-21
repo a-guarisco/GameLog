@@ -15,13 +15,8 @@ export const getNavigationTheme = (isDarkMode: boolean): Theme => {
     colors: {
       primary: `rgb(${themeVars['--color-primary-500']})`,
 
-      background: isDarkMode
-        ? `rgb(${themeVars['--color-background-0']})`
-        : `rgb(${themeVars['--color-background-50']})`,
-
-      card: isDarkMode
-        ? `rgb(${themeVars['--color-background-50']})`
-        : `rgb(${themeVars['--color-background-0']})`,
+      background: `rgb(${themeVars['--color-background-0']})`,
+      card: `rgb(${themeVars['--color-background-50']})`,
 
       text: `rgb(${themeVars['--color-typography-0']})`,
 
