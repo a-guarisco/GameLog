@@ -1,4 +1,5 @@
 import { Box } from '@gamelog/common/gluestack/box';
+import { Card } from '@gamelog/common/gluestack/card';
 import { Text } from '@gamelog/common/gluestack/text';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
@@ -18,7 +19,7 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
   const isFriend = friendship?.friendship_status === 'accepted';
 
   return (
-    <Box className="relative mb-3 border-b border-outline-100 pb-1">
+    <Card variant="elevated" className="relative mb-3 p-0">
       <HStack space="md" className="relative z-10 px-3 py-3 items-center">
         <UserAvatar username={user.username} isHighlighted={isFriend} />
 
@@ -36,6 +37,6 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
           <UserCardActions item={item} handlers={handlers} isActionLoading={isActionLoading} />
         </Box>
       </HStack>
-    </Box>
+    </Card>
   );
 };

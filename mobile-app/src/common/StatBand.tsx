@@ -1,4 +1,5 @@
 import { Box } from '@gamelog/common/gluestack/box';
+import { Card } from '@gamelog/common/gluestack/card';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -9,7 +10,8 @@ export type GameStat = {
 };
 
 const StatBand = ({ stats }: { stats: GameStat[] }) => (
-  <HStack className="overflow-hidden rounded-xl border border-outline-100 bg-background-200 shadow-md">
+  <Card variant="elevated" className="overflow-hidden p-0">
+    <HStack className="w-full">
     {stats.map((stat, index) => (
       <HStack key={stat.label} className="flex-1">
         {index > 0 && <Box className="w-px bg-outline-100" />}
@@ -28,7 +30,8 @@ const StatBand = ({ stats }: { stats: GameStat[] }) => (
         </VStack>
       </HStack>
     ))}
-  </HStack>
+    </HStack>
+  </Card>
 );
 
 export default StatBand;

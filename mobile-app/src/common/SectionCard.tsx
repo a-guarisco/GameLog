@@ -11,7 +11,7 @@ interface SectionCardProps {
 }
 
 const SectionCard = ({ label, children, className = '', testID }: SectionCardProps) => (
-  <Card variant="outline" className={`p-3 border-outline-50 ${className}`} testID={testID}>
+  <Card variant="elevated" className={`p-3 ${className}`} testID={testID}>
     <VStack space="sm">
     {!!label && (
       <Text

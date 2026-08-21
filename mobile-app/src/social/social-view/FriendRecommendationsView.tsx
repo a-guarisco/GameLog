@@ -3,6 +3,7 @@ import { Image, ScrollView, Pressable, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
+import { Card } from '@gamelog/common/gluestack/card';
 import { Text } from '@gamelog/common/gluestack/text';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
@@ -171,7 +172,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                   onPress={() => handleGamePress(cg.gameSteamId, cg.requester_play_time)}
                   testID={`common-game-item-${cg.gameSteamId}`}
                 >
-                  <Box className="relative mb-2 border-b border-outline-100 pb-1">
+                  <Card variant="elevated" className="relative mb-2 p-0">
                     <HStack space="md" className="px-3 py-3 items-center">
                       <Image
                         source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
@@ -198,7 +199,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                         </HStack>
                       </VStack>
                     </HStack>
-                  </Box>
+                  </Card>
                 </Pressable>
               ))}
             </VStack>
@@ -217,9 +218,9 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                     Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)
                   }
                 >
-                  <Box
-                    key={idx}
-                    className="relative mb-2 border-b border-outline-100 pb-1"
+                  <Card
+                    variant="elevated"
+                    className="relative mb-2 p-0"
                   >
                     <HStack space="md" className="px-3 py-3 items-center">
                       <Image
@@ -238,7 +239,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                         )}
                       </VStack>
                     </HStack>
-                  </Box>
+                  </Card>
                 </Pressable>
               ))}
             </VStack>
