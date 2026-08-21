@@ -19,8 +19,8 @@ const ProfileIdentity = ({
   memberSinceLabel,
 }: ProfileIdentityProps) => (
   <>
-    <VStack space="sm" className="items-center bg-background-100 px-5 shadow-xl">
-      <Avatar size="xl" className="-mt-9 border-4 border-background-100 bg-background-300">
+    <VStack space="sm" className="items-center bg-background-0 px-5 pb-4">
+      <Avatar size="xl" className="-mt-9 border-4 border-background-0 bg-background-300">
         <AvatarFallbackText>{name}</AvatarFallbackText>
         {!!avatarUrl && (
           <AvatarImage source={{ uri: avatarUrl }} alt={`${name} avatar`} resizeMode="cover" />

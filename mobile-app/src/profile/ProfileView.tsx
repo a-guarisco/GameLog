@@ -82,7 +82,7 @@ const ProfileView = () => {
           mostPlayedName={mostPlayedGame?.name}
         />
 
-        <Box className="bg-background-100 pb-6 shadow-xl">
+        <Box className="bg-background-0 pb-6">
           <VStack space="xl" className="pt-6">
             <Box className="px-4">
               <ProfileStats
