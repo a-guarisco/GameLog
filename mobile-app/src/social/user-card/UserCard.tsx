@@ -18,7 +18,7 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
   const isFriend = friendship?.friendship_status === 'accepted';
 
   return (
-    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200 shadow-md">
+    <Box className="relative mb-3 border-b border-outline-100 pb-1">
       <HStack space="md" className="relative z-10 px-3 py-3 items-center">
         <UserAvatar username={user.username} isHighlighted={isFriend} />
 

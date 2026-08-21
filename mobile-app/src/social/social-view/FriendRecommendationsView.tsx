@@ -171,7 +171,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                   onPress={() => handleGamePress(cg.gameSteamId, cg.requester_play_time)}
                   testID={`common-game-item-${cg.gameSteamId}`}
                 >
-                  <Box className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md">
+                  <Box className="relative mb-2 border-b border-outline-100 pb-1">
                     <HStack space="md" className="px-3 py-3 items-center">
                       <Image
                         source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
@@ -219,7 +219,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                 >
                   <Box
                     key={idx}
-                    className="relative overflow-hidden rounded-lg mb-2 bg-background-200 shadow-md"
+                    className="relative mb-2 border-b border-outline-100 pb-1"
                   >
                     <HStack space="md" className="px-3 py-3 items-center">
                       <Image

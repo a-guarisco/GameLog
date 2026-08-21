@@ -60,7 +60,7 @@ const SocialView: React.FC = () => {
       <ScrollablePage>
         <SocialHubBanner />
 
-        <Box className="w-80% bg-background-100 shadow-xl pt-6">
+        <Box className="flex-1 bg-background-0 pt-6">
           <Box className="mb-5 px-4">
             <SocialTabSwitcher
               tabs={tabs}
