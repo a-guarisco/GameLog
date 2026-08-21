@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native';
-import HeaderGameImage from '@gamelog/game/HeaderGameImage';
+import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 
 jest.mock('@gamelog/common/Banner', () => {
   const { View } = jest.requireActual('react-native');

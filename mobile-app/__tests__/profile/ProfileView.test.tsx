@@ -19,7 +19,7 @@ jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetPlaytimeByUser: jest.fn(),
 }));
 
-jest.mock('@gamelog/game/HeaderGameImage', () => {
+jest.mock('@gamelog/common/HeaderGameImage', () => {
   const { View } = jest.requireActual('react-native');
   return {
     __esModule: true,
