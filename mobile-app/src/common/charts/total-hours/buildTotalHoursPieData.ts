@@ -1,6 +1,7 @@
 import { OwnedGames } from '@gamelog/api-manager/dto';
-import { getTopGames, INFO_GRADIENT_TIERS } from '../chartsHelpers';
-import { brand } from '@gamelog/theme/theme';
+import { getTopGames, parseRGB } from '../chartsHelpers';
+import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
+import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { PieData } from '../charts.type';
 
 const buildTotalHoursPieData = (
@@ -10,26 +11,48 @@ const buildTotalHoursPieData = (
   if (!ownedGames?.response?.games) return [];
 
   const games = ownedGames.response.games;
+  
+  const allPlayed = [...games]
+    .filter((g) => g.playtime_forever > 0)
+    .sort((a, b) => b.playtime_forever - a.playtime_forever);
 
-  const top = getTopGames(games, gameToRepresent) ?? [];
+  const top = allPlayed.slice(0, gameToRepresent);
+  const otherMinutes = allPlayed.slice(gameToRepresent).reduce((sum, g) => sum + g.playtime_forever, 0);
 
-  const otherMinutes = top.slice(gameToRepresent).reduce((sum, g) => sum + g.playtime_forever, 0);
-
-  const slices: PieData[] = top.map((game, i) => ({
-    value: game.playtime_forever,
-    label: game.name.length > 12 ? game.name.slice(0, 12) + '…' : game.name,
-    color: INFO_GRADIENT_TIERS[i % INFO_GRADIENT_TIERS.length].frontColor,
-    gradientCenterColor: INFO_GRADIENT_TIERS[i % INFO_GRADIENT_TIERS.length].gradientColor,
-  }));
+  const rawSlices = top.map((game) => {
+    return {
+      value: game.playtime_forever,
+      label: game.name, // Pass the full name, allow UI to truncate dynamically
+      text: formatMinutesToHours(game.playtime_forever), // For the pie slice
+    };
+  });
 
   if (otherMinutes > 0) {
-    slices.push({
+    rawSlices.push({
       value: otherMinutes,
       label: 'Other',
-      color: `rgb(${brand.info['200']})`,
-      gradientCenterColor: `rgb(${brand.info['400']})`,
+      text: formatMinutesToHours(otherMinutes),
     });
   }
+
+  // A vibrant, highly saturated 6-color palette inspired by the infographic
+  const GRADIENT_PALETTE = [
+    { color: tailwindColors.blue[600], gradient: tailwindColors.blue[400] },
+    { color: tailwindColors.violet[600], gradient: tailwindColors.violet[400] },
+    { color: tailwindColors.fuchsia[600], gradient: tailwindColors.fuchsia[400] },
+    { color: tailwindColors.orange[600], gradient: tailwindColors.orange[400] },
+    { color: tailwindColors.lime[600], gradient: tailwindColors.lime[400] },
+    { color: tailwindColors.emerald[600], gradient: tailwindColors.emerald[400] },
+  ];
+
+  const slices: PieData[] = rawSlices.map((slice, i) => {
+    const palette = GRADIENT_PALETTE[i % GRADIENT_PALETTE.length];
+    return {
+      ...slice,
+      color: parseRGB(palette.color),
+      gradientCenterColor: parseRGB(palette.gradient),
+    };
+  });
 
   return slices;
 };

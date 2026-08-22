@@ -5,7 +5,6 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { computePieRadius, computePieInnerRadius, parseRGB } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
-import ExternalLabelBox from '../ExternalLabelBox';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import buildTotalHoursPieData from './buildTotalHoursPieData';
 import { PieData } from '../charts.type';
@@ -43,7 +42,11 @@ const TotalHoursPieChart = ({
   };
 
   return (
-    <ChartWrapperCard label="Time per Category" isLoading={isLoadingOwnedGames} error={!!errorOwnedGames}>
+    <ChartWrapperCard
+      label="Time per Category"
+      isLoading={isLoadingOwnedGames}
+      error={!!errorOwnedGames}
+    >
       {({ cardWidth, theme }) => (
         <>
           <PieChart
@@ -56,20 +59,33 @@ const TotalHoursPieChart = ({
             radius={computePieRadius(cardWidth)}
             innerRadius={computePieInnerRadius(computePieRadius(cardWidth))}
             innerCircleColor={parseRGB(theme['--color-background-50'])}
-            centerLabelComponent={() => <Box style={{ alignItems: 'center' }} />}
+            centerLabelComponent={() => (
+              <Box style={{ alignItems: 'flex-start', justifyContent: 'center' }}>
+                {pieData.map((item) => (
+                  <Box key={item.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                    <Box
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: item.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <Text
+                      style={{ color: `rgb(${theme['--color-typography-200']})`, fontSize: 10, fontWeight: '600' }}
+                      numberOfLines={1}
+                    >
+                      {item.label}
+                    </Text>
+                  </Box>
+                ))}
+              </Box>
+            )}
             isAnimated
             animationDuration={500}
-            showText
-            textSize={10}
-            textColor={parseRGB(theme['--color-typography-200'])}
-            labelsPosition="outward"
             showValuesAsLabels={false}
             showTextBackground={false}
-          />
-
-          <ExternalLabelBox
-            graphData={pieData.map((item) => ({ ...item, lamdaFormatLabel }))}
-            theme={theme}
           />
         </>
       )}

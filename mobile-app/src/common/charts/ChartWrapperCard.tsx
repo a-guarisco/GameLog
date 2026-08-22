@@ -28,6 +28,7 @@ const ChartWrapperCard = ({ label, isLoading, children, error, ErrorBehaviour }:
     <Box className="w-full items-center">
       <SectionCard label={label} className="w-full">
         <Box
+          testID="card"
           className="w-full items-center"
           onLayout={(e) => setCardWidth(e.nativeEvent.layout.width)}
         >
