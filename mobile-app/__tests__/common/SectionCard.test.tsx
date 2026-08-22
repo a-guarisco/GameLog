@@ -33,7 +33,7 @@ describe('SectionCard', () => {
     expect(screen.queryByText('Top games by hours')).toBeNull();
   });
 
-  it('keeps the outlined block styling and appends caller classes', () => {
+  it('keeps the elevated card styling and appends caller classes', () => {
     render(
       <SectionCard className="mt-4" testID="card">
         <Text>War Thunder</Text>
@@ -42,8 +42,8 @@ describe('SectionCard', () => {
 
     const { className } = screen.getByTestId('card').props;
 
-    expect(className).toContain('border-outline-100');
-    expect(className).toContain('bg-background-200');
+    expect(className).toContain('shadow-sm');
+    expect(className).toContain('bg-background-50');
     expect(className).toContain('mt-4');
   });
 });

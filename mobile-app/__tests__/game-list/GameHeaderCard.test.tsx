@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/react-native';
-import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
+import { GameHeaderCard } from '@gamelog/game-list/GameHeaderCard';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { Text } from 'react-native';
 

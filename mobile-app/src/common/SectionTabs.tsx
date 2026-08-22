@@ -1,5 +1,6 @@
 import { Pressable } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
+import { Card } from '@gamelog/common/gluestack/card';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 
@@ -21,7 +22,8 @@ const SectionTabs = <Id extends string>({
   onChange,
   testIDPrefix,
 }: SectionTabsProps<Id>) => (
-  <HStack className="border-b border-outline-100">
+  <Card variant="elevated" className="p-0 overflow-hidden">
+    <HStack className="w-full">
     {tabs.map((tab) => {
       const isActive = tab.id === activeId;
       return (
@@ -44,7 +46,8 @@ const SectionTabs = <Id extends string>({
         </Pressable>
       );
     })}
-  </HStack>
+    </HStack>
+  </Card>
 );
 
 export default SectionTabs;

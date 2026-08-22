@@ -37,3 +37,6 @@ serviceAccountKey.json
 
 # Documentation
 docs/
+
+# Agent configuration
+.agents/

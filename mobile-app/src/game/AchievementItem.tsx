@@ -1,3 +1,4 @@
+import { Card } from '@gamelog/common/gluestack/card';
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -41,7 +42,7 @@ const AchievementItem = ({
   const lockedFillColor = getLockedFillColor(!isUnlocked);
 
   return (
-    <Box className="relative overflow-hidden rounded-lg mb-3 bg-background-200 shadow-md">
+    <Card variant="elevated" className="relative overflow-hidden mb-3 p-0">
       <Box
         testID="global-progress-bar"
         className={`absolute top-0 left-0 h-full ${lockedFillColor} opacity-15`}
@@ -61,14 +62,14 @@ const AchievementItem = ({
           <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
             {displayName ? displayName : formatAchievementName(name)}
           </Text>
-          <Text size="xs" className="font-medium text-typography-400 mt-0.5">
-            <Text size="xs" className="font-medium text-typography-300 mt-0.5">
+          <Text size="xs" className="font-medium text-typography-200 mt-0.5">
+            <Text size="xs" className="font-bold text-typography-0 mt-0.5">
               {rarity.label}
             </Text>{' '}
             · {normalizedPercentage.toFixed(1)}% of players
           </Text>
           {description && (
-            <Text size="xs" className="text-typography-500 mt-1" numberOfLines={2}>
+            <Text size="xs" className="text-typography-100 mt-1" numberOfLines={2}>
               {description}
             </Text>
           )}
@@ -79,7 +80,7 @@ const AchievementItem = ({
           )}
         </VStack>
       </HStack>
-    </Box>
+    </Card>
   );
 };
 

@@ -2,7 +2,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { GameOverviewStatsCard } from '@gamelog/game-list/GameOverviewStatsCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 
-jest.mock('@gamelog/common/GameHeaderCard', () => {
+jest.mock('@gamelog/game-list/GameHeaderCard', () => {
   const { Pressable, Text } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     GameHeaderCard: ({ children, name, onPress }: any) => (

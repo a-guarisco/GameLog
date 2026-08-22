@@ -1,7 +1,7 @@
 import {
   getReportMinutesForGame,
   getReportTotalMinutes,
-} from '@gamelog/common/playtimeReportSelectors';
+} from '@gamelog/common/selectPlaytimeReport';
 import type { DailyReport } from '@gamelog/api-manager/dto';
 
 const REPORT: DailyReport = {

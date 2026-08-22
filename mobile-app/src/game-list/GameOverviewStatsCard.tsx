@@ -1,6 +1,6 @@
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { GameHeaderCard } from '@gamelog/common/GameHeaderCard';
+import { GameHeaderCard } from '@gamelog/game-list/GameHeaderCard';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import {
   formatDate,
@@ -47,7 +47,7 @@ export const GameOverviewStatsCard = ({ gameItem, onPress }: GameOverviewStatsCa
         className="flex-wrap"
       />
       <GameStatDivider />
-      <Text className="text-typography-400">ID: {appid}</Text>
+      <Text className="text-typography-200">ID: {appid}</Text>
     </GameHeaderCard>
   );
 };

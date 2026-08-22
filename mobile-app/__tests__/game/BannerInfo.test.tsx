@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native';
-import BannerInfo from '@gamelog/common/BannerInfo';
+import BannerInfo from '@gamelog/game/BannerInfo';
 
 jest.mock('@gamelog/common/gluestack/box', () => {
   const { View } = jest.requireActual('react-native');

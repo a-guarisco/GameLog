@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { VStack } from '@gamelog/common/gluestack/vstack';
+import { Card } from '@gamelog/common/gluestack/card';
 import { Text } from '@gamelog/common/gluestack/text';
 
 interface SectionCardProps {
@@ -10,11 +11,8 @@ interface SectionCardProps {
 }
 
 const SectionCard = ({ label, children, className = '', testID }: SectionCardProps) => (
-  <VStack
-    space="sm"
-    testID={testID}
-    className={`rounded-xl border border-outline-100 bg-background-200 p-3 ${className}`}
-  >
+  <Card variant="elevated" className={`p-3 ${className}`} testID={testID}>
+    <VStack space="sm">
     {!!label && (
       <Text
         size="2xs"
@@ -25,7 +23,8 @@ const SectionCard = ({ label, children, className = '', testID }: SectionCardPro
       </Text>
     )}
     {children}
-  </VStack>
+    </VStack>
+  </Card>
 );
 
 export default SectionCard;

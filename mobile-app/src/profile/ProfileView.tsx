@@ -11,8 +11,8 @@ import {
   useGetUserStreak,
   RECENT_PLAYTIME_DAYS,
 } from '@gamelog/api-manager/useApi';
-import { getReportTotalMinutes } from '@gamelog/common/playtimeReportSelectors';
-import HeaderGameImage from '@gamelog/game/HeaderGameImage';
+import { getReportTotalMinutes } from '@gamelog/common/selectPlaytimeReport';
+import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import ProfileIdentity from './ProfileIdentity';
@@ -82,7 +82,7 @@ const ProfileView = () => {
           mostPlayedName={mostPlayedGame?.name}
         />
 
-        <Box className="bg-background-100 pb-6 shadow-xl">
+        <Box className="bg-background-0 pb-6">
           <VStack space="xl" className="pt-6">
             <Box className="px-4">
               <ProfileStats

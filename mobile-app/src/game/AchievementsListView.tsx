@@ -5,8 +5,8 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
-import HeaderGameImage from './HeaderGameImage';
-import BannerInfo from '@gamelog/common/BannerInfo';
+import HeaderGameImage from '@gamelog/common/HeaderGameImage';
+import BannerInfo from '@gamelog/game/BannerInfo';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { useGetGameStreak } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
@@ -51,13 +51,13 @@ const AchievementsListView = ({ route }: any) => {
       <HeaderGameImage appid={gameID} />
       <ScrollablePage>
         <BannerInfo
-          className="bg-background-100 shadow-xl"
+          className="bg-background-0"
           title={gameName}
           iconUrl={gameCapsuleImage}
           secondaryText={secondaryText}
         />
 
-        <Box className=" w-80% bg-background-100 shadow-xl pt-6">
+        <Box className=" w-80% bg-background-0 pt-6">
           <Box className="mb-5 px-4">
             <Text size="3xl" className="font-bold uppercase text-center mb-3">
               Achievements for {gameName}

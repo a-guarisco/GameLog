@@ -1,9 +1,9 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import HeaderGameImage from '@gamelog/game/HeaderGameImage';
+import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import GameStatusChips from '@gamelog/game/GameStatusChips';
-import BannerInfo from '@gamelog/common/BannerInfo';
+import BannerInfo from '@gamelog/game/BannerInfo';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import BackButton from '@gamelog/common/BackButton';
 import GameStatBand from '@gamelog/common/StatBand';
@@ -47,9 +47,9 @@ const GameView = () => {
       <HeaderGameImage appid={gameItem.appid} />
 
       <ScrollablePage>
-        <BannerInfo className="bg-background-100 shadow-xl" title={gameItem.name} />
+        <BannerInfo className="bg-background-0" title={gameItem.name} />
 
-        <Box className="bg-background-100 shadow-xl pt-6 pb-6">
+        <Box className="pt-6 pb-6 bg-background-0">
           <VStack space="xl">
             <GameStatusChips livePlayers={livePlayers} streakText={streakText} />
 

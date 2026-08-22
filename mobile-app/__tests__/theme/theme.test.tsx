@@ -45,8 +45,8 @@ describe('getNavigationTheme', () => {
 
     expect(theme.colors).toEqual({
       primary: `rgb(${src['--color-primary-500']})`,
-      background: `rgb(${src['--color-background-50']})`,
-      card: `rgb(${src['--color-background-0']})`,
+      background: `rgb(${src['--color-background-0']})`,
+      card: `rgb(${src['--color-background-50']})`,
       text: `rgb(${src['--color-typography-0']})`,
       border: `rgb(${src['--color-outline-50']})`,
       notification: `rgb(${src['--color-info-500']})`,

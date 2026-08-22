@@ -9,7 +9,7 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('@gamelog/api-manager/apiManager');
-jest.mock('@gamelog/game/HeaderGameImage', () => {
+jest.mock('@gamelog/common/HeaderGameImage', () => {
   const { View } = jest.requireActual('react-native');
   return {
     __esModule: true,
@@ -80,8 +80,8 @@ describe('SocialView', () => {
   it('renders the Social Hub title and tab buttons', () => {
     render(<SocialView />);
     expect(screen.getByText('Social Hub')).toBeTruthy();
-    expect(screen.getByTestId('friends-tab-btn')).toBeTruthy();
-    expect(screen.getByTestId('search-tab-btn')).toBeTruthy();
+    expect(screen.getByTestId('social-tab-friends')).toBeTruthy();
+    expect(screen.getByTestId('social-tab-search')).toBeTruthy();
   });
 
   it('displays pending requests and accepted friends in the Friends tab', () => {
@@ -122,7 +122,7 @@ describe('SocialView', () => {
 
     render(<SocialView />);
 
-    fireEvent.press(screen.getByTestId('search-tab-btn'));
+    fireEvent.press(screen.getByTestId('social-tab-search'));
     fireEvent.changeText(screen.getByTestId('user-search-input'), 'Charlie');
 
     expect(screen.getByText('Charlie')).toBeTruthy();
@@ -149,7 +149,7 @@ describe('SocialView', () => {
 
     render(<SocialView />);
 
-    fireEvent.press(screen.getByTestId('search-tab-btn'));
+    fireEvent.press(screen.getByTestId('social-tab-search'));
     fireEvent.changeText(screen.getByTestId('user-search-input'), 'Charlie');
     fireEvent.press(screen.getByTestId('add-friend-btn-u3'));
 

@@ -7,7 +7,7 @@ import {
   useGetNumberOfCurrentPlayers,
   useGetPlaytimeReport,
 } from '@gamelog/api-manager/useApi';
-import { getReportMinutesForGame } from '@gamelog/common/playtimeReportSelectors';
+import { getReportMinutesForGame } from '@gamelog/common/selectPlaytimeReport';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import { formatMinutesToHoursShort, formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
