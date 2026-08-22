@@ -10,6 +10,7 @@ import SectionCard from '@gamelog/common/SectionCard';
 import SectionState from '@gamelog/common/SectionState';
 import { BarData } from '../charts.type';
 import buildTotalHoursBarData from './buildTotalHoursBarData';
+import { parseRGB } from '../chartsHelpers';
 
 interface TotalHoursChartProps {
   ownedGames?: any;
@@ -17,7 +18,7 @@ interface TotalHoursChartProps {
   errorOwnedGames?: any;
 }
 
-const PRIMARY_400 = `rgb(${brand.primary['400']})`;
+const PRIMARY_400 = parseRGB(brand.primary['400']);
 
 const TotalHoursChart = ({
   ownedGames,
@@ -39,7 +40,7 @@ const TotalHoursChart = ({
   const isEmpty = !hasError && barData.length === 0;
   const showChart = !isLoadingOwnedGames && !hasError && !isEmpty;
 
-  const axisColor = `rgb(${theme['--color-typography-200']})`;
+  const axisColor = parseRGB(theme['--color-typography-200']);
 
   return (
     <SectionCard label="Hours per game" testID="total-hours-chart">

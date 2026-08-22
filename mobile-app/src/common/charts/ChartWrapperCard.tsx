@@ -24,10 +24,10 @@ const ChartWrapperCard = ({ isLoading, children, error, ErrorBehaviour }: ChartC
   const theme = ThemeHandling();
 
   return (
-    <Box style={{ width: '95%', alignItems: 'center', overflow: 'hidden' }}>
+    <Box className="w-full items-center">
       <Card
-        style={{ backgroundColor: `rgb(${theme['--color-background-100']})` }}
-        className="w-full rounded-lg items-center py-4"
+        variant="elevated"
+        className="w-full items-center py-4"
         onLayout={(e) => setCardWidth(e.nativeEvent.layout.width)}
       >
         {isLoading || (!error && cardWidth === 0) ? (

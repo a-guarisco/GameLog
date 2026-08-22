@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { computePieRadius, computePieInnerRadius } from '../chartsHelpers';
+import { computePieRadius, computePieInnerRadius, parseRGB } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
 import ExternalLabelBox from '../ExternalLabelBox';
@@ -55,13 +55,13 @@ const TotalHoursPieChart = ({
             tooltipComponent={(index: number) => tooltipComponent(index, theme)}
             radius={computePieRadius(cardWidth)}
             innerRadius={computePieInnerRadius(computePieRadius(cardWidth))}
-            innerCircleColor={`rgb(${theme['--color-background-100']})`}
+            innerCircleColor={parseRGB(theme['--color-background-50'])}
             centerLabelComponent={() => <Box style={{ alignItems: 'center' }} />}
             isAnimated
             animationDuration={500}
             showText
             textSize={10}
-            textColor={`rgb(${theme['--color-typography-200']})`}
+            textColor={parseRGB(theme['--color-typography-200'])}
             labelsPosition="outward"
             showValuesAsLabels={false}
             showTextBackground={false}
