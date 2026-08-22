@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Card } from '@gamelog/common/gluestack/card';
-import { Text } from '@gamelog/common/gluestack/text';
+import CardTitleText from '@gamelog/common/typography/CardTitleText';
 
 interface SectionCardProps {
   label?: string;
@@ -14,13 +14,9 @@ const SectionCard = ({ label, children, className = '', testID }: SectionCardPro
   <Card variant="elevated" className={`p-3 ${className}`} testID={testID}>
     <VStack space="sm" className="w-full">
       {!!label && (
-        <Text
-          size="2xs"
-          className="font-bold uppercase text-typography-300"
-          style={{ letterSpacing: 1 }}
-        >
+        <CardTitleText>
           {label}
-        </Text>
+        </CardTitleText>
       )}
       {children}
     </VStack>

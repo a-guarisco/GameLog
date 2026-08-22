@@ -48,7 +48,7 @@ const GameGenreRadarChart = ({
                 strokeDashArray: [0, 0],
               }}
               labelConfig={{
-                stroke: parseRGB(theme['--color-typography-200']),
+                stroke: parseRGB(theme['--color-typography-400']),
               }}
               polygonConfig={{
                 stroke: parseRGB(brand.primary['500']),
