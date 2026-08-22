@@ -43,7 +43,7 @@ const TotalHoursPieChart = ({
   };
 
   return (
-    <ChartWrapperCard isLoading={isLoadingOwnedGames} error={!!errorOwnedGames}>
+    <ChartWrapperCard label="Time per Category" isLoading={isLoadingOwnedGames} error={!!errorOwnedGames}>
       {({ cardWidth, theme }) => (
         <>
           <PieChart

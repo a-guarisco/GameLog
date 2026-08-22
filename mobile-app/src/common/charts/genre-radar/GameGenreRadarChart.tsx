@@ -23,7 +23,7 @@ const GameGenreRadarChart = ({
   );
 
   return (
-    <ChartWrapperCard isLoading={isLoadingGenreChart} error={errorGenreChart}>
+    <ChartWrapperCard label="Time per Genre" isLoading={isLoadingGenreChart} error={errorGenreChart}>
       {({ theme, cardWidth }) => (
         <>
           <Box style={{ marginTop: -25, marginBottom: -15 }}>

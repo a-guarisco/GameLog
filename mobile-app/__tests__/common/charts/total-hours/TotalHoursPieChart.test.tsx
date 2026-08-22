@@ -25,6 +25,7 @@ jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
   computePieRadius: jest.fn(() => 100),
   computePieInnerRadius: jest.fn(() => 50),
+  parseRGB: jest.requireActual('@gamelog/common/charts/chartsHelpers').parseRGB,
 }));
 
 jest.mock('@gamelog/utils/formatUtils', () => ({
@@ -51,6 +52,7 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
             '--color-typography-200': '200,200,200',
             '--color-typography-100': '100,100,100',
             '--color-background-100': '0,0,0',
+            '--color-background-50': '50,50,50',
           },
         })}
     </View>
@@ -96,7 +98,7 @@ describe('TotalHoursPieChart', () => {
     const pie = UNSAFE_getByType('PieChart' as any);
 
     expect(pie.props.textColor).toBe('rgb(200,200,200)');
-    expect(pie.props.innerCircleColor).toBe('rgb(0,0,0)');
+    expect(pie.props.innerCircleColor).toBe('rgb(50,50,50)');
   });
 
   it('renders ExternalLabelBox with formatted labels', () => {
