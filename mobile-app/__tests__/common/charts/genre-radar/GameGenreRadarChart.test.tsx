@@ -46,10 +46,10 @@ describe('GameGenreRadarChart', () => {
     expect(screen.queryByTestId('external-label-box')).toBeNull();
   });
 
-  it('renders RadarChart and ExternalLabelBox when data is available', () => {
-    render(<GameGenreRadarChart genreChartData={GENRE_DATA} />);
+  it('renders RadarChart when data is available', () => {
+    const { UNSAFE_getByType } = render(<GameGenreRadarChart genreChartData={GENRE_DATA} />);
 
-    expect(screen.getByTestId('external-label-box')).toBeTruthy();
+    expect(UNSAFE_getByType('RadarChart' as any)).toBeTruthy();
   });
 
   it('derives numeric values and labels from genreChartData', () => {
@@ -57,7 +57,7 @@ describe('GameGenreRadarChart', () => {
     const radarChart = UNSAFE_getByType('RadarChart' as any);
 
     expect(radarChart.props.data).toEqual([600, 300]);
-    expect(radarChart.props.labels).toEqual(['Action', 'RPG']);
+    expect(radarChart.props.labels).toEqual(['Action\n600m', 'RPG\n300m']);
   });
 
   it('sets maxValue to the highest value in the dataset', () => {

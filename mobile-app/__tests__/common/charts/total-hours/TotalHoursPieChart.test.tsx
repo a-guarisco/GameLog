@@ -14,13 +14,7 @@ jest.mock('@gamelog/common/gluestack/text', () => {
   return { Text };
 });
 
-jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
-  const { View } = jest.requireActual('react-native');
-  const MockExternalLabelBox = (props: any) => <View testID="external-label-box" />;
 
-  MockExternalLabelBox.displayName = 'MockExternalLabelBox';
-  return MockExternalLabelBox;
-});
 
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
   computePieRadius: jest.fn(() => 100),
@@ -93,18 +87,11 @@ describe('TotalHoursPieChart', () => {
     expect(UNSAFE_getByType('PieChart' as any)).toBeTruthy();
   });
 
-  it('derives colors from theme', () => {
+  it('derives innerCircleColor from theme', () => {
     const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
-    expect(pie.props.textColor).toBe('rgb(200,200,200)');
     expect(pie.props.innerCircleColor).toBe('rgb(50,50,50)');
-  });
-
-  it('renders ExternalLabelBox with formatted labels', () => {
-    const { getByTestId } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
-
-    expect(getByTestId('external-label-box')).toBeTruthy();
   });
 
   it('formats tooltip label correctly', () => {
