@@ -10,7 +10,7 @@ const CardTitleText = ({ children, className = '' }: CardTitleTextProps) => {
   return (
     <Text
       size="2xs"
-      className={`font-bold uppercase text-typography-200 ${className}`}
+      className={`font-bold uppercase text-typography-400 ${className}`}
       style={{ letterSpacing: 1 }}
     >
       {children}
