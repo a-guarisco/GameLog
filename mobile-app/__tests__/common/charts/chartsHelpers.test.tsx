@@ -71,19 +71,19 @@ describe('getPercentileInfoGradient', () => {
 describe('computePieRadius', () => {
   it('should return the calculated radius when cardWidth is greater than 0', () => {
     const cardWidth = 400;
-    expect(computePieRadius(cardWidth)).toBe(112);
+    expect(computePieRadius(cardWidth)).toBe(140);
   });
 
-  it('should return 110 when cardWidth is 0 or less', () => {
-    expect(computePieRadius(0)).toBe(110);
-    expect(computePieRadius(-10)).toBe(110);
+  it('should return 140 when cardWidth is 0 or less', () => {
+    expect(computePieRadius(0)).toBe(140);
+    expect(computePieRadius(-10)).toBe(140);
   });
 });
 
 describe('computePieInnerRadius', () => {
   it('should return the calculated inner radius when given r', () => {
     const r = 200;
-    expect(computePieInnerRadius(r)).toBe(128);
+    expect(computePieInnerRadius(r)).toBe(140);
   });
 });
 

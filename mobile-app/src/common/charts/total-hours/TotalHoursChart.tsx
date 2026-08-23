@@ -1,15 +1,13 @@
-import { useMemo, useState } from 'react';
-import { useColorScheme } from 'react-native';
+import { useMemo } from 'react';
 import { BarChart } from 'react-native-gifted-charts';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
-import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { brand } from '@gamelog/theme/theme';
-import SectionCard from '@gamelog/common/SectionCard';
-import SectionState from '@gamelog/common/SectionState';
+import ChartWrapperCard from '../ChartWrapperCard';
 import { BarData } from '../charts.type';
 import buildTotalHoursBarData from './buildTotalHoursBarData';
+import { parseRGB } from '../chartsHelpers';
 
 interface TotalHoursChartProps {
   ownedGames?: any;
@@ -17,7 +15,7 @@ interface TotalHoursChartProps {
   errorOwnedGames?: any;
 }
 
-const PRIMARY_400 = `rgb(${brand.primary['400']})`;
+const PRIMARY_400 = parseRGB(brand.primary['400']);
 
 const TotalHoursChart = ({
   ownedGames,
@@ -26,50 +24,39 @@ const TotalHoursChart = ({
 }: TotalHoursChartProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
-  const [chartWidth, setChartWidth] = useState(0);
-  const isDark = useColorScheme() === 'dark';
-  const theme = isDark ? rawConfig.dark : rawConfig.light;
-
   const barData: BarData[] = useMemo(() => {
     const raw = buildTotalHoursBarData(ownedGames);
     return raw.map((item) => ({ ...item, frontColor: PRIMARY_400, gradientColor: undefined }));
   }, [ownedGames]);
 
-  const hasError = !!errorOwnedGames;
-  const isEmpty = !hasError && barData.length === 0;
-  const showChart = !isLoadingOwnedGames && !hasError && !isEmpty;
-
-  const axisColor = `rgb(${theme['--color-typography-200']})`;
-
   return (
-    <SectionCard label="Hours per game" testID="total-hours-chart">
-      <SectionState
-        isLoading={isLoadingOwnedGames}
-        hasError={hasError}
-        isEmpty={isEmpty}
-        errorMessage="Could not load playtime"
-        emptyMessage="No playtime recorded yet"
-      />
+    <ChartWrapperCard
+      label="Hours per game"
+      isLoading={isLoadingOwnedGames}
+      error={!!errorOwnedGames}
+      testID="total-hours-chart"
+    >
+      {({ cardWidth, theme }) => {
+        const axisColor = parseRGB(theme['--color-typography-200']);
+        const outlineColor = parseRGB(theme['--color-outline-100']);
 
-      {!isLoadingOwnedGames && !hasError && !isEmpty && (
-        <Box
-          style={{ overflow: 'hidden' }}
-          onLayout={(e) => setChartWidth(e.nativeEvent.layout.width)}
-        >
-          {showChart && (
+        return (
+          <Box style={{ overflow: 'hidden', width: '100%', alignItems: 'center' }}>
             <BarChart
-              parentWidth={chartWidth || 370}
+              parentWidth={cardWidth || 370}
               adjustToWidth
               data={barData}
               barWidth={40}
               initialSpacing={10}
               spacing={14}
               isAnimated
-              animationDuration={500}
+              animationDuration={600}
               barBorderRadius={4}
               yAxisThickness={0}
               xAxisThickness={0}
               hideYAxisText
+              rulesType="dashed"
+              rulesColor={outlineColor}
               yAxisTextStyle={{ color: axisColor }}
               xAxisType={'dashed'}
               xAxisColor={axisColor}
@@ -80,23 +67,22 @@ const TotalHoursChart = ({
                 color: axisColor,
                 textAlign: 'center',
                 fontSize: 10,
-                fontWeight: '700',
-                textTransform: 'uppercase',
+                fontWeight: '600',
               }}
               onPress={(item: any, index: number) => {
-                const appid = barData[index]?.appid ?? item?.appid;
-                if (appid) {
-                  navigation?.navigate('GameList', {
+                const gameItem = barData[index] ?? item;
+                if (gameItem && gameItem.appid) {
+                  navigation.navigate('GameList', {
                     screen: 'Game',
-                    params: { appid },
+                    params: { gameItem: { appid: gameItem.appid, name: gameItem.name } },
                   });
                 }
               }}
             />
-          )}
-        </Box>
-      )}
-    </SectionCard>
+          </Box>
+        );
+      }}
+    </ChartWrapperCard>
   );
 };
 

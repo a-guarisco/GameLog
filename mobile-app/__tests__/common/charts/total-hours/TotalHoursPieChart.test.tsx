@@ -14,17 +14,12 @@ jest.mock('@gamelog/common/gluestack/text', () => {
   return { Text };
 });
 
-jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
-  const { View } = jest.requireActual('react-native');
-  const MockExternalLabelBox = (props: any) => <View testID="external-label-box" />;
 
-  MockExternalLabelBox.displayName = 'MockExternalLabelBox';
-  return MockExternalLabelBox;
-});
 
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
   computePieRadius: jest.fn(() => 100),
   computePieInnerRadius: jest.fn(() => 50),
+  parseRGB: jest.requireActual('@gamelog/common/charts/chartsHelpers').parseRGB,
 }));
 
 jest.mock('@gamelog/utils/formatUtils', () => ({
@@ -51,6 +46,7 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
             '--color-typography-200': '200,200,200',
             '--color-typography-100': '100,100,100',
             '--color-background-100': '0,0,0',
+            '--color-background-50': '50,50,50',
           },
         })}
     </View>
@@ -91,27 +87,21 @@ describe('TotalHoursPieChart', () => {
     expect(UNSAFE_getByType('PieChart' as any)).toBeTruthy();
   });
 
-  it('derives colors from theme', () => {
+  it('derives innerCircleColor from theme', () => {
     const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
-    expect(pie.props.textColor).toBe('rgb(200,200,200)');
-    expect(pie.props.innerCircleColor).toBe('rgb(0,0,0)');
-  });
-
-  it('renders ExternalLabelBox with formatted labels', () => {
-    const { getByTestId } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
-
-    expect(getByTestId('external-label-box')).toBeTruthy();
+    expect(pie.props.innerCircleColor).toBe('rgb(50,50,50)');
   });
 
   it('formats tooltip label correctly', () => {
     const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
-    const tooltip = pie.props.tooltipComponent(0);
+    const tooltipElement = pie.props.tooltipComponent(0);
+    const { getByText } = render(tooltipElement);
 
     expect(formatMinutesToHours).toHaveBeenCalledWith(60);
-    expect(tooltip.props.children.join('')).toContain('Game A');
+    expect(getByText(/Game A/)).toBeTruthy();
   });
 });

@@ -1,15 +1,5 @@
 import buildTotalHoursBarData from '@gamelog/common/charts/total-hours/buildTotalHoursBarData';
-import { getPercentileInfoGradient } from '@gamelog/common/charts/chartsHelpers';
 import { GameItem, OwnedGames } from '@gamelog/api-manager/dto';
-
-jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
-  getPercentileInfoGradient: jest.fn(() => ({
-    frontColor: '#computed',
-    gradientColor: '#computed-g',
-  })),
-}));
-
-const mockGetPercentileInfoGradient = getPercentileInfoGradient as jest.Mock;
 
 const makeGame = (overrides: Partial<GameItem> = {}): GameItem => ({
   appid: '1',
@@ -82,23 +72,6 @@ describe('buildTotalHoursBarData', () => {
   it('keeps names of 10 characters or fewer unchanged', () => {
     const result = buildTotalHoursBarData(makeOwnedGames([makeGame({ name: 'ShortName' })]));
     expect(result[0].label).toBe('ShortName');
-  });
-
-  it('calls getPercentileInfoGradient with value, min, and max for each item', () => {
-    const games = [
-      makeGame({ appid: '1', playtime_forever: 60 }),
-      makeGame({ appid: '2', playtime_forever: 180 }),
-    ];
-    buildTotalHoursBarData(makeOwnedGames(games));
-
-    expect(mockGetPercentileInfoGradient).toHaveBeenCalledWith(3, 1, 3); // max item
-    expect(mockGetPercentileInfoGradient).toHaveBeenCalledWith(1, 1, 3); // min item
-  });
-
-  it('spreads getPercentileInfoGradient result onto each bar item', () => {
-    const result = buildTotalHoursBarData(makeOwnedGames([makeGame({ playtime_forever: 60 })]));
-    expect(result[0].frontColor).toBe('#computed');
-    expect(result[0].gradientColor).toBe('#computed-g');
   });
 
   it('sets spacing to 12 on every item', () => {

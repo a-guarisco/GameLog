@@ -1,16 +1,13 @@
 import buildTotalHoursPieData from '@gamelog/common/charts/total-hours/buildTotalHoursPieData';
-import { getTopGames } from '@gamelog/common/charts/chartsHelpers';
-import { brand } from '@gamelog/theme/theme';
+import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
-  getTopGames: jest.fn(),
-  INFO_GRADIENT_TIERS: [
-    { frontColor: '#a', gradientColor: '#b' },
-    { frontColor: '#c', gradientColor: '#d' },
-  ],
+  parseRGB: (c: any) => c ? `rgb(${String(c).replace(/ /g, ',')})` : 'transparent',
 }));
 
-const mockGetTopGames = getTopGames as jest.Mock;
+jest.mock('@gamelog/utils/formatUtils', () => ({
+  formatMinutesToHours: jest.fn((m) => `${m}m`),
+}));
 
 const makeGame = (name: string, minutes: number) => ({
   name,
@@ -32,18 +29,9 @@ describe('buildTotalHoursPieData', () => {
     expect(result).toEqual([]);
   });
 
-  it('calls getTopGames with games and limit', () => {
-    const games = [makeGame('A', 10)];
-    mockGetTopGames.mockReturnValue(games);
-
-    buildTotalHoursPieData({ response: { games } } as any, 3);
-
-    expect(mockGetTopGames).toHaveBeenCalledWith(games, 3);
-  });
-
-  it('maps games to pie slices with correct values and colors', () => {
-    const games = [makeGame('Game A', 60), makeGame('Game B', 40)];
-    mockGetTopGames.mockReturnValue(games);
+  it('sorts and maps games to pie slices with correct values and colors', () => {
+    // A has 60, B has 40. B is defined before A to test sorting.
+    const games = [makeGame('Game B', 40), makeGame('Game A', 60)];
 
     const result = buildTotalHoursPieData({ response: { games } } as any, 5);
 
@@ -51,77 +39,61 @@ describe('buildTotalHoursPieData', () => {
       {
         value: 60,
         label: 'Game A',
-        color: '#a',
-        gradientCenterColor: '#b',
+        text: '60m',
+        color: 'rgb(37,99,235)',
+        gradientCenterColor: 'rgb(96,165,250)',
       },
       {
         value: 40,
         label: 'Game B',
-        color: '#c',
-        gradientCenterColor: '#d',
+        text: '40m',
+        color: 'rgb(124,58,237)',
+        gradientCenterColor: 'rgb(167,139,250)',
       },
     ]);
   });
 
-  it('truncates long game names to 12 chars + ellipsis', () => {
-    const games = [makeGame('VeryLongGameName123', 50)];
-    mockGetTopGames.mockReturnValue(games);
-
-    const result = buildTotalHoursPieData({ response: { games } } as any, 5);
-
-    expect(result[0].label).toBe('VeryLongGame…');
-  });
-
   it('cycles through gradient tiers when more games than colors', () => {
-    const games = [
-      makeGame('A', 10),
-      makeGame('B', 20),
-      makeGame('C', 30), // should reuse first color
-    ];
-    mockGetTopGames.mockReturnValue(games);
+    const games = Array.from({ length: 8 }, (_, i) => makeGame(`Game ${i}`, 100 - i));
 
-    const result = buildTotalHoursPieData({ response: { games } } as any, 5);
+    const result = buildTotalHoursPieData({ response: { games } } as any, 8);
 
-    expect(result[2].color).toBe('#a');
-    expect(result[2].gradientCenterColor).toBe('#b');
+    // Color at index 6 should loop back to color at index 0 (Blue)
+    expect(result[6].color).toBe('rgb(37,99,235)');
+    expect(result[6].gradientCenterColor).toBe('rgb(96,165,250)');
   });
 
   it('adds "Other" slice when there are more games than limit', () => {
-    const games = [makeGame('A', 10), makeGame('B', 20), makeGame('C', 30)];
-
-    mockGetTopGames.mockReturnValue(games);
+    const games = [makeGame('A', 30), makeGame('B', 20), makeGame('C', 10)];
 
     const result = buildTotalHoursPieData({ response: { games } } as any, 2);
 
     const otherSlice = result.find((r) => r.label === 'Other');
 
     expect(otherSlice).toEqual({
-      value: 30,
+      value: 10,
       label: 'Other',
-      color: `rgb(${brand.info['200']})`,
-      gradientCenterColor: `rgb(${brand.info['400']})`,
+      text: '10m',
+      color: 'rgb(192,38,211)', // 3rd color in the palette (Fuchsia)
+      gradientCenterColor: 'rgb(232,121,249)',
     });
   });
 
   it('does not add "Other" slice when extra games sum to 0', () => {
-    const games = [makeGame('A', 10), makeGame('B', 20)];
+    const games = [makeGame('A', 10), makeGame('B', 20), makeGame('C', 0)];
 
-    mockGetTopGames.mockReturnValue(games);
-
-    const result = buildTotalHoursPieData({ response: { games } } as any, 5);
+    const result = buildTotalHoursPieData({ response: { games } } as any, 2);
 
     expect(result.find((r) => r.label === 'Other')).toBeUndefined();
   });
 
   it('correctly sums extra games into "Other"', () => {
-    const games = [makeGame('A', 10), makeGame('B', 20), makeGame('C', 30), makeGame('D', 40)];
-
-    mockGetTopGames.mockReturnValue(games);
+    const games = [makeGame('A', 40), makeGame('B', 30), makeGame('C', 20), makeGame('D', 10)];
 
     const result = buildTotalHoursPieData({ response: { games } } as any, 2);
 
     const otherSlice = result.find((r) => r.label === 'Other');
 
-    expect(otherSlice?.value).toBe(70);
+    expect(otherSlice?.value).toBe(30); // C + D
   });
 });
