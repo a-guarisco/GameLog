@@ -13,11 +13,7 @@ interface SectionCardProps {
 const SectionCard = ({ label, children, className = '', testID }: SectionCardProps) => (
   <Card variant="elevated" className={`p-3 ${className}`} testID={testID}>
     <VStack space="sm" className="w-full">
-      {!!label && (
-        <CardTitleText>
-          {label}
-        </CardTitleText>
-      )}
+      {!!label && <CardTitleText>{label}</CardTitleText>}
       {children}
     </VStack>
   </Card>

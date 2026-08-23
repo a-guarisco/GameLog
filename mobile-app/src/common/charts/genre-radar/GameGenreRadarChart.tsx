@@ -23,17 +23,22 @@ const GameGenreRadarChart = ({
   );
 
   return (
-    <ChartWrapperCard label="Time per Genre" isLoading={isLoadingGenreChart} error={errorGenreChart}>
+    <ChartWrapperCard
+      label="Time per Genre"
+      isLoading={isLoadingGenreChart}
+      error={errorGenreChart}
+    >
       {({ theme, cardWidth }) => (
         <>
-          <Box style={{ marginTop: -25, marginBottom: -15 }}>
+          <Box style={{ marginTop: -25, marginBottom: -0 }}>
             <RadarChart
-              radius={75}
               chartSize={cardWidth ? cardWidth - 16 : 320}
               data={values}
               labels={labels}
               maxValue={Math.max(...values, 1)}
               noOfSections={5}
+              isAnimated
+              animationDuration={500}
               labelsPositionOffset={Math.max(...values, 1) * 0.1}
               dataLabelsPositionOffset={10}
               gridConfig={{

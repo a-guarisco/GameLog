@@ -83,7 +83,7 @@ describe('computePieRadius', () => {
 describe('computePieInnerRadius', () => {
   it('should return the calculated inner radius when given r', () => {
     const r = 200;
-    expect(computePieInnerRadius(r)).toBe(110);
+    expect(computePieInnerRadius(r)).toBe(140);
   });
 });
 

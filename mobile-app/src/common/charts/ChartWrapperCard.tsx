@@ -12,6 +12,7 @@ interface ChartCardProps {
   children: (layout: { cardWidth: number; theme: typeof rawConfig.light }) => React.ReactNode;
   error: boolean;
   ErrorBehaviour?: React.ComponentType;
+  testID?: string;
 }
 
 const ThemeHandling = () => {
@@ -20,13 +21,20 @@ const ThemeHandling = () => {
   return theme;
 };
 
-const ChartWrapperCard = ({ label, isLoading, children, error, ErrorBehaviour }: ChartCardProps) => {
+const ChartWrapperCard = ({
+  label,
+  isLoading,
+  children,
+  error,
+  ErrorBehaviour,
+  testID,
+}: ChartCardProps) => {
   const [cardWidth, setCardWidth] = useState(0);
   const theme = ThemeHandling();
 
   return (
     <Box className="w-full items-center">
-      <SectionCard label={label} className="w-full">
+      <SectionCard label={label} className="w-full" testID={testID}>
         <Box
           testID="card"
           className="w-full items-center"

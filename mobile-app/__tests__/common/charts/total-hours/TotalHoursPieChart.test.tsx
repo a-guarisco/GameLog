@@ -98,9 +98,10 @@ describe('TotalHoursPieChart', () => {
     const { UNSAFE_getByType } = render(<TotalHoursPieChart ownedGames={OWNED_GAMES} />);
     const pie = UNSAFE_getByType('PieChart' as any);
 
-    const tooltip = pie.props.tooltipComponent(0);
+    const tooltipElement = pie.props.tooltipComponent(0);
+    const { getByText } = render(tooltipElement);
 
     expect(formatMinutesToHours).toHaveBeenCalledWith(60);
-    expect(tooltip.props.children.join('')).toContain('Game A');
+    expect(getByText(/Game A/)).toBeTruthy();
   });
 });
