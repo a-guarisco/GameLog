@@ -307,6 +307,7 @@ describe('ApiManager', () => {
         EndPoints.getPlaytimeReport('2026-08-05', '2026-08-18'),
         {
           headers: {
+            'Content-Type': 'application/json',
             Authorization: 'Bearer firebase-id-token',
           },
         }
@@ -329,6 +330,7 @@ describe('ApiManager', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(EndPoints.getPlaytimeByUser(14), {
         headers: {
+          'Content-Type': 'application/json',
           Authorization: 'Bearer firebase-id-token',
         },
       });
