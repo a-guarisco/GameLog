@@ -1,100 +1,94 @@
+import { useMemo } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import SectionCard from '@gamelog/common/SectionCard';
-import SectionState from '@gamelog/common/SectionState';
+import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import type { PlaytimeTrend } from './playtimeTrendSelectors';
-
-/** TODO: Make this dynamic based on the available space. */
-const PLOT_HEIGHT = 96;
-const MIN_BAR_PERCENT = 6;
+import { BarChart } from 'react-native-gifted-charts';
+import { brand } from '@gamelog/theme/theme';
+import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
 
 interface ProfilePlaytimeTrendProps {
   trend: PlaytimeTrend;
   hasError?: boolean;
 }
 
-const TrendBar = ({
-  percent,
-  isToday,
-  testID,
-}: {
-  percent: number;
-  isToday: boolean;
-  testID: string;
-}) => {
-  if (percent <= 0) {
-    return <Box testID={testID} className="h-0.5 w-full rounded-full bg-background-300" />;
-  }
+const ProfilePlaytimeTrend = ({ trend, hasError = false }: ProfilePlaytimeTrendProps) => {
+  const barData = useMemo(() => {
+    return trend.days.map((day) => ({
+      value: day.minutes,
+      label: day.label,
+      frontColor: parseRGB(day.isToday ? brand.primary['300'] : brand.primary['400']),
+    }));
+  }, [trend.days]);
 
   return (
-    <Box
-      testID={testID}
-      className={`w-full rounded-t-md ${isToday ? 'bg-primary-300' : 'bg-primary-400'}`}
-      style={{ height: `${Math.min(100, Math.max(MIN_BAR_PERCENT, percent))}%` }}
-    />
-  );
-};
+    <ChartWrapperCard
+      label={`Playtime · last ${trend.days.length} days`}
+      isLoading={false}
+      error={hasError}
+      testID="profile-playtime-trend"
+      ErrorBehaviour={() => (
+        <Text className="text-center text-error-500 my-4">Could not load playtime history</Text>
+      )}
+    >
+      {({ cardWidth, theme }) => {
+        if (!trend.hasPlaytime) {
+          return (
+            <Box className="py-8 items-center justify-center">
+              <Text className="text-typography-400">No playtime in this window</Text>
+            </Box>
+          );
+        }
 
-const ProfilePlaytimeTrend = ({ trend, hasError = false }: ProfilePlaytimeTrendProps) => (
-  <SectionCard label={`Playtime · last ${trend.days.length} days`} testID="profile-playtime-trend">
-    <SectionState
-      hasError={hasError}
-      isEmpty={!trend.hasPlaytime}
-      errorMessage="Could not load playtime history"
-      emptyMessage="No playtime in this window"
-    />
+        const axisColor = parseRGB(theme['--color-typography-200']);
 
-    {!hasError && trend.hasPlaytime && (
-      <VStack space="sm">
-        <HStack space="sm" className="items-baseline">
-          <Text size="xl" className="font-bold text-typography-0">
-            {trend.totalLabel}
-          </Text>
-          {!!trend.peakLabel && (
-            <Text size="xs" className="text-typography-300">
-              peak {trend.peakLabel}
-            </Text>
-          )}
-        </HStack>
+        return (
+          <VStack space="sm" className="w-full">
+            <HStack space="sm" className="items-baseline w-full">
+              <Text size="xl" className="font-bold text-typography-0">
+                {trend.totalLabel}
+              </Text>
+              {!!trend.peakLabel && (
+                <Text size="xs" className="text-typography-300">
+                  peak {trend.peakLabel}
+                </Text>
+              )}
+            </HStack>
 
-        <HStack space="xs" className="items-end" style={{ height: PLOT_HEIGHT }}>
-          {trend.days.map((day) => (
             <Box
-              key={day.date}
-              className="h-full flex-1 justify-end"
-              accessibilityLabel={day.accessibilityLabel}
+              style={{ overflow: 'hidden', width: '100%', alignItems: 'center', marginLeft: -20 }}
             >
-              <TrendBar
-                percent={day.percentOfPeak}
-                isToday={day.isToday}
-                testID={`profile-trend-bar-${day.date}`}
+              <BarChart
+                parentWidth={cardWidth || 370}
+                adjustToWidth
+                data={barData}
+                barWidth={16}
+                spacing={12}
+                initialSpacing={10}
+                isAnimated
+                animationDuration={400}
+                barBorderRadius={4}
+                yAxisThickness={0}
+                xAxisThickness={0}
+                hideRules
+                hideYAxisText
+                xAxisColor={axisColor}
+                yAxisTextStyle={{ color: axisColor, fontSize: 10 }}
+                xAxisLabelTextStyle={{ color: axisColor, fontSize: 10, textAlign: 'center' }}
+                dashWidth={0}
               />
             </Box>
-          ))}
-        </HStack>
 
-        <HStack space="xs">
-          {trend.days.map((day) => (
-            <Text
-              key={day.date}
-              size="2xs"
-              className={`flex-1 text-center font-bold ${
-                day.isToday ? 'text-typography-100' : 'text-typography-400'
-              }`}
-            >
-              {day.label}
+            <Text size="xs" className="text-typography-300 text-center mt-2">
+              Played {trend.activeDaysLabel}.
             </Text>
-          ))}
-        </HStack>
-
-        <Text size="xs" className="text-typography-300">
-          Played {trend.activeDaysLabel}.
-        </Text>
-      </VStack>
-    )}
-  </SectionCard>
-);
+          </VStack>
+        );
+      }}
+    </ChartWrapperCard>
+  );
+};
 
 export default ProfilePlaytimeTrend;

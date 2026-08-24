@@ -39,8 +39,8 @@ const GameGenreRadarChart = ({
               noOfSections={5}
               isAnimated
               animationDuration={500}
-              labelsPositionOffset={Math.max(...values, 1) * 0.1}
-              dataLabelsPositionOffset={10}
+              labelsPositionOffset={Math.max(...values, 1) * 0.08}
+              // dataLabelsPositionOffset={10}
               gridConfig={{
                 stroke: parseRGB(theme['--color-outline-100']),
                 strokeWidth: 1,
