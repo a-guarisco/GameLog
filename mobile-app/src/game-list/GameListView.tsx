@@ -8,7 +8,7 @@ import { useGameList } from './useGameList';
 import { ErrorBox, LoadingBox, InfoBox, WarningBox } from '@gamelog/common/feedbacks';
 import { GameListControls } from './GameListControls';
 
-import { getSteamId } from '@gamelog/api-manager/apiEndsPoints';
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 const GameListView = ({ route }: any) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();

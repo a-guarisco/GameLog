@@ -8,7 +8,7 @@ import {
   useGetPlaytimeReport,
   useGetUserStreak,
 } from '@gamelog/api-manager/useApi';
-import { getSteamId } from '@gamelog/api-manager/apiEndsPoints';
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
   ...jest.requireActual('@gamelog/api-manager/useApi'),
@@ -20,7 +20,7 @@ jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetPlaytimeByUser: jest.fn(),
 }));
 
-jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+jest.mock('@gamelog/api-manager/steamApiKey', () => ({
   getSteamId: jest.fn(),
 }));
 

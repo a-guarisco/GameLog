@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import apiManager from '@gamelog/api-manager/apiManager';
-import { setSteamApiKey as globalSetSteamApiKey, setSteamId as globalSetSteamId } from '@gamelog/api-manager/apiEndsPoints';
+import {
+  setSteamApiKey as globalSetSteamApiKey,
+  setSteamId as globalSetSteamId,
+} from '@gamelog/api-manager/steamApiKey';
 import { auth } from '@gamelog/auth/firebaseClient';
 
 export function useProfileSetup() {

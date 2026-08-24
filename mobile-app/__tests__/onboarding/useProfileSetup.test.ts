@@ -3,7 +3,7 @@ import { useProfileSetup } from '../../src/onboarding/useProfileSetup';
 import { DeviceEventEmitter } from 'react-native';
 import apiManager from '@gamelog/api-manager/apiManager';
 import { auth } from '@gamelog/auth/firebaseClient';
-import { setSteamId, setSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
+import { setSteamId, setSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   registerUser: jest.fn(),
@@ -15,7 +15,7 @@ jest.mock('@gamelog/auth/firebaseClient', () => ({
   },
 }));
 
-jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+jest.mock('@gamelog/api-manager/steamApiKey', () => ({
   setSteamId: jest.fn(),
   setSteamApiKey: jest.fn(),
 }));
@@ -36,7 +36,7 @@ describe('useProfileSetup', () => {
 
   it('validates username length', async () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.setUsername('ab');
     });
@@ -51,7 +51,7 @@ describe('useProfileSetup', () => {
 
   it('validates missing steamId', async () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.setUsername('validUser');
       result.current.setSteamId('');
@@ -68,7 +68,7 @@ describe('useProfileSetup', () => {
   it('calls apiManager.registerUser and emits event on success', async () => {
     const { result } = renderHook(() => useProfileSetup());
     const emitSpy = jest.spyOn(DeviceEventEmitter, 'emit');
-    
+
     act(() => {
       result.current.setUsername('validUser');
       result.current.setSteamId('123456');
@@ -94,7 +94,7 @@ describe('useProfileSetup', () => {
 
   it('calls apiManager.registerUser without API key if not provided', async () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.setUsername('validUser');
       result.current.setSteamId('123456');
@@ -117,7 +117,7 @@ describe('useProfileSetup', () => {
 
   it('handles apiManager error with response detail', async () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.setUsername('validUser');
       result.current.setSteamId('123456');
@@ -137,7 +137,7 @@ describe('useProfileSetup', () => {
 
   it('handles apiManager error with message fallback', async () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.setUsername('validUser');
       result.current.setSteamId('123456');
@@ -156,7 +156,7 @@ describe('useProfileSetup', () => {
 
   it('handles generic error with default fallback', async () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.setUsername('validUser');
       result.current.setSteamId('123456');
@@ -173,7 +173,7 @@ describe('useProfileSetup', () => {
 
   it('calls auth.signOut on handleSignOut', () => {
     const { result } = renderHook(() => useProfileSetup());
-    
+
     act(() => {
       result.current.handleSignOut();
     });

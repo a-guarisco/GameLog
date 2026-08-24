@@ -2,6 +2,29 @@ import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/asy
 
 jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 
+const secureStoreMockState: Record<string, string> = {};
+jest.mock('expo-secure-store', () => ({
+  WHEN_UNLOCKED: 'WHEN_UNLOCKED',
+  AFTER_FIRST_UNLOCK: 'AFTER_FIRST_UNLOCK',
+  ALWAYS: 'ALWAYS',
+  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: 'WHEN_PASSCODE_SET_THIS_DEVICE_ONLY',
+  WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY',
+  AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: 'AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY',
+  ALWAYS_THIS_DEVICE_ONLY: 'ALWAYS_THIS_DEVICE_ONLY',
+  isAvailableAsync: jest.fn(() => Promise.resolve(true)),
+  setItemAsync: jest.fn((key: string, value: string) => {
+    secureStoreMockState[key] = value;
+    return Promise.resolve();
+  }),
+  getItemAsync: jest.fn((key: string) => {
+    return Promise.resolve(secureStoreMockState[key] ?? null);
+  }),
+  deleteItemAsync: jest.fn((key: string) => {
+    delete secureStoreMockState[key];
+    return Promise.resolve();
+  }),
+}));
+
 jest.mock('@expo-google-fonts/dm-sans', () => ({
   useFonts: jest.fn(() => [true]),
   DMSans_100Thin: 'DMSans_100Thin',

@@ -21,7 +21,7 @@ import ProfileSectionTabs from './ProfileSectionTabs';
 import { getMemberSinceLabel, getMostPlayedGame, getTopGamesByHours } from './profileSelectors';
 import { getPlaytimeTrend } from './playtimeTrendSelectors';
 import { getPlatformSplit } from './platformSplitSelectors';
-import { getSteamId } from '@gamelog/api-manager/apiEndsPoints';
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 const ProfileView = () => {
   const USER_ID = getSteamId();

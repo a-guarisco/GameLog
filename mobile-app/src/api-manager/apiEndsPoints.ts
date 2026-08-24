@@ -1,34 +1,11 @@
 import { getApiProvider } from '@gamelog/api-manager/apiProvider';
+import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
 const getBackendBaseUrl = (): string =>
   process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
-
-let _dynamicSteamApiKey = '';
-let _dynamicSteamId = '';
-
-export const setSteamApiKey = (key: string) => {
-  _dynamicSteamApiKey = key;
-};
-
-export const setSteamId = (id: string) => {
-  _dynamicSteamId = id;
-};
-
-export const getSteamId = (): string => {
-  return _dynamicSteamId;
-};
-
-const getSteamApiKey = (): string => {
-  if (_dynamicSteamApiKey) {
-    return _dynamicSteamApiKey;
-  } else {
-    console.warn('STEAM API key is not set. Please update your profile or sign in.');
-    return '';
-  }
-};
 
 const getRelationship = (includePending: boolean): string => (includePending ? 'all' : 'friend');
 
@@ -181,5 +158,5 @@ const EndPoints = {
   },
 };
 
-export { isBackendProvider, getSteamApiKey };
+export { isBackendProvider };
 export default EndPoints;

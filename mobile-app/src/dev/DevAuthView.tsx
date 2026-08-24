@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearAllSecureStorage } from '@gamelog/storage/secureStorage';
+import { clearSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 import { auth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -32,8 +34,12 @@ export const DevAuthView = () => {
     try {
       await signOut(auth);
       await AsyncStorage.clear();
+      await clearAllSecureStorage();
+      await clearSteamApiKey();
       setCurrentUser(null);
-      setSessionMessage('Successfully signed out and cleared AsyncStorage auth tokens!');
+      setSessionMessage(
+        'Successfully signed out and cleared AsyncStorage & SecureStore credentials!'
+      );
     } catch (err: unknown) {
       setSessionMessage(err instanceof Error ? err.message : 'Error clearing session');
     }

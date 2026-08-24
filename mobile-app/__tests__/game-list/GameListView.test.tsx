@@ -1,10 +1,10 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import GameListView from '@gamelog/game-list/GameListView';
 import { useGameList } from '@gamelog/game-list/useGameList';
-import { getSteamId } from '@gamelog/api-manager/apiEndsPoints';
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('@gamelog/game-list/useGameList');
-jest.mock('@gamelog/api-manager/apiEndsPoints', () => ({
+jest.mock('@gamelog/api-manager/steamApiKey', () => ({
   getSteamId: jest.fn(),
 }));
 
