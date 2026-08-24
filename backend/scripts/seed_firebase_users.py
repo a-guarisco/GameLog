@@ -59,7 +59,13 @@ TEST_USERS = [
         "email": "test-04@test.com",
         "password": "12345678",
         "displayName": "test-04",
-        "localId": "wcMFGsVqaYYNHSAeUXgGiK14WPk2",
+        "localId": "6vF11uBvD2O33uLdC8yNntLpBwt2",
+    },
+    {
+        "email": "slait-graph@test.com",
+        "password": "12345678",
+        "displayName": "slait-graph",
+        "localId": "slaitgraph1234567890",
     },
     {
         "email": "test-05@test.com",
