@@ -1,8 +1,14 @@
-import { renderHook, act, waitFor } from '@testing-library/react-native';
+import { renderHook, act } from '@testing-library/react-native';
 import { useAuthSession } from '../../src/auth/useAuthSession';
 import { onIdTokenChanged } from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
+import {
+  setSteamId,
+  setSteamApiKey,
+  clearSteamApiKey,
+  initSteamApiKeyFromStorage,
+} from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('firebase/auth', () => ({
   onIdTokenChanged: jest.fn(),
@@ -14,6 +20,13 @@ jest.mock('@gamelog/auth/firebaseClient', () => ({
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   getUserMe: jest.fn(),
+}));
+
+jest.mock('@gamelog/api-manager/steamApiKey', () => ({
+  setSteamId: jest.fn(),
+  setSteamApiKey: jest.fn(),
+  clearSteamApiKey: jest.fn(() => Promise.resolve()),
+  initSteamApiKeyFromStorage: jest.fn(() => Promise.resolve(null)),
 }));
 
 describe('useAuthSession', () => {
@@ -55,20 +68,21 @@ describe('useAuthSession', () => {
     expect(result.current.backendUser).toBeNull();
   });
 
-  it('sets unauthenticated when firebase user is null', async () => {
+  it('sets unauthenticated and clears steam api key when firebase user is null', async () => {
     const { result } = renderHook(() => useAuthSession());
-    
+
     await act(async () => {
       await mockOnIdTokenChangedCallback(null);
     });
 
     expect(result.current.authState).toBe('unauthenticated');
     expect(result.current.firebaseUser).toBeNull();
+    expect(clearSteamApiKey).toHaveBeenCalled();
   });
 
   it('sets unverified for password user without email verified', async () => {
     const { result } = renderHook(() => useAuthSession());
-    
+
     await act(async () => {
       await mockOnIdTokenChangedCallback(getUnverifiedFirebaseUser());
     });
@@ -77,22 +91,44 @@ describe('useAuthSession', () => {
     expect(result.current.firebaseUser).not.toBeNull();
   });
 
-  it('sets authenticated if backend returns user', async () => {
-    (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '123' });
+  it('sets authenticated and stores steam credentials if backend returns user', async () => {
+    (apiManager.getUserMe as jest.Mock).mockResolvedValue({
+      id: '123',
+      steam_id: 'steam123',
+      steam_api_key: 'key123',
+    });
     const { result } = renderHook(() => useAuthSession());
-    
+
     await act(async () => {
       await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
     });
 
     expect(result.current.authState).toBe('authenticated');
-    expect(result.current.backendUser).toEqual({ id: '123' });
+    expect(result.current.backendUser).toEqual({
+      id: '123',
+      steam_id: 'steam123',
+      steam_api_key: 'key123',
+    });
+    expect(setSteamId).toHaveBeenCalledWith('steam123');
+    expect(setSteamApiKey).toHaveBeenCalledWith('key123');
+  });
+
+  it('attempts to restore steam api key from secure storage if backend user does not have steam_api_key', async () => {
+    (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '123', steam_id: 'steam123' });
+    const { result } = renderHook(() => useAuthSession());
+
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
+    });
+
+    expect(result.current.authState).toBe('authenticated');
+    expect(initSteamApiKeyFromStorage).toHaveBeenCalled();
   });
 
   it('sets onboarding if backend returns 404 with error response', async () => {
     (apiManager.getUserMe as jest.Mock).mockRejectedValue({ response: { status: 404 } });
     const { result } = renderHook(() => useAuthSession());
-    
+
     await act(async () => {
       await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
     });
@@ -101,9 +137,11 @@ describe('useAuthSession', () => {
   });
 
   it('sets onboarding if backend returns Error with 404 in message', async () => {
-    (apiManager.getUserMe as jest.Mock).mockRejectedValue(new Error('Request failed with status 404'));
+    (apiManager.getUserMe as jest.Mock).mockRejectedValue(
+      new Error('Request failed with status 404')
+    );
     const { result } = renderHook(() => useAuthSession());
-    
+
     await act(async () => {
       await mockOnIdTokenChangedCallback(getSocialFirebaseUser()); // social user bypasses email verified
     });
@@ -115,7 +153,7 @@ describe('useAuthSession', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     (apiManager.getUserMe as jest.Mock).mockRejectedValue(new Error('Network Error'));
     const { result } = renderHook(() => useAuthSession());
-    
+
     await act(async () => {
       await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
     });
@@ -136,18 +174,18 @@ describe('useAuthSession', () => {
     it('refreshes backend user if firebaseUser exists', async () => {
       (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '456' });
       const { result } = renderHook(() => useAuthSession());
-      
+
       await act(async () => {
         await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
       });
-      
+
       expect(result.current.backendUser).toEqual({ id: '456' });
-      
+
       (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '789' });
       await act(async () => {
         await result.current.refreshBackendUser();
       });
-      
+
       expect(result.current.backendUser).toEqual({ id: '789' });
       expect(result.current.authState).toBe('authenticated');
     });
@@ -164,15 +202,15 @@ describe('useAuthSession', () => {
 
     it('reloads user and proceeds to checkBackendRegistration if verified', async () => {
       (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '111' });
-      
+
       const unverifiedUser = getUnverifiedFirebaseUser();
       const verifiedUser = getVerifiedFirebaseUser();
-      
+
       // auth.currentUser will return verifiedUser after reload
       (auth as any).currentUser = verifiedUser;
 
       const { result } = renderHook(() => useAuthSession());
-      
+
       await act(async () => {
         await mockOnIdTokenChangedCallback(unverifiedUser);
       });
@@ -193,7 +231,7 @@ describe('useAuthSession', () => {
       (auth as any).currentUser = unverifiedUser; // still unverified after reload
 
       const { result } = renderHook(() => useAuthSession());
-      
+
       await act(async () => {
         await mockOnIdTokenChangedCallback(unverifiedUser);
       });

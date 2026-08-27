@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearAllSecureStorage } from '@gamelog/storage/secureStorage';
+import { clearSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 import { auth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -15,6 +17,7 @@ import { BackendTestAuth } from './BackendTestAuth';
 import { FirebaseSignUpTest } from './FirebaseSignUpTest';
 import { GoogleAuthTest } from './GoogleAuthTest';
 import { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest';
+import { SteamApiKeyUpdateTest } from './SteamApiKeyUpdateTest';
 
 export const DevAuthView = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
@@ -31,8 +34,12 @@ export const DevAuthView = () => {
     try {
       await signOut(auth);
       await AsyncStorage.clear();
+      await clearAllSecureStorage();
+      await clearSteamApiKey();
       setCurrentUser(null);
-      setSessionMessage('Successfully signed out and cleared AsyncStorage auth tokens!');
+      setSessionMessage(
+        'Successfully signed out and cleared AsyncStorage & SecureStore credentials!'
+      );
     } catch (err: unknown) {
       setSessionMessage(err instanceof Error ? err.message : 'Error clearing session');
     }
@@ -87,7 +94,16 @@ export const DevAuthView = () => {
           <FirebaseTokenGenerator className="w-full" />
         </Card>
 
-        {/* Backend Auth Tester Card */}
+        {/* Steam API Key Management Card */}
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">Steam API Key</Text>
+          <SteamApiKeyUpdateTest />
+        </Card>
+
+        {/* Backend & Environment Card */}
         <Card
           variant="elevated"
           className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"

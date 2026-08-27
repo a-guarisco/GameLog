@@ -2,20 +2,39 @@ import { useState, useEffect } from 'react';
 import { onIdTokenChanged, type User } from 'firebase/auth';
 import { auth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
-import type { UserRead } from '@gamelog/api-manager/dto';
+import {
+  setSteamApiKey,
+  setSteamId,
+  clearSteamApiKey,
+  initSteamApiKeyFromStorage,
+} from '@gamelog/api-manager/steamApiKey';
+import type { UserMeRead } from '@gamelog/api-manager/dto';
 
-export type AuthState = 'loading' | 'unauthenticated' | 'unverified' | 'onboarding' | 'authenticated';
+export type AuthState =
+  | 'loading'
+  | 'unauthenticated'
+  | 'unverified'
+  | 'onboarding'
+  | 'authenticated';
 
 export const useAuthSession = () => {
   const [authState, setAuthState] = useState<AuthState>('loading');
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
-  const [backendUser, setBackendUser] = useState<UserRead | null>(null);
+  const [backendUser, setBackendUser] = useState<UserMeRead | null>(null);
 
   const checkBackendRegistration = async (user: User) => {
     try {
       // Fetch current user from backend
       const response = await apiManager.getUserMe();
       setBackendUser(response);
+      if (response.steam_api_key) {
+        setSteamApiKey(response.steam_api_key);
+      } else {
+        await initSteamApiKeyFromStorage();
+      }
+      if (response.steam_id) {
+        setSteamId(response.steam_id);
+      }
       setAuthState('authenticated');
     } catch (error: any) {
       if (
@@ -45,6 +64,7 @@ export const useAuthSession = () => {
         await checkBackendRegistration(user);
       } else {
         setBackendUser(null);
+        clearSteamApiKey().catch(() => {});
         setAuthState('unauthenticated');
       }
     });
@@ -66,11 +86,14 @@ export const useAuthSession = () => {
       const updatedUser = auth.currentUser;
       setFirebaseUser(updatedUser);
 
-      // FORZA l'aggiornamento del token Firebase. 
+      // FORZA l'aggiornamento del token Firebase.
       // Questo invierà l'evento `onIdTokenChanged` a tutte le istanze del nostro hook in tutta l'app!
       await updatedUser?.getIdToken(true);
 
-      if (updatedUser?.emailVerified || !updatedUser?.providerData.some((p) => p.providerId === 'password')) {
+      if (
+        updatedUser?.emailVerified ||
+        !updatedUser?.providerData.some((p) => p.providerId === 'password')
+      ) {
         await checkBackendRegistration(updatedUser!);
       } else {
         setAuthState('unverified');

@@ -8,6 +8,10 @@ export interface UserRead {
   has_steam_api_key: boolean;
 }
 
+export interface UserMeRead extends UserRead {
+  steam_api_key: string;
+}
+
 export interface UserRegisterRequest {
   username: string;
   steam_id: string;

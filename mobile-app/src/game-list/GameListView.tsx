@@ -8,10 +8,12 @@ import { useGameList } from './useGameList';
 import { ErrorBox, LoadingBox, InfoBox, WarningBox } from '@gamelog/common/feedbacks';
 import { GameListControls } from './GameListControls';
 
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
+
 const GameListView = ({ route }: any) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   // const { playerID } = route.params as GameListProps;
-  const playerID = '76561198077919169'; //FIX
+  const playerID = getSteamId();
   const {
     processedGames,
     isLoading,

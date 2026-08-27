@@ -5,7 +5,7 @@ from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.users import FriendshipRequest, FriendshipResponse, UserSearchResult, user_service
-from src.users.schemas import UserRead, UserRegisterRequest
+from src.users.schemas import UserRead, UserMeRead, UserRegisterRequest, SteamApiKeyUpdateRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -59,11 +59,25 @@ def register_user(
 
 @router.get(
     "/me",
-    response_model=UserRead,
-    summary="Get current registered user profile",
+    response_model=UserMeRead,
+    summary="Get current registered user profile including steam_api_key",
 )
 def get_current_user_profile(
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return user_service.get_user_by_firebase_uid(db, auth_user.uid)
+
+
+@router.post(
+    "/me/steam-api-key",
+    response_model=UserMeRead,
+    summary="Update the Steam API Key for the current user",
+    status_code=200,
+)
+def update_steam_api_key(
+    payload: SteamApiKeyUpdateRequest,
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return user_service.update_steam_api_key(db, auth_user.uid, payload.steam_api_key)

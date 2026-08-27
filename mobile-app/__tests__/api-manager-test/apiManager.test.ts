@@ -1,5 +1,6 @@
 import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
-import EndPoints, { getSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
+import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import { auth } from '@gamelog/auth/firebaseClient';
 

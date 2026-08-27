@@ -7,11 +7,11 @@ from sqlmodel import Session, col, or_, select
 from src.auth.schemas import AuthenticatedUser
 from src.models import Friendship, FriendshipStatus, User
 from src.users import FriendshipInfo, UserSearchResult, notifications_service
-from src.users.schemas import FriendshipResponseStatus, UserRead, UserRegisterRequest
+from src.users.schemas import FriendshipResponseStatus, UserRead, UserMeRead, UserRegisterRequest
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
 
 
-def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
+def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> User:
     """
     Fetch the db in order to return a UserRead from a given firebase uuid
     """
@@ -23,8 +23,7 @@ def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> UserRead:
     if not user.steam_id:
         raise HTTPException(status_code=500, detail="User Steam ID not found")
 
-    return UserRead.model_validate(user)
-
+    return user
 
 def register_user(
     session: Session,
@@ -79,6 +78,26 @@ def register_user(
     session.refresh(new_user)
 
     return UserRead.model_validate(new_user)
+
+def update_steam_api_key(session: Session, firebase_uid: str, steam_api_key: str) -> UserMeRead:
+    statement = select(User).where(User.firebase_uid == firebase_uid)
+    user = session.exec(statement).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    from src.games.steam_fetcher_service import validate_steam_credentials_sync
+    is_valid = validate_steam_credentials_sync(user.steam_id, steam_api_key)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid Steam API Key for your Steam ID",
+        )
+
+    user.steam_api_key = steam_api_key
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return UserMeRead.model_validate(user)
 
 
 def search_users_by_username(session: Session, query: str, current_user_uid: str) -> list[UserSearchResult]:

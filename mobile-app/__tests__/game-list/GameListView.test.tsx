@@ -1,8 +1,12 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import GameListView from '@gamelog/game-list/GameListView';
 import { useGameList } from '@gamelog/game-list/useGameList';
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('@gamelog/game-list/useGameList');
+jest.mock('@gamelog/api-manager/steamApiKey', () => ({
+  getSteamId: jest.fn(),
+}));
 
 jest.mock('@gamelog/common/gluestack/spinner', () => ({
   Spinner: 'Spinner',
@@ -28,6 +32,7 @@ const mockUseGameList = useGameList as jest.Mock;
 describe('GameListView Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (getSteamId as jest.Mock).mockReturnValue('123456789');
   });
 
   it('shows LoadingBox when isLoading is true', () => {
@@ -37,6 +42,7 @@ describe('GameListView Component', () => {
     });
 
     const { getByText } = render(<GameListView route={{}} />);
+    expect(getSteamId).toHaveBeenCalled();
     expect(getByText('Loading games...')).toBeTruthy();
   });
 

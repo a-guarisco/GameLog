@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Linking, Pressable } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
@@ -43,27 +43,43 @@ export default function ProfileSetupScreen() {
               autoCapitalize="none"
             />
 
-            <GLTextInput
-              label="Steam ID *"
-              placeholder="e.g. 76561197960287930"
-              value={steamId}
-              onChangeText={setSteamId}
-              keyboardType="numeric"
-              helperText="Your 17-digit Steam ID64."
-            />
+            <Box>
+              <GLTextInput
+                label="Steam ID *"
+                placeholder="e.g. 76561197960287930"
+                value={steamId}
+                onChangeText={setSteamId}
+                keyboardType="numeric"
+                helperText="Your 17-digit Steam ID64."
+              />
+              <Pressable
+                onPress={() => Linking.openURL('https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC')}
+                className="mt-1 self-end"
+              >
+                <Text className="text-primary-500 text-xs underline">How to find my Steam ID?</Text>
+              </Pressable>
+            </Box>
 
-            <GLTextInput
-              label="Steam API Key (Optional)"
-              placeholder="Enter API Key to sync private games"
-              value={steamApiKey}
-              onChangeText={setSteamApiKey}
-              autoCapitalize="none"
-              secureTextEntry
-              helperText="Required only if you want to sync your Steam library automatically. You can add it later in Settings."
-            />
+            <Box>
+              <GLTextInput
+                label="Steam API Key (Optional)"
+                placeholder="Enter API Key to sync private games"
+                value={steamApiKey}
+                onChangeText={setSteamApiKey}
+                autoCapitalize="none"
+                secureTextEntry
+                helperText="Required only if you want to sync your Steam library automatically. You can add it later in Settings."
+              />
+              <Pressable
+                onPress={() => Linking.openURL('https://steamcommunity.com/dev/apikey')}
+                className="mt-1 self-end"
+              >
+                <Text className="text-primary-500 text-xs underline">How to get an API Key?</Text>
+              </Pressable>
+            </Box>
           </Box>
 
-          <Button onPress={handleRegister} isDisabled={loading} className="w-full mb-4" size="xl">
+          <Button onPress={handleRegister} isDisabled={loading} className="w-full mt-4 mb-4" size="xl">
             {loading ? <ButtonSpinner className="mr-2" /> : null}
             <ButtonText>Complete Setup</ButtonText>
           </Button>

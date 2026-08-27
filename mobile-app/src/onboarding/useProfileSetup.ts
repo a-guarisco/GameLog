@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import apiManager from '@gamelog/api-manager/apiManager';
+import {
+  setSteamApiKey as globalSetSteamApiKey,
+  setSteamId as globalSetSteamId,
+} from '@gamelog/api-manager/steamApiKey';
 import { auth } from '@gamelog/auth/firebaseClient';
 
 export function useProfileSetup() {
@@ -25,11 +29,15 @@ export function useProfileSetup() {
     setErrorMsg(null);
 
     try {
-      await apiManager.registerUser({
+      const response = await apiManager.registerUser({
         username,
         steam_id: steamId,
         steam_api_key: steamApiKey || undefined,
       });
+      if (response.steam_api_key) {
+        globalSetSteamApiKey(response.steam_api_key);
+      }
+      globalSetSteamId(steamId);
       DeviceEventEmitter.emit('registrationSuccess');
     } catch (err: unknown) {
       const errorWithResponse = err as {

@@ -4,7 +4,7 @@ import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/but
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { ErrorBox, SuccessBox } from '@gamelog/common/feedbacks';
 import apiManager from '@gamelog/api-manager/apiManager';
-import { setSteamApiKey } from '@gamelog/api-manager/apiEndsPoints';
+import { setSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 export const SteamApiKeyUpdateTest = () => {
   const [apiKey, setApiKey] = useState('');

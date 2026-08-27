@@ -12,12 +12,13 @@ import GameScreenshotsStrip from '@gamelog/game/GameScreenshotsStrip';
 import GameSectionTabs from '@gamelog/game/GameSectionTabs';
 import GlobalAchievementsPreview from '@gamelog/game/GlobalAchievementsPreview';
 import useGameViewData from '@gamelog/game/useGameViewData';
+import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 const GameView = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { gameItem } = route.params;
-  const playerID = '76561198077919169'; //FIX
+  const playerID = getSteamId();
 
   const {
     streakText,

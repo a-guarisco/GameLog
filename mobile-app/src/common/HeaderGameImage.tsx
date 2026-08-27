@@ -5,11 +5,11 @@ import { Box } from '@gamelog/common/gluestack/box';
 import Banner from '@gamelog/common/Banner';
 
 interface HeaderGameImageProps {
-  appid: string;
+  appid?: string;
 }
 
 const HeaderGameImage = ({ appid }: HeaderGameImageProps) => {
-  const gameHeaderImage = steamAssetUrls.getGameHeaderImage(appid);
+  const gameHeaderImage = appid ? steamAssetUrls.getGameHeaderImage(appid) : undefined;
 
   return (
     <Card

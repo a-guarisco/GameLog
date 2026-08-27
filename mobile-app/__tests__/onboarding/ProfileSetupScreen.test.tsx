@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
+import { Linking } from 'react-native';
 import ProfileSetupScreen from '../../src/onboarding/ProfileSetupScreen';
 import { useProfileSetup } from '../../src/onboarding/useProfileSetup';
 
@@ -73,6 +74,20 @@ describe('ProfileSetupScreen', () => {
     const { getByText } = render(<ProfileSetupScreen />);
     
     expect(getByText('Username already taken')).toBeTruthy();
+  });
+
+  it('opens URL when clicking on "How to find my Steam ID?"', () => {
+    const { getByText } = render(<ProfileSetupScreen />);
+    
+    fireEvent.press(getByText('How to find my Steam ID?'));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC');
+  });
+
+  it('opens URL when clicking on "How to get an API Key?"', () => {
+    const { getByText } = render(<ProfileSetupScreen />);
+    
+    fireEvent.press(getByText('How to get an API Key?'));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://steamcommunity.com/dev/apikey');
   });
 
   it('disables buttons when loading', () => {
