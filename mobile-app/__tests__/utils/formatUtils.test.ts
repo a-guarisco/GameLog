@@ -27,7 +27,7 @@ describe('formatMinutesToHours', () => {
   });
 
   it('formats zero minutes', () => {
-    expect(formatMinutesToHours(0)).toBe('0m');
+    expect(formatMinutesToHours(0)).toBe('0h');
   });
 
   it('handles large values', () => {

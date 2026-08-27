@@ -1,9 +1,14 @@
 export const formatMinutesToHours = (minutes: number): string => {
+  if (minutes === 0) return '0h';
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 };
-export const formatMinutesToHoursShort = (mins: number) => `${Math.floor(mins / 60)}h`;
+export const formatMinutesToHoursShort = (mins: number) => {
+  if (mins === 0) return '0h';
+  if (mins >= 60) return `${Math.floor(mins / 60)}h`;
+  return `${mins}m`;
+};
 
 export const formatAchievementName = (name: string): string => name.replace(/_/g, ' ').trim();
 
@@ -33,3 +38,22 @@ export const toIsoDate = (value: Date): string =>
 /** Explicit grouping: toLocaleString() silently drops separators where Intl data is missing. */
 export const formatThousands = (value: number): string =>
   value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export const formatMinutesWithSeconds = (minutesFloat: number | undefined | null) => {
+  if (
+    minutesFloat === undefined ||
+    minutesFloat === null ||
+    isNaN(minutesFloat) ||
+    !isFinite(minutesFloat)
+  ) {
+    return '0s';
+  }
+  const totalSeconds = Math.round(minutesFloat * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+};

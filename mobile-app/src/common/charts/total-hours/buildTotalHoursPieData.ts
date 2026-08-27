@@ -1,8 +1,13 @@
 import { OwnedGames } from '@gamelog/api-manager/dto';
-import { getTopGames, parseRGB } from '../chartsHelpers';
+import { parseRGB } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
-import { brand, tailwindColors } from '@gamelog/theme/theme';
-import { PieData } from '../charts.type';
+import { tailwindColors } from '@gamelog/theme/theme';
+export interface PieData {
+  value: number;
+  color: string;
+  gradientCenterColor: string;
+  label: string;
+}
 
 const buildTotalHoursPieData = (
   ownedGames: OwnedGames | null,
@@ -11,13 +16,15 @@ const buildTotalHoursPieData = (
   if (!ownedGames?.response?.games) return [];
 
   const games = ownedGames.response.games;
-  
+
   const allPlayed = [...games]
     .filter((g) => g.playtime_forever > 0)
     .sort((a, b) => b.playtime_forever - a.playtime_forever);
 
   const top = allPlayed.slice(0, gameToRepresent);
-  const otherMinutes = allPlayed.slice(gameToRepresent).reduce((sum, g) => sum + g.playtime_forever, 0);
+  const otherMinutes = allPlayed
+    .slice(gameToRepresent)
+    .reduce((sum, g) => sum + g.playtime_forever, 0);
 
   const rawSlices = top.map((game) => {
     return {
