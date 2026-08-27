@@ -33,11 +33,10 @@ export const ChartContextText = ({ children, className = '', ...props }: any) =>
   </Text>
 );
 
-export const ChartDateRangeText = ({ children, className = '', ...props }: any) => (
-  <Text size="sm" className={`font-medium text-typography-300 ${className}`} {...props}>
-    {children}
-  </Text>
-);
+import { DateRangeText } from './CardTypography';
+
+/** @deprecated Use DateRangeText from CardTypography directly. Kept for backward compatibility. */
+export const ChartDateRangeText = DateRangeText;
 
 export const getChartAxisStyle = (color: string, isBold: boolean = false) => ({
   color,

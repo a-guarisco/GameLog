@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Card } from '@gamelog/common/gluestack/card';
-import CardTitleText from '@gamelog/common/typography/CardTitleText';
+import { CardTitleText } from '@gamelog/common/typography/CardTypography';
 
 import { HStack } from '@gamelog/common/gluestack/hstack';
 
