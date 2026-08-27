@@ -92,6 +92,7 @@ export const ReportBox = () => {
         handleFetchReport={handleFetchReport}
         handleClearDates={handleClearDates}
         formatDate={formatDateHelper}
+        hasReport={!!report}
       />
 
       {report && (

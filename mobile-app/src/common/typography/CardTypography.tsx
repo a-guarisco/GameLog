@@ -66,3 +66,10 @@ export const StatLabelText = ({ children, className = '', ...props }: Typography
     {children}
   </Text>
 );
+
+/** Small contextual or helper text (e.g. "Long press to view details"). */
+export const ContextText = ({ children, className = '', ...props }: TypographyProps) => (
+  <Text size="xs" className={`text-typography-300 ${className}`} {...props}>
+    {children}
+  </Text>
+);

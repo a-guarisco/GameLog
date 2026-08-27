@@ -5,7 +5,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import SectionCard from '@gamelog/common/SectionCard';
-import { DateSelectorText } from '@gamelog/common/typography/CardTypography';
+import { DateSelectorText, ContextText } from '@gamelog/common/typography/CardTypography';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
 
 interface ReportRetrievalCardProps {
@@ -23,6 +23,7 @@ interface ReportRetrievalCardProps {
   handleFetchReport: () => void;
   handleClearDates: () => void;
   formatDate: (d?: Date) => string;
+  hasReport: boolean;
 }
 
 const ReportRetrievalCard = ({
@@ -40,6 +41,7 @@ const ReportRetrievalCard = ({
   handleFetchReport,
   handleClearDates,
   formatDate,
+  hasReport,
 }: ReportRetrievalCardProps) => {
   // Calculate dynamic text info
   const getDynamicInfoText = () => {
@@ -75,11 +77,11 @@ const ReportRetrievalCard = ({
       testID="report-retrieval-card"
       label="Report Retrieval"
       headerRight={
-        (startDate || endDate) && (
+        (!!startDate || !!endDate || hasReport) ? (
           <Pressable onPress={handleClearDates} hitSlop={12}>
             <Text className="text-sm font-bold text-primary-500">Reset</Text>
           </Pressable>
-        )
+        ) : null
       }
     >
       <VStack space="md">
@@ -112,9 +114,9 @@ const ReportRetrievalCard = ({
           <ButtonText>Generate Report</ButtonText>
         </Button>
 
-        <Text size="xs" className="text-typography-400 text-center italic mt-1">
+        <ContextText className="text-center mt-2">
           {getDynamicInfoText()}
-        </Text>
+        </ContextText>
 
         {showStart && (
           <DateTimePicker
