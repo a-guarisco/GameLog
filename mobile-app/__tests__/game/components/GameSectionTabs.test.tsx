@@ -116,11 +116,11 @@ describe('GameSectionTabs', () => {
     renderTabs();
 
     fireEvent.press(screen.getByTestId('game-tab-news'));
-    fireEvent.press(screen.getByText('See all news'));
+    fireEvent.press(screen.getByText('See all news on Steam'));
     expect(openURL).toHaveBeenCalledWith('https://store.steampowered.com/news/app/236390');
 
     fireEvent.press(screen.getByTestId('game-tab-guides'));
-    fireEvent.press(screen.getByText('See all 812 guides'));
+    fireEvent.press(screen.getByText('See all guides on Steam'));
     expect(openURL).toHaveBeenCalledWith('https://steamcommunity.com/app/236390/guides/');
 
     openURL.mockRestore();
@@ -180,7 +180,7 @@ describe('GameSectionTabs', () => {
       openNewsTab();
 
       expect(screen.queryByText('No news yet')).toBeNull();
-      expect(screen.getByText('See all news')).toBeTruthy();
+      expect(screen.getByText('See all news on Steam')).toBeTruthy();
     });
 
     it('reports a failed request and an empty feed', () => {
@@ -268,7 +268,7 @@ describe('GameSectionTabs', () => {
       mockGuides([]);
       openGuidesTab();
       expect(screen.getByText('No guides yet')).toBeTruthy();
-      expect(screen.getByText('See all guides')).toBeTruthy();
+      expect(screen.getByText('See all guides on Steam')).toBeTruthy();
     });
 
     it('survives a payload with no response block', () => {
