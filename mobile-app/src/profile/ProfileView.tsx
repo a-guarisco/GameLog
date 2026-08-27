@@ -18,34 +18,8 @@ import { useProfileChartsFetch } from './useProfileChartsFetch';
 
 const ProfileView = () => {
   const USER_ID = getSteamId();
-<<<<<<< HEAD
-
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(
-    USER_ID,
-    false,
-    false
-  );
-  const { genreChartData, isLoadingGenreChart, errorGenreChart } = useGetGameGenreChartData(
-    USER_ID,
-    false,
-    false
-  );
-  const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(useMemo(() => [USER_ID], []));
-  const { userStreak, isLoadingUserStreak } = useGetUserStreak();
-  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
-  const { playtimeByUser, isLoadingPlaytimeByUser, errorPlaytimeByUser } = useGetPlaytimeByUser();
-
-  const isLoading =
-    isLoadingOwnedGames ||
-    isLoadingGenreChart ||
-    isLoadingPlayersInfo ||
-    isLoadingUserStreak ||
-    isLoadingPlaytimeReport ||
-    isLoadingPlaytimeByUser;
-=======
   const { data, isLoading, errors, isLoadingStates } = useProfileChartsFetch(USER_ID);
   const { ownedGames, playersInfo, userStreak, playtimeReport, playtimeByUser } = data;
->>>>>>> 351a538 (refactor(mobile): overhaul ProfileView with tabbed layout, centralized fetch and migrated charts)
   const player = playersInfo?.response?.players?.[0];
   const streakText = useStreakText(userStreak?.streak, isLoadingStates.userStreak);
 
