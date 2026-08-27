@@ -51,6 +51,10 @@ jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, default: () => <View testID="genre-radar-chart" /> };
 });
+jest.mock('@gamelog/report/ReportBox', () => {
+  const { View } = jest.requireActual('react-native');
+  return { __esModule: true, ReportBox: () => <View testID="report-box" /> };
+});
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
 const mockUseGetGameGenreChartData = useGetGameGenreChartData as jest.Mock;

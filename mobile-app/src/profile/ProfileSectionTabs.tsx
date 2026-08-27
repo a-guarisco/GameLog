@@ -9,6 +9,7 @@ import ProfileTopGames from './ProfileTopGames';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import ProfilePlaytimeTrend from './ProfilePlaytimeTrend';
 import ProfilePlatformSplit from './ProfilePlatformSplitChart';
+import { ReportBox } from '../report/ReportBox';
 import type { TopGame } from './profileSelectors';
 import type { PlaytimeTrend } from './playtimeTrendSelectors';
 import type { PlatformSplit } from './platformSplitSelectors';
@@ -58,6 +59,7 @@ const ProfileSectionTabs = ({
         {activeTab === 'overview' && (
           <VStack space="md" className="w-full">
             <ProfilePlaytimeTrend trend={playtimeTrend} hasError={!!errorPlaytimeTrend} />
+            <ReportBox />
             <ProfileTopGames games={topGames} hasError={!!errorOwnedGames} />
           </VStack>
         )}

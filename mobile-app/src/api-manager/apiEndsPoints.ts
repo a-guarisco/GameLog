@@ -156,6 +156,15 @@ const EndPoints = {
   unregisterDeviceToken: () => {
     return `${getBackendBaseUrl()}/notifications/unregister_device`;
   },
+
+  getDailyReport: (startDate?: string, endDate?: string) => {
+    let url = `${getBackendBaseUrl()}/games/report`;
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    if (params.toString()) url += `?${params.toString()}`;
+    return url;
+  },
 };
 
 export { isBackendProvider };
