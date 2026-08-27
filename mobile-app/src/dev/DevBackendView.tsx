@@ -16,7 +16,7 @@ export const DevBackendView = () => {
         {/* Health Check Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Backend Status & Ping</Text>
           <BackendHealthCheck className="w-full" />
@@ -25,7 +25,7 @@ export const DevBackendView = () => {
         {/* Active Endpoints Card */}
         <Card
           variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2 bg-background-50 rounded-md"
+          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
         >
           <Text className="text-sm font-semibold text-typography-0">Configured Endpoints</Text>
           <Box className="gap-2.5">

@@ -232,19 +232,19 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
       </Box>
 
       <Box className="gap-2 pt-1">
-        <Button onPress={handleSignUp} isDisabled={isLoading}>
+        <Button isOnCard onPress={handleSignUp} isDisabled={isLoading}>
           <ButtonText>1. Sign Up (Firebase Auth)</ButtonText>
         </Button>
 
-        <Button onPress={handleSendVerification} isDisabled={isLoading || !currentUser}>
+        <Button isOnCard onPress={handleSendVerification} isDisabled={isLoading || !currentUser}>
           <ButtonText>2. Send Verification Email</ButtonText>
         </Button>
 
-        <Button onPress={handleCheckStatus} isDisabled={isLoading || !currentUser}>
+        <Button isOnCard onPress={handleCheckStatus} isDisabled={isLoading || !currentUser}>
           <ButtonText>3. Reload & Check Verification</ButtonText>
         </Button>
 
-        <Button onPress={handleRegisterBackend} isDisabled={isLoading || !currentUser}>
+        <Button isOnCard onPress={handleRegisterBackend} isDisabled={isLoading || !currentUser}>
           <ButtonText>4. Complete Backend Sync</ButtonText>
         </Button>
       </Box>

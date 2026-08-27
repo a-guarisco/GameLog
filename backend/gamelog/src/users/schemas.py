@@ -5,7 +5,6 @@ from enum import Enum
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
-from src.models.friendship import FriendshipBase
 from src.models.steam_rolling_time import SteamRollingTimeBase
 from src.models.user import UserBase
 
@@ -23,6 +22,7 @@ class UserRegisterRequest(SQLModel):
 
 class UserRead(UserBase):
     id: uuid.UUID
+    has_steam_api_key: bool = Field(default=False)
 
 
 class UserUpdate(SQLModel):

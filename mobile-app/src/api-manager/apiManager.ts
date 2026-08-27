@@ -19,14 +19,33 @@ import type {
   RecentPlayedGames,
   SteamNews,
   Streak,
+  UserRead,
+  UserRegisterRequest,
   UserSearchResult,
   RecommendationResponse,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = init ? await fetch(url, init) : await fetch(url);
+  const options = {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...init?.headers,
+    },
+  };
+  const response = await fetch(url, options);
+
   if (!response.ok) {
-    throw new Error(`HTTP error: ${response.status}. url Called: ${url}`);
+    let detail = `HTTP error: ${response.status}. url Called: ${url}`;
+    try {
+      const errorData = await response.json();
+      detail = errorData.detail || detail;
+    } catch (e) {
+      // Ignore JSON parse error
+    }
+    const error: any = new Error(detail);
+    error.response = { data: { detail }, status: response.status };
+    throw error;
   }
   return response.json();
 }
@@ -111,6 +130,13 @@ export default {
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),
   getFriendList: () => fetchAuthenticatedData<UserSearchResult[]>(EndPoints.getFriendList()),
+  getUserMe: () => fetchAuthenticatedData<UserRead>(EndPoints.getUserMe()),
+  registerUser: (data: UserRegisterRequest) =>
+    fetchAuthenticatedData<UserRead>(EndPoints.registerUser(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }),
   addFriend: (addresseeId: string) =>
     fetchAuthenticatedData<{ message: string; friendship_id: string }>(EndPoints.addFriend(), {
       method: 'POST',

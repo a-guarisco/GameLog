@@ -47,7 +47,7 @@ export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProp
 
   return (
     <Box className={`w-full max-w-[320px] gap-2 self-center ${className ?? ''}`}>
-      <Button onPress={generateToken} isDisabled={isLoading}>
+      <Button isOnCard onPress={generateToken} isDisabled={isLoading}>
         <ButtonText>Generate Firebase Token</ButtonText>
       </Button>
 
@@ -56,7 +56,7 @@ export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProp
       {idToken ? (
         <>
           <SuccessBox message="Firebase token generated successfully!" />
-          <Button onPress={() => setShowToken(!showToken)}>
+          <Button isOnCard onPress={() => setShowToken(!showToken)}>
             <ButtonText>{showToken ? 'Hide Token' : 'Show Token'}</ButtonText>
           </Button>
           {showToken ? (

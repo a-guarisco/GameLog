@@ -1,0 +1,209 @@
+import { renderHook, act, waitFor } from '@testing-library/react-native';
+import { useAuthSession } from '../../src/auth/useAuthSession';
+import { onIdTokenChanged } from 'firebase/auth';
+import { auth } from '@gamelog/auth/firebaseClient';
+import apiManager from '@gamelog/api-manager/apiManager';
+
+jest.mock('firebase/auth', () => ({
+  onIdTokenChanged: jest.fn(),
+}));
+
+jest.mock('@gamelog/auth/firebaseClient', () => ({
+  auth: { currentUser: null },
+}));
+
+jest.mock('@gamelog/api-manager/apiManager', () => ({
+  getUserMe: jest.fn(),
+}));
+
+describe('useAuthSession', () => {
+  let mockOnIdTokenChangedCallback: (user: any) => void;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (onIdTokenChanged as jest.Mock).mockImplementation((_auth, callback) => {
+      mockOnIdTokenChangedCallback = callback;
+      return jest.fn(); // unsubscribe fn
+    });
+  });
+
+  const getUnverifiedFirebaseUser = () => ({
+    emailVerified: false,
+    providerData: [{ providerId: 'password' }],
+    reload: jest.fn().mockResolvedValue(undefined),
+    getIdToken: jest.fn().mockResolvedValue('token'),
+  });
+
+  const getVerifiedFirebaseUser = () => ({
+    emailVerified: true,
+    providerData: [{ providerId: 'password' }],
+    reload: jest.fn().mockResolvedValue(undefined),
+    getIdToken: jest.fn().mockResolvedValue('token'),
+  });
+
+  const getSocialFirebaseUser = () => ({
+    emailVerified: false,
+    providerData: [{ providerId: 'google.com' }],
+    reload: jest.fn().mockResolvedValue(undefined),
+    getIdToken: jest.fn().mockResolvedValue('token'),
+  });
+
+  it('initializes with loading state', () => {
+    const { result } = renderHook(() => useAuthSession());
+    expect(result.current.authState).toBe('loading');
+    expect(result.current.firebaseUser).toBeNull();
+    expect(result.current.backendUser).toBeNull();
+  });
+
+  it('sets unauthenticated when firebase user is null', async () => {
+    const { result } = renderHook(() => useAuthSession());
+    
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(null);
+    });
+
+    expect(result.current.authState).toBe('unauthenticated');
+    expect(result.current.firebaseUser).toBeNull();
+  });
+
+  it('sets unverified for password user without email verified', async () => {
+    const { result } = renderHook(() => useAuthSession());
+    
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(getUnverifiedFirebaseUser());
+    });
+
+    expect(result.current.authState).toBe('unverified');
+    expect(result.current.firebaseUser).not.toBeNull();
+  });
+
+  it('sets authenticated if backend returns user', async () => {
+    (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '123' });
+    const { result } = renderHook(() => useAuthSession());
+    
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
+    });
+
+    expect(result.current.authState).toBe('authenticated');
+    expect(result.current.backendUser).toEqual({ id: '123' });
+  });
+
+  it('sets onboarding if backend returns 404 with error response', async () => {
+    (apiManager.getUserMe as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+    const { result } = renderHook(() => useAuthSession());
+    
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
+    });
+
+    expect(result.current.authState).toBe('onboarding');
+  });
+
+  it('sets onboarding if backend returns Error with 404 in message', async () => {
+    (apiManager.getUserMe as jest.Mock).mockRejectedValue(new Error('Request failed with status 404'));
+    const { result } = renderHook(() => useAuthSession());
+    
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(getSocialFirebaseUser()); // social user bypasses email verified
+    });
+
+    expect(result.current.authState).toBe('onboarding');
+  });
+
+  it('sets unauthenticated on generic backend error', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    (apiManager.getUserMe as jest.Mock).mockRejectedValue(new Error('Network Error'));
+    const { result } = renderHook(() => useAuthSession());
+    
+    await act(async () => {
+      await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
+    });
+
+    expect(result.current.authState).toBe('unauthenticated');
+    consoleErrorSpy.mockRestore();
+  });
+
+  describe('refreshBackendUser', () => {
+    it('does nothing if no firebaseUser', async () => {
+      const { result } = renderHook(() => useAuthSession());
+      await act(async () => {
+        await result.current.refreshBackendUser();
+      });
+      expect(apiManager.getUserMe).not.toHaveBeenCalled();
+    });
+
+    it('refreshes backend user if firebaseUser exists', async () => {
+      (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '456' });
+      const { result } = renderHook(() => useAuthSession());
+      
+      await act(async () => {
+        await mockOnIdTokenChangedCallback(getVerifiedFirebaseUser());
+      });
+      
+      expect(result.current.backendUser).toEqual({ id: '456' });
+      
+      (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '789' });
+      await act(async () => {
+        await result.current.refreshBackendUser();
+      });
+      
+      expect(result.current.backendUser).toEqual({ id: '789' });
+      expect(result.current.authState).toBe('authenticated');
+    });
+  });
+
+  describe('checkEmailVerification', () => {
+    it('does nothing if no firebaseUser', async () => {
+      const { result } = renderHook(() => useAuthSession());
+      await act(async () => {
+        await result.current.checkEmailVerification();
+      });
+      // nothing happens
+    });
+
+    it('reloads user and proceeds to checkBackendRegistration if verified', async () => {
+      (apiManager.getUserMe as jest.Mock).mockResolvedValue({ id: '111' });
+      
+      const unverifiedUser = getUnverifiedFirebaseUser();
+      const verifiedUser = getVerifiedFirebaseUser();
+      
+      // auth.currentUser will return verifiedUser after reload
+      (auth as any).currentUser = verifiedUser;
+
+      const { result } = renderHook(() => useAuthSession());
+      
+      await act(async () => {
+        await mockOnIdTokenChangedCallback(unverifiedUser);
+      });
+      expect(result.current.authState).toBe('unverified');
+
+      await act(async () => {
+        await result.current.checkEmailVerification();
+      });
+
+      expect(unverifiedUser.reload).toHaveBeenCalled();
+      expect(verifiedUser.getIdToken).toHaveBeenCalledWith(true);
+      expect(result.current.authState).toBe('authenticated');
+      expect(result.current.backendUser).toEqual({ id: '111' });
+    });
+
+    it('stays unverified if user is still not verified', async () => {
+      const unverifiedUser = getUnverifiedFirebaseUser();
+      (auth as any).currentUser = unverifiedUser; // still unverified after reload
+
+      const { result } = renderHook(() => useAuthSession());
+      
+      await act(async () => {
+        await mockOnIdTokenChangedCallback(unverifiedUser);
+      });
+      expect(result.current.authState).toBe('unverified');
+
+      await act(async () => {
+        await result.current.checkEmailVerification();
+      });
+
+      expect(result.current.authState).toBe('unverified');
+    });
+  });
+});

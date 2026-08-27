@@ -1,5 +1,6 @@
 # IDE-specific files and folders
 .vscode/
+.agents/
 .idea/
 *.swp
 *.swo
@@ -38,5 +39,7 @@ serviceAccountKey.json
 # Documentation
 docs/
 
-# Agent configuration
+# Python Coverage Reports
+.coverage
+htmlcov/
 .agents/

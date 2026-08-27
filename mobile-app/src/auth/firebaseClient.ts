@@ -41,7 +41,7 @@ const firebaseConfig: FirebaseOptions = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 const useEmulator = process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR !== 'false';
-const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || 'unknown-project';
+const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 
 let auth: ReturnType<typeof getAuth>;
 try {

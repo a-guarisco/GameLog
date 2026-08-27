@@ -38,11 +38,14 @@ cssInterop(PrimitiveIcon, {
 });
 
 const buttonStyle = tva({
-  base: 'group/button rounded bg-primary-500 flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2',
+  base: 'group/button rounded-xl bg-primary-500 flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2',
   variants: {
+    isOnCard: {
+      true: '',
+    },
     action: {
       primary:
-        'bg-primary-500 data-[hover=true]:bg-primary-600 data-[active=true]:bg-primary-700 border-primary-300 data-[hover=true]:border-primary-400 data-[active=true]:border-primary-500 data-[focus-visible=true]:web:ring-indicator-info',
+        'bg-background-200 dark:bg-background-50 data-[hover=true]:bg-background-300 dark:data-[hover=true]:bg-background-100 data-[active=true]:bg-background-400 dark:data-[active=true]:bg-background-200 data-[focus-visible=true]:web:ring-indicator-info',
       secondary:
         'bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info',
       positive:
@@ -68,6 +71,12 @@ const buttonStyle = tva({
     },
   },
   compoundVariants: [
+    {
+      action: 'primary',
+      isOnCard: true,
+      class:
+        'bg-background-100 dark:bg-background-200 data-[hover=true]:bg-background-200 dark:data-[hover=true]:bg-background-250 data-[active=true]:bg-background-300 dark:data-[active=true]:bg-background-100',
+    },
     {
       action: 'primary',
       variant: 'link',
@@ -116,7 +125,7 @@ const buttonStyle = tva({
 });
 
 const buttonTextStyle = tva({
-  base: 'text-typography-0 font-semibold web:select-none',
+  base: 'text-typography-0 font-medium web:select-none',
   parentVariants: {
     action: {
       primary:
@@ -126,6 +135,10 @@ const buttonTextStyle = tva({
       positive:
         'text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700',
       negative: 'text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
+    },
+    isOnCard: {
+      true: '',
+      false: '',
     },
     variant: {
       link: 'data-[hover=true]:underline data-[active=true]:underline',
@@ -145,8 +158,16 @@ const buttonTextStyle = tva({
     {
       variant: 'solid',
       action: 'primary',
+      isOnCard: false,
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-50',
+    },
+    {
+      variant: 'solid',
+      action: 'primary',
+      isOnCard: true,
+      class:
+        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-50',
     },
     {
       variant: 'solid',
@@ -158,13 +179,13 @@ const buttonTextStyle = tva({
       variant: 'solid',
       action: 'positive',
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     {
       variant: 'solid',
       action: 'negative',
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     {
       variant: 'outline',
@@ -196,6 +217,10 @@ const buttonTextStyle = tva({
 const buttonIconStyle = tva({
   base: 'fill-none',
   parentVariants: {
+    isOnCard: {
+      true: '',
+      false: '',
+    },
     variant: {
       link: 'data-[hover=true]:underline data-[active=true]:underline',
       outline: '',
@@ -224,6 +249,14 @@ const buttonIconStyle = tva({
     {
       variant: 'solid',
       action: 'primary',
+      isOnCard: false,
+      class:
+        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+    },
+    {
+      variant: 'solid',
+      action: 'primary',
+      isOnCard: true,
       class:
         'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
     },
@@ -277,13 +310,16 @@ type IButtonProps = Omit<React.ComponentPropsWithoutRef<typeof UIButton>, 'conte
   VariantProps<typeof buttonStyle> & { className?: string };
 
 const Button = React.forwardRef<React.ElementRef<typeof UIButton>, IButtonProps>(
-  ({ className, variant = 'solid', size = 'md', action = 'primary', ...props }, ref) => {
+  (
+    { className, variant = 'solid', size = 'md', action = 'primary', isOnCard = false, ...props },
+    ref
+  ) => {
     return (
       <UIButton
         ref={ref}
         {...props}
-        className={buttonStyle({ variant, size, action, class: className })}
-        context={{ variant, size, action }}
+        className={buttonStyle({ variant, size, action, isOnCard, class: className })}
+        context={{ variant, size, action, isOnCard }}
       />
     );
   }
@@ -298,6 +334,7 @@ const ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IBut
       variant: parentVariant,
       size: parentSize,
       action: parentAction,
+      isOnCard: parentIsOnCard,
     } = useStyleContext(SCOPE);
 
     return (
@@ -309,6 +346,7 @@ const ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IBut
             variant: parentVariant,
             size: parentSize,
             action: parentAction,
+            isOnCard: parentIsOnCard,
           },
           variant,
           size,

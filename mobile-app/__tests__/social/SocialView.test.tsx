@@ -256,7 +256,7 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('common-game-item-730'));
 
     expect(screen.queryByText('Recommendations')).toBeNull();
-    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+    expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
       screen: 'Game',
       params: {
         gameItem: expect.objectContaining({
@@ -305,7 +305,7 @@ describe('SocialView', () => {
 
     fireEvent.press(screen.getByTestId('common-game-item-730'));
 
-    expect(mockNavigate).toHaveBeenCalledWith('GameList', {
+    expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
       screen: 'Game',
       params: {
         gameItem: expect.objectContaining({

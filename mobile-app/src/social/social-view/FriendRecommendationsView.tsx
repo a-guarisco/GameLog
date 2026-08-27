@@ -92,7 +92,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
   const handleGamePress = (gameSteamId: string, requesterPlayTime: number) => {
     const displayName = gameNames[gameSteamId] || `App ID: ${gameSteamId}`;
     onClose();
-    navigation.navigate('GameList', {
+    navigation.navigate('GameListTab', {
       screen: 'Game',
       params: {
         gameItem: {
@@ -218,10 +218,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
                     Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)
                   }
                 >
-                  <Card
-                    variant="elevated"
-                    className="relative mb-2 p-0"
-                  >
+                  <Card variant="elevated" className="relative mb-2 p-0">
                     <HStack space="md" className="px-3 py-3 items-center">
                       <Image
                         source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}

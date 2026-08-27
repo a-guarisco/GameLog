@@ -16,6 +16,10 @@ import {
   FontsView,
 } from '@gamelog/dev';
 
+import LoginScreen from '@gamelog/onboarding/LoginScreen';
+import ProfileSetupScreen from '@gamelog/onboarding/ProfileSetupScreen';
+import UnverifiedScreen from '@gamelog/onboarding/UnverifiedScreen';
+
 export const GameListStack = createNativeStackNavigator({
   screens: {
     HomePage: {
@@ -36,7 +40,7 @@ export const GameListStack = createNativeStackNavigator({
   },
 });
 
-export const TestingStack = createNativeStackNavigator({
+export const DevStack = createNativeStackNavigator({
   screens: {
     TestingMain: {
       screen: DevView,
@@ -71,11 +75,11 @@ export const TestingStack = createNativeStackNavigator({
 
 export const RootTabs = createBottomTabNavigator({
   screens: {
-    GameList: {
+    GameListTab: {
       screen: GameListStack,
       options: {
         headerShown: false,
-        title: 'Game List',
+        title: 'Games',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
             name={focused ? 'game-controller' : 'game-controller-outline'}
@@ -85,16 +89,17 @@ export const RootTabs = createBottomTabNavigator({
         ),
       },
     },
-    Profile: {
+    ProfileTab: {
       screen: ProfileView,
       options: {
+        title: 'Profile',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
         ),
         headerShown: false,
       },
     },
-    Social: {
+    SocialTab: {
       screen: SocialView,
       options: {
         title: 'Social',
@@ -104,14 +109,41 @@ export const RootTabs = createBottomTabNavigator({
         headerShown: false,
       },
     },
-    ComponentLibrary: {
-      screen: TestingStack,
+    DevTab: {
+      screen: DevStack,
       options: {
         title: 'Dev',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name={focused ? 'construct' : 'construct-outline'} size={size} color={color} />
         ),
       },
+    },
+  },
+});
+
+export const AuthNavigator = createNativeStackNavigator({
+  screens: {
+    Login: {
+      screen: LoginScreen,
+      options: { headerShown: false },
+    },
+  },
+});
+
+export const UnverifiedNavigator = createNativeStackNavigator({
+  screens: {
+    Unverified: {
+      screen: UnverifiedScreen,
+      options: { headerShown: false },
+    },
+  },
+});
+
+export const OnboardingNavigator = createNativeStackNavigator({
+  screens: {
+    ProfileSetup: {
+      screen: ProfileSetupScreen,
+      options: { headerShown: false },
     },
   },
 });
