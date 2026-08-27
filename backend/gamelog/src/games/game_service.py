@@ -192,9 +192,10 @@ def _compute_daily_playtimes(
         records_by_game[record.steam_app_id].append(record)
 
     daily_totals = defaultdict(int)
+    daily_games = defaultdict(lambda: defaultdict(int))
     earliest_date = None
 
-    for records in records_by_game.values():
+    for app_id, records in records_by_game.items():
         records.sort(key=lambda r: r.created_at)
 
         for i, record in enumerate(records):
@@ -227,6 +228,7 @@ def _compute_daily_playtimes(
                 target_date = prev_record.created_at + timedelta(days=d)
                 assigned_time = daily_avg + (1 if d <= remainder else 0)
                 daily_totals[target_date] += assigned_time
+                daily_games[target_date][app_id] += assigned_time
 
     if end_date is None:
         end_date = date.today()
@@ -254,7 +256,19 @@ def _compute_daily_playtimes(
     result = []
     for i in range(num_days):
         target_d = start_date + timedelta(days=i)
-        result.append(DayByDayPlaytime(date=target_d, playtime_minutes=daily_totals.get(target_d, 0)))
+        
+        games_playtime = []
+        if target_d in daily_games:
+            from src.games.schemas import GamePlaytime
+            for g_app_id, mins in daily_games[target_d].items():
+                if mins > 0:
+                    games_playtime.append(GamePlaytime(app_id=g_app_id, playtime_minutes=mins))
+                    
+        result.append(DayByDayPlaytime(
+            date=target_d, 
+            playtime_minutes=daily_totals.get(target_d, 0),
+            games=games_playtime
+        ))
 
     return result
 
