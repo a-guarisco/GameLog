@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from datetime import date
 from uuid import UUID, uuid4
+import os
 
 from sqlalchemy import delete
 from sqlmodel import Session
@@ -51,12 +52,21 @@ DEMO_USER_2_ID = UUID("22222222-2222-2222-2222-222222222222")
 DEMO_USER_3_ID = UUID("33333333-3333-3333-3333-333333333333")
 DEMO_USER_4_ID = UUID("44444444-4444-4444-4444-444444444444")
 DEMO_USER_5_ID = UUID("55555555-5555-5555-5555-555555555555")
+SLAIT_GRAPH_USER_ID = UUID("b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0")
 
 DEMO_GAME_CS2_ID = UUID("66666666-6666-6666-6666-666666666666")
 DEMO_GAME_DOTA_ID = UUID("77777777-7777-7777-7777-777777777777")
 DEMO_GAME_RDR2_ID = UUID("88888888-8888-8888-8888-888888888888")
 DEMO_GAME_GTAV_ID = UUID("99999999-9999-9999-9999-999999999999")
 DEMO_GAME_ELDEN_RING_ID = UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+
+# SLAIT-GRAPH User Games
+GAME_DONT_STARVE_ID = UUID("b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1")
+GAME_MOTOGP_ID = UUID("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2")
+GAME_WALLPAPER_ENGINE_ID = UUID("b3b3b3b3-b3b3-b3b3-b3b3-b3b3b3b3b3b3")
+GAME_UNTURNED_ID = UUID("b4b4b4b4-b4b4-b4b4-b4b4-b4b4b4b4b4b4")
+GAME_METRO_ID = UUID("b5b5b5b5-b5b5-b5b5-b5b5-b5b5b5b5b5b5")
+GAME_RIDE6_ID = UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
 
 
 GENRES_DATA = [
@@ -229,6 +239,13 @@ def _users() -> list[User]:
             steam_id="76561198000000005",
             steam_api_key="",
         ),
+        User(
+            id=SLAIT_GRAPH_USER_ID,
+            firebase_uid="slaitgraph1234567890",
+            username="slait-graph",
+            steam_id=os.getenv("SLAIT_GRAPH_STEAM_ID", "dummy_slait_graph_id"),
+            steam_api_key=os.getenv("SLAIT_GRAPH_STEAM_API_KEY", "dummy_slait_graph_key"),
+        ),
     ]
 
 
@@ -255,6 +272,12 @@ def _games() -> list[Game]:
             id=DEMO_GAME_ELDEN_RING_ID,
             steam_app_id="1245620",  # Elden Ring
         ),
+        Game(id=GAME_DONT_STARVE_ID, steam_app_id="322330"),
+        Game(id=GAME_MOTOGP_ID, steam_app_id="3875050"),
+        Game(id=GAME_WALLPAPER_ENGINE_ID, steam_app_id="431960"),
+        Game(id=GAME_UNTURNED_ID, steam_app_id="304930"),
+        Game(id=GAME_METRO_ID, steam_app_id="286690"),
+        Game(id=GAME_RIDE6_ID, steam_app_id="2815070"),
     ]
 
 
@@ -268,6 +291,12 @@ def _shelvings() -> list[Shelving]:
         Shelving(owner_id=DEMO_USER_2_ID, game_id=DEMO_GAME_DOTA_ID, status=GameStatus.SHELVED),
         Shelving(owner_id=DEMO_USER_3_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYED),
         Shelving(owner_id=DEMO_USER_4_ID, game_id=DEMO_GAME_RDR2_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_DONT_STARVE_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_MOTOGP_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_WALLPAPER_ENGINE_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_UNTURNED_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_METRO_ID, status=GameStatus.PLAYING),
+        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_RIDE6_ID, status=GameStatus.PLAYING),
     ]
 
 
@@ -417,6 +446,67 @@ def _rolling_times() -> list[SteamRollingTime]:
             )
         )
 
+    # SLAIT-GRAPH User Playtime Seeding
+    # Real steam playtimes on Day 0: Don't Starve (629), MotoGP (115), Wallpaper Engine (50), Unturned (22), Metro (0), RIDE 6 (0)
+    import random
+    
+    HISTORY_DAYS = 180
+    
+    games_targets = [
+        ("322330", 629),
+        ("3875050", 115),
+        ("431960", 50),
+        ("304930", 22),
+        ("286690", 0),
+        ("2815070", 0)
+    ]
+    
+    for app_id, final_target in games_targets:
+        if final_target == 0:
+            current_playtime = 0
+            for day_offset in range(HISTORY_DAYS, -1, -1):
+                records.append(
+                    SteamRollingTime(
+                        id=uuid4(),
+                        user_id=SLAIT_GRAPH_USER_ID,
+                        steam_app_id=app_id,
+                        last_day_playtime=current_playtime,
+                        created_at=today - timedelta(days=day_offset),
+                    )
+                )
+            continue
+
+        # Use 50% of the playtime as the "baseline" (the playtime they had before joining GameLog)
+        baseline = final_target // 2
+        remaining = final_target - baseline
+        
+        increments = [0] * (HISTORY_DAYS + 1)
+        
+        # Distribute the remaining playtime on a random subset of "active days" for realistic clustering
+        active_days_count = random.randint(15, min(90, HISTORY_DAYS)) 
+        active_days = set(random.sample(range(0, HISTORY_DAYS), active_days_count))
+        
+        for _ in range(remaining):
+            day_idx = random.choice(list(active_days))
+            increments[day_idx] += 1
+            
+        current_playtime = baseline
+        
+        for day_offset in range(HISTORY_DAYS, -1, -1):
+            record_date = today - timedelta(days=day_offset)
+            if day_offset != HISTORY_DAYS:
+                current_playtime += increments[day_offset]
+                
+            records.append(
+                SteamRollingTime(
+                    id=uuid4(),
+                    user_id=SLAIT_GRAPH_USER_ID,
+                    steam_app_id=app_id,
+                    last_day_playtime=current_playtime,
+                    created_at=record_date,
+                )
+            )
+
     return records
 
 
@@ -486,6 +576,21 @@ def seed_database() -> None:
         session.add(game_rdr2)
         session.add(game_gtav)
         session.add(game_elden_ring)
+
+        # SLAIT-GRAPH User Games
+        game_dont_starve = Game(id=GAME_DONT_STARVE_ID, steam_app_id="322330", genres=[genre_instances["23"], genre_instances["25"]])
+        game_motogp = Game(id=GAME_MOTOGP_ID, steam_app_id="3875050", genres=[genre_instances["9"], genre_instances["18"]])
+        game_wallpaper = Game(id=GAME_WALLPAPER_ENGINE_ID, steam_app_id="431960", genres=[genre_instances["57"]])
+        game_unturned = Game(id=GAME_UNTURNED_ID, steam_app_id="304930", genres=[genre_instances["1"], genre_instances["37"]])
+        game_metro = Game(id=GAME_METRO_ID, steam_app_id="286690", genres=[genre_instances["1"]])
+        game_ride6 = Game(id=GAME_RIDE6_ID, steam_app_id="2815070", genres=[genre_instances["9"]])
+
+        session.add(game_dont_starve)
+        session.add(game_motogp)
+        session.add(game_wallpaper)
+        session.add(game_unturned)
+        session.add(game_metro)
+        session.add(game_ride6)
 
         # Seed realistic Top Games
         for tg in TOP_GAMES_DATA:

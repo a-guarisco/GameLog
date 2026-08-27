@@ -198,15 +198,35 @@ def _compute_daily_playtimes(
         records.sort(key=lambda r: r.created_at)
 
         for i, record in enumerate(records):
-            if i == 0:
-                daily_playtime = 0
-            else:
-                daily_playtime = max(0, record.last_day_playtime - records[i - 1].last_day_playtime)
-
-            daily_totals[record.created_at] += daily_playtime
-
             if earliest_date is None or record.created_at < earliest_date:
                 earliest_date = record.created_at
+
+            if i == 0:
+                continue
+
+            prev_record = records[i - 1]
+            delta_playtime = max(0, record.last_day_playtime - prev_record.last_day_playtime)
+
+            if delta_playtime == 0:
+                continue
+
+            delta_days = (record.created_at - prev_record.created_at).days
+            if delta_days <= 0:
+                delta_days = 1
+
+            # Sanity check: a single game cannot be played more than 24 hours in a day.
+            # This handles massive jumps from mock data mismatches or Steam syncing years of offline play.
+            max_possible_playtime = delta_days * 1440
+            if delta_playtime > max_possible_playtime:
+                delta_playtime = max_possible_playtime
+
+            daily_avg = delta_playtime // delta_days
+            remainder = delta_playtime % delta_days
+
+            for d in range(1, delta_days + 1):
+                target_date = prev_record.created_at + timedelta(days=d)
+                assigned_time = daily_avg + (1 if d <= remainder else 0)
+                daily_totals[target_date] += assigned_time
 
     if end_date is None:
         end_date = date.today()
