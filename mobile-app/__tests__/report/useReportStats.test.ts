@@ -21,14 +21,14 @@ describe('useReportStats', () => {
     const { result } = renderHook(() =>
       useReportStats(null, new Date(), new Date(), 'playtime', gameNames)
     );
-    expect(result.current.summaryStats).toBeNull();
+    expect(result.current.summary).toBeNull();
   });
 
   it('returns null summaryStats if appliedStartDate is missing', () => {
     const { result } = renderHook(() =>
       useReportStats(mockReport, undefined, new Date(), 'playtime', gameNames)
     );
-    expect(result.current.summaryStats).toBeNull();
+    expect(result.current.summary).toBeNull();
   });
 
   it('calculates stats correctly', () => {
@@ -39,14 +39,17 @@ describe('useReportStats', () => {
       useReportStats(mockReport, start, end, 'playtime', gameNames)
     );
 
-    expect(result.current.summaryStats).toEqual({
-      totalPlaytime: 210,
-      topGamePlaytime: 120,
-      topGameId: '1',
+    expect(result.current.summary).toEqual({
+      stats: [
+        { value: '3h', label: 'Playtime' },
+        { value: '3', label: 'Games' },
+        { value: 'Zelda', label: 'Top Game' },
+      ],
+      rangeText: expect.stringMatching(/ — .* · 10 days/),
+      maxPlaytimePerDay: 0,
       totalGames: 3,
-      diffDays: 10,
-      formattedStart: expect.any(String),
-      formattedEnd: expect.any(String),
+      totalPlaytime: 210,
+      topGameName: 'Zelda'
     });
   });
 
@@ -61,8 +64,8 @@ describe('useReportStats', () => {
       useReportStats(mockReport, start, undefined, 'playtime', gameNames)
     );
 
-    expect(result.current.summaryStats).toBeDefined();
-    expect(result.current.summaryStats?.diffDays).toBe(6); // 5 days difference + 1 inclusive
+    expect(result.current.summary).toBeDefined();
+    expect(result.current.summary?.rangeText).toMatch(/ · 6 days/); // 5 days difference + 1 inclusive
 
     jest.useRealTimers();
   });

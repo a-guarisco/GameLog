@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { DailyReport } from '@gamelog/api-manager/dto/report';
+import { selectReportSummary } from './selectReportSummary';
 
 export function useReportStats(
   report: DailyReport | null,
@@ -10,38 +11,10 @@ export function useReportStats(
 ) {
   const formatDate = (d?: Date) => (d ? d.toLocaleDateString() : 'Select Date');
 
-  const summaryStats = useMemo(() => {
-    if (!report || !report.game_reports || report.game_reports.length === 0 || !appliedStartDate)
-      return null;
-
-    let totalPlaytime = 0;
-    let topGamePlaytime = -1;
-    let topGameId = '';
-
-    report.game_reports.forEach((game) => {
-      totalPlaytime += game.today_play_time;
-      if (game.today_play_time > topGamePlaytime) {
-        topGamePlaytime = game.today_play_time;
-        topGameId = game.app_id;
-      }
-    });
-
-    const totalGames = report.game_reports.length;
-    const finalEndDate = appliedEndDate || new Date();
-    // compute days difference. 'to' date is exclusive, so diffDays is simply (end - start)
-    const diffTime = Math.abs(finalEndDate.getTime() - appliedStartDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-    return {
-      totalPlaytime,
-      topGamePlaytime,
-      topGameId,
-      totalGames,
-      diffDays,
-      formattedStart: formatDate(appliedStartDate),
-      formattedEnd: formatDate(finalEndDate),
-    };
-  }, [report, appliedStartDate, appliedEndDate]);
+  const summary = useMemo(
+    () => selectReportSummary(report, appliedStartDate, appliedEndDate, gameNames),
+    [report, appliedStartDate, appliedEndDate, gameNames]
+  );
 
   const sortedGameReports = useMemo(() => {
     if (!report || !report.game_reports) return [];
@@ -58,5 +31,5 @@ export function useReportStats(
     });
   }, [report, sortOrder, gameNames]);
 
-  return { summaryStats, sortedGameReports, formatDate };
+  return { summary, sortedGameReports, formatDate };
 }
