@@ -1,10 +1,10 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { GLGoogleButton, GoogleGIcon } from '../../src/onboarding/GLGoogleButton';
 
 // Mock nativewind colorScheme hook
 jest.mock('nativewind', () => ({
   useColorScheme: jest.fn(() => ({ colorScheme: 'light' })),
+  cssInterop: jest.fn(),
 }));
 
 describe('GLGoogleButton', () => {
@@ -17,7 +17,7 @@ describe('GLGoogleButton', () => {
   it('handles onPress', () => {
     const onPressMock = jest.fn();
     const { getByTestId } = render(<GLGoogleButton onPress={onPressMock} />);
-    
+
     fireEvent.press(getByTestId('gl-google-button'));
     expect(onPressMock).toHaveBeenCalledTimes(1);
   });
@@ -33,10 +33,10 @@ describe('GLGoogleButton', () => {
   it('renders disabled state correctly', () => {
     const onPressMock = jest.fn();
     const { getByTestId } = render(<GLGoogleButton isDisabled onPress={onPressMock} />);
-    
+
     const button = getByTestId('gl-google-button');
     expect(button.props.accessibilityState.disabled).toBe(true);
-    
+
     fireEvent.press(button);
     expect(onPressMock).not.toHaveBeenCalled();
   });
@@ -44,7 +44,7 @@ describe('GLGoogleButton', () => {
   it('applies dark mode styles correctly', () => {
     const { useColorScheme } = require('nativewind');
     useColorScheme.mockReturnValueOnce({ colorScheme: 'dark' });
-    
+
     const { getByTestId } = render(<GLGoogleButton />);
     const button = getByTestId('gl-google-button');
     // We check for the class that implies dark mode styling

@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -38,7 +38,7 @@ export default function LoginScreen() {
     errorCode === 'auth/user-not-found' ||
     errorCode === 'auth/wrong-password';
 
-  const authOptions: GLSegmentOption<AuthMode>[] = [
+  const authOptions: (GLSegmentOption<AuthMode> & { component: ReactNode })[] = [
     {
       id: 'signin',
       label: 'Sign In',
@@ -104,11 +104,11 @@ export default function LoginScreen() {
             className="mb-2"
           />
 
+          {authOptions.find((opt) => opt.id === authMode)?.component}
+
           <Box className="my-6 flex-row items-center">
             <Divider className="flex-1" />
-            <Text className="mx-4 text-typography-500 text-xs font-medium uppercase">
-              OR
-            </Text>
+            <Text className="mx-4 text-typography-500 text-xs font-medium uppercase">OR</Text>
             <Divider className="flex-1" />
           </Box>
 

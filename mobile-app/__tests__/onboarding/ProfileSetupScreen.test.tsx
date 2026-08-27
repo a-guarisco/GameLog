@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import ProfileSetupScreen from '../../src/onboarding/ProfileSetupScreen';
@@ -29,7 +28,7 @@ describe('ProfileSetupScreen', () => {
 
   it('renders correctly', () => {
     const { getByText, getByPlaceholderText } = render(<ProfileSetupScreen />);
-    
+
     expect(getByText('Complete Profile')).toBeTruthy();
     expect(getByPlaceholderText('Choose a username')).toBeTruthy();
     expect(getByPlaceholderText('e.g. 76561197960287930')).toBeTruthy();
@@ -40,7 +39,7 @@ describe('ProfileSetupScreen', () => {
 
   it('handles input changes', () => {
     const { getByPlaceholderText } = render(<ProfileSetupScreen />);
-    
+
     fireEvent.changeText(getByPlaceholderText('Choose a username'), 'newuser');
     expect(mockUseProfileSetup.setUsername).toHaveBeenCalledWith('newuser');
 
@@ -53,14 +52,14 @@ describe('ProfileSetupScreen', () => {
 
   it('calls handleRegister on submit', () => {
     const { getByText } = render(<ProfileSetupScreen />);
-    
+
     fireEvent.press(getByText('Complete Setup'));
     expect(mockUseProfileSetup.handleRegister).toHaveBeenCalled();
   });
 
   it('calls handleSignOut on cancel', () => {
     const { getByText } = render(<ProfileSetupScreen />);
-    
+
     fireEvent.press(getByText('Cancel & Sign Out'));
     expect(mockUseProfileSetup.handleSignOut).toHaveBeenCalled();
   });
@@ -72,20 +71,22 @@ describe('ProfileSetupScreen', () => {
     });
 
     const { getByText } = render(<ProfileSetupScreen />);
-    
+
     expect(getByText('Username already taken')).toBeTruthy();
   });
 
   it('opens URL when clicking on "How to find my Steam ID?"', () => {
     const { getByText } = render(<ProfileSetupScreen />);
-    
+
     fireEvent.press(getByText('How to find my Steam ID?'));
-    expect(Linking.openURL).toHaveBeenCalledWith('https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC');
+    expect(Linking.openURL).toHaveBeenCalledWith(
+      'https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC'
+    );
   });
 
   it('opens URL when clicking on "How to get an API Key?"', () => {
     const { getByText } = render(<ProfileSetupScreen />);
-    
+
     fireEvent.press(getByText('How to get an API Key?'));
     expect(Linking.openURL).toHaveBeenCalledWith('https://steamcommunity.com/dev/apikey');
   });
@@ -97,10 +98,10 @@ describe('ProfileSetupScreen', () => {
     });
 
     const { getByText } = render(<ProfileSetupScreen />);
-    
+
     const submitBtn = getByText('Complete Setup');
     const cancelBtn = getByText('Cancel & Sign Out');
-    
+
     // They should render, testing actual disabled state is tricky for Gluestack without specific queries,
     // but we can ensure they don't crash and render correctly.
     expect(submitBtn).toBeTruthy();

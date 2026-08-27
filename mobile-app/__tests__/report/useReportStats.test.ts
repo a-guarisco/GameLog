@@ -63,7 +63,7 @@ describe('useReportStats', () => {
 
     expect(result.current.summaryStats).toBeDefined();
     expect(result.current.summaryStats?.diffDays).toBe(6); // 5 days difference + 1 inclusive
-    
+
     jest.useRealTimers();
   });
 

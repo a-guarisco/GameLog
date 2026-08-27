@@ -1,6 +1,7 @@
-import React from 'react';
-import { Pressable, ActivityIndicator } from 'react-native';
+import { FC } from 'react';
+import { Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { Text } from '@gamelog/common/gluestack/text';
 import { useColorScheme } from 'nativewind';
 
@@ -34,7 +35,7 @@ export interface GLGoogleButtonProps {
   testID?: string;
 }
 
-export const GLGoogleButton: React.FC<GLGoogleButtonProps> = ({
+export const GLGoogleButton: FC<GLGoogleButtonProps> = ({
   onPress,
   isLoading = false,
   isDisabled = false,
@@ -67,7 +68,7 @@ export const GLGoogleButton: React.FC<GLGoogleButtonProps> = ({
       } ${className}`}
     >
       {isLoading ? (
-        <ActivityIndicator size="small" color={isDark ? '#E3E3E3' : '#1F1F1F'} className="mr-3" />
+        <Spinner size="small" color={isDark ? '#E3E3E3' : '#1F1F1F'} className="mr-3" />
       ) : (
         <GoogleGIcon size={20} />
       )}

@@ -69,14 +69,14 @@ export function useLogin() {
       }
     } catch (err: any) {
       console.error('Firebase Auth Error:', err);
-      
+
       let code = err.code;
       // Se Firebase lancia un errore senza .code (es. nell'emulatore), lo estraiamo dal messaggio
       if (!code && err.message) {
         const match = err.message.match(/\((auth\/[^)]+)\)/);
         if (match) code = match[1];
       }
-      
+
       setErrorCode(code || 'auth/network-request-failed');
     } finally {
       setLoading(false);

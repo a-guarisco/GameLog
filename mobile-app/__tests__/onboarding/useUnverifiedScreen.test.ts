@@ -21,7 +21,7 @@ jest.mock('@gamelog/auth/useAuthSession', () => ({
 
 describe('useUnverifiedScreen', () => {
   let mockCheckEmailVerification: jest.Mock;
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockCheckEmailVerification = jest.fn();
@@ -132,7 +132,9 @@ describe('useUnverifiedScreen', () => {
     });
 
     it('handles send verification error', async () => {
-      (sendEmailVerification as jest.Mock).mockRejectedValueOnce({ code: 'auth/too-many-requests' });
+      (sendEmailVerification as jest.Mock).mockRejectedValueOnce({
+        code: 'auth/too-many-requests',
+      });
       const { result } = renderHook(() => useUnverifiedScreen());
 
       await act(async () => {

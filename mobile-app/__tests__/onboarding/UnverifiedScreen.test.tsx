@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import UnverifiedScreen from '../../src/onboarding/UnverifiedScreen';
 import { useUnverifiedScreen } from '../../src/onboarding/useUnverifiedScreen';
@@ -31,7 +30,7 @@ describe('UnverifiedScreen', () => {
 
   it('renders correctly', () => {
     const { getByText } = render(<UnverifiedScreen />);
-    
+
     expect(getByText('Verify your Email')).toBeTruthy();
     expect(getByText('test@example.com')).toBeTruthy();
     expect(getByText('I verified it, continue')).toBeTruthy();
@@ -41,21 +40,21 @@ describe('UnverifiedScreen', () => {
 
   it('handles verification check press', () => {
     const { getByText } = render(<UnverifiedScreen />);
-    
+
     fireEvent.press(getByText('I verified it, continue'));
     expect(mockUseUnverifiedScreen.handleCheckVerification).toHaveBeenCalled();
   });
 
   it('handles resend email press', () => {
     const { getByText } = render(<UnverifiedScreen />);
-    
+
     fireEvent.press(getByText('Resend email'));
     expect(mockUseUnverifiedScreen.handleResendEmail).toHaveBeenCalled();
   });
 
   it('handles sign out press', () => {
     const { getByText } = render(<UnverifiedScreen />);
-    
+
     fireEvent.press(getByText('Sign Out / Change Account'));
     expect(mockUseUnverifiedScreen.handleSignOut).toHaveBeenCalled();
   });
@@ -87,7 +86,7 @@ describe('UnverifiedScreen', () => {
     });
 
     const { getByText } = render(<UnverifiedScreen />);
-    
+
     // We expect the buttons to be rendered. Gluestack Buttons uses `disabled` props down the tree.
     expect(getByText('I verified it, continue')).toBeTruthy();
     expect(getByText('Resend email')).toBeTruthy();
@@ -100,7 +99,7 @@ describe('UnverifiedScreen', () => {
     });
 
     const { getByText } = render(<UnverifiedScreen />);
-    
+
     expect(getByText('I verified it, continue')).toBeTruthy();
     expect(getByText('Resend email')).toBeTruthy();
   });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
@@ -7,7 +7,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { ErrorBox, LoadingBox, InfoBox } from '@gamelog/common/feedbacks';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform, Image, Pressable } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import SectionCard from '@gamelog/common/SectionCard';
@@ -40,7 +40,6 @@ export const ReportBox = () => {
   const [showDetails, setShowDetails] = useState(false);
   const { sortOrder, setSortOrder } = useReportSortOrder();
 
-
   const { summaryStats, sortedGameReports, formatDate } = useReportStats(
     report,
     appliedStartDate,
@@ -64,7 +63,10 @@ export const ReportBox = () => {
       return 'Generate last 2 weeks report';
     }
     if (startDate && !endDate) {
-      const diffDays = Math.max(1, Math.ceil((yesterday.getTime() - startDate.getTime()) / 86400000) + 1);
+      const diffDays = Math.max(
+        1,
+        Math.ceil((yesterday.getTime() - startDate.getTime()) / 86400000) + 1
+      );
       if (diffDays % 7 === 0) {
         const weeks = diffDays / 7;
         return `Generate last ${weeks} ${weeks === 1 ? 'week' : 'weeks'} report`;
@@ -73,8 +75,6 @@ export const ReportBox = () => {
     }
     return 'Generate report for selected range';
   };
-
-
 
   const onStartChange = (event: any, selectedDate?: Date) => {
     setShowStart(Platform.OS === 'ios');
@@ -89,7 +89,6 @@ export const ReportBox = () => {
       setEndDate(selectedDate);
     }
   };
-
 
   const handleGamePress = (appId: string, playTime: number) => {
     const displayName = gameNames[appId] || `App ID: ${appId}`;
@@ -119,14 +118,18 @@ export const ReportBox = () => {
 
         <HStack space="md" className="justify-between">
           <HStack space="sm" className="items-center flex-1">
-            <Text size="sm" className="font-medium text-typography-0">From:</Text>
+            <Text size="sm" className="font-medium text-typography-0">
+              From:
+            </Text>
             <Button onPress={() => setShowStart(true)} className="flex-1">
               <ButtonText>{startDate ? formatDate(startDate) : 'Select Date'}</ButtonText>
             </Button>
           </HStack>
 
           <HStack space="sm" className="items-center flex-1">
-            <Text size="sm" className="font-medium text-typography-0">To:</Text>
+            <Text size="sm" className="font-medium text-typography-0">
+              To:
+            </Text>
             <Button onPress={() => setShowEnd(true)} className="flex-1">
               <ButtonText>{endDate ? formatDate(endDate) : 'Select Date'}</ButtonText>
             </Button>
@@ -154,9 +157,7 @@ export const ReportBox = () => {
         )}
 
         <Button onPress={() => handleFetchReport(false)} isDisabled={loading}>
-          <ButtonText>
-            {getDynamicButtonText()}
-          </ButtonText>
+          <ButtonText>{getDynamicButtonText()}</ButtonText>
         </Button>
 
         {loading && <LoadingBox message="Fetching report..." />}
@@ -174,32 +175,52 @@ export const ReportBox = () => {
                 <Box className="bg-background-50 p-4 rounded-lg border border-outline-100">
                   <VStack space="xs">
                     <Text size="sm" className="font-medium text-typography-500">
-                      From {summaryStats.formattedStart} to {summaryStats.formattedEnd} ({summaryStats.diffDays} {summaryStats.diffDays === 1 ? 'day' : 'days'})
+                      From {summaryStats.formattedStart} to {summaryStats.formattedEnd} (
+                      {summaryStats.diffDays} {summaryStats.diffDays === 1 ? 'day' : 'days'})
                     </Text>
-                    
+
                     <HStack className="justify-between items-center mt-2">
-                      <Text size="sm" className="font-bold text-typography-0">Total Playtime</Text>
-                      <Text size="sm" className="font-bold text-success-700">{formatHours(summaryStats.totalPlaytime)}</Text>
+                      <Text size="sm" className="font-bold text-typography-0">
+                        Total Playtime
+                      </Text>
+                      <Text size="sm" className="font-bold text-success-700">
+                        {formatHours(summaryStats.totalPlaytime)}
+                      </Text>
                     </HStack>
-                    
+
                     <HStack className="justify-between items-center mt-2">
-                      <Text size="sm" className="font-bold text-typography-0">Games Played</Text>
-                      <Text className="text-sm font-bold text-info-700">{summaryStats.totalGames}</Text>
+                      <Text size="sm" className="font-bold text-typography-0">
+                        Games Played
+                      </Text>
+                      <Text className="text-sm font-bold text-info-700">
+                        {summaryStats.totalGames}
+                      </Text>
                     </HStack>
 
                     <VStack className="mt-2 pt-2 border-t border-background-300">
-                      <Text size="xs" className="font-bold text-typography-500 uppercase">Top Game</Text>
+                      <Text size="xs" className="font-bold text-typography-500 uppercase">
+                        Top Game
+                      </Text>
                       <HStack className="justify-between items-center mt-1">
-                        <Text size="sm" className="font-bold text-typography-0 flex-1 mr-2" numberOfLines={1}>
+                        <Text
+                          size="sm"
+                          className="font-bold text-typography-0 flex-1 mr-2"
+                          numberOfLines={1}
+                        >
                           {gameNames[summaryStats.topGameId] || `App ID: ${summaryStats.topGameId}`}
                         </Text>
-                        <Text className="text-sm font-bold text-success-700">{formatHours(summaryStats.topGamePlaytime)}</Text>
+                        <Text className="text-sm font-bold text-success-700">
+                          {formatHours(summaryStats.topGamePlaytime)}
+                        </Text>
                       </HStack>
                     </VStack>
                   </VStack>
                 </Box>
-                
-                <Pressable onPress={() => setShowDetails(!showDetails)} className="self-center mt-2 py-2 px-4 rounded-full bg-background-200">
+
+                <Pressable
+                  onPress={() => setShowDetails(!showDetails)}
+                  className="self-center mt-2 py-2 px-4 rounded-full bg-background-200"
+                >
                   <Text className="text-sm font-bold text-primary-500">
                     {showDetails ? 'Hide details' : 'See details'}
                   </Text>
@@ -234,7 +255,11 @@ export const ReportBox = () => {
                               resizeMode="cover"
                             />
                             <VStack className="flex-1">
-                              <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
+                              <Text
+                                size="sm"
+                                className="font-bold uppercase text-typography-0"
+                                numberOfLines={1}
+                              >
                                 {gameNames[game.app_id] || `App ID: ${game.app_id}`}
                               </Text>
                               <HStack space="md" className="mt-0.5">

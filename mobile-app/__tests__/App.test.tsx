@@ -7,7 +7,7 @@ import { useAuthSession } from '@gamelog/auth/useAuthSession';
 jest.mock('@gamelog/common/useAppInit');
 jest.mock('@gamelog/auth/useAuthSession');
 jest.mock('@gamelog/common/charts/total-hours/TotalHoursChart', () => () => null);
-jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => () => null);
+jest.mock('@gamelog/common/charts/total-hours/TotalHoursDoughnut', () => () => null);
 jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => () => null);
 
 jest.mock('@gamelog/onboarding/SplashScreen', () => {

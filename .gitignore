@@ -43,3 +43,10 @@ docs/
 .coverage
 htmlcov/
 .agents/
+
+# Firebase Emulator Exports
+firebase-export-*/
+
+# Coverage reports (mobile)
+mobile-app/coverage/
+mobile-app/coverage-report.txt

@@ -61,7 +61,7 @@ describe('googleAuth', () => {
 
   describe('with isolated modules', () => {
     let googleAuth: any;
-    
+
     beforeEach(() => {
       jest.resetModules();
     });
@@ -74,7 +74,9 @@ describe('googleAuth', () => {
       }));
       googleAuth = require('../../src/auth/googleAuth');
 
-      await expect(googleAuth.signInWithGoogle()).rejects.toThrow('Native Google Sign-In is not supported in Expo Go');
+      await expect(googleAuth.signInWithGoogle()).rejects.toThrow(
+        'Native Google Sign-In is not supported in Expo Go'
+      );
     });
 
     it('throws error if GoogleSignin throws on require', async () => {
@@ -87,12 +89,17 @@ describe('googleAuth', () => {
         throw new Error('Module not found');
       });
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-      
+
       googleAuth = require('../../src/auth/googleAuth');
-      
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[Google Auth] Native GoogleSignin module not found:', expect.any(Error));
-      await expect(googleAuth.signInWithGoogle()).rejects.toThrow('Native Google Sign-In is not supported in Expo Go');
-      
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Google Auth] Native GoogleSignin module not found:',
+        expect.any(Error)
+      );
+      await expect(googleAuth.signInWithGoogle()).rejects.toThrow(
+        'Native Google Sign-In is not supported in Expo Go'
+      );
+
       consoleWarnSpy.mockRestore();
     });
 
@@ -102,25 +109,25 @@ describe('googleAuth', () => {
         default: { executionEnvironment: 'standalone' },
         ExecutionEnvironment: { StoreClient: 'storeClient' },
       }));
-      
+
       const gMock = {
         configure: jest.fn(),
         hasPlayServices: jest.fn(),
         signIn: jest.fn().mockResolvedValue({ data: { idToken: 'test-token' } }),
       };
-      
+
       jest.doMock('@react-native-google-signin/google-signin', () => ({
         GoogleSignin: gMock,
       }));
-      
+
       const fMock = {
         GoogleAuthProvider: { credential: jest.fn(() => 'cred') },
         signInWithCredential: jest.fn().mockResolvedValue({ user: { uid: 'user-1' } }),
       };
       jest.doMock('firebase/auth', () => fMock);
-      
+
       googleAuth = require('../../src/auth/googleAuth');
-      
+
       const user = await googleAuth.signInWithGoogle();
       expect(gMock.configure).toHaveBeenCalled();
       expect(gMock.hasPlayServices).toHaveBeenCalled();
@@ -135,7 +142,7 @@ describe('googleAuth', () => {
         default: { executionEnvironment: 'standalone' },
         ExecutionEnvironment: { StoreClient: 'storeClient' },
       }));
-      
+
       const gMock = {
         configure: jest.fn(),
         hasPlayServices: jest.fn(),
@@ -143,10 +150,12 @@ describe('googleAuth', () => {
       };
       jest.doMock('@react-native-google-signin/google-signin', () => ({ GoogleSignin: gMock }));
       jest.doMock('firebase/auth', () => ({}));
-      
+
       googleAuth = require('../../src/auth/googleAuth');
-      
-      await expect(googleAuth.signInWithGoogle()).rejects.toThrow('Google Sign-In completed, but no ID Token was returned.');
+
+      await expect(googleAuth.signInWithGoogle()).rejects.toThrow(
+        'Google Sign-In completed, but no ID Token was returned.'
+      );
     });
 
     it('does nothing on signOut if in Expo Go', async () => {
@@ -157,9 +166,9 @@ describe('googleAuth', () => {
       }));
       const gMock = { signOut: jest.fn() };
       jest.doMock('@react-native-google-signin/google-signin', () => ({ GoogleSignin: gMock }));
-      
+
       googleAuth = require('../../src/auth/googleAuth');
-      
+
       await googleAuth.signOutGoogle();
       expect(gMock.signOut).not.toHaveBeenCalled();
     });
@@ -172,9 +181,9 @@ describe('googleAuth', () => {
       }));
       const gMock = { configure: jest.fn(), signOut: jest.fn() };
       jest.doMock('@react-native-google-signin/google-signin', () => ({ GoogleSignin: gMock }));
-      
+
       googleAuth = require('../../src/auth/googleAuth');
-      
+
       await googleAuth.signOutGoogle();
       expect(gMock.signOut).toHaveBeenCalled();
     });
@@ -185,15 +194,21 @@ describe('googleAuth', () => {
         default: { executionEnvironment: 'standalone' },
         ExecutionEnvironment: { StoreClient: 'storeClient' },
       }));
-      const gMock = { configure: jest.fn(), signOut: jest.fn().mockRejectedValue(new Error('Signout error')) };
+      const gMock = {
+        configure: jest.fn(),
+        signOut: jest.fn().mockRejectedValue(new Error('Signout error')),
+      };
       jest.doMock('@react-native-google-signin/google-signin', () => ({ GoogleSignin: gMock }));
-      
+
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-      
+
       googleAuth = require('../../src/auth/googleAuth');
       await googleAuth.signOutGoogle();
-      
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[Google Auth] Sign-out warning:', expect.any(Error));
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Google Auth] Sign-out warning:',
+        expect.any(Error)
+      );
       consoleWarnSpy.mockRestore();
     });
   });

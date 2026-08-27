@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent, within } from '@testing-library/react-native';
 import { ReportBox } from '../../src/report/ReportBox';
 import { useReport } from '../../src/report/useReport';
@@ -11,7 +10,7 @@ jest.mock('../../src/report/useReportSortOrder', () => ({
   useReportSortOrder: jest.fn().mockReturnValue({
     sortOrder: 'playtime',
     setSortOrder: jest.fn(),
-  })
+  }),
 }));
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
@@ -230,13 +229,13 @@ describe('ReportBox', () => {
     });
 
     const { getByText, getAllByText } = renderComponent();
-    
+
     expect(getByText('Report Summary')).toBeTruthy();
-    
+
     // Top Game should be Test Game (120 min)
     expect(getByText('Test Game')).toBeTruthy();
     // 45m should be formatted correctly
-    
+
     // Click "See details" to expand the list
     fireEvent.press(getByText('See details'));
 
@@ -248,7 +247,7 @@ describe('ReportBox', () => {
     // Now there should be two "Test Game" elements: one in summary, one in the list
     const gameTexts = getAllByText('Test Game');
     fireEvent.press(gameTexts[gameTexts.length - 1]);
-    
+
     expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
       screen: 'Game',
       params: {
@@ -263,7 +262,7 @@ describe('ReportBox', () => {
     // Test sorting interactions
     fireEvent.press(getByText('Streak'));
     expect(mockSetSortOrder).toHaveBeenCalledWith('streak');
-    
+
     fireEvent.press(getByText('A-Z'));
     expect(mockSetSortOrder).toHaveBeenCalledWith('alpha');
   });
@@ -279,8 +278,8 @@ describe('ReportBox', () => {
       report: {
         date: '2023-10-10',
         game_reports: [
-          { app_id: '1', today_play_time: 10, streak: 10 }, 
-          { app_id: '2', today_play_time: 20, streak: 5 }, 
+          { app_id: '1', today_play_time: 10, streak: 10 },
+          { app_id: '2', today_play_time: 20, streak: 5 },
         ],
       },
       gameNames: {
@@ -296,10 +295,10 @@ describe('ReportBox', () => {
       sortOrder: 'streak',
       setSortOrder: jest.fn(),
     });
-    
+
     let rendered = renderComponent();
     fireEvent.press(rendered.getByText('See details'));
-    
+
     // 10 streak is first
     let gameElements = rendered.getAllByTestId('game-list-item');
     expect(within(gameElements[0]).getByText('B Game')).toBeTruthy();
@@ -334,15 +333,15 @@ describe('ReportBox', () => {
     });
 
     const { getAllByText, UNSAFE_getAllByType } = renderComponent();
-    
+
     // There are two "Select Date" buttons (From and To)
     const dateButtons = getAllByText('Select Date');
     fireEvent.press(dateButtons[0]); // First one is From
     fireEvent.press(dateButtons[1]); // Second one is To
-    
+
     const pickers = UNSAFE_getAllByType(require('@react-native-community/datetimepicker'));
     expect(pickers.length).toBeGreaterThan(1);
-    
+
     const newDate = new Date('2023-12-01');
     fireEvent(pickers[0], 'onChange', { type: 'set' }, newDate);
     expect(mockSetStartDate).toHaveBeenCalledWith(newDate);
@@ -378,12 +377,12 @@ describe('ReportBox', () => {
     });
 
     const { getByTestId, getByText } = renderComponent();
-    
+
     // Show details first
     fireEvent.press(getByText('See details'));
-    
+
     fireEvent.press(getByTestId('game-list-item'));
-    
+
     expect(mockNavigate).toHaveBeenCalledWith('GameListTab', {
       screen: 'Game',
       params: {

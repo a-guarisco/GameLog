@@ -1,5 +1,6 @@
-import React from 'react';
-import { Pressable, ActivityIndicator } from 'react-native';
+import { FC } from 'react';
+import { Pressable } from 'react-native';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
 import Svg, { Path } from 'react-native-svg';
 import { Text } from '@gamelog/common/gluestack/text';
 import { useColorScheme } from 'nativewind';
@@ -22,7 +23,7 @@ export interface GLGithubButtonProps {
   testID?: string;
 }
 
-export const GLGithubButton: React.FC<GLGithubButtonProps> = ({
+export const GLGithubButton: FC<GLGithubButtonProps> = ({
   onPress,
   isLoading = false,
   isDisabled = false,
@@ -55,7 +56,7 @@ export const GLGithubButton: React.FC<GLGithubButtonProps> = ({
       } ${className}`}
     >
       {isLoading ? (
-        <ActivityIndicator size="small" color={textColor} className="mr-3" />
+        <Spinner size="small" color={textColor} className="mr-3" />
       ) : (
         <GithubLogo size={20} color={textColor} />
       )}

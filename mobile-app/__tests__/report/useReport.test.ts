@@ -129,7 +129,10 @@ describe('useReport', () => {
   });
 
   it('fetches default 14 days report if dates are missing', async () => {
-    (apiManager.getDailyReport as jest.Mock).mockResolvedValueOnce({ date: 'Default Date', game_reports: [] });
+    (apiManager.getDailyReport as jest.Mock).mockResolvedValueOnce({
+      date: 'Default Date',
+      game_reports: [],
+    });
 
     const { result } = renderHook(() => useReport());
 
@@ -144,7 +147,10 @@ describe('useReport', () => {
   });
 
   it('formats dates correctly before fetching', async () => {
-    (apiManager.getDailyReport as jest.Mock).mockResolvedValueOnce({ date: '2023-10-10', game_reports: [] });
+    (apiManager.getDailyReport as jest.Mock).mockResolvedValueOnce({
+      date: '2023-10-10',
+      game_reports: [],
+    });
 
     const { result } = renderHook(() => useReport());
 

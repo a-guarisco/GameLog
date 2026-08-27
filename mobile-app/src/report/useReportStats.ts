@@ -11,7 +11,8 @@ export function useReportStats(
   const formatDate = (d?: Date) => (d ? d.toLocaleDateString() : 'Select Date');
 
   const summaryStats = useMemo(() => {
-    if (!report || !report.game_reports || report.game_reports.length === 0 || !appliedStartDate) return null;
+    if (!report || !report.game_reports || report.game_reports.length === 0 || !appliedStartDate)
+      return null;
 
     let totalPlaytime = 0;
     let topGamePlaytime = -1;

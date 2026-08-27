@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 import { ActionFeedbackBanner } from './ActionFeedbackBanner';
@@ -13,7 +13,7 @@ interface SocialSectionTabsProps {
   errorMessageFriendList: string | null;
   pendingRequests: FriendshipRequest[];
   acceptedFriends: FriendshipRequest[];
-  
+
   // Search Tab Props
   searchQuery: string;
   onQueryChange: (query: string) => void;
@@ -33,7 +33,7 @@ interface SocialSectionTabsProps {
   };
 }
 
-const SocialSectionTabs: React.FC<SocialSectionTabsProps> = ({
+const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
   isLoadingFriendList,
   errorFriendList,
   errorMessageFriendList,
