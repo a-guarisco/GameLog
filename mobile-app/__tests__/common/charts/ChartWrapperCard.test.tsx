@@ -1,3 +1,4 @@
+import { ComponentType } from 'react';
 import * as ReactNative from 'react-native';
 import { View } from 'react-native';
 import { render, screen, fireEvent } from '@testing-library/react-native';
@@ -37,7 +38,7 @@ jest.mock('@gamelog/common/charts/ChartErrorHandler', () => {
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   return {
     __esModule: true,
-    default: ({ ErrorBehaviour }: { ErrorBehaviour?: React.ComponentType }) => {
+    default: ({ ErrorBehaviour }: { ErrorBehaviour?: ComponentType }) => {
       const Comp = ErrorBehaviour || (() => <View testID="default-error" />);
       return <Comp />;
     },
