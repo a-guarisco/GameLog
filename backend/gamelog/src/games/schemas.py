@@ -94,6 +94,8 @@ class DailyGameReport(BaseModel):
     app_id: str
     today_play_time: int
     streak: int
+    days_played_count: int
+    max_playtime_per_day: int
 
 
 class DailyReport(BaseModel):

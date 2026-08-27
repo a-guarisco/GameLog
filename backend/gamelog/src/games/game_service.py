@@ -114,11 +114,14 @@ def get_daily_report(session: Session, user_id: str, start_date: date | None = N
 
         if range_play_time > 0:
             streak = get_streak(session, user_id, steam_app_id, target_date=end_date)
+            range_daily_playtimes = [dp.playtime_minutes for dp in daily_playtimes if start_date <= dp.date <= end_date and dp.playtime_minutes > 0]
             game_reports.append(
                 DailyGameReport(
                     app_id=steam_app_id,
                     today_play_time=range_play_time,
                     streak=streak,
+                    days_played_count=len(range_daily_playtimes),
+                    max_playtime_per_day=max(range_daily_playtimes) if range_daily_playtimes else 0,
                 )
             )
 
