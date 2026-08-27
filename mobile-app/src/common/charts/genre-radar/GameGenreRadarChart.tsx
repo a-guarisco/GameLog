@@ -1,35 +1,32 @@
-import { useMemo } from 'react';
 import { RadarChart } from 'react-native-gifted-charts';
-import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { Box } from '@gamelog/common/gluestack/box';
+import { Text } from '@gamelog/common/gluestack/text';
 import { brand } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
+import { useGenreRadarChart } from './useGenreRadarChart';
+
+import type { OwnedGames } from '@gamelog/api-manager/dto';
+
 interface GameGenreRadarChartProps {
-  genreChartData?: any[];
-  isLoadingGenreChart?: boolean;
-  errorGenreChart?: any;
+  ownedGames?: OwnedGames | null;
 }
 
-const GameGenreRadarChart = ({
-  genreChartData = [],
-  isLoadingGenreChart = false,
-  errorGenreChart,
-}: GameGenreRadarChartProps) => {
-  const values = useMemo(() => genreChartData.map((d) => Number(d.value) || 0), [genreChartData]);
-  const labels = useMemo(
-    () => genreChartData.map((d) => `${d.label}\n${formatMinutesToHours(Number(d.value) || 0)}`),
-    [genreChartData]
-  );
+const GameGenreRadarChart = ({ ownedGames }: GameGenreRadarChartProps) => {
+  const { values, labels, isLoadingGenres } = useGenreRadarChart(ownedGames);
 
   return (
-    <ChartWrapperCard
-      label="Time per Genre"
-      isLoading={isLoadingGenreChart}
-      error={errorGenreChart}
-    >
-      {({ theme, cardWidth }) => (
-        <>
+    <ChartWrapperCard label="Genre Radar" isLoading={isLoadingGenres} error={false}>
+      {({ theme, cardWidth }) => {
+        if (values.length === 0) {
+          return (
+            <Box className="py-8 items-center justify-center w-full">
+              <Text className="text-typography-400">No genres found</Text>
+            </Box>
+          );
+        }
+
+        return (
           <Box style={{ marginTop: -25, marginBottom: -0 }}>
             <RadarChart
               chartSize={cardWidth ? cardWidth - 16 : 320}
@@ -40,7 +37,6 @@ const GameGenreRadarChart = ({
               isAnimated
               animationDuration={500}
               labelsPositionOffset={Math.max(...values, 1) * 0.08}
-              // dataLabelsPositionOffset={10}
               gridConfig={{
                 stroke: parseRGB(theme['--color-outline-100']),
                 strokeWidth: 1,
@@ -63,8 +59,8 @@ const GameGenreRadarChart = ({
               }}
             />
           </Box>
-        </>
-      )}
+        );
+      }}
     </ChartWrapperCard>
   );
 };

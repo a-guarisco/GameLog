@@ -1,59 +1,67 @@
 import { render, screen } from '@testing-library/react-native';
 import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
+import { useGenreRadarChart } from '@gamelog/common/charts/genre-radar/useGenreRadarChart';
 
 jest.mock('react-native-gifted-charts', () => ({ RadarChart: 'RadarChart' }));
 jest.mock('@gamelog/utils/formatUtils', () => ({
   formatMinutesToHours: jest.fn((m) => `${m}m`),
 }));
 
+jest.mock('@gamelog/common/charts/genre-radar/useGenreRadarChart', () => ({
+  useGenreRadarChart: jest.fn(),
+}));
+
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   const { View } = jest.requireActual('react-native');
   const MockChartWrapperCard = ({ children, isLoading, error }: any) => (
-    <View testID="chart-wrapper">{!isLoading && !error && children({ theme: 'dark' })}</View>
+    <View testID="chart-wrapper">
+      {!isLoading &&
+        !error &&
+        children({
+          cardWidth: 350,
+          theme: {
+            '--color-typography-200': '200,200,200',
+            '--color-background-200': '50,50,50',
+          },
+        })}
+    </View>
   );
 
   MockChartWrapperCard.displayName = 'MockChartWrapperCard';
   return MockChartWrapperCard;
 });
 
-jest.mock('@gamelog/common/charts/ExternalLabelBox', () => {
-  const { View } = jest.requireActual('react-native');
-  const MockExternalLabelBox = (props: any) => <View testID="external-label-box" />;
-
-  MockExternalLabelBox.displayName = 'MockExternalLabelBox';
-  return MockExternalLabelBox;
-});
-
-const GENRE_DATA = [
-  { label: 'Action', value: 600, color: '#aaa' },
-  { label: 'RPG', value: 300, color: '#bbb' },
-];
-
 beforeEach(() => jest.clearAllMocks());
 
 describe('GameGenreRadarChart', () => {
-  it('renders ChartWrapperCard in a loading state when data is loading', () => {
-    render(<GameGenreRadarChart genreChartData={[]} isLoadingGenreChart={true} />);
+  it('renders empty state when values are empty', () => {
+    (useGenreRadarChart as jest.Mock).mockReturnValue({
+      values: [],
+      labels: [],
+    });
+
+    render(<GameGenreRadarChart ownedGames={null} />);
 
     expect(screen.getByTestId('chart-wrapper')).toBeTruthy();
-    expect(screen.queryByTestId('external-label-box')).toBeNull();
-  });
-
-  it('renders ChartWrapperCard in an error state when there is an error', () => {
-    render(<GameGenreRadarChart genreChartData={[]} errorGenreChart={new Error('fetch failed')} />);
-
-    expect(screen.getByTestId('chart-wrapper')).toBeTruthy();
-    expect(screen.queryByTestId('external-label-box')).toBeNull();
+    expect(screen.getByText('No genres found')).toBeTruthy();
   });
 
   it('renders RadarChart when data is available', () => {
-    const { UNSAFE_getByType } = render(<GameGenreRadarChart genreChartData={GENRE_DATA} />);
+    (useGenreRadarChart as jest.Mock).mockReturnValue({
+      values: [600, 300],
+      labels: ['Action\n600m', 'RPG\n300m'],
+    });
 
+    const { UNSAFE_getByType } = render(<GameGenreRadarChart ownedGames={null} />);
     expect(UNSAFE_getByType('RadarChart' as any)).toBeTruthy();
   });
 
-  it('derives numeric values and labels from genreChartData', () => {
-    const { UNSAFE_getByType } = render(<GameGenreRadarChart genreChartData={GENRE_DATA} />);
+  it('passes values and labels to RadarChart from hook', () => {
+    (useGenreRadarChart as jest.Mock).mockReturnValue({
+      values: [600, 300],
+      labels: ['Action\n600m', 'RPG\n300m'],
+    });
+    const { UNSAFE_getByType } = render(<GameGenreRadarChart ownedGames={null} />);
     const radarChart = UNSAFE_getByType('RadarChart' as any);
 
     expect(radarChart.props.data).toEqual([600, 300]);
@@ -61,18 +69,13 @@ describe('GameGenreRadarChart', () => {
   });
 
   it('sets maxValue to the highest value in the dataset', () => {
-    const { UNSAFE_getByType } = render(<GameGenreRadarChart genreChartData={GENRE_DATA} />);
+    (useGenreRadarChart as jest.Mock).mockReturnValue({
+      values: [600, 300],
+      labels: ['Action\n600m', 'RPG\n300m'],
+    });
+    const { UNSAFE_getByType } = render(<GameGenreRadarChart ownedGames={null} />);
     const radarChart = UNSAFE_getByType('RadarChart' as any);
 
     expect(radarChart.props.maxValue).toBe(600);
-  });
-
-  it('coerces non-numeric values to 0', () => {
-    const { UNSAFE_getByType } = render(
-      <GameGenreRadarChart genreChartData={[{ label: 'Unknown', value: NaN, color: '#ccc' }]} />
-    );
-    const radarChart = UNSAFE_getByType('RadarChart' as any);
-
-    expect(radarChart.props.data).toEqual([0]);
   });
 });
