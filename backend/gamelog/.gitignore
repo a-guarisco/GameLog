@@ -4,4 +4,8 @@ __pycache__/
 .env
 serviceAccountKey.json
 last_cron.txt
-
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.ruff_cache/
