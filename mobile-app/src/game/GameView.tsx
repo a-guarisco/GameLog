@@ -3,7 +3,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import GameStatusChips from '@gamelog/game/GameStatusChips';
-import BannerInfo from '@gamelog/game/BannerInfo';
+import GameIdentity from '@gamelog/game/GameIdentity';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import BackButton from '@gamelog/common/BackButton';
 import GameStatBand from '@gamelog/common/StatBand';
@@ -48,12 +48,14 @@ const GameView = () => {
       <HeaderGameImage appid={gameItem.appid} />
 
       <ScrollablePage>
-        <BannerInfo className="bg-background-0" title={gameItem.name} />
+        <GameIdentity
+          className="bg-background-0"
+          title={gameItem.name}
+          chips={<GameStatusChips livePlayers={livePlayers} streakText={streakText} />}
+        />
 
         <Box className="pt-6 pb-6 bg-background-0">
           <VStack space="xl">
-            <GameStatusChips livePlayers={livePlayers} streakText={streakText} />
-
             <Box className="px-4">
               <GameStatBand stats={stats} />
             </Box>
