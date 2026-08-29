@@ -15,17 +15,25 @@ interface AchievementItemProps {
 }
 
 const getRarity = (percentage: number) => {
-  if (percentage < 5) return { label: 'Legendary', fill: 'bg-warning-500' };
-  if (percentage < 20) return { label: 'Rare', fill: 'bg-info-500' };
-  if (percentage < 50) return { label: 'Uncommon', fill: 'bg-success-500' };
-  return { label: 'Common', fill: 'bg-background-500' };
-};
-
-const getLockedFillColor = (locked: boolean) => {
-  if (locked) {
-    return 'bg-warning-500';
-  }
-  return 'bg-success-500';
+  if (percentage < 5)
+    return {
+      label: 'Legendary',
+      colorClass: 'text-amber-500 dark:text-amber-400',
+    };
+  if (percentage < 20)
+    return {
+      label: 'Rare',
+      colorClass: 'text-primary-400 dark:text-primary-300',
+    };
+  if (percentage < 50)
+    return {
+      label: 'Uncommon',
+      colorClass: 'text-teal-500 dark:text-teal-400',
+    };
+  return {
+    label: 'Common',
+    colorClass: 'text-typography-300 dark:text-typography-400',
+  };
 };
 
 const AchievementItem = ({
@@ -39,31 +47,36 @@ const AchievementItem = ({
   const normalizedPercentage = Number.isFinite(safePercentage) ? safePercentage : 0;
   const isUnlocked = !!unlockTime;
   const rarity = getRarity(normalizedPercentage);
-  const lockedFillColor = getLockedFillColor(!isUnlocked);
 
   return (
-    <Card variant="elevated" className="relative overflow-hidden mb-3 p-0">
+    <Card variant="elevated" className="relative overflow-hidden p-0">
       <Box
         testID="global-progress-bar"
-        className={`absolute top-0 left-0 h-full ${lockedFillColor} opacity-15`}
+        className={`absolute top-0 left-0 h-full ${
+          isUnlocked
+            ? 'bg-primary-500/15 dark:bg-primary-400/15'
+            : 'bg-background-300/30 dark:bg-background-700/30'
+        }`}
         style={{ width: `${normalizedPercentage}%` }}
       />
 
       <HStack space="md" className="relative z-10 px-3 py-3 items-start">
         <Box
-          className={`w-10 h-10 rounded-md items-center justify-center shrink-0 ${
-            isUnlocked ? 'bg-success-100' : 'bg-background-300'
+          className={`w-10 h-10 rounded-lg items-center justify-center shrink-0 ${
+            isUnlocked
+              ? 'bg-primary-500/15 dark:bg-primary-500/25 border border-primary-500/30'
+              : 'bg-background-100 dark:bg-background-200 border border-outline-100 dark:border-outline-50'
           }`}
         >
           <AchievementIcon isUnlocked={isUnlocked} />
         </Box>
 
         <VStack className="flex-1">
-          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+          <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
             {displayName ? displayName : formatAchievementName(name)}
           </Text>
           <Text size="xs" className="font-medium text-typography-200 mt-0.5">
-            <Text size="xs" className="font-bold text-typography-0 mt-0.5">
+            <Text size="xs" className={`font-bold mt-0.5 ${rarity.colorClass}`}>
               {rarity.label}
             </Text>{' '}
             · {normalizedPercentage.toFixed(1)}% of players
@@ -74,7 +87,7 @@ const AchievementItem = ({
             </Text>
           )}
           {isUnlocked && (
-            <Text size="xs" className="text-success-700 mt-1">
+            <Text size="xs" className="text-primary-500 dark:text-primary-400 font-medium mt-1">
               Unlocked {new Date(unlockTime! * 1000).toLocaleDateString()}
             </Text>
           )}
@@ -85,3 +98,4 @@ const AchievementItem = ({
 };
 
 export default AchievementItem;
+
