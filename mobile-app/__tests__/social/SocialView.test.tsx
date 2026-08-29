@@ -74,19 +74,19 @@ describe('SocialView', () => {
     render(<SocialView />);
     expect(screen.getByText('Social Hub')).toBeTruthy();
     expect(screen.getByText('Friends')).toBeTruthy();
-    expect(screen.getByText('Pending')).toBeTruthy();
+    expect(screen.getAllByText('Pending').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Game Recommender')).toBeTruthy();
     expect(screen.getByTestId('social-tab-friends')).toBeTruthy();
     expect(screen.getByTestId('social-tab-search')).toBeTruthy();
   });
 
-  it('displays pending requests and accepted friends in the Friends tab', () => {
+  it('displays pending requests and accepted friends in the Friends tab without recommend button', () => {
     render(<SocialView />);
     expect(screen.getByText('Alice')).toBeTruthy();
     expect(screen.getByText('Bob')).toBeTruthy();
     expect(screen.getByTestId('accept-btn-u2')).toBeTruthy();
     expect(screen.getByTestId('refuse-btn-u2')).toBeTruthy();
-    expect(screen.getByTestId('recommend-btn-u1')).toBeTruthy();
+    expect(screen.queryByTestId('recommend-btn-u1')).toBeNull();
   });
 
   it('allows accepting a friend request', async () => {
@@ -151,16 +151,6 @@ describe('SocialView', () => {
 
     await waitFor(() => {
       expect(mockApiManager.addFriend).toHaveBeenCalledWith('u3');
-    });
-  });
-
-  it('navigates to FriendRecommendations screen when clicking Recommend on a friend card', () => {
-    render(<SocialView />);
-
-    fireEvent.press(screen.getByTestId('recommend-btn-u1'));
-
-    expect(mockNavigate).toHaveBeenCalledWith('FriendRecommendations', {
-      friendItem: mockFriendList[0],
     });
   });
 

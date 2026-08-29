@@ -1,6 +1,6 @@
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { UserCardActionHandlers } from './userCardActionHandlers';
-import { AddFriendAction, IncomingRequestActions, RecommendAction } from './FriendshipActions';
+import { AddFriendAction, IncomingRequestActions } from './FriendshipActions';
 
 interface UserCardActionsProps {
   item: UserSearchResult;
@@ -16,16 +16,6 @@ export const UserCardActions: React.FC<UserCardActionsProps> = ({
   const { user, friendship } = item;
   const status = friendship?.friendship_status;
   const friendshipId = friendship?.friendship_id;
-
-  if (status === 'accepted') {
-    return handlers.onSelectRecommendations ? (
-      <RecommendAction
-        item={item}
-        onSelectRecommendations={handlers.onSelectRecommendations}
-        isDisabled={isActionLoading}
-      />
-    ) : null;
-  }
 
   if (
     status === 'pending_incoming' &&
@@ -56,3 +46,5 @@ export const UserCardActions: React.FC<UserCardActionsProps> = ({
 
   return null;
 };
+
+export default UserCardActions;
