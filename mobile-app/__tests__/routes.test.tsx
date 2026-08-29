@@ -1,4 +1,4 @@
-import { RootTabs, GameListStack } from '@gamelog/routes';
+import { RootTabs, GameListStack, SocialStack } from '@gamelog/routes';
 
 jest.mock('react-native-safe-area-context', () =>
   jest.requireActual('react-native-safe-area-context/jest/mock')
@@ -31,6 +31,30 @@ describe('GameListStack structure', () => {
   });
 });
 
+describe('SocialStack structure', () => {
+  it('registers the correct screens', () => {
+    const screens = Object.keys(SocialStack.config.screens);
+    expect(screens).toContain('SocialHome');
+    expect(screens).toContain('FriendRecommendations');
+  });
+
+  it('registers exactly 2 screens', () => {
+    expect(Object.keys(SocialStack.config.screens)).toHaveLength(2);
+  });
+
+  it('assigns the correct component to SocialHome', () => {
+    const Social = jest.requireActual('@gamelog/social/social-view/SocialView').default;
+    expect(SocialStack.config.screens.SocialHome.screen).toBe(Social);
+  });
+
+  it('assigns the correct component to FriendRecommendations', () => {
+    const FriendRecs = jest.requireActual(
+      '@gamelog/social/social-view/FriendRecommendationsView'
+    ).default;
+    expect(SocialStack.config.screens.FriendRecommendations.screen).toBe(FriendRecs);
+  });
+});
+
 describe('RootTabs structure', () => {
   it('registers the correct tabs', () => {
     const screens = Object.keys(RootTabs.config.screens);
@@ -52,8 +76,7 @@ describe('RootTabs structure', () => {
     expect(RootTabs.config.screens.ProfileTab.screen).toBe(Profile);
   });
 
-  it('assigns the correct component to the Social tab', () => {
-    const Social = jest.requireActual('@gamelog/social/social-view/SocialView').default;
-    expect(RootTabs.config.screens.SocialTab.screen).toBe(Social);
+  it('assigns SocialStack to the Social tab', () => {
+    expect(RootTabs.config.screens.SocialTab.screen).toBe(SocialStack);
   });
 });

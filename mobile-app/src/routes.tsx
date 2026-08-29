@@ -6,6 +6,7 @@ import ProfileView from '@gamelog/profile/ProfileView';
 import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import SocialView from '@gamelog/social/social-view/SocialView';
+import FriendRecommendationsView from '@gamelog/social/social-view/FriendRecommendationsView';
 import {
   DevView,
   DevEnvView,
@@ -35,6 +36,19 @@ export const GameListStack = createNativeStackNavigator({
     },
     AchievementsList: {
       screen: AchievementsListView,
+      options: { headerShown: false },
+    },
+  },
+});
+
+export const SocialStack = createNativeStackNavigator({
+  screens: {
+    SocialHome: {
+      screen: SocialView,
+      options: { headerShown: false },
+    },
+    FriendRecommendations: {
+      screen: FriendRecommendationsView,
       options: { headerShown: false },
     },
   },
@@ -100,7 +114,7 @@ export const RootTabs = createBottomTabNavigator({
       },
     },
     SocialTab: {
-      screen: SocialView,
+      screen: SocialStack,
       options: {
         title: 'Social',
         tabBarIcon: ({ color, size, focused }) => (

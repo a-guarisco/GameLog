@@ -1,7 +1,8 @@
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import { Text } from '@gamelog/common/gluestack/text';
+import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
+import SectionCard from '@gamelog/common/SectionCard';
 import { UserCard } from '../user-card/UserCard';
 import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 import { UserSearchInput } from './UserSearchInput';
@@ -46,29 +47,32 @@ export const SearchUsersTabContent: React.FC<SearchUsersTabContentProps> = ({
       return <InfoBox message={`No users found matching "${query}".`} className="py-6" />;
     }
     return (
-      <VStack className="mb-4">
-        <Text size="sm" className="font-bold uppercase text-typography-400 mb-2">
-          Search Results ({results.length})
-        </Text>
-        {results.map((item) => (
-          <UserCard
-            key={item.user.id}
-            item={item}
-            onAddFriend={handlers.onAddFriend}
-            onAcceptFriend={handlers.onAcceptFriend}
-            onRefuseFriend={handlers.onRefuseFriend}
-            onSelectRecommendations={handlers.onSelectRecommendations}
-            isActionLoading={isActionLoading}
-          />
-        ))}
-      </VStack>
+      <SectionCard label={`Search Results (${results.length})`}>
+        <VStack space="sm" className="pt-1">
+          {results.map((item) => (
+            <UserCard
+              key={item.user.id}
+              item={item}
+              onAddFriend={handlers.onAddFriend}
+              onAcceptFriend={handlers.onAcceptFriend}
+              onRefuseFriend={handlers.onRefuseFriend}
+              onSelectRecommendations={handlers.onSelectRecommendations}
+              isActionLoading={isActionLoading}
+            />
+          ))}
+        </VStack>
+      </SectionCard>
     );
   };
 
   return (
-    <VStack className="mb-4 px-4">
-      <UserSearchInput value={query} onChangeText={onQueryChange} />
+    <VStack space="md" className="px-4">
+      <Box>
+        <UserSearchInput value={query} onChangeText={onQueryChange} />
+      </Box>
       {renderResults()}
     </VStack>
   );
 };
+
+export default SearchUsersTabContent;

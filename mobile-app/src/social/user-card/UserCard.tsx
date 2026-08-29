@@ -19,12 +19,16 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
   const isFriend = friendship?.friendship_status === 'accepted';
 
   return (
-    <Card variant="elevated" className="relative mb-3 p-0">
-      <HStack space="md" className="relative z-10 px-3 py-3 items-center">
+    <Card
+      variant="elevated"
+      className="p-3 bg-background-50 border border-outline-100 rounded-lg"
+      testID={`user-card-${user.id}`}
+    >
+      <HStack space="md" className="items-center">
         <UserAvatar username={user.username} isHighlighted={isFriend} />
 
-        <VStack className="flex-1">
-          <Text size="sm" className="font-bold uppercase" numberOfLines={1}>
+        <VStack className="flex-1 pr-2">
+          <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
             {user.username}
           </Text>
           <Text size="xs" className="font-medium text-typography-400 mt-0.5">
@@ -40,3 +44,5 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
     </Card>
   );
 };
+
+export default UserCard;

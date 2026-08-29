@@ -9,12 +9,18 @@ const useTopNotchBlurOverlay = (minBannerHeight: number, bannerHeightScreenRatio
   const insets = useSafeAreaInsets();
   const scrollBlurTargetRef = useRef<View | null>(null);
 
-  const bannerHeight = useGetBannerHeight(minBannerHeight, bannerHeightScreenRatio);
-  const blurThreshold = bannerHeight - insets.top;
+  const bannerHeight =
+    minBannerHeight > 0 || bannerHeightScreenRatio > 0
+      ? useGetBannerHeight(minBannerHeight, bannerHeightScreenRatio)
+      : 0;
+  const blurThreshold = bannerHeight > 0 ? bannerHeight - insets.top : 0;
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const notchBlurOpacity = scrollY.interpolate({
-    inputRange: [Math.max(blurThreshold - BLUR_FADE_DISTANCE, 0), blurThreshold],
+    inputRange:
+      bannerHeight > 0
+        ? [Math.max(blurThreshold - BLUR_FADE_DISTANCE, 0), Math.max(blurThreshold, 0.01)]
+        : [0, BLUR_FADE_DISTANCE],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });

@@ -4,15 +4,15 @@ import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 import { ActionFeedbackBanner } from './ActionFeedbackBanner';
 import { FriendsTabContent } from './FriendsTabContent';
 import { SearchUsersTabContent } from './SearchUsersTabContent';
-import { UserSearchResult, FriendshipRequest } from '@gamelog/api-manager/dto';
+import { UserSearchResult } from '@gamelog/api-manager/dto';
 
 interface SocialSectionTabsProps {
   // Friends Tab Props
   isLoadingFriendList: boolean;
   errorFriendList: boolean;
-  errorMessageFriendList: string | null;
-  pendingRequests: FriendshipRequest[];
-  acceptedFriends: FriendshipRequest[];
+  errorMessageFriendList?: string | null;
+  pendingRequests: UserSearchResult[];
+  acceptedFriends: UserSearchResult[];
 
   // Search Tab Props
   searchQuery: string;
@@ -20,7 +20,7 @@ interface SocialSectionTabsProps {
   searchResults: UserSearchResult[];
   isLoadingSearch: boolean;
   errorSearch: boolean;
-  errorMessageSearch: string | null;
+  errorMessageSearch?: string | null;
 
   // Shared Action Props
   isActionLoading: boolean;
@@ -79,7 +79,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
         <FriendsTabContent
           isLoading={isLoadingFriendList}
           error={errorFriendList}
-          errorMessage={errorMessageFriendList}
+          errorMessage={errorMessageFriendList || undefined}
           pendingRequests={pendingRequests}
           acceptedFriends={acceptedFriends}
           handlers={{
@@ -98,7 +98,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
           results={searchResults}
           isLoading={isLoadingSearch}
           error={errorSearch}
-          errorMessage={errorMessageSearch}
+          errorMessage={errorMessageSearch || undefined}
           handlers={handlers}
           isActionLoading={isActionLoading}
         />

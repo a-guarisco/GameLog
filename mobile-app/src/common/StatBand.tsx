@@ -6,6 +6,7 @@ import StatBlock from '@gamelog/common/StatBlock';
 export type GameStat = {
   value: string;
   label: string;
+  valueClassName?: string;
 };
 
 const StatBand = ({ stats, isOnCard = false }: { stats: GameStat[]; isOnCard?: boolean }) => (
