@@ -114,5 +114,6 @@ async def update_game_status(
     """
     Update the user's game status for a specific game.
     """
-    return game_service.update_game_status(session=db, user_id=auth_user.uid, steam_app_id=payload.app_id, status=payload.status)
+    game_service.update_game_status(session=db, user_id=auth_user.uid, steam_app_id=payload.app_id, status=payload.status)
+    return {"message": "Game status updated successfully"}
 
