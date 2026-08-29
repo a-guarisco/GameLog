@@ -278,3 +278,65 @@ class TestStreakByGame:
         with patch("src.games.games_router.game_service.get_streak", side_effect=HTTPException(status_code=404, detail="User not found")):
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
         assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# /games/update_game_status
+# ---------------------------------------------------------------------------
+
+
+class TestUpdateGameStatusEndpoint:
+    ENDPOINT = "/games/update_game_status"
+
+    def test_requires_auth(self):
+        from src.main import app as _app
+
+        _app.dependency_overrides.clear()
+
+        plain_client = TestClient(_app, raise_server_exceptions=False)
+        response = plain_client.post(self.ENDPOINT, json={"app_id": "570", "status": "playing"})
+        assert response.status_code == 401
+
+    def test_update_status_success(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.update_game_status") as mock_svc:
+            response = client.post(self.ENDPOINT, json={"app_id": "570", "status": "playing"})
+            mock_svc.assert_called_once()
+            _, kwargs = mock_svc.call_args
+            assert kwargs.get("user_id") == "firebase-uid-1"
+            assert kwargs.get("steam_app_id") == "570"
+            assert kwargs.get("status") == "playing"
+
+        assert response.status_code == 200
+
+    def test_update_status_with_uppercase_status(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.update_game_status") as mock_svc:
+            response = client.post(self.ENDPOINT, json={"app_id": "570", "status": "SHELVED"})
+            mock_svc.assert_called_once()
+            _, kwargs = mock_svc.call_args
+            assert kwargs.get("user_id") == "firebase-uid-1"
+            assert kwargs.get("steam_app_id") == "570"
+            assert kwargs.get("status") == "shelved"
+
+        assert response.status_code == 200
+
+    def test_invalid_status_payload(self, client, session):
+        make_user(session)
+        response = client.post(self.ENDPOINT, json={"app_id": "570", "status": "invalid_status"})
+        assert response.status_code == 422
+
+    def test_missing_payload_fields(self, client, session):
+        make_user(session)
+        response = client.post(self.ENDPOINT, json={"app_id": "570"})
+        assert response.status_code == 422
+
+    def test_propagates_404_from_service(self, client, session):
+        make_user(session)
+        with patch(
+            "src.games.games_router.game_service.update_game_status",
+            side_effect=HTTPException(status_code=404, detail="Game not found in cache."),
+        ):
+            response = client.post(self.ENDPOINT, json={"app_id": "570", "status": "playing"})
+        assert response.status_code == 404
+

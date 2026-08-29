@@ -130,12 +130,39 @@ def get_daily_report(session: Session, user_id: str, start_date: date | None = N
     return DailyReport(date=end_date, game_reports=game_reports)
 
 
-# def update_game_status(session=db, user_id=auth_user.uid, steam_app_id=payload.app_id, status=payload.status):
-#     """
-#     Update the status of a game for a user. If the game is not already in the user's shelving, an error will be raised.
-#     """
-#     #todo use user_service to find user id
-#     pass
+def update_game_status(session: Session, user_id: str, steam_app_id: str, status: GameStatus | str):
+    """
+    Update the status of a game for a user. If the game is not already in the user's shelving, an error will be raised.
+    """
+    if isinstance(status, str):
+        cleaned = status.strip().lower()
+        try:
+            status = GameStatus(cleaned)
+        except ValueError:
+            try:
+                status = GameStatus[status.strip().upper()]
+            except KeyError:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid game status: '{status}'. Valid statuses are: {[s.value for s in GameStatus]}",
+                )
+
+    user = user_service.get_user_by_firebase_uid(session, user_id)
+    game = _get_cached_game(session, steam_app_id)
+
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found in cache.")
+
+    shelving = _get_game_player_shelve(session, game.id, user.id)
+
+    if not shelving:
+        raise HTTPException(status_code=404, detail="Game not found in user's shelving.")
+
+    shelving.status = status
+    session.add(shelving)
+    session.commit()
+
+
 
 
 
