@@ -17,22 +17,40 @@ interface UserCardProps extends UserCardActionHandlers {
 export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...handlers }) => {
   const { user, friendship } = item;
   const isFriend = friendship?.friendship_status === 'accepted';
+  const isPending = friendship?.friendship_status === 'pending_incoming';
 
   return (
     <Card
       variant="elevated"
-      className="p-3 bg-background-50 border border-outline-100 rounded-lg"
+      className="relative overflow-hidden p-0 border border-outline-100 rounded-lg bg-background-50"
       testID={`user-card-${user.id}`}
     >
-      <HStack space="md" className="items-center">
+      <Box
+        className={`absolute top-0 left-0 h-fullbg-transparent`}
+        style={{ width: isFriend || isPending ? '100%' : '0%' }}
+      />
+
+      <HStack space="md" className="relative z-10 px-3 py-3 items-center">
         <UserAvatar username={user.username} isHighlighted={isFriend} />
 
         <VStack className="flex-1 pr-2">
           <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
             {user.username}
           </Text>
-          <Text size="xs" className="font-medium text-typography-400 mt-0.5">
-            Steam ID: {user.steam_id}
+          <Text size="xs" className="font-medium text-typography-200 mt-0.5">
+            <Text
+              size="xs"
+              className={`font-bold ${
+                isFriend
+                  ? 'text-primary-500 dark:text-primary-400'
+                  : isPending
+                    ? 'text-warning-500 dark:text-warning-400'
+                    : 'text-typography-300 dark:text-typography-400'
+              }`}
+            >
+              {isFriend ? 'Friend' : isPending ? 'Pending' : 'Player'}
+            </Text>{' '}
+            · Steam ID: {user.steam_id}
           </Text>
           <UserCardBadge item={item} />
         </VStack>
