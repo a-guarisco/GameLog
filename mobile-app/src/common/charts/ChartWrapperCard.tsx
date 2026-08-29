@@ -22,10 +22,6 @@ const useChartTheme = () => {
   return theme;
 };
 
-// Cache the measured width so subsequent charts on the same screen (e.g. switching tabs)
-// can render immediately without waiting for onLayout and flashing a spinner.
-let sharedChartWidth = 0;
-
 const ChartWrapperCard = ({
   label,
   headerRight,
@@ -35,7 +31,9 @@ const ChartWrapperCard = ({
   ErrorBehaviour,
   testID,
 }: ChartCardProps) => {
-  const [cardWidth, setCardWidth] = useState(sharedChartWidth);
+  // Per-instance measured width — not shared. This ensures re-layout on rotation
+  // is always picked up; each card measures its own container independently.
+  const [cardWidth, setCardWidth] = useState(0);
   const theme = useChartTheme();
 
   return (
@@ -46,10 +44,8 @@ const ChartWrapperCard = ({
           className="w-full items-center"
           onLayout={(e) => {
             const width = e.nativeEvent.layout.width;
-            if (width > 0 && width !== sharedChartWidth) {
-              sharedChartWidth = width;
-            }
-            if (width !== cardWidth) {
+            // Always update on every layout event so rotation re-measures correctly.
+            if (width > 0 && width !== cardWidth) {
               setCardWidth(width);
             }
           }}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
+import { HStack } from '@gamelog/common/gluestack/hstack';
 import { RECENT_PLAYTIME_DAYS } from '@gamelog/api-manager/useApi';
 import { getReportTotalMinutes } from '@gamelog/common/selectPlaytimeReport';
 import HeaderGameImage from '@gamelog/common/HeaderGameImage';
@@ -17,6 +18,7 @@ import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 import { useProfileSpacing } from './useProfileSpacing';
 import { useProfileChartsFetch } from './useProfileChartsFetch';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 const ProfileView = () => {
   const USER_ID = getSteamId();
@@ -25,6 +27,7 @@ const ProfileView = () => {
   const { ownedGames, playersInfo, userStreak, playtimeReport, playtimeByUser } = data;
   const player = playersInfo?.response?.players?.[0];
   const streakText = useStreakText(userStreak?.streak, isLoadingStates.userStreak);
+  const { isLandscape } = useOrientation();
 
   const mostPlayedGame = useMemo(() => selectMostPlayedGame(ownedGames), [ownedGames]);
   const platformSplit = useMemo(() => selectPlatformSplit(ownedGames), [ownedGames]);
@@ -32,6 +35,8 @@ const ProfileView = () => {
     () => selectPlaytimeTrend(playtimeByUser, RECENT_PLAYTIME_DAYS),
     [playtimeByUser]
   );
+
+  const horizontalPadding = isLandscape ? 'px-8' : 'px-4';
 
   return (
     <Box className="relative flex-1">
@@ -47,28 +52,55 @@ const ProfileView = () => {
           mostPlayedName={mostPlayedGame?.name}
         />
         <Box className="bg-background-0 pb-6">
-          <VStack space="xl" className="pt-6">
-            <Box className="px-4">
-              <ProfileStats
-                ownedGames={ownedGames}
-                recentMinutes={getReportTotalMinutes(playtimeReport)}
-              />
-            </Box>
+          {isLandscape ? (
+            /* ── Landscape: stats row + tabs side-by-side ── */
+            <VStack space="xl" className="pt-6">
+              <Box className={horizontalPadding}>
+                <ProfileStats
+                  ownedGames={ownedGames}
+                  recentMinutes={getReportTotalMinutes(playtimeReport)}
+                />
+              </Box>
 
-            <Box className="px-4">
-              <ProfileSectionTabs
-                playtimeTrend={playtimeTrend}
-                errorPlaytimeTrend={errors.playtimeByUser}
-                platformSplit={platformSplit}
-                ownedGames={ownedGames}
-                errorOwnedGames={errors.ownedGames}
-                playtimeByUser={playtimeByUser}
-                errorPlaytimeByUser={errors.playtimeByUser}
-                userId={USER_ID}
-                isLoading={isLoading}
-              />
-            </Box>
-          </VStack>
+              <Box className={horizontalPadding}>
+                <ProfileSectionTabs
+                  playtimeTrend={playtimeTrend}
+                  errorPlaytimeTrend={errors.playtimeByUser}
+                  platformSplit={platformSplit}
+                  ownedGames={ownedGames}
+                  errorOwnedGames={errors.ownedGames}
+                  playtimeByUser={playtimeByUser}
+                  errorPlaytimeByUser={errors.playtimeByUser}
+                  userId={USER_ID}
+                  isLoading={isLoading}
+                />
+              </Box>
+            </VStack>
+          ) : (
+            /* ── Portrait: original stacked layout ── */
+            <VStack space="xl" className="pt-6">
+              <Box className={horizontalPadding}>
+                <ProfileStats
+                  ownedGames={ownedGames}
+                  recentMinutes={getReportTotalMinutes(playtimeReport)}
+                />
+              </Box>
+
+              <Box className={horizontalPadding}>
+                <ProfileSectionTabs
+                  playtimeTrend={playtimeTrend}
+                  errorPlaytimeTrend={errors.playtimeByUser}
+                  platformSplit={platformSplit}
+                  ownedGames={ownedGames}
+                  errorOwnedGames={errors.ownedGames}
+                  playtimeByUser={playtimeByUser}
+                  errorPlaytimeByUser={errors.playtimeByUser}
+                  userId={USER_ID}
+                  isLoading={isLoading}
+                />
+              </Box>
+            </VStack>
+          )}
         </Box>
       </ScrollablePage>
     </Box>

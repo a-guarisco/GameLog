@@ -21,6 +21,9 @@ import LoginScreen from '@gamelog/onboarding/LoginScreen';
 import ProfileSetupScreen from '@gamelog/onboarding/ProfileSetupScreen';
 import UnverifiedScreen from '@gamelog/onboarding/UnverifiedScreen';
 
+import { Dimensions } from 'react-native';
+import { AdaptiveTabBar } from '@gamelog/common/AdaptiveTabBar';
+
 export const GameListStack = createNativeStackNavigator({
   screens: {
     HomePage: {
@@ -88,6 +91,7 @@ export const DevStack = createNativeStackNavigator({
 });
 
 export const RootTabs = createBottomTabNavigator({
+  tabBar: (props) => <AdaptiveTabBar {...props} />,
   screens: {
     GameListTab: {
       screen: GameListStack,

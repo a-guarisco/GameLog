@@ -5,6 +5,7 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { brand } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
 import { useGenreRadarChart } from './useGenreRadarChart';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 
@@ -14,6 +15,8 @@ interface GameGenreRadarChartProps {
 
 const GameGenreRadarChart = ({ ownedGames }: GameGenreRadarChartProps) => {
   const { values, labels, isLoadingGenres } = useGenreRadarChart(ownedGames);
+  const { isLandscape } = useOrientation();
+  const radarPadding = isLandscape ? 8 : 16;
 
   return (
     <ChartWrapperCard label="Genre Radar" isLoading={isLoadingGenres} error={false}>
@@ -29,7 +32,7 @@ const GameGenreRadarChart = ({ ownedGames }: GameGenreRadarChartProps) => {
         return (
           <Box style={{ marginTop: -25, marginBottom: -0 }}>
             <RadarChart
-              chartSize={cardWidth ? cardWidth - 16 : 320}
+              chartSize={cardWidth ? cardWidth - radarPadding : 320}
               data={values}
               labels={labels}
               maxValue={Math.max(...values, 1)}

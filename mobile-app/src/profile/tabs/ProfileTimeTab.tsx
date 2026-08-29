@@ -3,6 +3,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import PlaytimeBlocksChart from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksChart';
 import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
 import TotalHoursDoughnut from '@gamelog/common/charts/total-hours/TotalHoursDoughnut';
+import { useOrientation } from '@gamelog/common/useOrientation';
 import type { OwnedGames, PlaytimeByUser } from '@gamelog/api-manager/dto';
 
 interface ProfileTimeTabProps {
@@ -11,8 +12,9 @@ interface ProfileTimeTabProps {
 }
 
 const ProfileTimeTab = ({ ownedGames, playtimeByUser }: ProfileTimeTabProps) => {
+  const { isLandscape } = useOrientation();
   return (
-    <VStack space="md" className="w-full items-center">
+    <VStack space={isLandscape ? 'xl' : 'md'} className="w-full items-center">
       <PlaytimeBlocksChart playtimeByUser={playtimeByUser} />
       <Box className="w-full">
         <TotalHoursChart ownedGames={ownedGames} />
