@@ -13,11 +13,7 @@ type ScrollablePageProps = {
   contentPaddingTop?: number;
 };
 
-const ScrollablePage = ({
-  children,
-  hasBanner = true,
-  contentPaddingTop,
-}: ScrollablePageProps) => {
+const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop }: ScrollablePageProps) => {
   const isDark = useColorScheme() === 'dark';
   const { isLandscape } = useOrientation();
   const insets = useSafeAreaInsets();
