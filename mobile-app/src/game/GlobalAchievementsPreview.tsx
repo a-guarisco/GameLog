@@ -38,7 +38,7 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
           errorMessage="Failed to load global achievements, please try again later."
         />
       ) : (
-        <VStack className="mb-4">
+        <VStack space="sm" className="mb-4">
           {topAchievements.map(
             (
               item: { name: string; percent: number; displayName?: string; description?: string },

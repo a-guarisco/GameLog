@@ -2,9 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import AchievementItem from '@gamelog/game/AchievementItem';
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
-import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
+import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import GameIdentity from '@gamelog/game/GameIdentity';
 import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import { useGetGameStreak } from '@gamelog/api-manager/useApi';
@@ -18,6 +17,7 @@ type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
   gameID: string;
   playerID: string;
+  gameItem?: any;
 };
 
 const AchievementsListView = ({ route }: any) => {
@@ -36,8 +36,6 @@ const AchievementsListView = ({ route }: any) => {
     error,
   } = useAchievementsData(gameID, playerID, globalAchievements);
 
-  // Game capsule image no longer used for game identity
-
   const content = isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
   ) : error ? (
@@ -51,30 +49,35 @@ const AchievementsListView = ({ route }: any) => {
       <ScrollablePage>
         <GameIdentity className="bg-background-0" title={gameName} secondaryText={secondaryText} />
 
-        <Box className=" w-80% bg-background-0 pt-6">
-          <Box className="mb-5 px-4">
-            <Text size="3xl" className="font-bold uppercase text-center mb-3">
-              Achievements for {gameName}
-            </Text>
-
-            <AchievementsProgressBar
-              unlockedCount={unlockedCount}
-              totalCount={totalCount}
-              completionPercent={completionPercent}
-            />
-          </Box>
-
-          <VStack className="mb-4 px-4 pt-4">
-            {mergedAchievements.map((item, index) => (
-              <AchievementItem
-                key={index}
-                name={item.name}
-                displayName={item.displayName}
-                percentage={item.percent}
-                unlockTime={item.unlockTime}
-                description={item.description}
+        <Box className="pt-6 pb-6 bg-background-0">
+          <VStack space="xl">
+            <Box className="px-4">
+              <AchievementsProgressBar
+                gameName={gameName}
+                unlockedCount={unlockedCount}
+                totalCount={totalCount}
+                completionPercent={completionPercent}
               />
-            ))}
+            </Box>
+
+            <Box className="px-4">
+              {mergedAchievements.length === 0 ? (
+                <InfoBox message="No achievements found for this game." />
+              ) : (
+                <VStack space="sm">
+                  {mergedAchievements.map((item, index) => (
+                    <AchievementItem
+                      key={item.name || index}
+                      name={item.name}
+                      displayName={item.displayName}
+                      percentage={item.percent}
+                      unlockTime={item.unlockTime}
+                      description={item.description}
+                    />
+                  ))}
+                </VStack>
+              )}
+            </Box>
           </VStack>
         </Box>
       </ScrollablePage>
@@ -90,3 +93,4 @@ const AchievementsListView = ({ route }: any) => {
 };
 
 export default AchievementsListView;
+
