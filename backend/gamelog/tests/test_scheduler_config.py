@@ -54,3 +54,40 @@ async def test_lifespan_scheduler_disabled():
         async with lifespan(None):
             pass
         mock_create_task.assert_not_called()
+
+
+@pytest.mark.anyio
+async def test_weekly_top_games_429_backoff(engine):
+    import httpx
+    from unittest.mock import AsyncMock, MagicMock
+    from src.core.scheduler import _run_weekly_top_games_job_async
+    from src.games.schemas import SteamTopGame
+
+    mock_top_games = [SteamTopGame(appid=123, rank=1)]
+    mock_response_429 = MagicMock()
+    mock_response_429.status_code = 429
+    err_429 = httpx.HTTPStatusError("429 Too Many Requests", request=MagicMock(), response=mock_response_429)
+
+    genres_side_effects = [
+        err_429,
+        err_429,
+        [{"id": 1, "description": "Action"}],
+    ]
+
+    mock_sleep = AsyncMock()
+
+    with (
+        patch("src.core.scheduler.engine", engine),
+        patch("src.games.steam_fetcher_service.get_most_played_games_from_steam_async", AsyncMock(return_value=mock_top_games)),
+        patch("src.games.steam_fetcher_service.get_game_genres_from_steam_async", AsyncMock(side_effect=genres_side_effects)),
+        patch("src.core.scheduler.asyncio.sleep", mock_sleep),
+    ):
+        await _run_weekly_top_games_job_async()
+
+    # Verify that sleep was called with increasing backoff: 2.0 then 4.0 (and 0.5 before saving)
+    sleep_calls = [call.args[0] for call in mock_sleep.call_args_list]
+    assert 2.0 in sleep_calls
+    assert 4.0 in sleep_calls
+    idx_2 = sleep_calls.index(2.0)
+    idx_4 = sleep_calls.index(4.0)
+    assert idx_2 < idx_4

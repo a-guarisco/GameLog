@@ -122,14 +122,16 @@ async def _run_weekly_top_games_job_async() -> None:
                         session.commit()
                     else:
                         genres_data = None
+                        retry_delay = 2.0
                         while True:
                             try:
                                 genres_data = await steam_fetcher_service.get_game_genres_from_steam_async(steam_app_id, client)
                                 break
                             except httpx.HTTPStatusError as e:
                                 if e.response.status_code == 429:
-                                    print(f"429 Too Many Requests hit for {steam_app_id}. Waiting 2 seconds before retrying...", flush=True)
-                                    await asyncio.sleep(2.0)
+                                    print(f"429 Too Many Requests hit for {steam_app_id}. Waiting {retry_delay} seconds before retrying...", flush=True)
+                                    await asyncio.sleep(retry_delay)
+                                    retry_delay *= 2
                                     continue
                                 print(f"Failed to fetch genres for {steam_app_id}: {e}", flush=True)
                                 break
