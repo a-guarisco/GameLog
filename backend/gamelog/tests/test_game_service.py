@@ -298,7 +298,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         assert shelving.owner_id == user.id
 
     @pytest.mark.anyio
-    async def test_unplayed_game_gets_shelved_status(self, session):
+    async def test_unplayed_game_gets_to_be_played_status(self, session):
         user = make_user(session)
 
         games = [
@@ -321,10 +321,10 @@ class TestUpdateUserShelvingSteamRollingAsync:
 
         game = session.exec(select(Game).where(Game.steam_app_id == "730")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
-        assert shelving.status == GameStatus.SHELVED
+        assert shelving.status == GameStatus.TO_BE_PLAYED
 
     @pytest.mark.anyio
-    async def test_played_game_gets_shelved_status(self, session):
+    async def test_played_game_gets_playing_status(self, session):
         user = make_user(session)
 
         games = [
@@ -347,7 +347,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
 
         game = session.exec(select(Game).where(Game.steam_app_id == "570")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
-        assert shelving.status == GameStatus.SHELVED
+        assert shelving.status == GameStatus.PLAYING
 
     @pytest.mark.anyio
     async def test_first_time_zero_playtime_creates_baseline_rolling(self, session):

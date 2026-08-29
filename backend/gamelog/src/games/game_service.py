@@ -10,6 +10,7 @@ from sqlmodel import Session, col, select
 from src.games import steam_fetcher_service
 from src.games.schemas import DailyGameReport, DailyReport, DayByDayPlaytime, SteamGame
 from src.models import Game, GameStatus, Genre, Shelving, SteamRollingTime, User
+from src.users import user_service
 
 
 async def update_user_shelving_steamrolling_async(
@@ -33,7 +34,8 @@ async def update_user_shelving_steamrolling_async(
 
         shelve_exists = _get_game_player_shelve(session, game_cached.id, user.id)
         if not shelve_exists:
-            _shelve_game(session, game_cached.id, user.id, GameStatus.SHELVED)
+            game_status = GameStatus.PLAYING if steam_game.playtime_forever > 0 else GameStatus.TO_BE_PLAYED
+            _shelve_game(session, game_cached.id, user.id, game_status)
             _create_steam_rolling(session, user, steam_game, steam_app_id)
 
         latest_rolling = _get_latest_steam_rolling(session, user.id, steam_app_id)
@@ -126,6 +128,15 @@ def get_daily_report(session: Session, user_id: str, start_date: date | None = N
             )
 
     return DailyReport(date=end_date, game_reports=game_reports)
+
+
+# def update_game_status(session=db, user_id=auth_user.uid, steam_app_id=payload.app_id, status=payload.status):
+#     """
+#     Update the status of a game for a user. If the game is not already in the user's shelving, an error will be raised.
+#     """
+#     #todo use user_service to find user id
+#     pass
+
 
 
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
@@ -277,11 +288,7 @@ def _compute_daily_playtimes(
 
 
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:
-    from src.models import User as UserModel
-
-    user = session.exec(select(UserModel).where(UserModel.firebase_uid == user_id)).first()
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
+    user = user_service.get_user_by_firebase_uid(session, user_id)
 
     query = select(SteamRollingTime).where(SteamRollingTime.user_id == user.id)
     if steam_app_id is not None:

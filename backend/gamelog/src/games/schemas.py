@@ -101,3 +101,7 @@ class DailyGameReport(BaseModel):
 class DailyReport(BaseModel):
     date: date
     game_reports: list[DailyGameReport]
+
+class UpdateStatus(BaseModel):
+    app_id: str
+    status: str
