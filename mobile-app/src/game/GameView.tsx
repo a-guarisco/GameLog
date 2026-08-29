@@ -69,6 +69,10 @@ const GameView = () => {
               />
             </Box>
 
+            <Box className="px-4">
+              <Box className="border-t border-outline-100" />
+            </Box>
+
             <GameScreenshotsStrip
               screenshots={screenshots}
               totalCount={totalScreenshots}
