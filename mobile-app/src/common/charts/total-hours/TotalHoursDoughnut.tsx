@@ -7,6 +7,7 @@ import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { useTotalHoursDoughnut } from './useTotalHoursDoughnut';
 import { Animated, Easing } from 'react-native';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 
@@ -104,8 +105,8 @@ const Tooltip = memo(({ item, theme, totalMinutes }: any) => {
 Tooltip.displayName = 'Tooltip';
 
 // Memoized Chart Wrapper to completely isolate the PieChart
-const AnimatedPieChart = memo(({ pieData, theme, cardWidth, totalMinutes }: any) => {
-  const radius = computePieRadius(cardWidth);
+const AnimatedPieChart = memo(({ pieData, theme, cardWidth, totalMinutes, isLandscape }: any) => {
+  const radius = computePieRadius(cardWidth, isLandscape);
   const innerRadius = computePieInnerRadius(radius);
   const legendHeight = Math.floor(innerRadius * Math.SQRT2);
   const legendWidth = legendHeight - 20;
@@ -173,6 +174,7 @@ AnimatedPieChart.displayName = 'AnimatedPieChart';
 
 const TotalHoursDoughnut = ({ ownedGames }: TotalHoursDoughnutProps) => {
   const { pieData, totalMinutes } = useTotalHoursDoughnut(ownedGames, GAME_TO_REPRESENT);
+  const { isLandscape } = useOrientation();
 
   return (
     <ChartWrapperCard
@@ -196,6 +198,7 @@ const TotalHoursDoughnut = ({ ownedGames }: TotalHoursDoughnutProps) => {
             theme={theme}
             cardWidth={cardWidth}
             totalMinutes={totalMinutes}
+            isLandscape={isLandscape}
           />
         );
       }}

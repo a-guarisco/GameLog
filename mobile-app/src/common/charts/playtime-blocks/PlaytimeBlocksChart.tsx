@@ -3,6 +3,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { useColorScheme } from 'react-native';
+import { useOrientation } from '@gamelog/common/useOrientation';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import { BarChart } from 'react-native-gifted-charts';
 import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
@@ -33,6 +34,11 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
   const [visibleStartIndex, setVisibleStartIndex] = useState<number | null>(null);
 
   const { isScrolling, setIsScrolling, shimmerAnim } = useChartScrollShimmer();
+  const { isLandscape } = useOrientation();
+
+  const barWidth = isLandscape ? 24 : 18;
+  const barChartHeight = isLandscape ? 200 : 140;
+  const containerHeight = isLandscape ? 240 : 180;
 
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
@@ -56,7 +62,7 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
     theme
   );
 
-  const scrollTimeout = useRef<NodeJS.Timeout>();
+  const scrollTimeout = useRef<any>(null);
   const chartScrollRef = useRef<any>(null);
   const isInitialScrollDone = useRef(false);
 
@@ -94,7 +100,6 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
       )}
     >
       {({ cardWidth }) => {
-        const barWidth = 18;
         const availableWidth = (cardWidth || 350) - 10;
         const maxDrawingWidth = availableWidth - 44;
 
@@ -190,7 +195,7 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
                 style={{
                   overflow: 'hidden',
                   width: exactTotalWidth,
-                  height: 180,
+                  height: containerHeight,
                   position: 'relative',
                   alignItems: 'center',
                 }}
@@ -257,7 +262,7 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
                   stackData={finalStackData}
                   maxValue={100}
                   barWidth={barWidth}
-                  height={140}
+                  height={barChartHeight}
                   yAxisThickness={0}
                   xAxisThickness={0}
                   hideRules

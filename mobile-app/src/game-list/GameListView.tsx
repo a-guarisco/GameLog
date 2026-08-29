@@ -7,13 +7,18 @@ import { GameOverviewStatsCard } from './GameOverviewStatsCard';
 import { useGameList } from './useGameList';
 import { ErrorBox, LoadingBox, InfoBox, WarningBox } from '@gamelog/common/feedbacks';
 import { GameListControls } from './GameListControls';
+import { useOrientation } from '@gamelog/common/useOrientation';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
-const GameListView = ({ route }: any) => {
+const GameListView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  // const { playerID } = route.params as GameListProps;
   const playerID = getSteamId();
+  const { isLandscape } = useOrientation();
+  const insets = useSafeAreaInsets();
+  const leftPadding = isLandscape ? insets.left + 74 : 0;
+
   const {
     processedGames,
     isLoading,
@@ -27,7 +32,7 @@ const GameListView = ({ route }: any) => {
   } = useGameList(playerID);
 
   return (
-    <Box className="flex-1">
+    <Box className="flex-1" style={{ paddingLeft: leftPadding }}>
       <GameListControls sortBy={sortBy} onSortChange={handleSortChange} />
       {isLoading ? (
         <LoadingBox className="flex-1" message="Loading games..." />
@@ -41,7 +46,7 @@ const GameListView = ({ route }: any) => {
         <FlatList
           data={processedGames}
           renderItem={({ item }: { item: OwnedGames['response']['games'][0] }) => (
-            <Box className="w-1/2 p-1">
+            <Box className={isLandscape ? 'w-1/3 p-1' : 'w-1/2 p-1'}>
               <GameOverviewStatsCard
                 gameItem={item}
                 onPress={() => navigation.navigate('Game', { gameItem: item })}
@@ -49,7 +54,8 @@ const GameListView = ({ route }: any) => {
             </Box>
           )}
           keyExtractor={(item) => item.appid.toString()}
-          numColumns={2}
+          key={isLandscape ? 'grid-3' : 'grid-2'}
+          numColumns={isLandscape ? 3 : 2}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 20 }}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
         />
