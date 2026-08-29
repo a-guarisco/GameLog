@@ -13,7 +13,7 @@ describe('AchievementsSummary', () => {
       />
     );
 
-    expect(screen.getByText('Achievements')).toBeTruthy();
+    expect(screen.getByText('Game Completion')).toBeTruthy();
     expect(screen.getByText('15 / 30 · 50%')).toBeTruthy();
   });
 
