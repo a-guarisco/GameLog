@@ -42,10 +42,11 @@ describe('useCommunityGenreRadarChart', () => {
       [50, 50, 0],
       [40, 30, 20],
     ]);
-    expect(result.current.labels).toEqual([
-      'Action\n50% · 40%',
-      'RPG\n50% · 30%',
-      'Strategy\n0% · 20%',
+    expect(result.current.labels).toEqual(['Action', 'RPG', 'Strategy']);
+    expect(result.current.comparisonItems).toEqual([
+      { id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 },
+      { id: '2', description: 'RPG', userPercentage: 50, communityPercentage: 30 },
+      { id: '3', description: 'Strategy', userPercentage: 0, communityPercentage: 20 },
     ]);
     expect(result.current.maxValue).toBe(50);
   });

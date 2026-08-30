@@ -91,7 +91,11 @@ describe('CommunityGenreRadarChart', () => {
         [50, 20],
         [40, 30],
       ],
-      labels: ['Action\n50% · 40%', 'RPG\n20% · 30%'],
+      labels: ['Action', 'RPG'],
+      comparisonItems: [
+        { id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 },
+        { id: '2', description: 'RPG', userPercentage: 20, communityPercentage: 30 },
+      ],
       maxValue: 50,
       isLoading: false,
       errorCommunity: false,
@@ -102,13 +106,15 @@ describe('CommunityGenreRadarChart', () => {
 
     expect(screen.getByText('You (%)')).toBeTruthy();
     expect(screen.getByText('Community (%)')).toBeTruthy();
+    expect(screen.getByText('You: 50%')).toBeTruthy();
+    expect(screen.getByText('Others: 40%')).toBeTruthy();
 
     const radarChart = UNSAFE_getByType('RadarChart' as any);
     expect(radarChart.props.dataSet).toEqual([
       [50, 20],
       [40, 30],
     ]);
-    expect(radarChart.props.labels).toEqual(['Action\n50% · 40%', 'RPG\n20% · 30%']);
+    expect(radarChart.props.labels).toEqual(['Action', 'RPG']);
     expect(radarChart.props.maxValue).toBe(50);
   });
 });
