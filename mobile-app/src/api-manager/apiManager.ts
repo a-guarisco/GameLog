@@ -24,6 +24,8 @@ import type {
   UserRegisterRequest,
   UserSearchResult,
   RecommendationResponse,
+  CommunityGenreHour,
+  CommunityScope,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
@@ -172,4 +174,6 @@ export default {
     }),
   getDailyReport: (startDate?: string, endDate?: string) =>
     fetchAuthenticatedData<DailyReport>(EndPoints.getDailyReport(startDate, endDate)),
+  getCommunityGenre: (scope: CommunityScope) =>
+    fetchAuthenticatedData<CommunityGenreHour[]>(EndPoints.getCommunityGenre(scope)),
 };
