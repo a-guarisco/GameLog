@@ -64,7 +64,7 @@ def register_user(
         detail = "Invalid Steam ID or Steam API Key" if register_data.steam_api_key else "Invalid Steam ID"
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
-    region = player_summary.get("loccountrycode", None)
+    region = player_summary.get("loccountrycode") or "Unknown"
     new_user = User(
         firebase_uid=auth_user.uid,
         username=register_data.username,
