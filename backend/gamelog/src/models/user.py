@@ -26,6 +26,7 @@ class User(UserBase, table=True):
     steam_api_key: str = Field(max_length=255)
     game_shelvings: list["Shelving"] = Relationship(back_populates="user")
     steam_rolling_time: list["SteamRollingTime"] = Relationship(back_populates="user")
+    region: str = Field(max_length=2, index=True)
 
     sent_friendships: list["Friendship"] = Relationship(
         sa_relationship_kwargs={"primaryjoin": "User.id==Friendship.requester_id", "back_populates": "requester"}

@@ -57,26 +57,24 @@ def register_user(
             detail="Steam ID is already registered",
         )
 
-    if register_data.steam_api_key:
-        from src.games.steam_fetcher_service import validate_steam_credentials_sync
+    from src.games.steam_fetcher_service import get_steam_player_summary_sync
 
-        is_valid = validate_steam_credentials_sync(register_data.steam_id, register_data.steam_api_key)
-        if not is_valid:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid Steam ID or Steam API Key",
-            )
+    player_summary = get_steam_player_summary_sync(register_data.steam_id, register_data.steam_api_key or None )
+    if not player_summary:
+        detail = "Invalid Steam ID or Steam API Key" if register_data.steam_api_key else "Invalid Steam ID"
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
+    region = player_summary.get("loccountrycode", None)
     new_user = User(
         firebase_uid=auth_user.uid,
         username=register_data.username,
         steam_id=register_data.steam_id,
         steam_api_key=register_data.steam_api_key or "",
+        region=region,
     )
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
-
     return UserRead.model_validate(new_user)
 
 def update_steam_api_key(session: Session, firebase_uid: str, steam_api_key: str) -> UserMeRead:
