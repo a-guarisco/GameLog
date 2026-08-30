@@ -9,6 +9,7 @@ from src.games.schemas import GetOwnedGamesResponse, SteamGame, SteamTopGame
 from src.models import User
 from src.users.schemas import GetFriendListResponse, SteamFriend
 
+DEFAULT_STEAM_API_KEY = "4C67D2313547027F4ECB151CD10E76EC"
 
 async def get_owned_games_from_steam_async(
     user: User,
@@ -42,6 +43,22 @@ async def get_friend_list_from_steam_async(
         friends=[SteamFriend(**friend) for friend in friends_list.get("friends", [])],
     )
 
+async def get_user_region(
+    steam_id: str,
+    steam_api_key: str | None
+) -> str|None:
+    if not steam_api_key:
+        warnings.warn("Using default steam api key")
+        steam_api_key = DEFAULT_STEAM_API_KEY
+
+    url = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={steam_api_key}&steamids={steam_id}"
+
+    payload = await _get_steam_api_response(url)
+    player_summaries = payload.get("response", {}).get("players", [])
+    if player_summaries:
+        return player_summaries[0].get("loccountrycode", "Unknown")
+    else:
+        return None
 
 async def _get_steam_api_response(
     url: str,
@@ -68,7 +85,7 @@ def _retrieve_steam_key(user: User) -> str:
 
     if not steam_api_key:
         warnings.warn("Using default steam api key")
-        steam_api_key = "4C67D2313547027F4ECB151CD10E76EC"
+        steam_api_key = DEFAULT_STEAM_API_KEY
     return steam_api_key
 
 
@@ -96,23 +113,27 @@ async def get_most_played_games_from_steam_async(
     return [SteamTopGame(**game) for game in payload.get("response", {}).get("ranks", [])]
 
 
-def validate_steam_credentials_sync(steam_id: str, api_key: str) -> bool:
+def get_steam_player_summary_sync(steam_id: str, api_key: str | None = None) -> dict | None:
     """
-    Synchronously validate a Steam API key and Steam ID by calling GetPlayerSummaries.
-    Returns True if valid, False otherwise.
+    Fetches the player summary from Steam using the provided API key (or DEFAULT_STEAM_API_KEY).
+    Returns the player dictionary if valid, or None if invalid/not found.
     """
-    if not steam_id or not api_key:
-        return False
-
-    url = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={api_key}&steamids={steam_id}"
+    if not steam_id:
+        return None
+    key = api_key or DEFAULT_STEAM_API_KEY
+    url = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={key}&steamids={steam_id}"
     try:
         response = httpx.get(url, timeout=5.0)
         if response.status_code == 200:
-            data = response.json()
-            players = data.get("response", {}).get("players", [])
-            if len(players) > 0 and players[0].get("steamid") == steam_id:
-                return True
+            players = response.json().get("response", {}).get("players", [])
+            if players and players[0].get("steamid") == steam_id:
+                return players[0]
     except Exception as e:
-        logger.warning(f"Error validating Steam credentials: {e}")
+        logger.warning(f"Error fetching Steam player summary: {e}")
+    return None
 
-    return False
+
+def validate_steam_credentials_sync(steam_id: str, api_key: str) -> bool:
+    if not api_key:
+        return False
+    return get_steam_player_summary_sync(steam_id, api_key) is not None

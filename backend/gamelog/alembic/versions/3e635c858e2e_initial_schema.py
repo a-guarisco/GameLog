@@ -59,12 +59,14 @@ def upgrade() -> None:
         sa.Column("steam_id", sqlmodel.sql.sqltypes.AutoString(length=32), nullable=False),
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("steam_api_key", sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
+        sa.Column("region", sqlmodel.sql.sqltypes.AutoString(length=5), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("firebase_uid"),
         sa.UniqueConstraint("steam_id"),
         sa.UniqueConstraint("username"),
     )
     op.create_index(op.f("ix_user_firebase_uid"), "user", ["firebase_uid"], unique=False)
+    op.create_index(op.f("ix_user_region"), "user", ["region"], unique=False)
     op.create_index(op.f("ix_user_steam_id"), "user", ["steam_id"], unique=False)
     op.create_index(op.f("ix_user_username"), "user", ["username"], unique=False)
     op.create_table(
@@ -200,6 +202,7 @@ def downgrade() -> None:
     op.drop_table("devicetoken")
     op.drop_index(op.f("ix_user_username"), table_name="user")
     op.drop_index(op.f("ix_user_steam_id"), table_name="user")
+    op.drop_index(op.f("ix_user_region"), table_name="user")
     op.drop_index(op.f("ix_user_firebase_uid"), table_name="user")
     op.drop_table("user")
     op.drop_index(op.f("ix_topgame_steam_app_id"), table_name="topgame")
