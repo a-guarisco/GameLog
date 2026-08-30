@@ -10,8 +10,9 @@ jest.mock('@gamelog/common/charts/community-genre-radar/useCommunityGenreRadarCh
 
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   const { View } = jest.requireActual('react-native');
-  const MockChartWrapperCard = ({ children, isLoading, error, ErrorBehaviour }: any) => (
+  const MockChartWrapperCard = ({ children, headerRight, isLoading, error, ErrorBehaviour }: any) => (
     <View testID="chart-wrapper">
+      {headerRight}
       {error && ErrorBehaviour ? (
         <ErrorBehaviour />
       ) : (
@@ -36,10 +37,11 @@ describe('CommunityGenreRadarChart', () => {
     jest.clearAllMocks();
   });
 
-  it('renders scope tabs (Global, Region, Friends)', () => {
+  it('renders scope segmented control options (Global, Region, Friends)', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [],
       labels: [],
+      comparisonItems: [],
       maxValue: 1,
       isLoading: false,
       errorCommunity: false,
@@ -53,10 +55,11 @@ describe('CommunityGenreRadarChart', () => {
     expect(screen.getByTestId('community-radar-scope-friends')).toBeTruthy();
   });
 
-  it('switches scope when a tab is pressed', () => {
+  it('switches scope when a segment option is pressed', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [],
       labels: [],
+      comparisonItems: [],
       maxValue: 1,
       isLoading: false,
       errorCommunity: false,
@@ -74,6 +77,7 @@ describe('CommunityGenreRadarChart', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [],
       labels: [],
+      comparisonItems: [],
       maxValue: 1,
       isLoading: false,
       errorCommunity: true,
@@ -85,7 +89,7 @@ describe('CommunityGenreRadarChart', () => {
     expect(screen.getByText('User region is not set')).toBeTruthy();
   });
 
-  it('renders RadarChart with dataSet and legend when data is available', () => {
+  it('renders RadarChart with dataSet, legend, and chips when data is available', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [
         [50, 20],
@@ -105,9 +109,11 @@ describe('CommunityGenreRadarChart', () => {
     const { UNSAFE_getByType } = render(<CommunityGenreRadarChart ownedGames={null} />);
 
     expect(screen.getByText('You (%)')).toBeTruthy();
-    expect(screen.getByText('Community (%)')).toBeTruthy();
-    expect(screen.getByText('You: 50%')).toBeTruthy();
-    expect(screen.getByText('Others: 40%')).toBeTruthy();
+    expect(screen.getByText('Others (%)')).toBeTruthy();
+    expect(screen.getByText('50%')).toBeTruthy();
+    expect(screen.getByText('30%')).toBeTruthy();
+    expect(screen.getByTestId('user-progress-1')).toBeTruthy();
+    expect(screen.getByTestId('others-progress-1')).toBeTruthy();
 
     const radarChart = UNSAFE_getByType('RadarChart' as any);
     expect(radarChart.props.dataSet).toEqual([
