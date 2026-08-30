@@ -75,7 +75,7 @@ def test_register_user_without_steam_api_key_success(client: TestClient, session
     app.dependency_overrides.clear()
 
 
-def test_register_user_without_country_in_steam_defaults_to_unknown(client: TestClient, session: Session):
+def test_register_user_without_country_in_steam_defaults_to_none(client: TestClient, session: Session):
     app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
         uid="new-firebase-uid-3", email="newuser3@test.com", email_verified=True
     )
@@ -97,7 +97,7 @@ def test_register_user_without_country_in_steam_defaults_to_unknown(client: Test
     data = response.json()
     db_user = session.get(User, uuid.UUID(data["id"]))
     assert db_user is not None
-    assert db_user.region == "Unknown"
+    assert db_user.region is None
 
     app.dependency_overrides.clear()
 

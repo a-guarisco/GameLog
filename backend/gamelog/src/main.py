@@ -6,6 +6,7 @@ from src.achievements.router import router as achievements_router
 from src.auth.auth import get_current_user
 from src.auth.firebase_init import initialize_firebase_app
 from src.auth.schemas import AuthenticatedUser
+from src.community.community_router import router as community_router
 from src.core.database import get_db
 from src.core.scheduler import lifespan
 from src.core.settings import get_settings
@@ -21,6 +22,7 @@ app.include_router(achievements_router)
 app.include_router(games_router)
 app.include_router(users_router)
 app.include_router(notifications_router)
+app.include_router(community_router)
 
 
 @app.get("/hello")
