@@ -1,5 +1,6 @@
 import { getApiProvider } from '@gamelog/api-manager/apiProvider';
 import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
+import { CommunityScope } from '@gamelog/api-manager/dto';
 
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
@@ -164,6 +165,10 @@ const EndPoints = {
     if (endDate) params.append('end_date', endDate);
     if (params.toString()) url += `?${params.toString()}`;
     return url;
+  },
+
+  getCommunityGenre: (scope: CommunityScope) => {
+    return `${getBackendBaseUrl()}/community/genre?scope=${scope}`;
   },
 };
 
