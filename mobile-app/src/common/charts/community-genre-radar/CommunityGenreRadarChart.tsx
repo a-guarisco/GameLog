@@ -5,8 +5,11 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
+import { Card } from '@gamelog/common/gluestack/card';
 import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 import { WarningBox } from '@gamelog/common/feedbacks';
+import Chip from '@gamelog/common/Chip';
+import ProgressTrack from '@gamelog/common/ProgressTrack';
 import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
 import { useCommunityGenreRadarChart } from './useCommunityGenreRadarChart';
@@ -31,6 +34,7 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
   const {
     dataSet,
     labels,
+    comparisonItems,
     maxValue,
     isLoading,
     errorCommunity,
@@ -71,9 +75,9 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
           }
 
           return (
-            <VStack className="w-full items-center">
+            <VStack className="w-full items-center" space="md">
               {/* Legend */}
-              <HStack space="lg" className="items-center justify-center pt-1 pb-2">
+              <HStack space="lg" className="items-center justify-center pt-1 pb-1">
                 <HStack space="xs" className="items-center">
                   <Box
                     className="w-3 h-3 rounded-full"
@@ -94,7 +98,8 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
                 </HStack>
               </HStack>
 
-              <Box style={{ marginTop: -15, marginBottom: 0 }}>
+              {/* Radar Chart */}
+              <Box style={{ marginTop: -15, marginBottom: -10 }}>
                 <RadarChart
                   chartSize={cardWidth ? cardWidth - radarPadding : 320}
                   dataSet={dataSet}
@@ -122,18 +127,66 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
                     {
                       stroke: parseRGB(brand.primary['500']),
                       fill: parseRGB(brand.primary['400']),
-                      strokeWidth: 2,
-                      opacity: 0.6,
+                      strokeWidth: 2.5,
+                      opacity: 0.15,
                     },
                     {
                       stroke: parseRGB(tailwindColors.orange['500']),
                       fill: parseRGB(tailwindColors.orange['400']),
-                      strokeWidth: 2,
-                      opacity: 0.6,
+                      strokeWidth: 2.5,
+                      strokeDashArray: [6, 4],
+                      opacity: 0.15,
                     },
                   ]}
                 />
               </Box>
+
+              {/* Genre Breakdown List with Colored Percentages */}
+              <VStack space="sm" className="w-full pt-2">
+                {comparisonItems.map((item) => (
+                  <Card
+                    key={item.id || item.description}
+                    variant="elevated"
+                    className="p-2.5 bg-background-50 border border-outline-100/60 rounded-lg"
+                  >
+                    <VStack space="xs">
+                      <HStack className="items-center justify-between">
+                        <Text size="xs" className="font-bold uppercase text-typography-0 flex-1 pr-2" numberOfLines={1}>
+                          {item.description}
+                        </Text>
+                        <HStack space="xs" className="items-center">
+                          <Chip variant="tag" className="bg-primary-500/15 border border-primary-500/30">
+                            <Text size="xs" className="font-bold text-primary-400">
+                              You: {item.userPercentage}%
+                            </Text>
+                          </Chip>
+                          <Chip variant="tag" className="bg-orange-500/15 border border-orange-500/30">
+                            <Text size="xs" className="font-bold text-orange-400">
+                              Others: {item.communityPercentage}%
+                            </Text>
+                          </Chip>
+                        </HStack>
+                      </HStack>
+
+                      {/* Side-by-side or stacked visual progress track */}
+                      <VStack space="xs" className="pt-1">
+                        <ProgressTrack
+                          percent={item.userPercentage}
+                          fillClassName="bg-primary-500"
+                          className="h-1.5"
+                          testID={`user-progress-${item.id || item.description}`}
+                        />
+                        <ProgressTrack
+                          percent={item.communityPercentage}
+                          fillClassName="bg-orange-500"
+                          className="h-1.5"
+                          testID={`comm-progress-${item.id || item.description}`}
+                        />
+                      </VStack>
+                    </VStack>
+                  </Card>
+                ))}
+              </VStack>
             </VStack>
           );
         }}

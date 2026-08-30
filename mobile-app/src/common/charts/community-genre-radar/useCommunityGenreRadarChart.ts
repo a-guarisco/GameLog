@@ -3,6 +3,13 @@ import { buildGenreChartData, GenreChartItem } from '@gamelog/common/charts/genr
 import { useCommunityGenre } from './useCommunityGenre';
 import type { OwnedGames, CommunityScope } from '@gamelog/api-manager/dto';
 
+export interface CommunityGenreComparisonItem {
+  id: string;
+  description: string;
+  userPercentage: number;
+  communityPercentage: number;
+}
+
 export const useCommunityGenreRadarChart = (
   ownedGames: OwnedGames | null | undefined,
   scope: CommunityScope
@@ -61,23 +68,30 @@ export const useCommunityGenreRadarChart = (
     return map;
   }, [userGenreData]);
 
-  // Align axes according to community genres
-  const { userValues, communityValues, labels } = useMemo(() => {
-    if (!communityGenres || communityGenres.length === 0) {
-      return { userValues: [], communityValues: [], labels: [] };
-    }
+  // Build comparison items and aligned chart arrays
+  const comparisonItems = useMemo<CommunityGenreComparisonItem[]>(() => {
+    if (!communityGenres || communityGenres.length === 0) return [];
+    return communityGenres.map((g) => {
+      const commPct = Number(g.percentage) || 0;
+      const userPct = userGenrePercentages.get(g.description.toLowerCase().trim()) ?? 0;
+      return {
+        id: g.id,
+        description: g.description,
+        userPercentage: userPct,
+        communityPercentage: commPct,
+      };
+    });
+  }, [communityGenres, userGenrePercentages]);
 
+  const { userValues, communityValues, labels } = useMemo(() => {
     const uValues: number[] = [];
     const cValues: number[] = [];
     const lbls: string[] = [];
 
-    communityGenres.forEach((g) => {
-      const commPct = Number(g.percentage) || 0;
-      const userPct = userGenrePercentages.get(g.description.toLowerCase().trim()) ?? 0;
-
-      uValues.push(userPct);
-      cValues.push(commPct);
-      lbls.push(`${g.description}\n${userPct}% · ${commPct}%`);
+    comparisonItems.forEach((item) => {
+      uValues.push(item.userPercentage);
+      cValues.push(item.communityPercentage);
+      lbls.push(item.description);
     });
 
     return {
@@ -85,7 +99,7 @@ export const useCommunityGenreRadarChart = (
       communityValues: cValues,
       labels: lbls,
     };
-  }, [communityGenres, userGenrePercentages]);
+  }, [comparisonItems]);
 
   const dataSet = useMemo(() => {
     if (userValues.length === 0 && communityValues.length === 0) return [];
@@ -103,6 +117,7 @@ export const useCommunityGenreRadarChart = (
     dataSet,
     userValues,
     communityValues,
+    comparisonItems,
     labels,
     maxValue,
     isLoading,
