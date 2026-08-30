@@ -1,5 +1,6 @@
 
 
+import calendar
 from collections import defaultdict
 from datetime import date, timedelta
 import uuid
@@ -8,7 +9,12 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 
 from src.auth.schemas import AuthenticatedUser
-from src.community.schemas import CommunityGenreHour, CommunityScope, CommunityWeeklyPlaytimeResponse
+from src.community.schemas import (
+    CommunityGenreHour,
+    CommunityMonthlyPlaytimeResponse,
+    CommunityScope,
+    CommunityWeeklyPlaytimeResponse,
+)
 from src.games import game_service
 from src.models import Friendship, FriendshipStatus, Game, Genre, SteamRollingTime, User
 from src.users import user_service
@@ -63,6 +69,59 @@ def get_community_weekly_playtime(
     ]
 
     return CommunityWeeklyPlaytimeResponse(user=user_hours, community=community_hours)
+
+
+def get_community_monthly_playtime(
+    scope: CommunityScope,
+    start_date: date,
+    end_date: date,
+    user: AuthenticatedUser,
+    db: Session,
+) -> CommunityMonthlyPlaytimeResponse:
+    """
+    Return the month-by-month playtime comparison for the specified period
+    comparing the user vs the community average (excluding the user).
+    """
+    current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+
+    months: list[tuple[int, int]] = []
+    cur_year = start_date.year
+    cur_month = start_date.month
+    while (cur_year < end_date.year) or (cur_year == end_date.year and cur_month <= end_date.month):
+        months.append((cur_year, cur_month))
+        cur_month += 1
+        if cur_month > 12:
+            cur_month = 1
+            cur_year += 1
+
+    user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
+
+    target_daily_maps = [
+        _get_user_daily_playtimes_map(db, target_id, end_date)
+        for target_id in target_user_ids
+    ]
+
+    user_hours: list[float] = []
+    community_hours: list[float] = []
+    num_target_users = len(target_user_ids)
+
+    for y, m in months:
+        last_day = calendar.monthrange(y, m)[1]
+        days_in_month = [date(y, m, d) for d in range(1, last_day + 1)]
+
+        user_month_mins = sum(user_daily_map.get(d, 0) for d in days_in_month)
+        user_hours.append(round(user_month_mins / 60.0, 2))
+
+        community_month_mins = sum(
+            t_map.get(d, 0)
+            for t_map in target_daily_maps
+            for d in days_in_month
+        )
+        community_hours.append(round(community_month_mins / (60.0 * num_target_users), 2))
+
+    return CommunityMonthlyPlaytimeResponse(user=user_hours, community=community_hours)
+
 
 
 def _get_user_daily_playtimes_map(db: Session, user_id: uuid.UUID, end_date: date) -> dict[date, int]:
