@@ -25,6 +25,7 @@ import type {
   UserSearchResult,
   RecommendationResponse,
   CommunityGenreHour,
+  CommunityPlaytimeResponse,
   CommunityScope,
 } from '@gamelog/api-manager/dto';
 
@@ -176,4 +177,12 @@ export default {
     fetchAuthenticatedData<DailyReport>(EndPoints.getDailyReport(startDate, endDate)),
   getCommunityGenre: (scope: CommunityScope) =>
     fetchAuthenticatedData<CommunityGenreHour[]>(EndPoints.getCommunityGenre(scope)),
+  getCommunityWeeklyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) =>
+    fetchAuthenticatedData<CommunityPlaytimeResponse>(
+      EndPoints.getCommunityWeeklyPlaytime(scope, startDate, endDate)
+    ),
+  getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) =>
+    fetchAuthenticatedData<CommunityPlaytimeResponse>(
+      EndPoints.getCommunityMonthlyPlaytime(scope, startDate, endDate)
+    ),
 };

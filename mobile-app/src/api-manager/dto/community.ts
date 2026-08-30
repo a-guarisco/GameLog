@@ -5,3 +5,8 @@ export interface CommunityGenreHour {
   description: string;
   percentage: number;
 }
+
+export interface CommunityPlaytimeResponse {
+  user: number[];
+  community: number[];
+}

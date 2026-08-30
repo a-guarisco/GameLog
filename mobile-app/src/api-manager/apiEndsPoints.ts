@@ -170,6 +170,14 @@ const EndPoints = {
   getCommunityGenre: (scope: CommunityScope) => {
     return `${getBackendBaseUrl()}/community/genre?scope=${scope}`;
   },
+
+  getCommunityWeeklyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) => {
+    return `${getBackendBaseUrl()}/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  },
+
+  getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) => {
+    return `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  },
 };
 
 export { isBackendProvider };

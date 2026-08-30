@@ -83,18 +83,19 @@ describe('ProfileSectionTabs', () => {
   it('renders all four tabs', () => {
     renderTabs();
 
-    ['Overview', 'Time', 'Genres', 'Platforms'].forEach((label) =>
+    ['Overview', 'Time', 'Genres', 'Community'].forEach((label) =>
       expect(screen.getByText(label)).toBeTruthy()
     );
   });
 
-  it('opens on the overview panel, showing PlaytimeTrend and ReportBox', () => {
+  it('opens on the overview panel, showing PlaytimeTrend, PlatformSplit, and ReportBox', () => {
     renderTabs();
 
     expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+    expect(screen.getByTestId('profile-platform-split')).toBeTruthy();
     expect(screen.getByTestId('report-box')).toBeTruthy();
     expect(screen.queryByTestId('genre-radar-chart')).toBeNull();
-    expect(screen.queryByTestId('profile-platform-split')).toBeNull();
+    expect(screen.queryByTestId('community-genre-radar-chart')).toBeNull();
   });
 
   it('swaps in the time tab', () => {
@@ -107,7 +108,7 @@ describe('ProfileSectionTabs', () => {
     expect(screen.queryByTestId('profile-playtime-trend')).toBeNull();
   });
 
-  it('swaps in the genre radar on the genres tab', () => {
+  it('swaps in the genre radar and community genre radar on the genres tab', () => {
     renderTabs();
 
     fireEvent.press(screen.getByTestId('profile-tab-genres'));
@@ -117,11 +118,13 @@ describe('ProfileSectionTabs', () => {
     expect(screen.queryByTestId('report-box')).toBeNull();
   });
 
-  it('swaps in the platform split on the platforms tab', () => {
+  it('swaps in the community tab', () => {
     renderTabs();
 
-    fireEvent.press(screen.getByTestId('profile-tab-platforms'));
+    fireEvent.press(screen.getByTestId('profile-tab-community'));
 
-    expect(screen.getByTestId('profile-platform-split')).toBeTruthy();
+    expect(screen.getByTestId('profile-community-tab')).toBeTruthy();
+    expect(screen.queryByTestId('genre-radar-chart')).toBeNull();
+    expect(screen.queryByTestId('community-genre-radar-chart')).toBeNull();
   });
 });
