@@ -8,18 +8,18 @@ import type { OwnedGames, PlaytimeByUser } from '@gamelog/api-manager/dto';
 import ProfileOverviewTab from './tabs/ProfileOverviewTab';
 import ProfileTimeTab from './tabs/ProfileTimeTab';
 import ProfileGenresTab from './tabs/ProfileGenresTab';
-import ProfilePlatformsTab from './tabs/ProfilePlatformsTab';
+import ProfileCommunityTab from './tabs/ProfileCommunityTab';
 
 import type { PlaytimeTrend } from '@gamelog/common/charts/playtime-trend/selectPlaytimeTrend';
 import type { PlatformSplit } from '@gamelog/common/charts/platform-split/selectPlatformSplit';
 
-type ProfileSectionId = 'overview' | 'time' | 'genres' | 'platforms';
+type ProfileSectionId = 'overview' | 'time' | 'genres' | 'community';
 
 const TABS: SectionTab<ProfileSectionId>[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'time', label: 'Time' },
   { id: 'genres', label: 'Genres' },
-  { id: 'platforms', label: 'Platforms' },
+  { id: 'community', label: 'Community' },
 ];
 
 interface ProfileSectionTabsProps {
@@ -61,7 +61,13 @@ const ProfileSectionTabs = ({
           <Spinner size="large" className="py-20 w-full" />
         ) : (
           <>
-            {activeTab === 'overview' && <ProfileOverviewTab playtimeByUser={playtimeByUser} />}
+            {activeTab === 'overview' && (
+              <ProfileOverviewTab
+                playtimeByUser={playtimeByUser}
+                platformSplit={platformSplit}
+                hasError={!!errorOwnedGames}
+              />
+            )}
 
             {activeTab === 'time' && (
               <ProfileTimeTab ownedGames={ownedGames} playtimeByUser={playtimeByUser} />
@@ -69,9 +75,7 @@ const ProfileSectionTabs = ({
 
             {activeTab === 'genres' && <ProfileGenresTab ownedGames={ownedGames} />}
 
-            {activeTab === 'platforms' && (
-              <ProfilePlatformsTab platformSplit={platformSplit} hasError={!!errorOwnedGames} />
-            )}
+            {activeTab === 'community' && <ProfileCommunityTab />}
           </>
         )}
       </VStack>
