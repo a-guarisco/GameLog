@@ -68,12 +68,14 @@ def make_user(
     username: str = "testuser",
     steam_id: str = "76561197960287930",
     steam_api_key: str = "FAKE_KEY",
+    region: str = "IT",
 ) -> User:
     user = User(
         firebase_uid=firebase_uid,
         username=username,
         steam_id=steam_id,
         steam_api_key=steam_api_key,
+        region=region,
     )
     session.add(user)
     session.commit()
