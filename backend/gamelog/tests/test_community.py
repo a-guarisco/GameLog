@@ -1,3 +1,4 @@
+from datetime import date
 import uuid
 import pytest
 from fastapi import HTTPException
@@ -131,6 +132,124 @@ class TestCommunityService:
         assert exc.value.status_code == 400
         assert "User has no friends" in exc.value.detail
 
+    def test_weekly_playtime_global_scope_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="US")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="FR")
+
+        monday = date(2026, 8, 24)
+        tuesday = date(2026, 8, 25)
+        wednesday = date(2026, 8, 26)
+        sunday = date(2026, 8, 30)
+
+        # u1: 60 mins on Tuesday
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=60, created_at=tuesday)
+
+        # u2: 120 mins over Tuesday + Wednesday (60 mins each)
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=120, created_at=wednesday)
+
+        # u3: 180 mins on Tuesday
+        make_rolling(session, user=u3, steam_app_id="300", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u3, steam_app_id="300", last_day_playtime=180, created_at=tuesday)
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_weekly_playtime(
+            CommunityScope.GLOBAL, monday, sunday, auth_user, session
+        )
+
+        assert len(result.user) == 7
+        assert len(result.community) == 7
+
+        # u1 user array: Tuesday is index 1 (0=Mon, 1=Tue) -> 60/60 = 1.0 hr
+        assert result.user == [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        # Community is u2 + u3 (2 users):
+        # Tuesday (idx 1): (60 + 180) / 2 = 120 mins = 2.0 hrs
+        # Wednesday (idx 2): (60 + 0) / 2 = 30 mins = 0.5 hrs
+        assert result.community == [0.0, 2.0, 0.5, 0.0, 0.0, 0.0, 0.0]
+
+    def test_weekly_playtime_region_scope_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="US")
+
+        monday = date(2026, 8, 24)
+        tuesday = date(2026, 8, 25)
+        sunday = date(2026, 8, 30)
+
+        # u1 plays 30 min on Monday (baseline on Sunday 2026-08-23)
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 8, 23))
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=30, created_at=monday)
+
+        # u2 (same region): 120 mins on Tuesday
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=120, created_at=tuesday)
+
+        # u3 (different region): 300 mins on Tuesday (should be excluded)
+        make_rolling(session, user=u3, steam_app_id="100", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u3, steam_app_id="100", last_day_playtime=300, created_at=tuesday)
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_weekly_playtime(
+            CommunityScope.REGION, monday, sunday, auth_user, session
+        )
+
+        assert result.user[0] == 0.5
+        assert result.community[1] == 2.0
+
+    def test_weekly_playtime_region_scope_missing_region_raises_400(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region=None)
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+
+        with pytest.raises(HTTPException) as exc:
+            community_service.get_community_weekly_playtime(
+                CommunityScope.REGION, date(2026, 8, 24), date(2026, 8, 30), auth_user, session
+            )
+        assert exc.value.status_code == 400
+        assert "User region is not set" in exc.value.detail
+
+    def test_weekly_playtime_friends_scope_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="IT")
+
+        friendship = Friendship(requester_id=u1.id, addressee_id=u2.id, status=FriendshipStatus.ACCEPTED)
+        session.add(friendship)
+        session.commit()
+
+        monday = date(2026, 8, 24)
+        thursday = date(2026, 8, 27)
+        sunday = date(2026, 8, 30)
+
+        # u2 (friend) plays 60 mins on Thursday
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 8, 26))
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=60, created_at=thursday)
+
+        # u3 (non-friend) plays 300 mins on Thursday
+        make_rolling(session, user=u3, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 8, 26))
+        make_rolling(session, user=u3, steam_app_id="100", last_day_playtime=300, created_at=thursday)
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_weekly_playtime(
+            CommunityScope.FRIENDS, monday, sunday, auth_user, session
+        )
+
+        # Thursday is index 3 (0=Mon, 1=Tue, 2=Wed, 3=Thu)
+        assert result.community[3] == 1.0
+
+    def test_weekly_playtime_friends_scope_no_friends_raises_400(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+
+        with pytest.raises(HTTPException) as exc:
+            community_service.get_community_weekly_playtime(
+                CommunityScope.FRIENDS, date(2026, 8, 24), date(2026, 8, 30), auth_user, session
+            )
+        assert exc.value.status_code == 400
+        assert "User has no friends" in exc.value.detail
+
 
 class TestCommunityRouter:
     def test_get_community_genre_endpoint(self, client: TestClient, session: Session):
@@ -169,4 +288,49 @@ class TestCommunityRouter:
         make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
         response = client.get("/community/genre?scope=INVALID_SCOPE")
         assert response.status_code == 422
+
+    def test_get_weekly_playtime_endpoint_success(self, client: TestClient, session: Session):
+        u1 = make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="firebase-uid-2", username="user2", steam_id="s2", region="IT")
+
+        monday = date(2026, 8, 24)
+        tuesday = date(2026, 8, 25)
+        sunday = date(2026, 8, 30)
+
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=60, created_at=tuesday)
+
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=120, created_at=tuesday)
+
+        response = client.get(f"/community/weekly_playtime?scope=GLOBAL&start_date={monday.isoformat()}&end_date={sunday.isoformat()}")
+        assert response.status_code == 200
+        data = response.json()
+        assert "user" in data
+        assert "community" in data
+        assert len(data["user"]) == 7
+        assert len(data["community"]) == 7
+        assert data["user"][1] == 1.0
+        assert data["community"][1] == 2.0
+
+    def test_get_weekly_playtime_endpoint_invalid_dates_non_monday(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        # Sunday to Saturday (not Monday to Sunday)
+        response = client.get("/community/weekly_playtime?scope=GLOBAL&start_date=2026-08-23&end_date=2026-08-29")
+        assert response.status_code == 400
+        assert "start_date must be Monday and end_date must be the following Sunday" in response.json()["detail"]
+
+    def test_get_weekly_playtime_endpoint_invalid_duration(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        # Monday to Saturday (6 days, not 7)
+        response = client.get("/community/weekly_playtime?scope=GLOBAL&start_date=2026-08-24&end_date=2026-08-29")
+        assert response.status_code == 400
+        assert "start_date must be Monday and end_date must be the following Sunday" in response.json()["detail"]
+
+    def test_get_weekly_playtime_endpoint_missing_params(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        response = client.get("/community/weekly_playtime?scope=GLOBAL")
+        assert response.status_code == 422
+
+
 
