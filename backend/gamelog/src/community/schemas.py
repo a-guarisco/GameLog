@@ -22,6 +22,7 @@ class CommunityGenreHour(BaseModel):
     description: str
     percentage: float
 
+
 class CommunityWeeklyPlaytimeResponse(BaseModel):
     user: list[float]
     community: list[float]
@@ -33,6 +34,12 @@ class CommunityMonthlyPlaytimeResponse(BaseModel):
 
 
 class CommunityWeeklyTopGameResponse(BaseModel):
+    id: str
+    user_playtime: float
+    community_playtime: float
+
+
+class CommunityMonthlyTopGameResponse(BaseModel):
     id: str
     user_playtime: float
     community_playtime: float

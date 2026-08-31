@@ -12,6 +12,7 @@ from src.auth.schemas import AuthenticatedUser
 from src.community.schemas import (
     CommunityGenreHour,
     CommunityMonthlyPlaytimeResponse,
+    CommunityMonthlyTopGameResponse,
     CommunityScope,
     CommunityWeeklyPlaytimeResponse,
     CommunityWeeklyTopGameResponse,
@@ -135,31 +136,71 @@ def get_community_weekly_top_games(
     Return the user and community average playtime for the top games (up to 5)
     sorted by combined highest playtime from user and community in the specified week.
     """
+    week_dates = [start_date + timedelta(days=i) for i in range(7)]
+    return _compute_community_top_games_for_dates(
+        scope=scope,
+        dates=week_dates,
+        end_date=end_date,
+        user=user,
+        db=db,
+        response_cls=CommunityWeeklyTopGameResponse,
+    )
+
+
+def get_community_monthly_top_games(
+    scope: CommunityScope,
+    start_date: date,
+    end_date: date,
+    user: AuthenticatedUser,
+    db: Session,
+) -> list[CommunityMonthlyTopGameResponse]:
+    """
+    Return the user and community average playtime for the top games (up to 5)
+    sorted by combined highest playtime from user and community in the specified month(s) period.
+    """
+    num_days = (end_date - start_date).days + 1
+    period_dates = [start_date + timedelta(days=i) for i in range(num_days)]
+    return _compute_community_top_games_for_dates(
+        scope=scope,
+        dates=period_dates,
+        end_date=end_date,
+        user=user,
+        db=db,
+        response_cls=CommunityMonthlyTopGameResponse,
+    )
+
+
+def _compute_community_top_games_for_dates(
+    scope: CommunityScope,
+    dates: list[date],
+    end_date: date,
+    user: AuthenticatedUser,
+    db: Session,
+    response_cls: type,
+) -> list:
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
     target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
 
-    week_dates = [start_date + timedelta(days=i) for i in range(7)]
-
     user_daily_game_map = _get_user_daily_game_playtimes_map(db, current_user.id, end_date)
-    user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, week_dates)
+    user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, dates)
 
     community_game_totals: dict[str, int] = defaultdict(int)
     for target_id in target_user_ids:
         t_daily_game_map = _get_user_daily_game_playtimes_map(db, target_id, end_date)
-        t_totals = _aggregate_game_playtimes_for_dates(t_daily_game_map, week_dates)
+        t_totals = _aggregate_game_playtimes_for_dates(t_daily_game_map, dates)
         for app_id, mins in t_totals.items():
             community_game_totals[app_id] += mins
 
     num_target_users = len(target_user_ids)
     all_game_ids = set(user_game_totals.keys()) | set(community_game_totals.keys())
 
-    candidates: list[CommunityWeeklyTopGameResponse] = []
+    candidates = []
     for app_id in all_game_ids:
         user_hours = round(user_game_totals.get(app_id, 0) / 60.0, 2)
         comm_hours = round(community_game_totals.get(app_id, 0) / (60.0 * num_target_users), 2)
         if user_hours > 0 or comm_hours > 0:
             candidates.append(
-                CommunityWeeklyTopGameResponse(
+                response_cls(
                     id=app_id,
                     user_playtime=user_hours,
                     community_playtime=comm_hours,

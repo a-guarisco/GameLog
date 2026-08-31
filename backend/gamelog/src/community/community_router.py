@@ -10,6 +10,7 @@ from src.community import community_service
 from src.community.schemas import (
     CommunityGenreHour,
     CommunityMonthlyPlaytimeResponse,
+    CommunityMonthlyTopGameResponse,
     CommunityScope,
     CommunityWeeklyPlaytimeResponse,
     CommunityWeeklyTopGameResponse,
@@ -82,6 +83,24 @@ def get_community_monthly_playtime(
 ):
     _check_month_is_correct(start_date, end_date)
     return community_service.get_community_monthly_playtime(
+        scope=scope, start_date=start_date, end_date=end_date, user=auth_user, db=db
+    )
+
+
+@router.get(
+    "/monthly_top_game_playtime",
+    summary="Return the average playtime for the most played games in the specified month period and community scope",
+    response_model=list[CommunityMonthlyTopGameResponse],
+)
+def get_community_monthly_top_game_playtime(
+    scope: CommunityScope = Query(..., description="Community scope: global, region, or friends"),
+    start_date: date = Query(..., description="Start date of the period (YYYY-MM-01)"),
+    end_date: date = Query(..., description="End date of the period (last day of month)"),
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _check_month_is_correct(start_date, end_date)
+    return community_service.get_community_monthly_top_games(
         scope=scope, start_date=start_date, end_date=end_date, user=auth_user, db=db
     )
 
