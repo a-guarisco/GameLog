@@ -107,10 +107,13 @@ export const useCommunityPlaytimeHistogramData = ({
           marginLeft: -barWidth / 2,
         },
         frontColor: primaryColor,
+        topRadius: 4,
+        bottomRadius: 4,
+        borderRadius: 4,
         borderTopLeftRadius: 4,
         borderTopRightRadius: 4,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
+        borderBottomLeftRadius: 4,
+        borderBottomRightRadius: 4,
       });
 
       // Community Bar
@@ -118,10 +121,13 @@ export const useCommunityPlaytimeHistogramData = ({
         value: cVal,
         spacing: 12,
         frontColor: purpleColor,
+        topRadius: 4,
+        bottomRadius: 4,
+        borderRadius: 4,
         borderTopLeftRadius: 4,
         borderTopRightRadius: 4,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
+        borderBottomLeftRadius: 4,
+        borderBottomRightRadius: 4,
       });
     });
 
