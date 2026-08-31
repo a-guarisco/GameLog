@@ -12,7 +12,11 @@ import { BarChart } from 'react-native-gifted-charts';
 import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { brand, tailwindColors } from '@gamelog/theme/theme';
-import { ChartAxisText, ChartDateRangeText } from '@gamelog/common/typography/ChartTypography';
+import {
+  ChartAxisText,
+  ChartDateRangeText,
+  ChartSummaryText,
+} from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate, formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useCommunityPlaytime, CommunityPeriodRange } from './useCommunityPlaytime';
@@ -22,15 +26,17 @@ import type { CommunityScope } from '@gamelog/api-manager/dto';
 const MemoizedBarChart = memo(BarChart);
 
 const RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
-  { id: 'week', label: 'Week', testID: 'community-histogram-range-week' },
-  { id: 'month', label: 'Months', testID: 'community-histogram-range-month' },
+  { id: 'week', label: '1W', testID: 'community-histogram-range-week' },
+  { id: 'month', label: '6M', testID: 'community-histogram-range-month' },
 ];
 
 interface CommunityPlaytimeHistogramChartProps {
   scope?: CommunityScope;
 }
 
-const CommunityPlaytimeHistogramChart = ({ scope = 'global' }: CommunityPlaytimeHistogramChartProps) => {
+const CommunityPlaytimeHistogramChart = ({
+  scope = 'global',
+}: CommunityPlaytimeHistogramChartProps) => {
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
   const [offset, setOffset] = useState<number>(0);
 
@@ -45,13 +51,7 @@ const CommunityPlaytimeHistogramChart = ({ scope = 'global' }: CommunityPlaytime
   const primaryColor = parseRGB(brand.primary['500']);
   const purpleColor = parseRGB(tailwindColors.purple['500']);
 
-  const {
-    data,
-    isLoading,
-    error,
-    errorMessage,
-    dateRangeInfo,
-  } = useCommunityPlaytime({
+  const { data, isLoading, error, errorMessage, dateRangeInfo } = useCommunityPlaytime({
     scope,
     periodRange,
     offset,
@@ -90,7 +90,7 @@ const CommunityPlaytimeHistogramChart = ({ scope = 'global' }: CommunityPlaytime
     <ChartWrapperCard
       label="Community Playtime"
       headerRight={
-        <Box className="w-[140px] ml-auto">
+        <Box className="w-[100px] ml-auto">
           <GLSegmentedControl<CommunityPeriodRange>
             options={RANGE_OPTIONS}
             activeId={periodRange}
@@ -131,38 +131,28 @@ const CommunityPlaytimeHistogramChart = ({ scope = 'global' }: CommunityPlaytime
         return (
           <VStack space="sm" className="w-full">
             <VStack space="xs" className="w-full mt-1">
-              {/* Header with dual playtimes and date range navigation */}
-              <VStack className="w-full px-4 mb-4" space="xs">
+              {/* Header with dual playtime numbers on left and date navigation on right */}
+              <VStack className="w-full px-0 mb-3" space="xs">
                 <HStack className="w-full justify-between items-center flex-wrap">
-                  <HStack space="md" className="items-center">
-                    {/* User Playtime (Blue) */}
-                    <HStack space="xs" className="items-center">
-                      <Box
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: `rgb(${brand.primary['500']})` }}
-                      />
-                      <Text size="sm" className="font-bold text-primary-500">
-                        You: {userTotalLabel}
-                      </Text>
-                    </HStack>
-
-                    {/* Community Playtime (Purple) */}
-                    <HStack space="xs" className="items-center">
-                      <Box
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
-                      />
-                      <Text size="sm" className="font-bold text-purple-500">
-                        Others: {communityTotalLabel}
-                      </Text>
-                    </HStack>
+                  {/* Left: Summary totals in blue and purple with separator */}
+                  <HStack space="xs" className="items-baseline">
+                    <ChartSummaryText className="text-primary-500">
+                      {userTotalLabel}
+                    </ChartSummaryText>
+                    <Text size="lg" className="text-typography-400 font-bold">
+                      {' '}
+                      ·{' '}
+                    </Text>
+                    <ChartSummaryText className="text-purple-500">
+                      {communityTotalLabel}
+                    </ChartSummaryText>
                   </HStack>
 
-                  {/* Navigation Chevrons */}
-                  <HStack space="xs" className="items-center">
+                  {/* Right: Date navigation positioned below the range selector */}
+                  <HStack space="xs" className="items-center -mr-1">
                     <Pressable
                       onPress={() => setOffset((prev) => prev - 1)}
-                      className="w-9 h-9 items-center justify-center rounded-full active:bg-background-100"
+                      className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
                       accessibilityLabel="Previous period"
                       testID="community-histogram-prev"
                     >
@@ -177,7 +167,7 @@ const CommunityPlaytimeHistogramChart = ({ scope = 'global' }: CommunityPlaytime
                       onPress={() => setOffset((prev) => Math.min(0, prev + 1))}
                       disabled={offset >= 0}
                       style={{ opacity: offset >= 0 ? 0.3 : 1 }}
-                      className="w-9 h-9 items-center justify-center rounded-full active:bg-background-100"
+                      className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
                       accessibilityLabel="Next period"
                       testID="community-histogram-next"
                     >
@@ -272,11 +262,43 @@ const CommunityPlaytimeHistogramChart = ({ scope = 'global' }: CommunityPlaytime
                   disableScroll
                   dashWidth={0}
                   scrollAnimation={false}
+                  roundedTop
+                  roundedBottom
+                  topRadius={4}
+                  bottomRadius={4}
                 />
               </Box>
 
-              <Text size="xs" className="text-typography-300 text-center mt-2">
-                Comparing your hours with {scope === 'global' ? 'the global community' : scope === 'region' ? 'your region' : 'your friends'}.
+              {/* Caption / Legend colored as in communityGenreRadar */}
+              <HStack space="lg" className="items-center justify-center pt-2 pb-1">
+                <HStack space="xs" className="items-center">
+                  <Box
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: `rgb(${brand.primary['500']})` }}
+                  />
+                  <Text size="xs" className="font-bold text-primary-500">
+                    You
+                  </Text>
+                </HStack>
+                <HStack space="xs" className="items-center">
+                  <Box
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
+                  />
+                  <Text size="xs" className="font-bold text-purple-500">
+                    Others
+                  </Text>
+                </HStack>
+              </HStack>
+
+              <Text size="xs" className="text-typography-300 text-center">
+                Comparing your hours with{' '}
+                {scope === 'global'
+                  ? 'the global community'
+                  : scope === 'region'
+                    ? 'your region'
+                    : 'your friends'}
+                .
               </Text>
             </VStack>
           </VStack>

@@ -49,12 +49,12 @@ describe('CommunityPlaytimeHistogramChart', () => {
     await waitFor(() => {
       expect(screen.getByTestId('community-playtime-histogram-chart')).toBeTruthy();
       expect(screen.getByTestId('mock-bar-chart')).toBeTruthy();
-      expect(screen.getByText(/You:/)).toBeTruthy();
-      expect(screen.getByText(/Others:/)).toBeTruthy();
+      expect(screen.getByText('You')).toBeTruthy();
+      expect(screen.getByText('Others')).toBeTruthy();
     });
   });
 
-  it('switches between Week and Months', async () => {
+  it('switches between 1W and 6M range options', async () => {
     (ApiManager.getCommunityWeeklyPlaytime as jest.Mock).mockResolvedValue({
       user: [1, 2, 3, 4, 5, 6, 7],
       community: [2, 2, 2, 2, 2, 2, 2],
@@ -66,7 +66,7 @@ describe('CommunityPlaytimeHistogramChart', () => {
 
     render(<CommunityPlaytimeHistogramChart scope="global" />);
 
-    fireEvent.press(screen.getByText('Months'));
+    fireEvent.press(screen.getByText('6M'));
 
     await waitFor(() => {
       expect(ApiManager.getCommunityMonthlyPlaytime).toHaveBeenCalled();
