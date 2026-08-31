@@ -6,6 +6,7 @@ import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
 
 interface CompactGameListRow {
+  testID?: string;
   app_id?: string | number;
   appId?: string | number;
   gameSteamId?: string | number;
@@ -82,7 +83,7 @@ const CompactGameList = ({
         return (
           <Pressable
             key={appId || `${game.streak ?? 'unknown'}-${game.days_played_count ?? '0'}`}
-            testID="game-list-item"
+            testID={game.testID ?? 'game-list-item'}
             onPress={() => handleGamePress(appId, playTime)}
             className="active:opacity-70"
           >
