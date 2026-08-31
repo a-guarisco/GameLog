@@ -414,30 +414,30 @@ class TestCommunityService:
         )
 
         assert len(result) == 5
-        # Top 1: Game 500 (comm = 2.5h, user = 1.0h, combined = 3.5h)
+        # Top 1: Game 500 (comm = 5.0h, user = 1.0h)
         assert result[0].id == "500"
-        assert result[0].community_playtime == 2.5
+        assert result[0].community_playtime == 5.0
         assert result[0].user_playtime == 1.0
 
-        # Top 2: Game 100 (comm = 0.5h, user = 2.0h, combined = 2.5h)
-        assert result[1].id == "100"
-        assert result[1].community_playtime == 0.5
-        assert result[1].user_playtime == 2.0
+        # Top 2: Game 400 (comm = 4.0h, user = 0.0h)
+        assert result[2].id == "300"
+        assert result[1].id == "400"
+        assert result[1].community_playtime == 4.0
+        assert result[1].user_playtime == 0.0
 
-        # Top 3: Game 400 (comm = 2.0h, user = 0.0h, combined = 2.0h)
-        assert result[2].id == "400"
-        assert result[2].community_playtime == 2.0
+        # Top 3: Game 300 (comm = 3.0h, user = 0.0h)
+        assert result[2].community_playtime == 3.0
         assert result[2].user_playtime == 0.0
 
-        # Top 4: Game 300 (comm = 1.5h, user = 0.0h, combined = 1.5h)
-        assert result[3].id == "300"
-        assert result[3].community_playtime == 1.5
+        # Top 4: Game 200 (comm = 2.0h, user = 0.0h)
+        assert result[3].id == "200"
+        assert result[3].community_playtime == 2.0
         assert result[3].user_playtime == 0.0
 
-        # Top 5: Game 200 (comm = 1.0h, user = 0.0h, combined = 1.0h)
-        assert result[4].id == "200"
+        # Top 5: Game 100 (comm = 1.0h, user = 2.0h)
+        assert result[4].id == "100"
         assert result[4].community_playtime == 1.0
-        assert result[4].user_playtime == 0.0
+        assert result[4].user_playtime == 2.0
 
     def test_weekly_top_games_region_scope_success(self, session: Session):
         u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
@@ -533,7 +533,7 @@ class TestCommunityService:
 
         assert result == []
 
-    def test_weekly_top_games_combined_sorting(self, session: Session):
+    def test_weekly_top_games_sorting_by_community_playtime(self, session: Session):
         u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
         u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="US")
 
@@ -555,15 +555,15 @@ class TestCommunityService:
         )
 
         assert len(result) == 2
-        # Game 999 has combined 5.0 + 0.0 = 5.0 -> Top 1
-        assert result[0].id == "999"
-        assert result[0].user_playtime == 5.0
-        assert result[0].community_playtime == 0.0
+        # Game 100 has community playtime 2.0 -> Top 1
+        assert result[0].id == "100"
+        assert result[0].user_playtime == 0.0
+        assert result[0].community_playtime == 2.0
 
-        # Game 100 has combined 0.0 + 2.0 = 2.0 -> Top 2
-        assert result[1].id == "100"
-        assert result[1].user_playtime == 0.0
-        assert result[1].community_playtime == 2.0
+        # Game 999 has community playtime 0.0 -> Top 2
+        assert result[1].id == "999"
+        assert result[1].user_playtime == 5.0
+        assert result[1].community_playtime == 0.0
 
     def test_monthly_top_games_global_scope_success(self, session: Session):
         u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
@@ -573,14 +573,14 @@ class TestCommunityService:
         start_date = date(2026, 1, 1)
         end_date = date(2026, 1, 31)
 
-        # Game 200: u2 plays 180m on Jan 10, u3 plays 120m on Jan 15 -> community total = 300m -> avg = 300 / (2 * 60) = 2.5h
+        # Game 200: u2 plays 180m on Jan 10, u3 plays 120m on Jan 15 -> 2 players, 300m total -> avg = 300 / (2 * 60) = 2.5h
         make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 9))
         make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=180, created_at=date(2026, 1, 10))
 
         make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 14))
         make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=120, created_at=date(2026, 1, 15))
 
-        # Game 100: u2 plays 120m on Jan 20 -> community total = 120m -> avg = 120 / (2 * 60) = 1.0h
+        # Game 100: u2 plays 120m on Jan 20 -> 1 player, 120m total -> avg = 120 / (1 * 60) = 2.0h
         make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 1, 19))
         make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=120, created_at=date(2026, 1, 20))
 
@@ -594,15 +594,15 @@ class TestCommunityService:
         )
 
         assert len(result) == 2
-        # Game 100: user = 3.0h, comm = 1.0h -> combined = 4.0h -> Top 1
-        assert result[0].id == "100"
-        assert result[0].user_playtime == 3.0
-        assert result[0].community_playtime == 1.0
+        # Game 200: comm = 2.5h, user = 0.0h -> Top 1
+        assert result[0].id == "200"
+        assert result[0].user_playtime == 0.0
+        assert result[0].community_playtime == 2.5
 
-        # Game 200: user = 0.0h, comm = 2.5h -> combined = 2.5h -> Top 2
-        assert result[1].id == "200"
-        assert result[1].user_playtime == 0.0
-        assert result[1].community_playtime == 2.5
+        # Game 100: comm = 2.0h, user = 3.0h -> Top 2
+        assert result[1].id == "100"
+        assert result[1].user_playtime == 3.0
+        assert result[1].community_playtime == 2.0
 
     def test_monthly_top_games_region_scope_success(self, session: Session):
         u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
@@ -672,6 +672,37 @@ class TestCommunityService:
         )
 
         assert result == []
+
+    def test_weekly_top_games_active_players_no_dilution(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="US")
+        u4 = make_user(session, firebase_uid="u4", username="user4", steam_id="s4", region="FR")
+
+        monday = date(2026, 8, 24)
+        tuesday = date(2026, 8, 25)
+        sunday = date(2026, 8, 30)
+
+        # Only u2 plays Game 100 for 120m (2.0h). u3 and u4 do not play Game 100 at all.
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=120, created_at=tuesday)
+
+        # u3 plays Game 200 for 60m (1.0h)
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=0, created_at=monday)
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=60, created_at=tuesday)
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_weekly_top_games(
+            CommunityScope.GLOBAL, monday, sunday, auth_user, session
+        )
+
+        assert len(result) == 2
+        # Game 100 should be 2.0h (120m / 1 player), NOT diluted by u3 or u4 (120m / 3 users = 0.67h)
+        assert result[0].id == "100"
+        assert result[0].community_playtime == 2.0
+        # Game 200 should be 1.0h (60m / 1 player)
+        assert result[1].id == "200"
+        assert result[1].community_playtime == 1.0
 
 
 class TestCommunityRouter:
