@@ -340,3 +340,53 @@ class TestUpdateGameStatusEndpoint:
             response = client.post(self.ENDPOINT, json={"app_id": "570", "status": "playing"})
         assert response.status_code == 404
 
+
+# ---------------------------------------------------------------------------
+# /games/genres_batch
+# ---------------------------------------------------------------------------
+
+
+class TestGenresBatchEndpoint:
+    ENDPOINT = "/games/genres_batch"
+
+    def test_requires_auth(self):
+        from src.main import app as _app
+
+        _app.dependency_overrides.clear()
+
+        plain_client = TestClient(_app, raise_server_exceptions=False)
+        response = plain_client.post(self.ENDPOINT, json={"app_ids": ["570", "730"]})
+        assert response.status_code == 401
+
+    def test_get_genres_batch_success(self, client, session):
+        make_user(session)
+        mock_data = {"570": ["Action", "Strategy"], "730": ["Shooter"]}
+        with patch("src.games.games_router.game_service.get_genres_for_apps", return_value=mock_data) as mock_svc:
+            response = client.post(self.ENDPOINT, json={"app_ids": ["570", "730"]})
+            mock_svc.assert_called_once()
+            _, kwargs = mock_svc.call_args
+            assert kwargs.get("app_ids") == ["570", "730"]
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"app_id": "570", "genres": ["Action", "Strategy"]},
+            {"app_id": "730", "genres": ["Shooter"]},
+        ]
+
+    def test_get_genres_batch_empty_list(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_genres_for_apps", return_value={}):
+            response = client.post(self.ENDPOINT, json={"app_ids": []})
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    def test_get_genres_batch_too_many_ids(self, client, session):
+        make_user(session)
+        too_many = [str(i) for i in range(1001)]
+        response = client.post(self.ENDPOINT, json={"app_ids": too_many})
+        assert response.status_code == 400
+        assert "Too many app_ids requested" in response.json()["detail"]
+
+
+

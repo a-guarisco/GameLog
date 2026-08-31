@@ -1,8 +1,8 @@
 import uuid
 from datetime import date
-
 from typing import Any
-from pydantic import BaseModel, field_validator
+
+from pydantic import BaseModel, RootModel, field_validator
 from sqlmodel import Field
 
 from src.models import Genre
@@ -124,3 +124,14 @@ class UpdateStatus(BaseModel):
         raise ValueError(
             f"Invalid game status: '{v}'. Valid statuses are: {[s.value for s in GameStatus]}"
         )
+
+
+class GenresBatchRequest(BaseModel):
+    app_ids: list[str] = Field(default_factory=list)
+
+
+class GameGenres(BaseModel):
+    app_id: str
+    genres: list[str] = Field(default_factory=list)
+
+

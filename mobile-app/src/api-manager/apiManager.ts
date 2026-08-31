@@ -8,6 +8,7 @@ import type {
   PlaytimeByUser,
   GameBasicInfo,
   GameGenres,
+  BackendGameGenres,
   GlobalAchievement,
   GameSchema,
   OwnedGames,
@@ -130,9 +131,9 @@ export default {
     fetchAuthenticatedData<DailyReport>(EndPoints.getPlaytimeReport(startDate, endDate)),
 
   getGenresBatch: (appIds: string[]) =>
-    fetchAuthenticatedData<Record<string, string[]>>(EndPoints.getGenresBatch(), {
+    fetchAuthenticatedData<BackendGameGenres[]>(EndPoints.getGenresBatch(), {
       method: 'POST',
-      body: JSON.stringify(appIds),
+      body: JSON.stringify({ app_ids: appIds }),
     }),
 
   getPlaytimeByUser: (days: number) =>

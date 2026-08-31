@@ -11,3 +11,8 @@ interface AppData {
 }
 
 export type GameGenres = Record<string, AppData>;
+
+export interface BackendGameGenres {
+  app_id: string;
+  genres: string[];
+}
