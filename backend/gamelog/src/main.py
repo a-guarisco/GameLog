@@ -1,9 +1,12 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Response, status
+from sqlalchemy import text
+from sqlmodel import Session
 
 from src.achievements.router import router as achievements_router
 from src.auth.auth import get_current_user
 from src.auth.firebase_init import initialize_firebase_app
 from src.auth.schemas import AuthenticatedUser
+from src.core.database import get_db
 from src.core.scheduler import lifespan
 from src.core.settings import get_settings
 from src.games.games_router import router as games_router
@@ -26,8 +29,24 @@ def hello_world():
 
 
 @app.get("/health")
-def healthcheck():
-    return {"status": "ok"}
+def healthcheck(response: Response, db: Session = Depends(get_db)):
+    db_status = "connected"
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as e:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {
+            "status": "unhealthy",
+            "app": settings.app_name,
+            "version": settings.app_version,
+            "database": f"error: {str(e)}",
+        }
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+        "version": settings.app_version,
+        "database": db_status,
+    }
 
 
 @app.get("/me")

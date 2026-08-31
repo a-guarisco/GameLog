@@ -2,8 +2,10 @@ import { renderHook } from '@testing-library/react-native';
 import { usePlaytimeBlocksData } from '@gamelog/common/charts/playtime-blocks/usePlaytimeBlocksData';
 
 describe('usePlaytimeBlocksData', () => {
+  const MOCK_TODAY = new Date('2023-10-18T12:00:00Z');
+
   const getOffsetDateString = (offsetDays: number) => {
-    const d = new Date();
+    const d = new Date(MOCK_TODAY);
     d.setDate(d.getDate() + offsetDays);
     return d.toISOString().split('T')[0];
   };
@@ -13,6 +15,16 @@ describe('usePlaytimeBlocksData', () => {
     { date: getOffsetDateString(0), playtime_minutes: 120 },
     { date: getOffsetDateString(-1), playtime_minutes: 60 },
   ];
+
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(MOCK_TODAY);
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.clearAllMocks();
+  });
 
   it('calculates data for week mode correctly', () => {
     const { result } = renderHook(() =>

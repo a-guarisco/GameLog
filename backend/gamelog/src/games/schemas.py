@@ -1,11 +1,12 @@
 import uuid
 from datetime import date
 
-from pydantic import BaseModel
+from typing import Any
+from pydantic import BaseModel, field_validator
 from sqlmodel import Field
 
 from src.models import Genre
-from src.models.game import GameBase
+from src.models.game import GameBase, GameStatus
 
 
 class GameCreate(GameBase):
@@ -101,3 +102,25 @@ class DailyGameReport(BaseModel):
 class DailyReport(BaseModel):
     date: date
     game_reports: list[DailyGameReport]
+
+class UpdateStatus(BaseModel):
+    app_id: str
+    status: GameStatus
+
+    @field_validator("status", mode="before")
+    @classmethod
+    def validate_status(cls, v: Any) -> GameStatus:
+        if isinstance(v, GameStatus):
+            return v
+        if isinstance(v, str):
+            cleaned = v.strip().lower()
+            try:
+                return GameStatus(cleaned)
+            except ValueError:
+                try:
+                    return GameStatus[v.strip().upper()]
+                except KeyError:
+                    pass
+        raise ValueError(
+            f"Invalid game status: '{v}'. Valid statuses are: {[s.value for s in GameStatus]}"
+        )

@@ -298,7 +298,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
         assert shelving.owner_id == user.id
 
     @pytest.mark.anyio
-    async def test_unplayed_game_gets_shelved_status(self, session):
+    async def test_unplayed_game_gets_to_be_played_status(self, session):
         user = make_user(session)
 
         games = [
@@ -321,10 +321,10 @@ class TestUpdateUserShelvingSteamRollingAsync:
 
         game = session.exec(select(Game).where(Game.steam_app_id == "730")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
-        assert shelving.status == GameStatus.SHELVED
+        assert shelving.status == GameStatus.TO_BE_PLAYED
 
     @pytest.mark.anyio
-    async def test_played_game_gets_shelved_status(self, session):
+    async def test_played_game_gets_playing_status(self, session):
         user = make_user(session)
 
         games = [
@@ -347,7 +347,7 @@ class TestUpdateUserShelvingSteamRollingAsync:
 
         game = session.exec(select(Game).where(Game.steam_app_id == "570")).first()
         shelving = session.exec(select(Shelving).where(Shelving.game_id == game.id)).first()
-        assert shelving.status == GameStatus.SHELVED
+        assert shelving.status == GameStatus.PLAYING
 
     @pytest.mark.anyio
     async def test_first_time_zero_playtime_creates_baseline_rolling(self, session):
@@ -762,3 +762,73 @@ class TestGetStreak:
         with pytest.raises(HTTPException) as exc_info:
             game_service.get_streak(session, "ghost-uid", None)
         assert exc_info.value.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# update_game_status
+# ---------------------------------------------------------------------------
+
+
+class TestUpdateGameStatus:
+    def test_update_game_status_success(self, session):
+        user = make_user(session)
+        game = make_game(session, steam_app_id="570")
+        shelving = make_shelving(session, user=user, game=game, status=GameStatus.TO_BE_PLAYED)
+
+        game_service.update_game_status(session, user.firebase_uid, "570", GameStatus.PLAYING)
+
+        session.refresh(shelving)
+        assert shelving.status == GameStatus.PLAYING
+
+    def test_update_game_status_with_string_status(self, session):
+        user = make_user(session)
+        game = make_game(session, steam_app_id="570")
+        shelving = make_shelving(session, user=user, game=game, status=GameStatus.PLAYING)
+
+        game_service.update_game_status(session, user.firebase_uid, "570", "platinato")
+
+        session.refresh(shelving)
+        assert shelving.status == GameStatus.PLATINATO
+
+    def test_update_game_status_with_uppercase_string_status(self, session):
+        user = make_user(session)
+        game = make_game(session, steam_app_id="570")
+        shelving = make_shelving(session, user=user, game=game, status=GameStatus.PLAYING)
+
+        game_service.update_game_status(session, user.firebase_uid, "570", "SHELVED")
+
+        session.refresh(shelving)
+        assert shelving.status == GameStatus.SHELVED
+
+    def test_update_game_status_invalid_status(self, session):
+        user = make_user(session)
+        game = make_game(session, steam_app_id="570")
+        make_shelving(session, user=user, game=game, status=GameStatus.PLAYING)
+
+        with pytest.raises(HTTPException) as exc_info:
+            game_service.update_game_status(session, user.firebase_uid, "570", "invalid_status")
+        assert exc_info.value.status_code == 400
+        assert "Invalid game status" in exc_info.value.detail
+
+    def test_update_game_status_user_not_found(self, session):
+        make_game(session, steam_app_id="570")
+        with pytest.raises(HTTPException) as exc_info:
+            game_service.update_game_status(session, "nonexistent-uid", "570", GameStatus.PLAYING)
+        assert exc_info.value.status_code == 404
+        assert "User not found" in exc_info.value.detail
+
+    def test_update_game_status_game_not_cached(self, session):
+        user = make_user(session)
+        with pytest.raises(HTTPException) as exc_info:
+            game_service.update_game_status(session, user.firebase_uid, "99999", GameStatus.PLAYING)
+        assert exc_info.value.status_code == 404
+        assert "Game not found in cache" in exc_info.value.detail
+
+    def test_update_game_status_not_in_user_shelving(self, session):
+        user = make_user(session)
+        make_game(session, steam_app_id="570")  # game is cached, but user hasn't shelved it
+        with pytest.raises(HTTPException) as exc_info:
+            game_service.update_game_status(session, user.firebase_uid, "570", GameStatus.PLAYING)
+        assert exc_info.value.status_code == 404
+        assert "Game not found in user's shelving" in exc_info.value.detail
+

@@ -8,7 +8,7 @@ from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.games import game_service, recommendations_service
-from src.games.schemas import DailyReport, RecommendationResponse
+from src.games.schemas import DailyReport, RecommendationResponse, UpdateStatus
 
 router = APIRouter(prefix="/games", tags=["games"])
 
@@ -100,3 +100,20 @@ def get_daily_report(
     Generate an on-demand daily report for the user identified by firebase_uid between start_date and end_date (defaults to today).
     """
     return game_service.get_daily_report(session=db, user_id=auth_user.uid, start_date=start_date, end_date=end_date)
+
+@router.post(
+    "/update_game_status",
+    summary="Update user game status",
+    status_code=200,
+)
+async def update_game_status(
+    payload: UpdateStatus,
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Update the user's game status for a specific game.
+    """
+    game_service.update_game_status(session=db, user_id=auth_user.uid, steam_app_id=payload.app_id, status=payload.status)
+    return {"message": "Game status updated successfully"}
+
