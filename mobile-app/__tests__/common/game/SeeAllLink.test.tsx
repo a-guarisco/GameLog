@@ -29,4 +29,12 @@ describe('SeeAllLink', () => {
     expect(screen.getByTestId('see-all').props.accessibilityRole).toBe('button');
     expect(screen.getByTestId('see-all').props.accessibilityLabel).toBe('See all 12 achievements');
   });
+
+  it('renders correctly in dark mode', () => {
+    const ReactNative = require('react-native');
+    jest.spyOn(ReactNative, 'useColorScheme').mockReturnValueOnce('dark');
+    render(<SeeAllLink label="See all" onPress={jest.fn()} />);
+    expect(screen.getByText('See all')).toBeTruthy();
+  });
 });
+

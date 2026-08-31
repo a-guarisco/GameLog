@@ -54,4 +54,10 @@ describe('HeaderGameImage', () => {
 
     expect(banner.props.accessibilityLabel).toContain('-140-18');
   });
+
+  it('renders without appid', () => {
+    render(<HeaderGameImage />);
+    expect(screen.getByTestId('banner')).toBeTruthy();
+  });
 });
+

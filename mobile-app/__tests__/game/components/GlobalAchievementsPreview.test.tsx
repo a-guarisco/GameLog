@@ -81,6 +81,7 @@ describe('GlobalAchievementsPreview', () => {
     render(<GlobalAchievementsPreview gameID={'123'} playerID="player1" />);
 
     await waitFor(() => {
+      expect(screen.getByText('Ach 1')).toBeTruthy();
       expect(screen.getByText('See more')).toBeTruthy();
     });
 
@@ -90,6 +91,8 @@ describe('GlobalAchievementsPreview', () => {
       globalAchievements: mockData,
       gameID: '123',
       playerID: 'player1',
+      gameItem: undefined,
     });
   });
 });
+
