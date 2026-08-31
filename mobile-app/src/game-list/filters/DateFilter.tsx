@@ -5,6 +5,8 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { METRICS } from '@gamelog/theme/metrics';
+import { DateSelectorText } from '@gamelog/common/typography/CardTypography';
 import { FilterChip } from './FilterChip';
 import { FilterModalWrapper } from './FilterModalWrapper';
 import { DateRange } from '../useGameList';
@@ -40,6 +42,10 @@ export const DateFilter = ({ dateRangeFilter, setDateRangeFilter }: DateFilterPr
         value={dateRangeFilter.from || dateRangeFilter.to ? 'Custom' : 'All'}
         onPress={() => setIsOpen(true)}
         isActive={!!(dateRangeFilter.from || dateRangeFilter.to)}
+        activeBgClass={METRICS.lastPlayed.bgClass}
+        activeBorderClass={METRICS.lastPlayed.borderClass}
+        activeTextClass={METRICS.lastPlayed.textClass}
+        activeIconColor={METRICS.lastPlayed.hex}
       />
 
       <FilterModalWrapper
@@ -48,29 +54,31 @@ export const DateFilter = ({ dateRangeFilter, setDateRangeFilter }: DateFilterPr
         title="Filter by Date Range"
       >
         <VStack space="lg" className="pb-8">
-          <HStack space="md" className="items-center">
-            <Text className="w-16 font-medium">From:</Text>
-            <Pressable
-              className="flex-1 border border-outline-300 p-3 rounded-md"
-              onPress={() => setShowStartPicker(true)}
-            >
-              <Text>{tempStart ? tempStart.toLocaleDateString() : 'Select Start Date'}</Text>
-            </Pressable>
+          <HStack className="justify-between items-center px-4 mt-2">
+            <VStack space="xs" className="items-center flex-1">
+              <Text size="xs" className="font-medium text-typography-400">
+                From
+              </Text>
+              <Pressable onPress={() => setShowStartPicker(true)} hitSlop={12}>
+                <DateSelectorText>{tempStart ? tempStart.toLocaleDateString() : 'Select Date'}</DateSelectorText>
+              </Pressable>
+            </VStack>
+
+            <VStack space="xs" className="items-center flex-1">
+              <Text size="xs" className="font-medium text-typography-400">
+                To
+              </Text>
+              <Pressable onPress={() => setShowEndPicker(true)} hitSlop={12}>
+                <DateSelectorText>{tempEnd ? tempEnd.toLocaleDateString() : 'Select Date'}</DateSelectorText>
+              </Pressable>
+            </VStack>
           </HStack>
-          <HStack space="md" className="items-center">
-            <Text className="w-16 font-medium">To:</Text>
-            <Pressable
-              className="flex-1 border border-outline-300 p-3 rounded-md"
-              onPress={() => setShowEndPicker(true)}
-            >
-              <Text>{tempEnd ? tempEnd.toLocaleDateString() : 'Select End Date'}</Text>
-            </Pressable>
-          </HStack>
-          <HStack space="md" className="mt-4">
-            <Button variant="outline" className="flex-1" onPress={clearDateFilter}>
+          
+          <HStack space="md" className="mt-6">
+            <Button className="flex-1" isOnCard onPress={clearDateFilter}>
               <ButtonText>Clear</ButtonText>
             </Button>
-            <Button className="flex-1" onPress={applyDateFilter}>
+            <Button className="flex-1" isOnCard onPress={applyDateFilter}>
               <ButtonText>Apply</ButtonText>
             </Button>
           </HStack>
