@@ -7,17 +7,19 @@ import { Image } from '@gamelog/common/gluestack/image';
 import { Card } from '@gamelog/common/gluestack/card';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { PLATFORMS } from '@gamelog/common/charts/platform-split/selectPlatformSplit';
-import { GameListItemData } from './useGameList';
+import { GameListItemData, SortBy, PlatformFilter } from './useGameList';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GameListCardBadges } from './GameListCardBadges';
 import { GameListCardExpandedDetails } from './GameListCardExpandedDetails';
 
 interface GameListCardProps {
   gameItem: GameListItemData;
+  sortBy: SortBy;
+  platformFilter: PlatformFilter;
   onPress?: () => void;
 }
 
-export const GameListCard = ({ gameItem, onPress }: GameListCardProps) => {
+export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: GameListCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const headerUrl = steamAssetUrls.getGameHeaderImage(gameItem.appid);
   const logoUrl = steamAssetUrls.getGameClearLogoImage(gameItem.appid);
@@ -90,6 +92,9 @@ export const GameListCard = ({ gameItem, onPress }: GameListCardProps) => {
             gameItem={gameItem} 
             topPlatform={topPlatform} 
             lastPlayedText={lastPlayedText} 
+            isExpanded={isExpanded}
+            sortBy={sortBy}
+            platformFilter={platformFilter}
           />
         </VStack>
       </Pressable>
@@ -108,6 +113,7 @@ export const GameListCard = ({ gameItem, onPress }: GameListCardProps) => {
           gameItem={gameItem} 
           exactDateString={exactDateString} 
           platforms={platforms} 
+          lastPlayedText={lastPlayedText}
         />
       )}
     </Card>

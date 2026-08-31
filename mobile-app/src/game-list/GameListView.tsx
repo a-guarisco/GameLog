@@ -68,6 +68,8 @@ const GameListView = () => {
             <Box className={isLandscape ? 'w-1/3 p-1' : 'w-1/2 p-1'}>
               <GameListCard
                 gameItem={item}
+                sortBy={sortBy}
+                platformFilter={platformFilter}
                 onPress={() => navigation.navigate('Game', { gameItem: item })}
               />
             </Box>

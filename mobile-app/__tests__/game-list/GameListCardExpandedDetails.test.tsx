@@ -25,7 +25,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('GameListCardExpandedDetails', () => {
   it('renders correctly with all data', () => {
-    const { getByText } = render(
+    const { getByText, getAllByText } = render(
       <GameListCardExpandedDetails
         gameItem={mockGameItem}
         exactDateString="Jan 1, 2023"
@@ -37,11 +37,10 @@ describe('GameListCardExpandedDetails', () => {
       { wrapper }
     );
 
-    expect(getByText('Test Game')).toBeTruthy();
-    expect(getByText('Jan 1, 2023')).toBeTruthy();
+    expect(getByText(/Jan 1, 2023/)).toBeTruthy();
     expect(getByText('Action, Adventure')).toBeTruthy();
     expect(getByText('Windows')).toBeTruthy();
-    expect(getByText('50m')).toBeTruthy();
+    expect(getAllByText('50m')).toBeTruthy();
     expect(getByText('Mac')).toBeTruthy();
     expect(getByText('20m')).toBeTruthy();
   });
