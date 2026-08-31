@@ -126,19 +126,16 @@ const CommunityTopGamesHistogramChart = ({
             <VStack className="w-full px-0 mb-1" space="xs">
               <HStack className="w-full justify-between items-center flex-wrap">
                 {/* Left: Reference segmented pill ("Others" / "You") with equal button dimensions */}
-                <HStack className="w-[170px] items-center rounded-full border border-outline-300 overflow-hidden">
+                <HStack className="w-[130px] items-center rounded-full border border-outline-300 overflow-hidden">
                   <Pressable
                     onPress={() => setReference('community')}
                     testID="community-top-games-reference-community"
-                    className={`flex-1 py-1.5 flex-row items-center justify-center border-r border-outline-300 ${
+                    className={`flex-1 py-1 flex-row items-center justify-center border-r border-outline-300 ${
                       reference === 'community' ? 'bg-purple-500/20' : 'bg-transparent'
                     }`}
                   >
-                    {reference === 'community' && (
-                      <Icon as={CheckIcon} className="text-purple-500 mr-1" size="2xs" />
-                    )}
                     <Text
-                      size="sm"
+                      size="xs"
                       className={
                         reference === 'community'
                           ? 'text-typography-0 font-bold'
@@ -152,15 +149,12 @@ const CommunityTopGamesHistogramChart = ({
                   <Pressable
                     onPress={() => setReference('user')}
                     testID="community-top-games-reference-user"
-                    className={`flex-1 py-1.5 flex-row items-center justify-center ${
+                    className={`flex-1 py-1 flex-row items-center justify-center ${
                       reference === 'user' ? 'bg-primary-500/20' : 'bg-transparent'
                     }`}
                   >
-                    {reference === 'user' && (
-                      <Icon as={CheckIcon} className="text-primary-500 mr-1" size="2xs" />
-                    )}
                     <Text
-                      size="sm"
+                      size="xs"
                       className={
                         reference === 'user'
                           ? 'text-typography-0 font-bold'
