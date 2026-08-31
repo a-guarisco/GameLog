@@ -117,3 +117,21 @@ async def update_game_status(
     game_service.update_game_status(session=db, user_id=auth_user.uid, steam_app_id=payload.app_id, status=payload.status)
     return {"message": "Game status updated successfully"}
 
+
+
+@router.post(
+    "/genres_batch",
+    summary="Get all genres for a list of app_ids",
+    status_code=200,
+)
+def get_genres_batch(
+    app_ids: list[str],
+    db: Session = Depends(get_db),
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+) -> dict[str, list[str]]:
+    """
+    Returns a mapping of steam_app_id to a list of genre descriptions for the requested app_ids.
+    """
+    if len(app_ids) > 1000:
+        raise HTTPException(status_code=400, detail="Too many app_ids requested. Max 1000.")
+    return game_service.get_genres_for_apps(session=db, app_ids=app_ids)
