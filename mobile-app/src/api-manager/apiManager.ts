@@ -146,6 +146,13 @@ export default {
   getGameStatus: (steamAppId: string) =>
     fetchAuthenticatedData<GameStatus>(EndPoints.getGameStatus(steamAppId)),
 
+  updateGameStatus: (appId: string, status: GameStatus) =>
+    fetchAuthenticatedData<{ message: string }>(EndPoints.updateGameStatus(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_id: appId, status }),
+    }),
+
   getUserGameStatuses: () =>
     fetchAuthenticatedData<GameStatusesResponse[]>(EndPoints.getGameStatus()),
 

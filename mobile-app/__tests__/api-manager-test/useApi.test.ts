@@ -14,8 +14,9 @@ import {
   useGetPlaytimeByUser,
   useGetUserGameStatuses,
   useGetGameStatus,
+  useUpdateGameStatus,
 } from '@gamelog/api-manager/useApi';
-import { renderHook } from '@testing-library/react-native';
+import { renderHook, act } from '@testing-library/react-native';
 
 
 jest.mock('@gamelog/api-manager/apiManager');
@@ -457,6 +458,58 @@ describe('useGetGameStatus', () => {
       error: 'errorGameStatus',
     },
     mockData: 'playing',
+  });
+});
+
+describe('useUpdateGameStatus', () => {
+  it('calls ApiManager.updateGameStatus and manages loading/error state', async () => {
+    mockApiManager.updateGameStatus.mockResolvedValueOnce({ message: 'Success' });
+    const { result } = renderHook(() => useUpdateGameStatus());
+
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBeNull();
+
+    let response: any;
+    await act(async () => {
+      response = await result.current.updateGameStatus('730', 'to_be_played');
+    });
+
+    expect(response).toEqual({ message: 'Success' });
+    expect(mockApiManager.updateGameStatus).toHaveBeenCalledWith('730', 'to_be_played');
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBeNull();
+  });
+
+  it('handles errors when updateGameStatus fails', async () => {
+    mockApiManager.updateGameStatus.mockRejectedValueOnce(new Error('Update failed'));
+    const { result } = renderHook(() => useUpdateGameStatus());
+
+    await act(async () => {
+      try {
+        await result.current.updateGameStatus('730', 'to_be_played');
+      } catch (e) {
+        // Expected error
+      }
+    });
+
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBe('Update failed');
+  });
+
+  it('handles generic error objects without message', async () => {
+    mockApiManager.updateGameStatus.mockRejectedValueOnce({});
+    const { result } = renderHook(() => useUpdateGameStatus());
+
+    await act(async () => {
+      try {
+        await result.current.updateGameStatus('730', 'to_be_played');
+      } catch (e) {
+        // Expected error
+      }
+    });
+
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBe('Failed to update game status');
   });
 });
 
