@@ -175,13 +175,13 @@ describe('useGameList hook', () => {
       isLoadingOwnedGames: false,
     });
     mockUseGetUserGameStatuses.mockReturnValue({
-      userGameStatuses: { '1': 'playing', '2': 'played' },
+      userGameStatuses: { '1': 'playing', '2': 'platinato' },
       isLoadingUserGameStatuses: false,
     });
 
     const { result } = renderHook(() => useGameList('123'));
     // Half-Life (appid 2, playtime 500) is sorted first, Portal (appid 1, playtime 100) is second
-    expect(result.current.processedGames[0].gameStatus).toBe('played');
+    expect(result.current.processedGames[0].gameStatus).toBe('platinato');
     expect(result.current.processedGames[1].gameStatus).toBe('playing');
   });
 

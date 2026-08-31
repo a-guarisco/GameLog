@@ -54,7 +54,6 @@ describe('StatusFilter', () => {
     expect(getByText('Playing')).toBeTruthy();
     expect(getByText('To Be Played')).toBeTruthy();
     expect(getByText('Shelved')).toBeTruthy();
-    expect(getByText('Played')).toBeTruthy();
     expect(getByText('Platinato')).toBeTruthy();
     expect(getByText('No Status')).toBeTruthy();
 

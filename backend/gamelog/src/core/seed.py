@@ -295,7 +295,7 @@ def _shelvings() -> list[Shelving]:
         Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_GTAV_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_ELDEN_RING_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=DEMO_USER_2_ID, game_id=DEMO_GAME_DOTA_ID, status=GameStatus.SHELVED),
-        Shelving(owner_id=DEMO_USER_3_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYED),
+        Shelving(owner_id=DEMO_USER_3_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=DEMO_USER_4_ID, game_id=DEMO_GAME_RDR2_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_DONT_STARVE_ID, status=GameStatus.PLAYING),
         Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_MOTOGP_ID, status=GameStatus.PLAYING),
