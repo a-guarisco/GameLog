@@ -21,7 +21,7 @@ import LoginScreen from '@gamelog/onboarding/LoginScreen';
 import ProfileSetupScreen from '@gamelog/onboarding/ProfileSetupScreen';
 import UnverifiedScreen from '@gamelog/onboarding/UnverifiedScreen';
 
-import { Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AdaptiveTabBar } from '@gamelog/common/AdaptiveTabBar';
 
 export const GameListStack = createNativeStackNavigator({
@@ -29,8 +29,7 @@ export const GameListStack = createNativeStackNavigator({
     HomePage: {
       screen: GameListView,
       options: {
-        title: 'Game List',
-        headerShown: true,
+        header: () => <SafeAreaView edges={['top']} className="bg-background-0" />,
       },
     },
     Game: {
