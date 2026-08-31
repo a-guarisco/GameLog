@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Image, Pressable, Linking } from 'react-native';
+import { Pressable, Linking } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -11,7 +11,6 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { useGetFriendRecommendations, useGetFriendList } from '@gamelog/api-manager/useApi';
-import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
@@ -22,6 +21,7 @@ import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { PageTitle } from '@gamelog/common/typography/CommonTypography';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
+import CompactGameList from '@gamelog/common/CompactGameList';
 import { selectAcceptedFriends } from './friendListSelectors';
 import { UserAvatar } from '../user-card/UserAvatar';
 
@@ -37,8 +37,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const route = useRoute<any>();
 
-  const initialFriend: UserSearchResult | undefined =
-    propFriendItem || route.params?.friendItem;
+  const initialFriend: UserSearchResult | undefined = propFriendItem || route.params?.friendItem;
 
   const [activeFriend, setActiveFriend] = useState<UserSearchResult | undefined>(initialFriend);
   const [isSelectingFriend, setIsSelectingFriend] = useState<boolean>(!initialFriend);
@@ -279,12 +278,9 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
       );
     }
 
-    const hasCommonGenres =
-      recommendations?.common_genres && recommendations.common_genres.length > 0;
-    const hasCommonGames =
-      recommendations?.common_games && recommendations.common_games.length > 0;
-    const hasTopGames =
-      recommendations?.top_games && recommendations.top_games.length > 0;
+    const hasCommonGenres = Boolean(recommendations?.common_genres?.length);
+    const hasCommonGames = Boolean(recommendations?.common_games?.length);
+    const hasTopGames = Boolean(recommendations?.top_games?.length);
 
     if (!recommendations || (!hasCommonGenres && !hasCommonGames && !hasTopGames)) {
       return (
@@ -317,80 +313,51 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
         {/* Common Games Played */}
         {hasCommonGames && (
           <SectionCard label={`Common Games Played (${recommendations.common_games.length})`}>
-            <VStack space="sm" className="pt-1">
-              {recommendations.common_games.map((cg, idx) => (
-                <Pressable
-                  key={idx}
-                  onPress={() => handleGamePress(cg.gameSteamId, cg.requester_play_time)}
-                  testID={`common-game-item-${cg.gameSteamId}`}
-                >
-                  <Card variant="elevated" className="p-2.5 bg-background-50 border border-outline-100">
-                    <HStack space="md" className="items-center">
-                      <Image
-                        source={{ uri: steamAssetUrls.getGameCapsuleImage(cg.gameSteamId) }}
-                        className="w-16 h-12 rounded-md bg-background-300 shrink-0"
-                        resizeMode="cover"
-                      />
-                      <VStack className="flex-1">
-                        <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
-                          {gameNames[cg.gameSteamId] || `App ID: ${cg.gameSteamId}`}
-                        </Text>
-                        <HStack space="md" className="mt-1">
-                          <Text size="xs" className="font-medium text-typography-400">
-                            You:{' '}
-                            <Text size="xs" className="font-bold text-success-700">
-                              {formatHours(cg.requester_play_time)}
-                            </Text>
-                          </Text>
-                          <Text size="xs" className="font-medium text-typography-400">
-                            {friendName}:{' '}
-                            <Text size="xs" className="font-bold text-warning-700">
-                              {formatHours(cg.friend_play_time)}
-                            </Text>
-                          </Text>
-                        </HStack>
-                      </VStack>
-                    </HStack>
-                  </Card>
-                </Pressable>
-              ))}
-            </VStack>
+            <CompactGameList
+              items={recommendations.common_games.map((cg) => ({
+                app_id: cg.gameSteamId,
+                today_play_time: cg.requester_play_time,
+                detail_rows: [
+                  {
+                    label: 'You:',
+                    value: formatHours(cg.requester_play_time),
+                    valueClassName: 'text-success-700',
+                  },
+                  {
+                    label: `${friendName}:`,
+                    value: formatHours(cg.friend_play_time),
+                    valueClassName: 'text-warning-700',
+                  },
+                ],
+              }))}
+              gameNames={gameNames}
+              handleGamePress={(appId, playTime) => handleGamePress(appId, playTime)}
+            />
           </SectionCard>
         )}
 
         {/* Recommended Top Games */}
         {hasTopGames && (
           <SectionCard label={`Recommended Top Games (${recommendations.top_games.length})`}>
-            <VStack space="sm" className="pt-1">
-              {recommendations.top_games.map((tg, idx) => (
-                <Pressable
-                  key={idx}
-                  onPress={() =>
-                    Linking.openURL(`https://store.steampowered.com/app/${tg.gameSteamId}`)
-                  }
-                >
-                  <Card variant="elevated" className="p-2.5 bg-background-50 border border-outline-100">
-                    <HStack space="md" className="items-center">
-                      <Image
-                        source={{ uri: steamAssetUrls.getGameCapsuleImage(tg.gameSteamId) }}
-                        className="w-16 h-12 rounded-md bg-background-300 shrink-0"
-                        resizeMode="cover"
-                      />
-                      <VStack className="flex-1">
-                        <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
-                          {gameNames[tg.gameSteamId] || `App ID: ${tg.gameSteamId}`}
-                        </Text>
-                        {tg.keys && tg.keys.length > 0 && (
-                          <Text size="xs" className="text-typography-400 mt-1" numberOfLines={1}>
-                            {tg.keys.map((k) => k.description || k.id).join(' · ')}
-                          </Text>
-                        )}
-                      </VStack>
-                    </HStack>
-                  </Card>
-                </Pressable>
-              ))}
-            </VStack>
+            <CompactGameList
+              items={recommendations.top_games.map((tg) => ({
+                app_id: tg.gameSteamId,
+                detail_rows:
+                  tg.keys && tg.keys.length > 0
+                    ? [
+                        {
+                          label: 'Tags:',
+                          value: tg.keys.map((k) => k.description || k.id).join(' · '),
+                          valueClassName: 'text-typography-100',
+                        },
+                      ]
+                    : [],
+              }))}
+              gameNames={gameNames}
+              handleGamePress={(appId) =>
+                Linking.openURL(`https://store.steampowered.com/app/${appId}`)
+              }
+            />
           </SectionCard>
         )}
       </VStack>
@@ -456,7 +423,9 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
           </Box>
         )}
 
-        {isSelectingFriend || !activeFriend ? renderFriendSearcher() : renderRecommendationsContent()}
+        {isSelectingFriend || !activeFriend
+          ? renderFriendSearcher()
+          : renderRecommendationsContent()}
       </ScrollablePage>
 
       <BackButton onPress={handleBack} testID="recommendations-back-btn" />

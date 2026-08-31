@@ -8,7 +8,7 @@ import { DateRangeText } from '@gamelog/common/typography/CardTypography';
 import { formatMinutesToHoursShort, formatThousands } from '@gamelog/utils/formatUtils';
 import ExpandToggle from '@gamelog/common/ExpandToggle';
 import { GLSegmentedControl } from '@gamelog/common/GLSegmentedControl';
-import ReportGameList from './ReportGameList';
+import CompactGameList from '@gamelog/common/CompactGameList';
 
 interface ReportResultsCardProps {
   report: any; // Ideally import DailyReport
@@ -40,13 +40,14 @@ const ReportResultsCard = ({
           <InfoBox message="No games played in this period." className="mt-2" />
         ) : summary ? (
           <VStack space="sm">
-            <DateRangeText className="text-center mb-1">
-              {summary.rangeText}
-            </DateRangeText>
-            
+            <DateRangeText className="text-center mb-1">{summary.rangeText}</DateRangeText>
+
             <HStack space="sm" className="justify-between">
               <VStack className="flex-1 items-center">
-                <Text size="xs" className="text-typography-300 font-medium uppercase tracking-widest text-center">
+                <Text
+                  size="xs"
+                  className="text-typography-300 font-medium uppercase tracking-widest text-center"
+                >
                   Playtime
                 </Text>
                 <Text size="xl" className="font-bold text-typography-0 mt-0.5 text-center">
@@ -54,7 +55,10 @@ const ReportResultsCard = ({
                 </Text>
               </VStack>
               <VStack className="flex-1 items-center">
-                <Text size="xs" className="text-typography-300 font-medium uppercase tracking-widest text-center">
+                <Text
+                  size="xs"
+                  className="text-typography-300 font-medium uppercase tracking-widest text-center"
+                >
                   Games
                 </Text>
                 <Text size="xl" className="font-bold text-typography-0 mt-0.5 text-center">
@@ -62,7 +66,10 @@ const ReportResultsCard = ({
                 </Text>
               </VStack>
               <VStack className="flex-1 items-center">
-                <Text size="xs" className="text-typography-300 font-medium uppercase tracking-widest text-center">
+                <Text
+                  size="xs"
+                  className="text-typography-300 font-medium uppercase tracking-widest text-center"
+                >
                   Max / Day
                 </Text>
                 <Text size="xl" className="font-bold text-typography-0 mt-0.5 text-center">
@@ -72,10 +79,17 @@ const ReportResultsCard = ({
             </HStack>
 
             <VStack className="items-center mt-1">
-              <Text size="xs" className="text-typography-300 font-medium uppercase tracking-widest text-center">
+              <Text
+                size="xs"
+                className="text-typography-300 font-medium uppercase tracking-widest text-center"
+              >
                 Top Game
               </Text>
-              <Text size="lg" className="font-bold text-typography-0 mt-0.5 text-center" numberOfLines={1}>
+              <Text
+                size="lg"
+                className="font-bold text-typography-0 mt-0.5 text-center"
+                numberOfLines={1}
+              >
                 {summary.topGameName}
               </Text>
             </VStack>
@@ -101,7 +115,7 @@ const ReportResultsCard = ({
                   onSelect={(id) => setSortOrder(id as any)}
                   className="mb-2"
                 />
-                <ReportGameList
+                <CompactGameList
                   sortedGameReports={sortedGameReports}
                   gameNames={gameNames}
                   handleGamePress={handleGamePress}
