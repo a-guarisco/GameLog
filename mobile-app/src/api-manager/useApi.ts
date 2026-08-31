@@ -167,9 +167,18 @@ export const useGetGameGenreChartData = (
 };
 
 export const useGetGenresBatch = (appIds: string[]) => {
-  const fetchFunc = useCallback(() => {
-    if (!appIds || appIds.length === 0) return Promise.resolve({});
-    return ApiManager.getGenresBatch(appIds);
+  const fetchFunc = useCallback(async () => {
+    if (!appIds || appIds.length === 0) return {};
+    const res = await ApiManager.getGenresBatch(appIds);
+    if (!res) return {};
+    if (Array.isArray(res)) {
+      const map: Record<string, string[]> = {};
+      for (const item of res) {
+        map[item.app_id] = item.genres;
+      }
+      return map;
+    }
+    return res;
   }, [appIds]);
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
