@@ -12,7 +12,7 @@ export interface ProfileVSpaceOptions {
 export const calculateProfileVSpace = ({
   bannerHeight,
   insetsTop,
-  identityOffset = 70,
+  identityOffset = 80,
   avatarOverlap = 48,
   safeMargin = 8,
 }: ProfileVSpaceOptions) => {
