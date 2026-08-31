@@ -2,6 +2,7 @@ import type { PlaytimeByUser, GamePlaytime } from '@gamelog/api-manager/dto';
 import { formatMinutesToHours, toIsoDate } from '@gamelog/utils/formatUtils';
 import { tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
+import { CHART_PALETTE } from '@gamelog/theme/metrics';
 
 const WEEKDAY_INITIALS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const WEEKDAY_NAMES = [
@@ -47,13 +48,14 @@ export interface PlaytimeTrend {
   previousTotalMinutes: number;
 }
 
+// Chart palette colors
 const STACK_PALETTE = [
-  parseRGB(tailwindColors.blue[600]),
-  parseRGB(tailwindColors.violet[600]),
-  parseRGB(tailwindColors.fuchsia[600]),
-  parseRGB(tailwindColors.orange[600]),
-  parseRGB(tailwindColors.lime[600]),
-  parseRGB(tailwindColors.emerald[600]),
+  CHART_PALETTE[0],
+  CHART_PALETTE[1],
+  CHART_PALETTE[2],
+  CHART_PALETTE[3],
+  CHART_PALETTE[4],
+  CHART_PALETTE[5],
 ];
 const STACK_OTHER_COLOR = parseRGB(tailwindColors.zinc[600]);
 
