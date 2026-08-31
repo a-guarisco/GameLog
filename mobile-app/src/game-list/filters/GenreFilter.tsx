@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, Pressable } from 'react-native';
+import { METRICS } from '@gamelog/theme/metrics';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { ModalOptionText } from '@gamelog/common/CommonTypography';
 import { FilterChip } from './FilterChip';
@@ -22,9 +23,13 @@ export const GenreFilter = ({
     <>
       <FilterChip
         label="Genre"
-        value={genreFilter}
+        value={genreFilter === 'All' ? 'All' : genreFilter}
         onPress={() => setIsOpen(true)}
         isActive={genreFilter !== 'All'}
+        activeBgClass={METRICS.genre.bgClass}
+        activeBorderClass={METRICS.genre.borderClass}
+        activeTextClass={METRICS.genre.textClass}
+        activeIconColor={METRICS.genre.hex}
       />
 
       <FilterModalWrapper
