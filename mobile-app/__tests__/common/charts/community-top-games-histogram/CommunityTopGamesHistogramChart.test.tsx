@@ -102,6 +102,40 @@ describe('CommunityTopGamesHistogramChart', () => {
     });
   });
 
+  it('switches between Others and You reference options and re-orders bars', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([
+      { id: '1245620', user_playtime: 14.333, community_playtime: 8.75 },
+    ]);
+    (ApiManager.getGameBasicInfo as jest.Mock).mockResolvedValue({
+      '1245620': { data: { name: 'Elden Ring' } },
+    });
+
+    render(<CommunityTopGamesHistogramChart scope="global" />);
+
+    await waitFor(() => {
+      expect(ApiManager.getCommunityWeeklyTopGames).toHaveBeenCalledWith(
+        'global',
+        expect.any(String),
+        expect.any(String),
+        'community'
+      );
+      expect(screen.getByTestId('community-bar-1245620')).toBeTruthy();
+      expect(screen.getByTestId('user-bar-1245620')).toBeTruthy();
+    });
+
+    // Toggle to 'You' (user reference)
+    fireEvent.press(screen.getByTestId('community-top-games-reference-user'));
+
+    await waitFor(() => {
+      expect(ApiManager.getCommunityWeeklyTopGames).toHaveBeenCalledWith(
+        'global',
+        expect.any(String),
+        expect.any(String),
+        'user'
+      );
+    });
+  });
+
   it('renders empty state when no data is returned', async () => {
     (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
 

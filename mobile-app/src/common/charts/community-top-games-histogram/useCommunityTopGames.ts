@@ -7,11 +7,12 @@ import {
   CommunityPeriodRange,
   CommunityDateRangeInfo,
 } from '@gamelog/common/charts/community-playtime-histogram/useCommunityPlaytime';
-import type { CommunityTopGame, CommunityScope } from '@gamelog/api-manager/dto';
+import type { CommunityTopGame, CommunityScope, TopGameReference } from '@gamelog/api-manager/dto';
 
 export interface UseCommunityTopGamesProps {
   scope: CommunityScope;
   periodRange: CommunityPeriodRange;
+  reference?: TopGameReference;
   offset: number;
   currentDate?: Date;
 }
@@ -19,6 +20,7 @@ export interface UseCommunityTopGamesProps {
 export const useCommunityTopGames = ({
   scope,
   periodRange,
+  reference = 'community',
   offset,
   currentDate = new Date(),
 }: UseCommunityTopGamesProps) => {
@@ -34,15 +36,17 @@ export const useCommunityTopGames = ({
       return ApiManager.getCommunityWeeklyTopGames(
         scope,
         dateRangeInfo.startDate,
-        dateRangeInfo.endDate
+        dateRangeInfo.endDate,
+        reference
       );
     }
     return ApiManager.getCommunityMonthlyTopGames(
       scope,
       dateRangeInfo.startDate,
-      dateRangeInfo.endDate
+      dateRangeInfo.endDate,
+      reference
     );
-  }, [scope, periodRange, dateRangeInfo.startDate, dateRangeInfo.endDate]);
+  }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate]);
 
   const { data, isLoading, error, errorMessage, refetch } =
     useAsyncFetch<CommunityTopGame[]>(fetchFunc);

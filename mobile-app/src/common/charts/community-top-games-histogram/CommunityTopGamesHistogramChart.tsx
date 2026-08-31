@@ -4,7 +4,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Icon, ChevronLeftIcon, ChevronRightIcon } from '@gamelog/common/gluestack/icon';
+import { Icon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from '@gamelog/common/gluestack/icon';
 import { WarningBox } from '@gamelog/common/feedbacks';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
@@ -13,9 +13,12 @@ import { ChartDateRangeText } from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { useCommunityTopGames } from './useCommunityTopGames';
-import { useCommunityTopGamesHistogramData } from './useCommunityTopGamesHistogramData';
+import {
+  useCommunityTopGamesHistogramData,
+  TopGameDisplayItem,
+} from './useCommunityTopGamesHistogramData';
 import type { CommunityPeriodRange } from '@gamelog/common/charts/community-playtime-histogram/useCommunityPlaytime';
-import type { CommunityScope, OwnedGames } from '@gamelog/api-manager/dto';
+import type { CommunityScope, OwnedGames, TopGameReference } from '@gamelog/api-manager/dto';
 
 const RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
   { id: 'week', label: '1W', testID: 'community-top-games-range-week' },
@@ -32,11 +35,13 @@ const CommunityTopGamesHistogramChart = ({
   ownedGames,
 }: CommunityTopGamesHistogramChartProps) => {
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
+  const [reference, setReference] = useState<TopGameReference>('community');
   const [offset, setOffset] = useState<number>(0);
 
   const { data, isLoading, error, errorMessage, dateRangeInfo } = useCommunityTopGames({
     scope,
     periodRange,
+    reference,
     offset,
   });
 
@@ -52,6 +57,42 @@ const CommunityTopGamesHistogramChart = ({
         className="w-full"
       />
     </Box>
+  );
+
+  const renderUserBar = (item: TopGameDisplayItem) => (
+    <HStack key="user" className="w-full items-center" space="md">
+      <Box className="flex-1 flex-row items-center h-1.5">
+        <Box
+          className="h-1.5 rounded-full bg-primary-400"
+          style={{
+            width: `${item.userPlaytime > 0 ? Math.max(1, item.userPercent) : 0}%`,
+            opacity: item.userPlaytime > 0 ? 1 : 0,
+          }}
+          testID={`user-bar-${item.id}`}
+        />
+      </Box>
+      <Text size="sm" className="font-bold text-typography-0 w-16 text-right">
+        {item.userFormatted}
+      </Text>
+    </HStack>
+  );
+
+  const renderCommunityBar = (item: TopGameDisplayItem) => (
+    <HStack key="community" className="w-full items-center" space="md">
+      <Box className="flex-1 flex-row items-center h-1.5">
+        <Box
+          className="h-1.5 rounded-full bg-purple-500"
+          style={{
+            width: `${item.communityPlaytime > 0 ? Math.max(1, item.communityPercent) : 0}%`,
+            opacity: item.communityPlaytime > 0 ? 1 : 0,
+          }}
+          testID={`community-bar-${item.id}`}
+        />
+      </Box>
+      <Text size="sm" className="font-bold text-typography-0 w-16 text-right">
+        {item.communityFormatted}
+      </Text>
+    </HStack>
   );
 
   return (
@@ -81,32 +122,84 @@ const CommunityTopGamesHistogramChart = ({
 
         return (
           <VStack space="md" className="w-full">
-            {/* Centered Date range navigation */}
-            <HStack space="xs" className="w-full items-center justify-center -mt-1 mb-1">
-              <Pressable
-                onPress={() => setOffset((prev) => prev - 1)}
-                className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
-                accessibilityLabel="Previous period"
-                testID="community-top-games-prev"
-              >
-                <Icon as={ChevronLeftIcon} className="text-typography-500" />
-              </Pressable>
+            {/* Header controls row with Reference Filter Buttons on left and Date navigation on right */}
+            <VStack className="w-full px-0 mb-1" space="xs">
+              <HStack className="w-full justify-between items-center flex-wrap">
+                {/* Left: Reference segmented pill ("Others" / "You") with equal button dimensions */}
+                <HStack className="w-[170px] items-center rounded-full border border-outline-300 overflow-hidden">
+                  <Pressable
+                    onPress={() => setReference('community')}
+                    testID="community-top-games-reference-community"
+                    className={`flex-1 py-1.5 flex-row items-center justify-center border-r border-outline-300 ${
+                      reference === 'community' ? 'bg-purple-500/20' : 'bg-transparent'
+                    }`}
+                  >
+                    {reference === 'community' && (
+                      <Icon as={CheckIcon} className="text-purple-500 mr-1" size="2xs" />
+                    )}
+                    <Text
+                      size="sm"
+                      className={
+                        reference === 'community'
+                          ? 'text-typography-0 font-bold'
+                          : 'text-typography-300 font-medium'
+                      }
+                    >
+                      Others
+                    </Text>
+                  </Pressable>
 
-              <ChartDateRangeText>
-                {formatShortDate(startTimestamp)} - {formatShortDate(endTimestamp)}
-              </ChartDateRangeText>
+                  <Pressable
+                    onPress={() => setReference('user')}
+                    testID="community-top-games-reference-user"
+                    className={`flex-1 py-1.5 flex-row items-center justify-center ${
+                      reference === 'user' ? 'bg-primary-500/20' : 'bg-transparent'
+                    }`}
+                  >
+                    {reference === 'user' && (
+                      <Icon as={CheckIcon} className="text-primary-500 mr-1" size="2xs" />
+                    )}
+                    <Text
+                      size="sm"
+                      className={
+                        reference === 'user'
+                          ? 'text-typography-0 font-bold'
+                          : 'text-typography-300 font-medium'
+                      }
+                    >
+                      You
+                    </Text>
+                  </Pressable>
+                </HStack>
 
-              <Pressable
-                onPress={() => setOffset((prev) => Math.min(0, prev + 1))}
-                disabled={offset >= 0}
-                style={{ opacity: offset >= 0 ? 0.3 : 1 }}
-                className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
-                accessibilityLabel="Next period"
-                testID="community-top-games-next"
-              >
-                <Icon as={ChevronRightIcon} className="text-typography-500" />
-              </Pressable>
-            </HStack>
+                {/* Right: Date navigation positioned below the range selector */}
+                <HStack space="xs" className="items-center -mr-1">
+                  <Pressable
+                    onPress={() => setOffset((prev) => prev - 1)}
+                    className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
+                    accessibilityLabel="Previous period"
+                    testID="community-top-games-prev"
+                  >
+                    <Icon as={ChevronLeftIcon} className="text-typography-500" />
+                  </Pressable>
+
+                  <ChartDateRangeText>
+                    {formatShortDate(startTimestamp)} - {formatShortDate(endTimestamp)}
+                  </ChartDateRangeText>
+
+                  <Pressable
+                    onPress={() => setOffset((prev) => Math.min(0, prev + 1))}
+                    disabled={offset >= 0}
+                    style={{ opacity: offset >= 0 ? 0.3 : 1 }}
+                    className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
+                    accessibilityLabel="Next period"
+                    testID="community-top-games-next"
+                  >
+                    <Icon as={ChevronRightIcon} className="text-typography-500" />
+                  </Pressable>
+                </HStack>
+              </HStack>
+            </VStack>
 
             {/* Content: List of top games or empty state */}
             {!hasData ? (
@@ -118,84 +211,43 @@ const CommunityTopGamesHistogramChart = ({
             ) : (
               <VStack space="md" className="w-full">
                 {topGamesItems.map((item) => (
-                  <VStack
+                  <HStack
                     key={item.id}
-                    space="xs"
-                    className="w-full"
+                    space="md"
+                    className="items-start w-full"
                     testID={`top-game-item-${item.id}`}
                   >
-                    {/* Game Header: Capsule Image + Game Title */}
-                    <HStack space="sm" className="items-center w-full">
-                      <Image
-                        source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
-                        className="w-14 h-7 rounded-md bg-background-200 shrink-0"
-                        resizeMode="cover"
-                        testID={`game-capsule-${item.id}`}
-                      />
+                    {/* Left: Capsule Image with height matching title + 2 bars */}
+                    <Image
+                      source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
+                      style={{ width: 115, height: 68, borderRadius: 6, backgroundColor: '#333' }}
+                      resizeMode="cover"
+                      testID={`game-capsule-${item.id}`}
+                    />
+
+                    {/* Right: Title and Dual Bars */}
+                    <VStack className="flex-1" space="xs">
                       <Text
-                        size="sm"
-                        className="font-bold uppercase text-typography-0 flex-1"
+                        size="md"
+                        className="font-bold text-typography-0"
                         numberOfLines={1}
                       >
                         {item.name}
                       </Text>
-                    </HStack>
 
-                    {/* Bars Container */}
-                    <VStack space="xs" className="w-full pl-1 pr-1">
-                      {/* User Playtime Bar */}
-                      <Box className="w-full flex-row items-center">
-                        <Box
-                          className="h-5 rounded-full bg-primary-500 items-end justify-center px-2"
-                          style={{
-                            width: `${item.userPlaytime > 0 ? Math.max(18, item.userPercent) : 0}%`,
-                            opacity: item.userPlaytime > 0 ? 1 : 0,
-                          }}
-                          testID={`user-bar-${item.id}`}
-                        >
-                          {item.userPlaytime > 0 && (
-                            <Text
-                              className="text-white text-[11px] font-bold"
-                              numberOfLines={1}
-                            >
-                              {item.userFormatted}
-                            </Text>
-                          )}
-                        </Box>
-                        {item.userPlaytime === 0 && (
-                          <Text className="text-typography-400 text-xs font-semibold pl-1">
-                            0m
-                          </Text>
-                        )}
-                      </Box>
-
-                      {/* Community Playtime Bar */}
-                      <Box className="w-full flex-row items-center">
-                        <Box
-                          className="h-5 rounded-full bg-purple-500 items-end justify-center px-2"
-                          style={{
-                            width: `${item.communityPlaytime > 0 ? Math.max(18, item.communityPercent) : 0}%`,
-                            opacity: item.communityPlaytime > 0 ? 1 : 0,
-                          }}
-                          testID={`community-bar-${item.id}`}
-                        >
-                          {item.communityPlaytime > 0 && (
-                            <Text
-                              className="text-white text-[11px] font-bold"
-                              numberOfLines={1}
-                            >
-                              {item.communityFormatted}
-                            </Text>
-                          )}
-                        </Box>
-                        {item.communityPlaytime === 0 && (
-                          <Text className="text-typography-400 text-xs font-semibold pl-1">
-                            0m
-                          </Text>
-                        )}
-                      </Box>
+                      {reference === 'user' ? (
+                        <>
+                          {renderUserBar(item)}
+                          {renderCommunityBar(item)}
+                        </>
+                      ) : (
+                        <>
+                          {renderCommunityBar(item)}
+                          {renderUserBar(item)}
+                        </>
+                      )}
                     </VStack>
-                  </VStack>
+                  </HStack>
                 ))}
               </VStack>
             )}
@@ -223,13 +275,21 @@ const CommunityTopGamesHistogramChart = ({
             </HStack>
 
             <Text size="xs" className="text-typography-300 text-center">
-              Comparing your hours on trending titles with{' '}
-              {scope === 'global'
-                ? 'the global community'
-                : scope === 'region'
-                  ? 'your region'
-                  : 'your friends'}
-              .
+              {reference === 'user'
+                ? `Comparing your top played games against ${
+                    scope === 'global'
+                      ? 'the global community'
+                      : scope === 'region'
+                        ? 'your region'
+                        : 'your friends'
+                  } averages.`
+                : `Comparing community trending titles in ${
+                    scope === 'global'
+                      ? 'the global community'
+                      : scope === 'region'
+                        ? 'your region'
+                        : 'your friends'
+                  } with your playtime.`}
             </Text>
           </VStack>
         );

@@ -17,3 +17,5 @@ export interface CommunityTopGame {
   community_playtime: number;
 }
 
+export type TopGameReference = 'community' | 'user';
+
