@@ -1,7 +1,7 @@
 import { OwnedGames } from '@gamelog/api-manager/dto';
-import { parseRGB } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
-import { tailwindColors } from '@gamelog/theme/theme';
+import { CHART_GRADIENT_PALETTE } from '@gamelog/theme/metrics';
+
 export interface PieData {
   value: number;
   color: string;
@@ -42,22 +42,12 @@ const buildTotalHoursPieData = (
     });
   }
 
-  // A vibrant, highly saturated 6-color palette inspired by the infographic
-  const GRADIENT_PALETTE = [
-    { color: tailwindColors.blue[600], gradient: tailwindColors.blue[400] },
-    { color: tailwindColors.violet[600], gradient: tailwindColors.violet[400] },
-    { color: tailwindColors.fuchsia[600], gradient: tailwindColors.fuchsia[400] },
-    { color: tailwindColors.orange[600], gradient: tailwindColors.orange[400] },
-    { color: tailwindColors.lime[600], gradient: tailwindColors.lime[400] },
-    { color: tailwindColors.emerald[600], gradient: tailwindColors.emerald[400] },
-  ];
-
   const slices: PieData[] = rawSlices.map((slice, i) => {
-    const palette = GRADIENT_PALETTE[i % GRADIENT_PALETTE.length];
+    const palette = CHART_GRADIENT_PALETTE[i % CHART_GRADIENT_PALETTE.length];
     return {
       ...slice,
-      color: parseRGB(palette.color),
-      gradientCenterColor: parseRGB(palette.gradient),
+      color: palette.color,
+      gradientCenterColor: palette.gradient,
     };
   });
 

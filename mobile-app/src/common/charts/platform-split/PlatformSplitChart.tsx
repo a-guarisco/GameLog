@@ -5,17 +5,18 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
+import { CHART_PALETTE } from '@gamelog/theme/metrics';
 import type { PlatformSplit } from './selectPlatformSplit';
 
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 
 const RAMP = [
-  { hex: parseRGB(tailwindColors.blue[600]) },
-  { hex: parseRGB(tailwindColors.violet[600]) },
-  { hex: parseRGB(tailwindColors.fuchsia[600]) },
-  { hex: parseRGB(tailwindColors.orange[600]) },
-  { hex: parseRGB(tailwindColors.lime[600]) },
-  { hex: parseRGB(tailwindColors.emerald[600]) },
+  { hex: CHART_PALETTE[0] },
+  { hex: CHART_PALETTE[1] },
+  { hex: CHART_PALETTE[2] },
+  { hex: CHART_PALETTE[3] },
+  { hex: CHART_PALETTE[4] },
+  { hex: CHART_PALETTE[5] },
 ];
 
 const rampTone = (rank: number) => RAMP[rank % RAMP.length];
