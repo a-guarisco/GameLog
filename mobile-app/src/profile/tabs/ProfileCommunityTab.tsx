@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 import CommunityPlaytimeHistogramChart from '@gamelog/common/charts/community-playtime-histogram/CommunityPlaytimeHistogramChart';
-import type { CommunityScope } from '@gamelog/api-manager/dto';
+import CommunityTopGamesHistogramChart from '@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart';
+import type { CommunityScope, OwnedGames } from '@gamelog/api-manager/dto';
 
 const COMMUNITY_SCOPES: SectionTab<CommunityScope>[] = [
   { id: 'global', label: 'Global' },
@@ -10,7 +11,11 @@ const COMMUNITY_SCOPES: SectionTab<CommunityScope>[] = [
   { id: 'friends', label: 'Friends' },
 ];
 
-const ProfileCommunityTab = () => {
+interface ProfileCommunityTabProps {
+  ownedGames?: OwnedGames | null;
+}
+
+const ProfileCommunityTab = ({ ownedGames }: ProfileCommunityTabProps) => {
   const [scope, setScope] = useState<CommunityScope>('global');
 
   return (
@@ -22,8 +27,10 @@ const ProfileCommunityTab = () => {
         testIDPrefix="community-scope-tab"
       />
       <CommunityPlaytimeHistogramChart scope={scope} />
+      <CommunityTopGamesHistogramChart scope={scope} ownedGames={ownedGames} />
     </VStack>
   );
 };
 
 export default ProfileCommunityTab;
+

@@ -182,6 +182,14 @@ const EndPoints = {
   getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) => {
     return `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
   },
+
+  getCommunityWeeklyTopGames: (scope: CommunityScope, startDate: string, endDate: string) => {
+    return `${getBackendBaseUrl()}/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  },
+
+  getCommunityMonthlyTopGames: (scope: CommunityScope, startDate: string, endDate: string) => {
+    return `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  },
 };
 
 export { isBackendProvider };
