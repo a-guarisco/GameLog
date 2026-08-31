@@ -77,7 +77,7 @@ const buttonStyle = tva({
       action: 'primary',
       isOnCard: true,
       class:
-        'bg-background-100 dark:bg-background-200 data-[hover=true]:bg-background-200 dark:data-[hover=true]:bg-background-250 data-[active=true]:bg-background-300 dark:data-[active=true]:bg-background-100',
+        'bg-background-100 dark:bg-background-100 data-[hover=true]:bg-background-200 dark:data-[hover=true]:bg-background-200 data-[active=true]:bg-background-300 dark:data-[active=true]:bg-background-300',
     },
     {
       action: 'primary',

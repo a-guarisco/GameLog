@@ -4,7 +4,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { useGetGameNews } from '@gamelog/api-manager/useApi';
 import type { SteamNewsItem } from '@gamelog/api-manager/dto';
-import SeeAllLink from '@gamelog/common/SeeAllLink';
+import GoToLink from '@gamelog/common/GoToLink';
 import SectionState from '@gamelog/common/SectionState';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
 
@@ -66,9 +66,10 @@ const GameNewsPanel = ({ appid }: GameNewsPanelProps) => {
         <NewsItemRow key={item.gid} item={item} isFirst={index === 0} />
       ))}
 
-      <SeeAllLink
-        label="See all news"
+      <GoToLink
+        label="See all news on Steam"
         onPress={() => openExternalUrl(`https://store.steampowered.com/news/app/${appid}`)}
+        testID="see-all-news-button"
       />
     </VStack>
   );

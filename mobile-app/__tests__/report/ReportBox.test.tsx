@@ -62,9 +62,9 @@ describe('ReportBox', () => {
     const { getByText, queryByText } = renderComponent();
 
     expect(getByText('Report Retrieval')).toBeTruthy();
-    expect(getByText('From:')).toBeTruthy();
-    expect(getByText('To:')).toBeTruthy();
-    expect(getByText('Generate last 2 weeks report')).toBeTruthy();
+    expect(getByText('From')).toBeTruthy();
+    expect(getByText('To')).toBeTruthy();
+    expect(getByText('Generates a report for the last 14 days.')).toBeTruthy();
     expect(queryByText('Reset')).toBeNull(); // Reset should not be visible when no dates
   });
 
@@ -104,9 +104,8 @@ describe('ReportBox', () => {
 
     const { getByText } = renderComponent();
 
-    // Since only startDate is defined, the button text will be "Generate last X days/weeks report"
-    // The exact X depends on current date, so we can just match part of the string
-    fireEvent.press(getByText(/Generate last .* report/));
+    // Click the Generate Report button
+    fireEvent.press(getByText('Generate Report'));
     expect(mockHandleFetchReport).toHaveBeenCalled();
   });
 
@@ -127,7 +126,7 @@ describe('ReportBox', () => {
     });
 
     let rendered = renderComponent();
-    expect(rendered.getByText('Generate last 1 week report')).toBeTruthy();
+    expect(rendered.getByText('Report starting 1 week ago.')).toBeTruthy();
 
     rendered.unmount();
 
@@ -147,7 +146,7 @@ describe('ReportBox', () => {
     });
 
     rendered = renderComponent();
-    expect(rendered.getByText('Generate last 2 weeks report')).toBeTruthy();
+    expect(rendered.getByText('Report starting 2 weeks ago.')).toBeTruthy();
   });
 
   it('displays loading state correctly', () => {
@@ -195,7 +194,6 @@ describe('ReportBox', () => {
     });
 
     const { getByText } = renderComponent();
-    expect(getByText('Report Summary')).toBeTruthy();
     expect(getByText('No games played in this period.')).toBeTruthy();
   });
 
@@ -230,14 +228,21 @@ describe('ReportBox', () => {
 
     const { getByText, getAllByText } = renderComponent();
 
-    expect(getByText('Report Summary')).toBeTruthy();
+    // Check summary rendered correctly. The new UI uses selectReportSummary which returns:
+    // "Oct 1 — Oct 10 · 10 days"
+    // "2h" for PLAYTIME
+    expect(getByText(/· 10 days/)).toBeTruthy();
+    expect(getByText(/Playtime/i)).toBeTruthy();
+    expect(getByText(/Games/i)).toBeTruthy();
+    expect(getByText(/Top Game/i)).toBeTruthy();
+    expect(getByText(/Max \/ Day/i)).toBeTruthy();
 
-    // Top Game should be Test Game (120 min)
+    // Top Game should be Test Game
     expect(getByText('Test Game')).toBeTruthy();
     // 45m should be formatted correctly
 
     // Click "See details" to expand the list
-    fireEvent.press(getByText('See details'));
+    fireEvent.press(getByText('Show game breakdown'));
 
     // Check formatting (2h appears in summary and list)
     expect(getAllByText('2h').length).toBeGreaterThan(0);
@@ -297,7 +302,7 @@ describe('ReportBox', () => {
     });
 
     let rendered = renderComponent();
-    fireEvent.press(rendered.getByText('See details'));
+    fireEvent.press(rendered.getByText('Show game breakdown'));
 
     // 10 streak is first
     let gameElements = rendered.getAllByTestId('game-list-item');
@@ -312,7 +317,7 @@ describe('ReportBox', () => {
     });
 
     rendered = renderComponent();
-    fireEvent.press(rendered.getByText('See details'));
+    fireEvent.press(rendered.getByText('Show game breakdown'));
 
     gameElements = rendered.getAllByTestId('game-list-item');
     expect(within(gameElements[0]).getByText('A Game')).toBeTruthy();
@@ -379,7 +384,7 @@ describe('ReportBox', () => {
     const { getByTestId, getByText } = renderComponent();
 
     // Show details first
-    fireEvent.press(getByText('See details'));
+    fireEvent.press(getByText('Show game breakdown'));
 
     fireEvent.press(getByTestId('game-list-item'));
 

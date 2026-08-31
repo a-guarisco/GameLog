@@ -6,7 +6,7 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { useGetGameGuides } from '@gamelog/api-manager/useApi';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
 import { getGuideTopicTags, getGuideUrl } from '@gamelog/game/guideTags';
-import SeeAllLink from '@gamelog/common/SeeAllLink';
+import GoToLink from '@gamelog/common/GoToLink';
 import SectionState from '@gamelog/common/SectionState';
 import Chip from '@gamelog/common/Chip';
 import { formatThousands } from '@gamelog/utils/formatUtils';
@@ -91,10 +91,8 @@ const GameGuidesPanel = ({ appid }: GameGuidesPanelProps) => {
         <GuideCard key={guide.publishedfileid} guide={guide} />
       ))}
 
-      <SeeAllLink
-        label={
-          totalGuides > 0 ? `See all ${formatThousands(totalGuides)} guides` : 'See all guides'
-        }
+      <GoToLink
+        label="See all guides on Steam"
         onPress={() => openExternalUrl(`https://steamcommunity.com/app/${appid}/guides/`)}
       />
     </VStack>

@@ -50,7 +50,7 @@ describe('GameGuidesPanel', () => {
 
     expect(screen.getByText('Stardew Valley 100% Achievement Guide')).toBeTruthy();
     expect(screen.getByText('An achievement that empowers those who earn it.')).toBeTruthy();
-    expect(screen.getByText('See all 100 guides')).toBeTruthy();
+    expect(screen.getByText('See all guides on Steam')).toBeTruthy();
   });
 
   it('opens guide external URL on card click', () => {
