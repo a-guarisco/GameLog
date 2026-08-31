@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import PlaytimeBlocksChart from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksChart';
+import { toIsoDate } from '@gamelog/utils/formatUtils';
 
 // We mock the ChartWrapperCard so we can trigger the layout event
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
@@ -44,7 +45,7 @@ describe('PlaytimeBlocksChart', () => {
   const getOffsetDateString = (offsetDays: number) => {
     const d = new Date(MOCK_TODAY);
     d.setDate(d.getDate() + offsetDays);
-    return d.toISOString().split('T')[0];
+    return toIsoDate(d);
   };
 
   const mockPlaytimeByUser = [
