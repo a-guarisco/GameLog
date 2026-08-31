@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import { usePlaytimeBlocksData } from '@gamelog/common/charts/playtime-blocks/usePlaytimeBlocksData';
+import { toIsoDate } from '@gamelog/utils/formatUtils';
 
 describe('usePlaytimeBlocksData', () => {
   const MOCK_TODAY = new Date('2023-10-18T12:00:00Z');
@@ -7,7 +8,7 @@ describe('usePlaytimeBlocksData', () => {
   const getOffsetDateString = (offsetDays: number) => {
     const d = new Date(MOCK_TODAY);
     d.setDate(d.getDate() + offsetDays);
-    return d.toISOString().split('T')[0];
+    return toIsoDate(d);
   };
 
   const theme = { '--color-primary-200': '1,1,1', '--color-background-100': '0,0,0' };
