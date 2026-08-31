@@ -15,7 +15,9 @@ describe('GameListControls', () => {
     onSortChange: jest.fn(),
     genreFilter: 'All',
     setGenreFilter: jest.fn(),
-    platformFilter: 'All',
+    statusFilter: 'All' as const,
+    setStatusFilter: jest.fn(),
+    platformFilter: 'All' as const,
     setPlatformFilter: jest.fn(),
     dateRangeFilter: { start: null, end: null },
     setDateRangeFilter: jest.fn(),
@@ -31,6 +33,7 @@ describe('GameListControls', () => {
 
     expect(getByText('Sort', { exact: false })).toBeTruthy();
     expect(getByText('Genre', { exact: false })).toBeTruthy();
+    expect(getByText('Status', { exact: false })).toBeTruthy();
     expect(getByText('Platform', { exact: false })).toBeTruthy();
     expect(getByText('Date', { exact: false })).toBeTruthy();
   });

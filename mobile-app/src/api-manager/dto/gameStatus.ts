@@ -7,9 +7,8 @@ export interface GameStatusesResponse {
 
 
 export const GAME_STATUS_LABELS: Record<GameStatus, string> = {
-
   playing: 'Playing',
-  to_be_played: 'To Play',
+  to_be_played: 'To Be Played',
   shelved: 'Shelved',
   played: 'Played',
   platinato: 'Platinato',

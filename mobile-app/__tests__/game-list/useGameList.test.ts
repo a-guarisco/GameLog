@@ -184,6 +184,36 @@ describe('useGameList hook', () => {
     expect(result.current.processedGames[0].gameStatus).toBe('played');
     expect(result.current.processedGames[1].gameStatus).toBe('playing');
   });
+
+  it('should filter games based on statusFilter', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: mockGames,
+      isLoadingOwnedGames: false,
+    });
+    mockUseGetUserGameStatuses.mockReturnValue({
+      userGameStatuses: { '1': 'playing' },
+      isLoadingUserGameStatuses: false,
+    });
+
+    const { result } = renderHook(() => useGameList('123'));
+
+    act(() => {
+      result.current.setStatusFilter('playing');
+    });
+    expect(result.current.processedGames).toHaveLength(1);
+    expect(result.current.processedGames[0].appid).toBe(1);
+
+    act(() => {
+      result.current.setStatusFilter('none');
+    });
+    expect(result.current.processedGames).toHaveLength(1);
+    expect(result.current.processedGames[0].appid).toBe(2);
+
+    act(() => {
+      result.current.setStatusFilter('All');
+    });
+    expect(result.current.processedGames).toHaveLength(2);
+  });
 });
 
 
