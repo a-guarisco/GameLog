@@ -457,14 +457,108 @@ describe('ApiManager', () => {
 
     await ApiManager.getOwnedGames(steamId, false, false);
 
-    // For now, all endpoints use Steam regardless of provider selection
-    // Backend-specific endpoints will be implemented gradually as needed
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=false&include_played_free_games=false`,
       expect.objectContaining({
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
       })
     );
+  });
+
+  describe('additional authenticated endpoints', () => {
+    beforeEach(() => {
+      (auth as any).currentUser = {
+        getIdToken: jest.fn().mockResolvedValue('mock-token-123'),
+      };
+    });
+
+    it('handles getGenresBatch', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ '440': ['Action'] }),
+      });
+      const res = await ApiManager.getGenresBatch(['440']);
+      expect(res).toEqual({ '440': ['Action'] });
+    });
+
+    it('handles updateSteamApiKey', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: '1', email: 'test@example.com' }),
+      });
+      const res = await ApiManager.updateSteamApiKey('new-steam-key');
+      expect(res).toEqual({ id: '1', email: 'test@example.com' });
+    });
+
+    it('handles registerDeviceToken and unregisterDeviceToken', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 'dev-1', device_token: 'tok-123' }),
+      });
+      const regRes = await ApiManager.registerDeviceToken('tok-123', 'ios');
+      expect(regRes).toEqual({ id: 'dev-1', device_token: 'tok-123' });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({}),
+      });
+      await ApiManager.unregisterDeviceToken('tok-123');
+    });
+
+    it('handles getDailyReport', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ total_playtime_minutes: 60 }),
+      });
+      const report = await ApiManager.getDailyReport('2026-08-01', '2026-08-10');
+      expect(report).toEqual({ total_playtime_minutes: 60 });
+    });
+
+    it('handles community endpoints', async () => {
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => [{ genre: 'Action', hours: 50 }],
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ buckets: [] }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ buckets: [] }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => [{ app_id: '440', title: 'TF2', hours: 10 }],
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => [{ app_id: '440', title: 'TF2', hours: 10 }],
+        });
+
+      const genreRes = await ApiManager.getCommunityGenre('global');
+      expect(genreRes).toEqual([{ genre: 'Action', hours: 50 }]);
+
+      const weeklyRes = await ApiManager.getCommunityWeeklyPlaytime('friends', '2026-08-01', '2026-08-07');
+      expect(weeklyRes).toEqual({ buckets: [] });
+
+      const monthlyRes = await ApiManager.getCommunityMonthlyPlaytime('region', '2026-08-01', '2026-08-31');
+      expect(monthlyRes).toEqual({ buckets: [] });
+
+      const topWeekly = await ApiManager.getCommunityWeeklyTopGames('global', '2026-08-01', '2026-08-07');
+      expect(topWeekly).toEqual([{ app_id: '440', title: 'TF2', hours: 10 }]);
+
+      const topMonthly = await ApiManager.getCommunityMonthlyTopGames('global', '2026-08-01', '2026-08-31');
+      expect(topMonthly).toEqual([{ app_id: '440', title: 'TF2', hours: 10 }]);
+    });
+
+    it('throws error when no Firebase user token is available', async () => {
+      (auth as any).currentUser = null;
+      await expect(ApiManager.getUserMe()).rejects.toThrow(
+        'No active Firebase user session. Sign in before calling authenticated backend endpoints.'
+      );
+    });
   });
 });
 
@@ -495,10 +589,25 @@ describe('fetchData', () => {
     expect(result).toEqual(payload);
   });
 
-  it('throws descriptive error when response is not ok', async () => {
+  it('throws descriptive error with server detail when available', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: async () => ({ detail: 'Custom error detail from server' }),
+    });
+
+    await expect(fetchData('https://example.dev/bad')).rejects.toThrow(
+      'Custom error detail from server'
+    );
+  });
+
+  it('throws descriptive error when response is not ok and json parse fails', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
+      json: async () => {
+        throw new Error('Not JSON');
+      },
     });
 
     await expect(fetchData('https://example.dev/missing')).rejects.toThrow(
@@ -513,3 +622,4 @@ describe('fetchData', () => {
     await expect(fetchData('https://example.dev/error')).rejects.toThrow('Network down');
   });
 });
+

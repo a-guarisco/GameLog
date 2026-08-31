@@ -280,3 +280,135 @@ describe('useGetGameGuides', () => {
     mockData: { response: { total: 812, publishedfiledetails: [] } },
   });
 });
+
+describe('useGetGameBasicInfo', () => {
+  useTestApiHook({
+    useHook: () => require('@gamelog/api-manager/useApi').useGetGameBasicInfo('730'),
+    apiMethod: 'getGameBasicInfo',
+    apiArgs: ['730'],
+    expectedKeys: {
+      data: 'gameBasicInfo',
+      loading: 'isLoadingGameBasicInfo',
+      error: 'errorGameBasicInfo',
+    },
+    mockData: { '730': { success: true, data: { name: 'CS2' } } },
+  });
+});
+
+describe('useGetFullPlaytimeReport', () => {
+  it('calls useGetPlaytimeReport with 10000 days', () => {
+    mockAsyncFetch();
+    const { useGetFullPlaytimeReport } = require('@gamelog/api-manager/useApi');
+    const { result } = renderHook(() => useGetFullPlaytimeReport());
+    expect(result.current.isLoadingPlaytimeReport).toBe(false);
+  });
+});
+
+describe('useGetGameGenreChartData', () => {
+  it('fetches owned games and formats genre chart data', async () => {
+    mockAsyncFetch({ data: [{ genre: 'Action', value: 10 }] });
+    const { useGetGameGenreChartData } = require('@gamelog/api-manager/useApi');
+    const { result } = renderHook(() => useGetGameGenreChartData('u1', true, true));
+
+    expect(result.current.genreChartData).toEqual([{ genre: 'Action', value: 10 }]);
+
+    mockApiManager.getOwnedGames.mockResolvedValueOnce({
+      response: {
+        game_count: 1,
+        games: [{ appid: 440, name: 'TF2', playtime_forever: 100 }],
+      },
+    } as any);
+
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    const data = await fetchFunc();
+    expect(mockApiManager.getOwnedGames).toHaveBeenCalledWith('u1', true, true);
+    expect(Array.isArray(data)).toBe(true);
+  });
+});
+
+describe('useGetGenresBatch', () => {
+  it('returns empty object if appIds is empty', async () => {
+    mockAsyncFetch({ data: {} });
+    const { useGetGenresBatch } = require('@gamelog/api-manager/useApi');
+    const { result } = renderHook(() => useGetGenresBatch([]));
+
+    expect(result.current.libraryGenres).toEqual({});
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    const res = await fetchFunc();
+    expect(res).toEqual({});
+    expect(mockApiManager.getGenresBatch).not.toHaveBeenCalled();
+  });
+
+  it('calls ApiManager when appIds is provided', async () => {
+    mockAsyncFetch();
+    const { useGetGenresBatch } = require('@gamelog/api-manager/useApi');
+    renderHook(() => useGetGenresBatch(['440', '730']));
+
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    await fetchFunc();
+    expect(mockApiManager.getGenresBatch).toHaveBeenCalledWith(['440', '730']);
+  });
+});
+
+describe('useGetFriendList', () => {
+  it('fetches friend list and defaults to empty array', async () => {
+    mockAsyncFetch({ data: null });
+    const { useGetFriendList } = require('@gamelog/api-manager/useApi');
+    const { result } = renderHook(() => useGetFriendList());
+
+    expect(result.current.friendList).toEqual([]);
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    await fetchFunc();
+    expect(mockApiManager.getFriendList).toHaveBeenCalled();
+  });
+});
+
+describe('useSearchUsers', () => {
+  it('returns empty array when query is empty', async () => {
+    mockAsyncFetch({ data: null });
+    const { useSearchUsers } = require('@gamelog/api-manager/useApi');
+    const { result } = renderHook(() => useSearchUsers('   '));
+
+    expect(result.current.searchResults).toEqual([]);
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    const res = await fetchFunc();
+    expect(res).toEqual([]);
+    expect(mockApiManager.searchUsers).not.toHaveBeenCalled();
+  });
+
+  it('searches users when query is present', async () => {
+    mockAsyncFetch();
+    const { useSearchUsers } = require('@gamelog/api-manager/useApi');
+    renderHook(() => useSearchUsers('john'));
+
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    await fetchFunc();
+    expect(mockApiManager.searchUsers).toHaveBeenCalledWith('john');
+  });
+});
+
+describe('useGetFriendRecommendations', () => {
+  it('returns null when friendId is falsy', async () => {
+    mockAsyncFetch({ data: null });
+    const { useGetFriendRecommendations } = require('@gamelog/api-manager/useApi');
+    const { result } = renderHook(() => useGetFriendRecommendations(null));
+
+    expect(result.current.recommendations).toBeNull();
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    const res = await fetchFunc();
+    expect(res).toBeNull();
+    expect(mockApiManager.getRecommendations).not.toHaveBeenCalled();
+  });
+
+  it('calls ApiManager with friendId when provided', async () => {
+    mockAsyncFetch();
+    const { useGetFriendRecommendations } = require('@gamelog/api-manager/useApi');
+    renderHook(() => useGetFriendRecommendations('friend-123'));
+
+    const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
+    await fetchFunc();
+    expect(mockApiManager.getRecommendations).toHaveBeenCalledWith('friend-123');
+  });
+});
+
+
