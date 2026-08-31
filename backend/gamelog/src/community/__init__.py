@@ -5,6 +5,7 @@ from .schemas import (
     CommunityScope,
     CommunityWeeklyPlaytimeResponse,
     CommunityWeeklyTopGameResponse,
+    TopGameReference,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "CommunityScope",
     "CommunityWeeklyPlaytimeResponse",
     "CommunityWeeklyTopGameResponse",
+    "TopGameReference",
 ]
