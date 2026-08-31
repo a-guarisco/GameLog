@@ -30,7 +30,11 @@ import type {
   CommunityTopGame,
   CommunityScope,
   TopGameReference,
+  GameStatus,
+  GameStatusesResponse,
 } from '@gamelog/api-manager/dto';
+
+
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
   const options = {
@@ -138,6 +142,15 @@ export default {
 
   getPlaytimeByUser: (days: number) =>
     fetchAuthenticatedData<PlaytimeByUser>(EndPoints.getPlaytimeByUser(days)),
+
+  getGameStatus: (steamAppId: string) =>
+    fetchAuthenticatedData<GameStatus>(EndPoints.getGameStatus(steamAppId)),
+
+  getUserGameStatuses: () =>
+    fetchAuthenticatedData<GameStatusesResponse[]>(EndPoints.getGameStatus()),
+
+
+
 
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),

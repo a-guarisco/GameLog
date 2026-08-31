@@ -118,6 +118,14 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/games/playtime_by_user?days=${days}`;
   },
 
+  getGameStatus: (steamAppId?: string) => {
+    if (steamAppId) {
+      return `${getBackendBaseUrl()}/games/game_status?steam_app_id=${steamAppId}`;
+    }
+    return `${getBackendBaseUrl()}/games/game_status`;
+  },
+
+
   getAuthOutcome: () => {
     return `${getBackendBaseUrl()}/me`;
   },

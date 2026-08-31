@@ -12,8 +12,11 @@ import {
   useGetGameGuides,
   useGetPlaytimeReport,
   useGetPlaytimeByUser,
+  useGetUserGameStatuses,
+  useGetGameStatus,
 } from '@gamelog/api-manager/useApi';
 import { renderHook } from '@testing-library/react-native';
+
 
 jest.mock('@gamelog/api-manager/apiManager');
 jest.mock('@gamelog/common/useAsyncFetch');
@@ -411,4 +414,46 @@ describe('useGetFriendRecommendations', () => {
   });
 });
 
+
+
+describe('useGetUserGameStatuses', () => {
+  useTestApiHook({
+    useHook: useGetUserGameStatuses,
+    apiMethod: 'getUserGameStatuses',
+    apiArgs: [],
+    expectedKeys: {
+      data: 'userGameStatuses',
+      loading: 'isLoadingUserGameStatuses',
+      error: 'errorUserGameStatuses',
+    },
+    mockData: { '730': 'playing' },
+  });
+
+  it('maps array response into a key-value record', async () => {
+    mockAsyncFetch();
+    renderHook(useGetUserGameStatuses);
+    const fetchFunc = mockUseAsyncFetch.mock.calls[0][0];
+    mockApiManager.getUserGameStatuses.mockResolvedValueOnce([
+      { app_id: '730', status: 'playing' },
+      { app_id: '570', status: 'played' },
+    ] as any);
+    const mapped = await fetchFunc();
+    expect(mapped).toEqual({ '730': 'playing', '570': 'played' });
+  });
+});
+
+
+describe('useGetGameStatus', () => {
+  useTestApiHook({
+    useHook: () => useGetGameStatus('730'),
+    apiMethod: 'getGameStatus',
+    apiArgs: ['730'],
+    expectedKeys: {
+      data: 'gameStatus',
+      loading: 'isLoadingGameStatus',
+      error: 'errorGameStatus',
+    },
+    mockData: 'playing',
+  });
+});
 

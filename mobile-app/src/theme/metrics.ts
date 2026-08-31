@@ -44,7 +44,15 @@ export const METRICS = {
     hex: parseRGB(tailwindColors.emerald[600]),
     gradientHex: parseRGB(tailwindColors.emerald[400]),
   },
+  status: {
+    borderClass: 'border-cyan-600',
+    textClass: 'text-cyan-600',
+    bgClass: 'bg-cyan-100 dark:bg-cyan-900/40',
+    hex: parseRGB(tailwindColors.cyan[600]),
+    gradientHex: parseRGB(tailwindColors.cyan[400]),
+  },
 } as const;
+
 
 export const CHART_PALETTE = [
   METRICS.playtime.hex,

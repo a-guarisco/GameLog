@@ -3,7 +3,8 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
 import { toIsoDate } from '@gamelog/utils/formatUtils';
-import { Streak } from './dto';
+import { Streak, GameStatus } from './dto';
+
 
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
@@ -191,7 +192,47 @@ export const useGetGenresBatch = (appIds: string[]) => {
   };
 };
 
+export const useGetUserGameStatuses = () => {
+  const fetchFunc = useCallback(async () => {
+    const res = await ApiManager.getUserGameStatuses();
+    if (!res) return {};
+    if (Array.isArray(res)) {
+      const map: Record<string, GameStatus> = {};
+      for (const item of res) {
+        map[item.app_id] = item.status;
+      }
+      return map;
+    }
+    return res;
+  }, []);
+
+
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    userGameStatuses: data ?? {},
+    isLoadingUserGameStatuses: isLoading,
+    errorUserGameStatuses: error,
+    errorMessageUserGameStatuses: errorMessage,
+    refetchUserGameStatuses: refetch,
+  };
+};
+
+export const useGetGameStatus = (gameID: string) => {
+  const fetchFunc = useCallback(() => ApiManager.getGameStatus(gameID), [gameID]);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    gameStatus: data,
+    isLoadingGameStatus: isLoading,
+    errorGameStatus: error,
+    errorMessageGameStatus: errorMessage,
+    refetchGameStatus: refetch,
+  };
+};
+
 export const useGetFriendList = () => {
+
   const fetchFunc = useCallback(() => ApiManager.getFriendList(), []);
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);

@@ -360,6 +360,41 @@ describe('ApiManager', () => {
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
+    it('fetches single game status with the current Firebase token', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => 'playing',
+      });
+
+      const result = await ApiManager.getGameStatus('730');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getGameStatus('730'), {
+        headers: { Authorization: 'Bearer firebase-id-token', 'Content-Type': 'application/json' },
+      });
+      expect(result).toBe('playing');
+    });
+
+    it('fetches all user game statuses with the current Firebase token', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [
+          { app_id: '730', status: 'playing' },
+          { app_id: '570', status: 'played' },
+        ],
+      });
+
+      const result = await ApiManager.getUserGameStatuses();
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.getGameStatus(), {
+        headers: { Authorization: 'Bearer firebase-id-token', 'Content-Type': 'application/json' },
+      });
+      expect(result).toEqual([
+        { app_id: '730', status: 'playing' },
+        { app_id: '570', status: 'played' },
+      ]);
+    });
+
+
+
+
     it('fetches search users with the current Firebase token', async () => {
       const mockResponse = [
         { user: { id: 'u1', username: 'alex', steam_id: '123' }, friendship: {} },
