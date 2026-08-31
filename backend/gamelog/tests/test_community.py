@@ -565,6 +565,114 @@ class TestCommunityService:
         assert result[1].user_playtime == 0.0
         assert result[1].community_playtime == 2.0
 
+    def test_monthly_top_games_global_scope_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="US")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="FR")
+
+        start_date = date(2026, 1, 1)
+        end_date = date(2026, 1, 31)
+
+        # Game 200: u2 plays 180m on Jan 10, u3 plays 120m on Jan 15 -> community total = 300m -> avg = 300 / (2 * 60) = 2.5h
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=180, created_at=date(2026, 1, 10))
+
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 14))
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=120, created_at=date(2026, 1, 15))
+
+        # Game 100: u2 plays 120m on Jan 20 -> community total = 120m -> avg = 120 / (2 * 60) = 1.0h
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 1, 19))
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=120, created_at=date(2026, 1, 20))
+
+        # u1 (current user) plays Game 100 for 180m (3.0h) on Jan 12
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 1, 11))
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=180, created_at=date(2026, 1, 12))
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_monthly_top_games(
+            CommunityScope.GLOBAL, start_date, end_date, auth_user, session
+        )
+
+        assert len(result) == 2
+        # Game 100: user = 3.0h, comm = 1.0h -> combined = 4.0h -> Top 1
+        assert result[0].id == "100"
+        assert result[0].user_playtime == 3.0
+        assert result[0].community_playtime == 1.0
+
+        # Game 200: user = 0.0h, comm = 2.5h -> combined = 2.5h -> Top 2
+        assert result[1].id == "200"
+        assert result[1].user_playtime == 0.0
+        assert result[1].community_playtime == 2.5
+
+    def test_monthly_top_games_region_scope_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="US")
+
+        start_date = date(2026, 1, 1)
+        end_date = date(2026, 1, 31)
+
+        # u2 (same region IT): 120 mins on game 100
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=120, created_at=date(2026, 1, 10))
+
+        # u3 (different region US): 600 mins on game 200 (excluded)
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=600, created_at=date(2026, 1, 10))
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_monthly_top_games(
+            CommunityScope.REGION, start_date, end_date, auth_user, session
+        )
+
+        assert len(result) == 1
+        assert result[0].id == "100"
+        assert result[0].community_playtime == 2.0
+        assert result[0].user_playtime == 0.0
+
+    def test_monthly_top_games_friends_scope_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="IT")
+
+        friendship = Friendship(requester_id=u1.id, addressee_id=u2.id, status=FriendshipStatus.ACCEPTED)
+        session.add(friendship)
+        session.commit()
+
+        start_date = date(2026, 1, 1)
+        end_date = date(2026, 1, 31)
+
+        # u2 (friend): 180 mins on game 100
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=180, created_at=date(2026, 1, 10))
+
+        # u3 (non-friend): 500 mins on game 200 (excluded)
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=500, created_at=date(2026, 1, 10))
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_monthly_top_games(
+            CommunityScope.FRIENDS, start_date, end_date, auth_user, session
+        )
+
+        assert len(result) == 1
+        assert result[0].id == "100"
+        assert result[0].community_playtime == 3.0
+
+    def test_monthly_top_games_no_games_played(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="US")
+
+        start_date = date(2026, 1, 1)
+        end_date = date(2026, 1, 31)
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_monthly_top_games(
+            CommunityScope.GLOBAL, start_date, end_date, auth_user, session
+        )
+
+        assert result == []
+
 
 class TestCommunityRouter:
     def test_get_community_genre_endpoint(self, client: TestClient, session: Session):
@@ -748,6 +856,55 @@ class TestCommunityRouter:
         make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
         response = client.get("/community/weekly_top_game_playtime?scope=GLOBAL")
         assert response.status_code == 422
+
+    def test_get_monthly_top_game_playtime_endpoint_success(self, client: TestClient, session: Session):
+        u1 = make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="firebase-uid-2", username="user2", steam_id="s2", region="IT")
+
+        start_date = date(2026, 1, 1)
+        end_date = date(2026, 1, 31)
+
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=60, created_at=date(2026, 1, 10))
+
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=0, created_at=date(2026, 1, 9))
+        make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=120, created_at=date(2026, 1, 10))
+
+        response = client.get(
+            f"/community/monthly_top_game_playtime?scope=GLOBAL&start_date={start_date.isoformat()}&end_date={end_date.isoformat()}"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 2
+        assert data[0]["id"] == "200"
+        assert data[0]["user_playtime"] == 0.0
+        assert data[0]["community_playtime"] == 2.0
+        assert data[1]["id"] == "100"
+        assert data[1]["user_playtime"] == 1.0
+        assert data[1]["community_playtime"] == 0.0
+
+    def test_get_monthly_top_game_playtime_endpoint_invalid_dates_not_first(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        response = client.get(
+            "/community/monthly_top_game_playtime?scope=GLOBAL&start_date=2026-01-02&end_date=2026-01-31"
+        )
+        assert response.status_code == 400
+        assert "start_date must be the first day of a month" in response.json()["detail"]
+
+    def test_get_monthly_top_game_playtime_endpoint_invalid_dates_not_last(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        response = client.get(
+            "/community/monthly_top_game_playtime?scope=GLOBAL&start_date=2026-01-01&end_date=2026-01-30"
+        )
+        assert response.status_code == 400
+        assert "end_date must be the last day of a month" in response.json()["detail"]
+
+    def test_get_monthly_top_game_playtime_endpoint_missing_params(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        response = client.get("/community/monthly_top_game_playtime?scope=GLOBAL")
+        assert response.status_code == 422
+
 
 
 
