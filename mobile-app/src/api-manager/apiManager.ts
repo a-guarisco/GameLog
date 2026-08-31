@@ -124,9 +124,14 @@ export default {
   getStreakByGame: (appId: string) =>
     fetchAuthenticatedData<Streak>(EndPoints.getStreakByGame(appId)),
 
-  /** Playtime per game between two inclusive `YYYY-MM-DD` dates. */
   getPlaytimeReport: (startDate: string, endDate: string) =>
     fetchAuthenticatedData<DailyReport>(EndPoints.getPlaytimeReport(startDate, endDate)),
+
+  getGenresBatch: (appIds: string[]) =>
+    fetchAuthenticatedData<Record<string, string[]>>(EndPoints.getGenresBatch(), {
+      method: 'POST',
+      body: JSON.stringify(appIds),
+    }),
 
   getPlaytimeByUser: (days: number) =>
     fetchAuthenticatedData<PlaytimeByUser>(EndPoints.getPlaytimeByUser(days)),

@@ -322,3 +322,42 @@ def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str
         query = query.where(SteamRollingTime.steam_app_id == steam_app_id)
 
     return session.exec(query.order_by(col(SteamRollingTime.created_at))).all()
+
+
+def get_genres_for_apps(session: Session, app_ids: list[str]) -> dict[str, list[str]]:
+    """
+    Returns a mapping of steam_app_id to a list of genre descriptions for the requested app_ids.
+    It checks both Game and TopGame tables.
+    """
+    from src.models import Game, TopGame
+    from sqlalchemy.orm import selectinload
+    from sqlmodel import col
+    
+    result = {}
+    
+    if not app_ids:
+        return result
+
+    # Check Game table
+    query_games = (
+        select(Game)
+        .where(col(Game.steam_app_id).in_(app_ids))
+        .options(selectinload(Game.genres))
+    )
+    games = session.exec(query_games).all()
+    for game in games:
+        result[game.steam_app_id] = [g.description for g in game.genres]
+        
+    # Check TopGame table for the remaining ones
+    missing_app_ids = [app_id for app_id in app_ids if app_id not in result]
+    if missing_app_ids:
+        query_top = (
+            select(TopGame)
+            .where(col(TopGame.steam_app_id).in_(missing_app_ids))
+            .options(selectinload(TopGame.genres))
+        )
+        top_games = session.exec(query_top).all()
+        for tg in top_games:
+            result[tg.steam_app_id] = [g.description for g in tg.genres]
+            
+    return result
