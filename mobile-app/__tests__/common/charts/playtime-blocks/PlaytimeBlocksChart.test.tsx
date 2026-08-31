@@ -39,8 +39,10 @@ jest.mock('@gamelog/common/charts/playtime-blocks/useChartScrollShimmer', () => 
 }));
 
 describe('PlaytimeBlocksChart', () => {
+  const MOCK_TODAY = new Date('2023-10-18T12:00:00Z'); // A Wednesday, so -1 is in the same week
+
   const getOffsetDateString = (offsetDays: number) => {
-    const d = new Date();
+    const d = new Date(MOCK_TODAY);
     d.setDate(d.getDate() + offsetDays);
     return d.toISOString().split('T')[0];
   };
@@ -51,10 +53,12 @@ describe('PlaytimeBlocksChart', () => {
   ];
 
   beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(MOCK_TODAY);
     jest.clearAllMocks();
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
