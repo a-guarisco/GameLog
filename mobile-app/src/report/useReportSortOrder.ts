@@ -21,7 +21,7 @@ export function useReportSortOrder(defaultOrder: SortOrder = 'playtime') {
         setIsLoaded(true);
       }
     };
-    
+
     loadSortOrder();
   }, []);
 

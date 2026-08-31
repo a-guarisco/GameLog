@@ -1,5 +1,6 @@
-import React from 'react';
-import { Pressable, ActivityIndicator } from 'react-native';
+import { FC } from 'react';
+import { Pressable } from 'react-native';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
 import Svg, { Path } from 'react-native-svg';
 import { Text } from '@gamelog/common/gluestack/text';
 import { useColorScheme } from 'nativewind';
@@ -28,7 +29,7 @@ export interface GLFacebookButtonProps {
   testID?: string;
 }
 
-export const GLFacebookButton: React.FC<GLFacebookButtonProps> = ({
+export const GLFacebookButton: FC<GLFacebookButtonProps> = ({
   onPress,
   isLoading = false,
   isDisabled = false,
@@ -62,7 +63,7 @@ export const GLFacebookButton: React.FC<GLFacebookButtonProps> = ({
       } ${className}`}
     >
       {isLoading ? (
-        <ActivityIndicator size="small" color={textColor} className="mr-3" />
+        <Spinner size="small" color={textColor} className="mr-3" />
       ) : (
         <FacebookLogo size={20} color={textColor} />
       )}

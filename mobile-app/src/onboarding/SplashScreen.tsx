@@ -1,5 +1,6 @@
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
 import { Text } from '@gamelog/common/gluestack/text';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
 
 export default function SplashScreen() {
   return (
@@ -7,7 +8,7 @@ export default function SplashScreen() {
       <Text size="3xl" bold className="mb-4">
         GameLog
       </Text>
-      <ActivityIndicator size="large" />
+      <Spinner size="large" />
     </View>
   );
 }

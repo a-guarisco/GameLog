@@ -1,5 +1,5 @@
-'use client';
-import React from 'react';
+import { ComponentPropsWithoutRef, forwardRef, ElementRef, ElementType } from 'react';
+
 import { createButton } from '@gluestack-ui/core/button/creator';
 import {
   tva,
@@ -8,9 +8,11 @@ import {
   type VariantProps,
 } from '@gluestack-ui/utils/nativewind-utils';
 import { cssInterop } from 'nativewind';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Spinner } from '../spinner';
 import { Text } from '../text';
 import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
+('use client');
 
 const SCOPE = 'BUTTON';
 
@@ -20,7 +22,7 @@ const UIButton = createButton({
   Root: Root,
   Text,
   Group: View,
-  Spinner: ActivityIndicator,
+  Spinner: Spinner,
   Icon: UIIcon,
 });
 
@@ -306,10 +308,10 @@ const buttonGroupStyle = tva({
   },
 });
 
-type IButtonProps = Omit<React.ComponentPropsWithoutRef<typeof UIButton>, 'context'> &
+type IButtonProps = Omit<ComponentPropsWithoutRef<typeof UIButton>, 'context'> &
   VariantProps<typeof buttonStyle> & { className?: string };
 
-const Button = React.forwardRef<React.ElementRef<typeof UIButton>, IButtonProps>(
+const Button = forwardRef<ElementRef<typeof UIButton>, IButtonProps>(
   (
     { className, variant = 'solid', size = 'md', action = 'primary', isOnCard = false, ...props },
     ref
@@ -325,10 +327,10 @@ const Button = React.forwardRef<React.ElementRef<typeof UIButton>, IButtonProps>
   }
 );
 
-type IButtonTextProps = React.ComponentPropsWithoutRef<typeof UIButton.Text> &
+type IButtonTextProps = ComponentPropsWithoutRef<typeof UIButton.Text> &
   VariantProps<typeof buttonTextStyle> & { className?: string };
 
-const ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IButtonTextProps>(
+const ButtonText = forwardRef<ElementRef<typeof UIButton.Text>, IButtonTextProps>(
   ({ className, variant, size, action, ...props }, ref) => {
     const {
       variant: parentVariant,
@@ -360,15 +362,15 @@ const ButtonText = React.forwardRef<React.ElementRef<typeof UIButton.Text>, IBut
 
 const ButtonSpinner = UIButton.Spinner;
 
-type IButtonIcon = React.ComponentPropsWithoutRef<typeof UIButton.Icon> &
+type IButtonIcon = ComponentPropsWithoutRef<typeof UIButton.Icon> &
   VariantProps<typeof buttonIconStyle> & {
     className?: string | undefined;
-    as?: React.ElementType;
+    as?: ElementType;
     height?: number;
     width?: number;
   };
 
-const ButtonIcon = React.forwardRef<React.ElementRef<typeof UIButton.Icon>, IButtonIcon>(
+const ButtonIcon = forwardRef<ElementRef<typeof UIButton.Icon>, IButtonIcon>(
   ({ className, size, ...props }, ref) => {
     const {
       variant: parentVariant,
@@ -408,10 +410,10 @@ const ButtonIcon = React.forwardRef<React.ElementRef<typeof UIButton.Icon>, IBut
   }
 );
 
-type IButtonGroupProps = React.ComponentPropsWithoutRef<typeof UIButton.Group> &
+type IButtonGroupProps = ComponentPropsWithoutRef<typeof UIButton.Group> &
   VariantProps<typeof buttonGroupStyle>;
 
-const ButtonGroup = React.forwardRef<React.ElementRef<typeof UIButton.Group>, IButtonGroupProps>(
+const ButtonGroup = forwardRef<ElementRef<typeof UIButton.Group>, IButtonGroupProps>(
   ({ className, space = 'md', isAttached = false, flexDirection = 'column', ...props }, ref) => {
     return (
       <UIButton.Group

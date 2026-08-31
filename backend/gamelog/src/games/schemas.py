@@ -48,9 +48,15 @@ Schema from the backend response to playtime_by_user or playtime_by_game
 """
 
 
+class GamePlaytime(BaseModel):
+    app_id: str
+    playtime_minutes: int
+
+
 class DayByDayPlaytime(BaseModel):
     date: date
     playtime_minutes: int
+    games: list[GamePlaytime] = Field(default_factory=list)
 
 
 """

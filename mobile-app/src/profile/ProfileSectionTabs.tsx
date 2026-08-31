@@ -2,17 +2,16 @@ import { useState } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
-import TotalHoursPieChart from '@gamelog/common/charts/total-hours/TotalHoursPieChart';
-import GameGenreRadarChart from '@gamelog/common/charts/genre-radar/GameGenreRadarChart';
-import type { OwnedGames } from '@gamelog/api-manager/dto';
-import ProfileTopGames from './ProfileTopGames';
-import TotalHoursChart from '@gamelog/common/charts/total-hours/TotalHoursChart';
-import ProfilePlaytimeTrend from './ProfilePlaytimeTrend';
-import ProfilePlatformSplit from './ProfilePlatformSplitChart';
-import { ReportBox } from '../report/ReportBox';
-import type { TopGame } from './profileSelectors';
-import type { PlaytimeTrend } from './playtimeTrendSelectors';
-import type { PlatformSplit } from './platformSplitSelectors';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
+import type { OwnedGames, PlaytimeByUser } from '@gamelog/api-manager/dto';
+
+import ProfileOverviewTab from './tabs/ProfileOverviewTab';
+import ProfileTimeTab from './tabs/ProfileTimeTab';
+import ProfileGenresTab from './tabs/ProfileGenresTab';
+import ProfilePlatformsTab from './tabs/ProfilePlatformsTab';
+
+import type { PlaytimeTrend } from '@gamelog/common/charts/playtime-trend/selectPlaytimeTrend';
+import type { PlatformSplit } from '@gamelog/common/charts/platform-split/selectPlatformSplit';
 
 type ProfileSectionId = 'overview' | 'time' | 'genres' | 'platforms';
 
@@ -24,25 +23,27 @@ const TABS: SectionTab<ProfileSectionId>[] = [
 ];
 
 interface ProfileSectionTabsProps {
-  topGames: TopGame[];
   playtimeTrend: PlaytimeTrend;
   errorPlaytimeTrend?: unknown;
   platformSplit: PlatformSplit;
   ownedGames?: OwnedGames | null;
   errorOwnedGames?: unknown;
-  genreChartData?: any[];
-  errorGenreChart?: unknown;
+  playtimeByUser?: PlaytimeByUser | null;
+  errorPlaytimeByUser?: unknown;
+  userId: string;
+  isLoading?: boolean;
 }
 
 const ProfileSectionTabs = ({
-  topGames,
   playtimeTrend,
   errorPlaytimeTrend,
   platformSplit,
   ownedGames,
   errorOwnedGames,
-  genreChartData,
-  errorGenreChart,
+  playtimeByUser,
+  errorPlaytimeByUser,
+  userId,
+  isLoading,
 }: ProfileSectionTabsProps) => {
   const [activeTab, setActiveTab] = useState<ProfileSectionId>('overview');
 
@@ -55,44 +56,23 @@ const ProfileSectionTabs = ({
         testIDPrefix="profile-tab"
       />
 
-      <VStack className="items-center pt-4">
-        {activeTab === 'overview' && (
-          <VStack space="md" className="w-full">
-            <ProfilePlaytimeTrend trend={playtimeTrend} hasError={!!errorPlaytimeTrend} />
-            <ReportBox />
-            <ProfileTopGames games={topGames} hasError={!!errorOwnedGames} />
-          </VStack>
-        )}
+      <VStack className="items-center pt-4" space="md" w="100%">
+        {isLoading ? (
+          <Spinner size="large" className="py-20 w-full" />
+        ) : (
+          <>
+            {activeTab === 'overview' && <ProfileOverviewTab playtimeByUser={playtimeByUser} />}
 
-        {activeTab === 'time' && (
-          <VStack space="md" className="w-full items-center">
-            <Box className="w-full">
-              <TotalHoursChart
-                ownedGames={ownedGames}
-                isLoadingOwnedGames={false}
-                errorOwnedGames={errorOwnedGames}
-              />
-            </Box>
-            <TotalHoursPieChart
-              ownedGames={ownedGames}
-              isLoadingOwnedGames={false}
-              errorOwnedGames={errorOwnedGames}
-            />
-          </VStack>
-        )}
+            {activeTab === 'time' && (
+              <ProfileTimeTab ownedGames={ownedGames} playtimeByUser={playtimeByUser} />
+            )}
 
-        {activeTab === 'genres' && (
-          <GameGenreRadarChart
-            genreChartData={genreChartData}
-            isLoadingGenreChart={false}
-            errorGenreChart={errorGenreChart}
-          />
-        )}
+            {activeTab === 'genres' && <ProfileGenresTab ownedGames={ownedGames} />}
 
-        {activeTab === 'platforms' && (
-          <Box className="w-full">
-            <ProfilePlatformSplit split={platformSplit} hasError={!!errorOwnedGames} />
-          </Box>
+            {activeTab === 'platforms' && (
+              <ProfilePlatformsTab platformSplit={platformSplit} hasError={!!errorOwnedGames} />
+            )}
+          </>
         )}
       </VStack>
     </Box>

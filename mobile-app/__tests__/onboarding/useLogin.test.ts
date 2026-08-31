@@ -69,7 +69,7 @@ describe('useLogin', () => {
     it('calls signInWithGoogle successfully', async () => {
       const { result } = renderHook(() => useLogin());
       (signInWithGoogle as jest.Mock).mockResolvedValueOnce({});
-      
+
       await act(async () => {
         await result.current.handleGoogleSignIn();
       });
@@ -81,7 +81,7 @@ describe('useLogin', () => {
     it('sets error code if signInWithGoogle fails', async () => {
       const { result } = renderHook(() => useLogin());
       (signInWithGoogle as jest.Mock).mockRejectedValueOnce({ code: 'auth/google-error' });
-      
+
       await act(async () => {
         await result.current.handleGoogleSignIn();
       });
@@ -93,7 +93,7 @@ describe('useLogin', () => {
     it('sets default error code if signInWithGoogle fails without code', async () => {
       const { result } = renderHook(() => useLogin());
       (signInWithGoogle as jest.Mock).mockRejectedValueOnce({});
-      
+
       await act(async () => {
         await result.current.handleGoogleSignIn();
       });
@@ -105,7 +105,7 @@ describe('useLogin', () => {
   describe('handleFacebookSignIn', () => {
     it('sets provider-setup-pending error', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       await act(async () => {
         await result.current.handleFacebookSignIn();
       });
@@ -118,7 +118,7 @@ describe('useLogin', () => {
   describe('handleGithubSignIn', () => {
     it('sets provider-setup-pending error', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       await act(async () => {
         await result.current.handleGithubSignIn();
       });
@@ -131,7 +131,7 @@ describe('useLogin', () => {
   describe('handleEmailAuth', () => {
     it('sets validation error if missing fields', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       await act(async () => {
         await result.current.handleEmailAuth();
       });
@@ -141,7 +141,7 @@ describe('useLogin', () => {
 
     it('sets validation error if passwords mismatch in signup', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       act(() => {
         result.current.setIsSignUp(true);
         result.current.setEmail('test@example.com');
@@ -158,7 +158,7 @@ describe('useLogin', () => {
 
     it('calls signInWithEmailAndPassword in signin mode', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       act(() => {
         result.current.setEmail('test@example.com');
         result.current.setPassword('password123');
@@ -170,14 +170,18 @@ describe('useLogin', () => {
         await result.current.handleEmailAuth();
       });
 
-      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(expect.anything(), 'test@example.com', 'password123');
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        'test@example.com',
+        'password123'
+      );
       expect(result.current.loading).toBe(false);
       expect(result.current.errorCode).toBeNull();
     });
 
     it('calls createUserWithEmailAndPassword in signup mode', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       act(() => {
         result.current.setIsSignUp(true);
         result.current.setEmail('test@example.com');
@@ -193,7 +197,11 @@ describe('useLogin', () => {
         await result.current.handleEmailAuth();
       });
 
-      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(expect.anything(), 'test@example.com', 'password123');
+      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+        expect.anything(),
+        'test@example.com',
+        'password123'
+      );
       expect(sendEmailVerification).toHaveBeenCalledWith(mockUser);
       expect(result.current.loading).toBe(false);
       expect(result.current.errorCode).toBeNull();
@@ -201,13 +209,15 @@ describe('useLogin', () => {
 
     it('handles firebase auth errors with code', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       act(() => {
         result.current.setEmail('test@example.com');
         result.current.setPassword('password123');
       });
 
-      (signInWithEmailAndPassword as jest.Mock).mockRejectedValueOnce({ code: 'auth/invalid-credential' });
+      (signInWithEmailAndPassword as jest.Mock).mockRejectedValueOnce({
+        code: 'auth/invalid-credential',
+      });
 
       await act(async () => {
         await result.current.handleEmailAuth();
@@ -219,13 +229,15 @@ describe('useLogin', () => {
 
     it('extracts firebase error code from message if code is missing', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       act(() => {
         result.current.setEmail('test@example.com');
         result.current.setPassword('password123');
       });
 
-      (signInWithEmailAndPassword as jest.Mock).mockRejectedValueOnce({ message: 'Firebase: Error (auth/user-not-found).' });
+      (signInWithEmailAndPassword as jest.Mock).mockRejectedValueOnce({
+        message: 'Firebase: Error (auth/user-not-found).',
+      });
 
       await act(async () => {
         await result.current.handleEmailAuth();
@@ -236,7 +248,7 @@ describe('useLogin', () => {
 
     it('falls back to network-request-failed if no code or message matches', async () => {
       const { result } = renderHook(() => useLogin());
-      
+
       act(() => {
         result.current.setEmail('test@example.com');
         result.current.setPassword('password123');

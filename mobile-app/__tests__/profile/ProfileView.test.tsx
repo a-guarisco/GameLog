@@ -43,7 +43,7 @@ jest.mock('@gamelog/common/feedbacks/LoadingBox', () => {
   };
 });
 
-jest.mock('@gamelog/common/charts/total-hours/TotalHoursPieChart', () => {
+jest.mock('@gamelog/common/charts/total-hours/TotalHoursDoughnut', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, default: () => <View testID="total-hours-pie-chart" /> };
 });
@@ -54,6 +54,18 @@ jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
 jest.mock('@gamelog/report/ReportBox', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, ReportBox: () => <View testID="report-box" /> };
+});
+jest.mock('@gamelog/common/charts/playtime-trend/PlaytimeTrendChart', () => {
+  const { View } = jest.requireActual('react-native');
+  return { __esModule: true, default: () => <View testID="profile-playtime-trend" /> };
+});
+jest.mock('@gamelog/common/charts/playtime-blocks/PlaytimeBlocksChart', () => {
+  const { View } = jest.requireActual('react-native');
+  return { __esModule: true, default: () => <View testID="playtime-blocks-chart" /> };
+});
+jest.mock('@gamelog/common/charts/platform-split/PlatformSplitChart', () => {
+  const { View } = jest.requireActual('react-native');
+  return { __esModule: true, default: () => <View testID="profile-platform-split" /> };
 });
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
@@ -176,46 +188,44 @@ const setupLoadingMocks = (loading: Record<string, boolean>) => {
 describe('ProfileView — loading', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it('shows LoadingBox with "Loading Profile" while owned games are loading', () => {
+  it('shows Spinner while owned games are loading', () => {
     setupLoadingMocks({ ownedGames: true });
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
-    expect(screen.getByText('Loading Profile')).toBeTruthy();
-    expect(screen.queryByTestId('profile-header-image')).toBeNull();
+    expect(screen.getByLabelText('loading')).toBeTruthy();
   });
 
-  it('shows LoadingBox while player info is loading', () => {
+  it('shows Spinner while player info is loading', () => {
     setupLoadingMocks({ playersInfo: true });
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+    expect(screen.getByLabelText('loading')).toBeTruthy();
   });
 
-  it('shows LoadingBox while the streak is loading', () => {
+  it('shows Spinner while the streak is loading', () => {
     setupLoadingMocks({ userStreak: true });
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+    expect(screen.getByLabelText('loading')).toBeTruthy();
   });
 
-  it('shows LoadingBox while the two-week playtime report is loading', () => {
+  it('shows Spinner while the two-week playtime report is loading', () => {
     setupLoadingMocks({ playtimeReport: true });
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+    expect(screen.getByLabelText('loading')).toBeTruthy();
   });
 
-  it('shows LoadingBox while the day-by-day playtime history is loading', () => {
+  it('shows Spinner while the day-by-day playtime history is loading', () => {
     setupLoadingMocks({ playtimeByUser: true });
 
     render(<ProfileView />);
 
-    expect(screen.getByTestId('profile-loading-box')).toBeTruthy();
+    expect(screen.getByLabelText('loading')).toBeTruthy();
   });
 });
 
@@ -302,27 +312,9 @@ describe('ProfileView — loaded', () => {
   });
 
   it('plots the backend playtime history on the overview tab', () => {
-    jest.useFakeTimers().setSystemTime(new Date(2026, 7, 18, 10, 30));
     setupLoadedMocks();
-
     render(<ProfileView />);
-
-    // 90 + 150 minutes over the window, and the busiest day fills the plot.
-    expect(screen.getByText('4h 0m')).toBeTruthy();
-    expect(screen.getByTestId('profile-trend-bar-2026-08-18')).toBeTruthy();
-    expect(screen.getByText('Played 2 of 14 days.')).toBeTruthy();
-    jest.useRealTimers();
-  });
-
-  it('opens on the overview tab with the top games ranked', () => {
-    setupLoadedMocks();
-
-    render(<ProfileView />);
-
-    expect(screen.getByTestId('profile-top-games')).toBeTruthy();
-    expect(screen.getByTestId('profile-top-game-fill-236390').props.style).toEqual(
-      expect.objectContaining({ width: '100%' })
-    );
+    expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
   });
 
   it('reaches every chart through the tabs', () => {

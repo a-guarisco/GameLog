@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import LoginScreen from '../../src/onboarding/LoginScreen';
 import { useLogin } from '../../src/onboarding/useLogin';
@@ -37,12 +36,12 @@ describe('LoginScreen', () => {
 
   it('renders correctly in signin mode', () => {
     const { getByText, getByPlaceholderText, queryByPlaceholderText } = render(<LoginScreen />);
-    
+
     expect(getByText('GameLog')).toBeTruthy();
     expect(getByPlaceholderText('Email')).toBeTruthy();
     expect(getByPlaceholderText('Password')).toBeTruthy();
     expect(queryByPlaceholderText('Confirm Password')).toBeNull();
-    
+
     expect(getByText('Continue with Google')).toBeTruthy();
     expect(getByText('Continue with Facebook')).toBeTruthy();
     expect(getByText('Continue with GitHub')).toBeTruthy();
@@ -55,7 +54,7 @@ describe('LoginScreen', () => {
     });
 
     const { getByText, getByPlaceholderText } = render(<LoginScreen />);
-    
+
     expect(getByPlaceholderText('Email')).toBeTruthy();
     expect(getByPlaceholderText('Password')).toBeTruthy();
     expect(getByPlaceholderText('Confirm Password')).toBeTruthy();
@@ -66,10 +65,10 @@ describe('LoginScreen', () => {
     // We assume GLSegmentedControl renders some text that we can press
     // Typically it renders the labels "Sign In" and "Sign Up"
     const { getByText } = render(<LoginScreen />);
-    
+
     const signUpTab = getByText('Sign Up');
     fireEvent.press(signUpTab);
-    
+
     // It's up to the implementation of GLSegmentedControl, but let's assume it fires the onSelect
     // If GLSegmentedControl handles touch correctly, setAuthMode will be called.
     // If not, we might need a test specifically for GLSegmentedControl or mock it.
@@ -84,7 +83,7 @@ describe('LoginScreen', () => {
     });
 
     const { getByText } = render(<LoginScreen />);
-    
+
     expect(getByText(/Haven't registered yet\?/)).toBeTruthy();
     const btn = getByText('Go to Sign Up');
     fireEvent.press(btn);
@@ -99,7 +98,7 @@ describe('LoginScreen', () => {
     });
 
     const { getByText, queryByText } = render(<LoginScreen />);
-    
+
     expect(queryByText(/Haven't registered yet\?/)).toBeNull();
     expect(getByText('Error: auth/invalid-credential')).toBeTruthy();
   });
@@ -111,13 +110,13 @@ describe('LoginScreen', () => {
     });
 
     const { getByText } = render(<LoginScreen />);
-    
+
     expect(getByText('Account created!')).toBeTruthy();
   });
 
   it('handles social login presses', () => {
     const { getByTestId } = render(<LoginScreen />);
-    
+
     fireEvent.press(getByTestId('gl-google-button'));
     expect(mockUseLogin.handleGoogleSignIn).toHaveBeenCalled();
 

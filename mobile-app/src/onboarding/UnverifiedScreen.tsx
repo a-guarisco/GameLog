@@ -1,4 +1,3 @@
-import React from 'react';
 import { View } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -25,16 +24,23 @@ export default function UnverifiedScreen() {
   return (
     <View className="flex-1 bg-background-50 dark:bg-background-0 items-center justify-center p-6">
       <Box className="w-full max-w-[400px] items-center">
-        <Ionicons name="mail-unread-outline" size={80} color={toHex(brand.primary['500'])} className="mb-4" />
-        
+        <Ionicons
+          name="mail-unread-outline"
+          size={80}
+          color={toHex(brand.primary['500'])}
+          className="mb-4"
+        />
+
         <Text size="2xl" bold className="text-center mb-2">
           Verify your Email
         </Text>
-        
+
         <Text className="text-center text-typography-600 mb-8">
           We sent a verification link to{' '}
-          <Text bold className="text-typography-900">{firebaseUser?.email}</Text>. 
-          Click the link to activate your account and start using GameLog.
+          <Text bold className="text-typography-900">
+            {firebaseUser?.email}
+          </Text>
+          . Click the link to activate your account and start using GameLog.
         </Text>
 
         <Box className="w-full gap-4">
@@ -43,7 +49,12 @@ export default function UnverifiedScreen() {
             <ButtonText>I verified it, continue</ButtonText>
           </Button>
 
-          <Button variant="outline" action="secondary" onPress={handleResendEmail} isDisabled={loading || resendLoading}>
+          <Button
+            variant="outline"
+            action="secondary"
+            onPress={handleResendEmail}
+            isDisabled={loading || resendLoading}
+          >
             {resendLoading ? <ButtonSpinner className="mr-2" /> : null}
             <ButtonText>Resend email</ButtonText>
           </Button>

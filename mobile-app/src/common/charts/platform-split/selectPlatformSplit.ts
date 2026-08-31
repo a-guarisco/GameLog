@@ -31,7 +31,7 @@ const toPercentLabel = (percent: number) => {
   return rounded === 0 ? '<1%' : `${rounded}%`;
 };
 
-export const getPlatformSplit = (ownedGames?: OwnedGames | null): PlatformSplit => {
+export const selectPlatformSplit = (ownedGames?: OwnedGames | null): PlatformSplit => {
   const games = ownedGames?.response?.games ?? [];
 
   const totals = PLATFORMS.map((platform) => ({

@@ -53,7 +53,9 @@ export default function ProfileSetupScreen() {
                 helperText="Your 17-digit Steam ID64."
               />
               <Pressable
-                onPress={() => Linking.openURL('https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC')}
+                onPress={() =>
+                  Linking.openURL('https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC')
+                }
                 className="mt-1 self-end"
               >
                 <Text className="text-primary-500 text-xs underline">How to find my Steam ID?</Text>
@@ -79,7 +81,12 @@ export default function ProfileSetupScreen() {
             </Box>
           </Box>
 
-          <Button onPress={handleRegister} isDisabled={loading} className="w-full mt-4 mb-4" size="xl">
+          <Button
+            onPress={handleRegister}
+            isDisabled={loading}
+            className="w-full mt-4 mb-4"
+            size="xl"
+          >
             {loading ? <ButtonSpinner className="mr-2" /> : null}
             <ButtonText>Complete Setup</ButtonText>
           </Button>

@@ -1,4 +1,4 @@
-import { getPlatformSplit } from '@gamelog/profile/platformSplitSelectors';
+import { selectPlatformSplit } from '@gamelog/common/charts/platform-split/selectPlatformSplit';
 import type { OwnedGames } from '@gamelog/api-manager/dto';
 
 const makeGame = (overrides: Record<string, number> = {}) =>
@@ -20,9 +20,9 @@ const makeLibrary = (games: OwnedGames['response']['games']): OwnedGames => ({
   response: { game_count: games.length, games },
 });
 
-describe('getPlatformSplit', () => {
+describe('selectPlatformSplit', () => {
   it('sums each platform across the library and ranks them', () => {
-    const split = getPlatformSplit(
+    const split = selectPlatformSplit(
       makeLibrary([
         makeGame({ playtime_windows_forever: 600, playtime_linux_forever: 120 }),
         makeGame({ playtime_windows_forever: 600, playtime_deck_forever: 300 }),
@@ -34,14 +34,14 @@ describe('getPlatformSplit', () => {
   });
 
   it('drops platforms that were never played', () => {
-    const split = getPlatformSplit(makeLibrary([makeGame({ playtime_windows_forever: 600 })]));
+    const split = selectPlatformSplit(makeLibrary([makeGame({ playtime_windows_forever: 600 })]));
 
     expect(split.shares).toHaveLength(1);
     expect(split.shares[0].name).toBe('Windows');
   });
 
   it('gives each platform its share of the total', () => {
-    const split = getPlatformSplit(
+    const split = selectPlatformSplit(
       makeLibrary([makeGame({ playtime_windows_forever: 750, playtime_deck_forever: 250 })])
     );
 
@@ -51,7 +51,7 @@ describe('getPlatformSplit', () => {
   });
 
   it('never rounds a played platform down to 0%', () => {
-    const split = getPlatformSplit(
+    const split = selectPlatformSplit(
       makeLibrary([makeGame({ playtime_windows_forever: 100000, playtime_mac_forever: 60 })])
     );
 
@@ -59,14 +59,14 @@ describe('getPlatformSplit', () => {
   });
 
   it('groups the thousands in every hour label', () => {
-    const split = getPlatformSplit(makeLibrary([makeGame({ playtime_windows_forever: 69120 })]));
+    const split = selectPlatformSplit(makeLibrary([makeGame({ playtime_windows_forever: 69120 })]));
 
     expect(split.shares[0].hoursLabel).toBe('1,152h');
     expect(split.totalLabel).toBe('1,152h');
   });
 
   it('carries an icon per platform', () => {
-    const split = getPlatformSplit(
+    const split = selectPlatformSplit(
       makeLibrary([
         makeGame({
           playtime_windows_forever: 40,
@@ -86,7 +86,7 @@ describe('getPlatformSplit', () => {
   });
 
   it('ignores negative playtime rather than subtracting it from the total', () => {
-    const split = getPlatformSplit(
+    const split = selectPlatformSplit(
       makeLibrary([makeGame({ playtime_windows_forever: 600, playtime_mac_forever: -600 })])
     );
 
@@ -95,7 +95,7 @@ describe('getPlatformSplit', () => {
   });
 
   it('reports an empty library without dividing by zero', () => {
-    const split = getPlatformSplit(makeLibrary([]));
+    const split = selectPlatformSplit(makeLibrary([]));
 
     expect(split.shares).toEqual([]);
     expect(split.hasPlaytime).toBe(false);
@@ -103,13 +103,13 @@ describe('getPlatformSplit', () => {
   });
 
   it('survives a library that never arrived', () => {
-    expect(getPlatformSplit(null).hasPlaytime).toBe(false);
-    expect(getPlatformSplit(undefined).shares).toEqual([]);
-    expect(getPlatformSplit({} as OwnedGames).hasPlaytime).toBe(false);
+    expect(selectPlatformSplit(null).hasPlaytime).toBe(false);
+    expect(selectPlatformSplit(undefined).shares).toEqual([]);
+    expect(selectPlatformSplit({} as OwnedGames).hasPlaytime).toBe(false);
   });
 
   it('treats missing per-platform fields as zero', () => {
-    const split = getPlatformSplit(makeLibrary([{ playtime_windows_forever: 600 } as any]));
+    const split = selectPlatformSplit(makeLibrary([{ playtime_windows_forever: 600 } as any]));
 
     expect(split.shares).toHaveLength(1);
     expect(split.shares[0].percent).toBe(100);

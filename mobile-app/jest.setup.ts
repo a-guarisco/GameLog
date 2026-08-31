@@ -51,6 +51,14 @@ jest.mock('expo-blur', () => {
   };
 });
 
+jest.mock('nativewind', () => ({
+  cssInterop: jest.fn(),
+  verifyTemplate: jest.fn(),
+  withTV: jest.fn(),
+  vars: jest.fn(() => ({})),
+  useColorScheme: jest.fn(() => ({ colorScheme: 'light', setColorScheme: jest.fn() })),
+}));
+
 jest.mock('expo-linear-gradient', () => {
   const { View } = jest.requireActual('react-native');
 

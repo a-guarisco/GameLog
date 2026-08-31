@@ -1,20 +1,25 @@
 import { OwnedGames } from '@gamelog/api-manager/dto';
-import { BarData } from '../charts.type';
+export interface BarData {
+  value: number;
+  appid: string;
+  frontColor: string;
+  gradientColor: string;
+  label: string;
+}
 
 const buildTotalHoursBarData = (ownedGames: OwnedGames | null): BarData[] => {
   if (!ownedGames?.response?.games) return [];
 
-  const data = ownedGames.response.games.map(
-    (game: { playtime_forever: number; name: string; appid: string }) => ({
-      value: Math.trunc(game.playtime_forever / 60),
-      appid: game.appid,
+  const data = ownedGames.response.games
+    .filter((game: { playtime_forever: number }) => game.playtime_forever > 0)
+    .map((game: { playtime_forever: number; name: string; appid: string }) => ({
+      value: game.playtime_forever,
+      appid: String(game.appid),
       frontColor: '',
       gradientColor: '',
-      spacing: 12,
-      label: game.name.length > 10 ? game.name.slice(0, 100) + '...' : game.name,
-      name: game.name, // Keep the full name for navigation
-    })
-  );
+      label: game.name,
+      name: game.name,
+    }));
 
   const sortedData = data.sort((a, b) => b.value - a.value).slice(0, 100);
 

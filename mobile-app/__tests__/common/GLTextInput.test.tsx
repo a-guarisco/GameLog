@@ -1,10 +1,13 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { GLTextInput } from '../../src/common/GLTextInput';
 import { View, Text } from 'react-native';
 
 describe('GLTextInput', () => {
-  const MockIcon = (props: any) => <Text testID="mock-icon" {...props}>Icon</Text>;
+  const MockIcon = (props: any) => (
+    <Text testID="mock-icon" {...props}>
+      Icon
+    </Text>
+  );
 
   it('renders with default props', () => {
     const { getByPlaceholderText } = render(<GLTextInput placeholder="Basic input" />);
@@ -36,27 +39,21 @@ describe('GLTextInput', () => {
 
   it('renders with right icon and handles press', () => {
     const onPressMock = jest.fn();
-    const { root } = render(
-      <GLTextInput rightIcon={MockIcon} onRightIconPress={onPressMock} />
-    );
+    const { root } = render(<GLTextInput rightIcon={MockIcon} onRightIconPress={onPressMock} />);
     expect(root.findByType(MockIcon)).toBeTruthy();
-    
+
     // In Gluestack, InputSlot wraps the RightIcon, making it pressable if onPress is provided.
     // It's hard to trigger that press without testID on the slot itself.
     // Let's just ensure it renders with RightIcon to cover the branch.
   });
 
   it('applies isInvalid correctly', () => {
-    const { getByPlaceholderText } = render(
-      <GLTextInput isInvalid placeholder="Invalid input" />
-    );
+    const { getByPlaceholderText } = render(<GLTextInput isInvalid placeholder="Invalid input" />);
     expect(getByPlaceholderText('Invalid input')).toBeTruthy();
   });
 
   it('applies isDisabled correctly', () => {
-    const { UNSAFE_getByProps } = render(
-      <GLTextInput isDisabled placeholder="Disabled input" />
-    );
+    const { UNSAFE_getByProps } = render(<GLTextInput isDisabled placeholder="Disabled input" />);
     expect(UNSAFE_getByProps({ placeholder: 'Disabled input' })).toBeTruthy();
   });
 
@@ -64,7 +61,7 @@ describe('GLTextInput', () => {
     const { root } = render(
       <GLTextInput containerClassName="custom-container" className="custom-input" />
     );
-    
+
     // We just verify it renders without crashing. The branches for classNames default values are tested.
     expect(root).toBeTruthy();
   });

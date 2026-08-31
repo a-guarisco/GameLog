@@ -76,14 +76,16 @@ describe('firebaseClient', () => {
     const { auth } = require('../../src/auth/firebaseClient');
     expect(auth).toBeDefined();
   });
-  
+
   it('falls back to getAuth if initializeAuth throws', () => {
     setupValidEnv();
-    
+
     // Mock @firebase/auth to throw on initializeAuth
     jest.doMock('@firebase/auth', () => {
       return {
-        initializeAuth: () => { throw new Error('Cannot init twice'); },
+        initializeAuth: () => {
+          throw new Error('Cannot init twice');
+        },
         getAuth: jest.fn(() => 'fallback-auth'),
         getReactNativePersistence: jest.fn(),
         connectAuthEmulator: jest.fn(),

@@ -2,7 +2,7 @@ import buildTotalHoursPieData from '@gamelog/common/charts/total-hours/buildTota
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 
 jest.mock('@gamelog/common/charts/chartsHelpers', () => ({
-  parseRGB: (c: any) => c ? `rgb(${String(c).replace(/ /g, ',')})` : 'transparent',
+  parseRGB: (c: any) => (c ? `rgb(${String(c).replace(/ /g, ',')})` : 'transparent'),
 }));
 
 jest.mock('@gamelog/utils/formatUtils', () => ({

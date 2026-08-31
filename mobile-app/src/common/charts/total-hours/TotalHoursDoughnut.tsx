@@ -1,23 +1,23 @@
-import React, { useMemo } from 'react';
+import { memo, useRef, useEffect, useCallback } from 'react';
 import { PieChart } from 'react-native-gifted-charts';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { computePieRadius, computePieInnerRadius, parseRGB } from '../chartsHelpers';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
 import ChartWrapperCard from '../ChartWrapperCard';
-import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
-import buildTotalHoursPieData from './buildTotalHoursPieData';
-import { PieData } from '../charts.type';
-interface TotalHoursPieChartProps {
-  ownedGames?: any;
-  isLoadingOwnedGames?: boolean;
-  errorOwnedGames?: any;
+import { useTotalHoursDoughnut } from './useTotalHoursDoughnut';
+import { Animated, Easing } from 'react-native';
+
+import type { OwnedGames } from '@gamelog/api-manager/dto';
+
+interface TotalHoursDoughnutProps {
+  ownedGames?: OwnedGames | null;
 }
 
 const GAME_TO_REPRESENT = 5;
 
 // Memoized Center Label to prevent re-renders breaking the animation
-const CenterLabel = React.memo(({ pieData, theme, legendWidth, legendHeight }: any) => (
+const CenterLabel = memo(({ pieData, theme, legendWidth, legendHeight }: any) => (
   <Box
     style={{
       width: legendWidth,
@@ -49,7 +49,7 @@ const CenterLabel = React.memo(({ pieData, theme, legendWidth, legendHeight }: a
         <Text
           style={{
             color: `rgb(${theme['--color-typography-200']})`,
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: '600',
           }}
           numberOfLines={1}
@@ -60,9 +60,10 @@ const CenterLabel = React.memo(({ pieData, theme, legendWidth, legendHeight }: a
     ))}
   </Box>
 ));
+CenterLabel.displayName = 'CenterLabel';
 
 // Memoized Tooltip
-const Tooltip = React.memo(({ item, theme, totalMinutes }: any) => {
+const Tooltip = memo(({ item, theme, totalMinutes }: any) => {
   const value = parseInt(item.value.toString());
   const percent = Math.round((value / totalMinutes) * 100);
   const formatted = `${formatMinutesToHours(value)} · ${percent}%`;
@@ -100,21 +101,20 @@ const Tooltip = React.memo(({ item, theme, totalMinutes }: any) => {
     </Box>
   );
 });
-
-import { Animated, Easing } from 'react-native';
+Tooltip.displayName = 'Tooltip';
 
 // Memoized Chart Wrapper to completely isolate the PieChart
-const AnimatedPieChart = React.memo(({ pieData, theme, cardWidth, totalMinutes }: any) => {
+const AnimatedPieChart = memo(({ pieData, theme, cardWidth, totalMinutes }: any) => {
   const radius = computePieRadius(cardWidth);
   const innerRadius = computePieInnerRadius(radius);
   const legendHeight = Math.floor(innerRadius * Math.SQRT2);
   const legendWidth = legendHeight - 20;
 
   // Custom entrance animation to bypass gifted-charts bugs
-  const scale = React.useRef(new Animated.Value(0.3)).current;
-  const opacity = React.useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0.3)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Run the scale and fade animations in parallel
     Animated.parallel([
       Animated.timing(opacity, {
@@ -130,20 +130,29 @@ const AnimatedPieChart = React.memo(({ pieData, theme, cardWidth, totalMinutes }
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [opacity, scale]);
 
-  const renderTooltip = React.useCallback(
+  const renderTooltip = useCallback(
     (index: number) => <Tooltip item={pieData[index]} theme={theme} totalMinutes={totalMinutes} />,
     [pieData, theme, totalMinutes]
   );
 
-  const renderCenter = React.useCallback(
-    () => <CenterLabel pieData={pieData} theme={theme} legendWidth={legendWidth} legendHeight={legendHeight} />,
+  const renderCenter = useCallback(
+    () => (
+      <CenterLabel
+        pieData={pieData}
+        theme={theme}
+        legendWidth={legendWidth}
+        legendHeight={legendHeight}
+      />
+    ),
     [pieData, theme, legendWidth, legendHeight]
   );
 
   return (
-    <Animated.View style={{ opacity, transform: [{ scale }], alignItems: 'center', justifyContent: 'center' }}>
+    <Animated.View
+      style={{ opacity, transform: [{ scale }], alignItems: 'center', justifyContent: 'center' }}
+    >
       <PieChart
         data={pieData}
         donut
@@ -160,35 +169,38 @@ const AnimatedPieChart = React.memo(({ pieData, theme, cardWidth, totalMinutes }
     </Animated.View>
   );
 });
+AnimatedPieChart.displayName = 'AnimatedPieChart';
 
-const TotalHoursPieChart = ({
-  ownedGames,
-  isLoadingOwnedGames = false,
-  errorOwnedGames,
-}: TotalHoursPieChartProps) => {
-  const pieData: PieData[] = useMemo(() => {
-    return buildTotalHoursPieData(ownedGames, GAME_TO_REPRESENT);
-  }, [ownedGames]);
-
-  const totalMinutes = useMemo(() => pieData.reduce((sum, d) => sum + d.value, 0), [pieData]);
+const TotalHoursDoughnut = ({ ownedGames }: TotalHoursDoughnutProps) => {
+  const { pieData, totalMinutes } = useTotalHoursDoughnut(ownedGames, GAME_TO_REPRESENT);
 
   return (
     <ChartWrapperCard
-      label="Total Hours Pie"
-      isLoading={isLoadingOwnedGames}
-      error={!!errorOwnedGames}
+      label="Top 5 Doughnut"
+      isLoading={false}
+      error={false}
       testID="total-hours-pie-chart"
     >
-      {({ cardWidth, theme }) => (
-        <AnimatedPieChart 
-          pieData={pieData} 
-          theme={theme} 
-          cardWidth={cardWidth} 
-          totalMinutes={totalMinutes} 
-        />
-      )}
+      {({ cardWidth, theme }) => {
+        if (pieData.length === 0) {
+          return (
+            <Box className="py-8 items-center justify-center w-full">
+              <Text className="text-typography-400">No games found</Text>
+            </Box>
+          );
+        }
+
+        return (
+          <AnimatedPieChart
+            pieData={pieData}
+            theme={theme}
+            cardWidth={cardWidth}
+            totalMinutes={totalMinutes}
+          />
+        );
+      }}
     </ChartWrapperCard>
   );
 };
 
-export default TotalHoursPieChart;
+export default TotalHoursDoughnut;

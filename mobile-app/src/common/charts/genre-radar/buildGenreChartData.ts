@@ -1,7 +1,11 @@
 import apiManager from '@gamelog/api-manager/apiManager';
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import { INFO_GRADIENT_TIERS, getTopGames } from '../chartsHelpers';
-import { GenreChartItem } from '../charts.type';
+export interface GenreChartItem {
+  label: string;
+  value: number;
+  color: string;
+}
 
 export const TOP_GAMES_TO_FETCH = 8;
 export const TOP_GENRES_TO_SHOW = 8;

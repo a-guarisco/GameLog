@@ -6,13 +6,13 @@ const getGames = (ownedGames?: OwnedGames | null): GameItem[] => ownedGames?.res
 
 const toHours = (minutes: number) => Math.floor(minutes / 60);
 
-export const getMostPlayedGame = (ownedGames?: OwnedGames | null): GameItem | null =>
+export const selectMostPlayedGame = (ownedGames?: OwnedGames | null): GameItem | null =>
   getGames(ownedGames).reduce<GameItem | null>(
     (best, game) => (!best || game.playtime_forever > best.playtime_forever ? game : best),
     null
   );
 
-export const getProfileStats = (
+export const selectProfileStats = (
   ownedGames?: OwnedGames | null,
   recentMinutes: number = 0
 ): GameStat[] => {
@@ -36,7 +36,7 @@ export interface TopGame {
 
 const TOP_GAMES_COUNT = 5;
 
-export const getTopGamesByHours = (
+export const selectTopGamesByHours = (
   ownedGames?: OwnedGames | null,
   limit: number = TOP_GAMES_COUNT
 ): TopGame[] => {
@@ -58,5 +58,5 @@ export const getTopGamesByHours = (
 };
 
 /** Steam sends `timecreated` in seconds; accounts predating the field simply have no chip. */
-export const getMemberSinceLabel = (timecreated?: number | null): string | null =>
+export const selectMemberSinceLabel = (timecreated?: number | null): string | null =>
   timecreated ? `Since ${new Date(timecreated * 1000).getFullYear()}` : null;
