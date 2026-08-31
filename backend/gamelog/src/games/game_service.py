@@ -8,8 +8,9 @@ from fastapi import HTTPException
 from sqlmodel import Session, col, select
 
 from src.games import steam_fetcher_service
-from src.games.schemas import DailyGameReport, DailyReport, DayByDayPlaytime, SteamGame
+from src.games.schemas import DailyGameReport, DailyReport, DayByDayPlaytime, GameStatusesResponse, SteamGame
 from src.models import Game, GameStatus, Genre, Shelving, SteamRollingTime, User
+
 from src.users import user_service
 
 
@@ -70,8 +71,25 @@ def get_game_status(session: Session, user_id: str, steam_app_id: str) -> GameSt
         raise HTTPException(status_code=404, detail="Game not found in cache.")
     shelve = _get_game_player_shelve(session, game.id, user.id)
     if not shelve:
-        raise HTTPException(status_code=401, detail="Game not found in user's shelf.")
+        raise HTTPException(status_code=404, detail="Game not found in user's shelf.")
     return shelve.status
+
+
+def get_user_game_statuses(session: Session, user_id: str) -> list[GameStatusesResponse]:
+    """
+    Return a list of GameStatusesResponse containing statuses for all games shelved by the user.
+    """
+    user = user_service.get_user_by_firebase_uid(session, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    statement = (
+        select(Game.steam_app_id, Shelving.status)
+        .join(Shelving, col(Shelving.game_id) == Game.id)
+        .where(col(Shelving.owner_id) == user.id)
+    )
+    results = session.exec(statement).all()
+    return [GameStatusesResponse(app_id=steam_app_id, status=status) for steam_app_id, status in results]
+
 
 
 def get_streak(session: Session, user_id: str, steam_app_id: str | None, target_date: date | None = None) -> int:

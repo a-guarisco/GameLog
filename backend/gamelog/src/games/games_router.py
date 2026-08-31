@@ -8,8 +8,9 @@ from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.games import game_service, recommendations_service
-from src.games.schemas import DailyReport, GameGenres, GenresBatchRequest, RecommendationResponse, UpdateStatus
+from src.games.schemas import DailyReport, GameGenres, GameStatusesResponse, GenresBatchRequest, RecommendationResponse, UpdateStatus
 from src.models import GameStatus
+
 
 router = APIRouter(prefix="/games", tags=["games"])
 
@@ -122,17 +123,22 @@ async def update_game_status(
 @router.get(
     "/game_status",
     summary="Get user game status",
+    response_model=GameStatus | list[GameStatusesResponse],
     status_code=200,
 )
 def get_game_status(
-    steam_app_id: str,
+    steam_app_id: str | None = None,
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> GameStatus:
+) -> GameStatus | list[GameStatusesResponse]:
+
     """
-    Get the status of a game for the current user.
+    Get the status of a game for the current user, or all game statuses if steam_app_id is not provided.
     """
-    return game_service.get_game_status(session=db, user_id=auth_user.uid, steam_app_id=steam_app_id)
+    if steam_app_id is not None:
+        return game_service.get_game_status(session=db, user_id=auth_user.uid, steam_app_id=steam_app_id)
+    return game_service.get_user_game_statuses(session=db, user_id=auth_user.uid)
+
 
 @router.post(
     "/genres_batch",

@@ -135,3 +135,12 @@ class GameGenres(BaseModel):
     genres: list[str] = Field(default_factory=list)
 
 
+class GameStatusesResponse(BaseModel):
+    app_id: str
+    status: GameStatus
+
+
+GameStatuesResponse = GameStatusesResponse
+
+
+
