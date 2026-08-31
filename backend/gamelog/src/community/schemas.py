@@ -32,3 +32,7 @@ class CommunityMonthlyPlaytimeResponse(BaseModel):
     community: list[float]
 
 
+class CommunityWeeklyTopGameResponse(BaseModel):
+    id: str
+    user_playtime: float
+    community_playtime: float
