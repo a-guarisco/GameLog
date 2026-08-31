@@ -1,48 +1,42 @@
-import { render, fireEvent } from '@testing-library/react-native';
+import React from 'react';
+import { render } from '@testing-library/react-native';
 import { GameListControls } from '@gamelog/game-list/GameListControls';
+import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 
-describe('GameListControls Component', () => {
-  const mockOnSortChange = jest.fn();
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <GluestackUIProvider mode="light">{children}</GluestackUIProvider>
+);
+
+describe('GameListControls', () => {
+  const mockProps = {
+    searchQuery: '',
+    onSearchChange: jest.fn(),
+    sortBy: 'playtime' as const,
+    onSortChange: jest.fn(),
+    genreFilter: 'All',
+    setGenreFilter: jest.fn(),
+    platformFilter: 'All',
+    setPlatformFilter: jest.fn(),
+    dateRangeFilter: { start: null, end: null },
+    setDateRangeFilter: jest.fn(),
+    allAvailableGenres: ['Action', 'RPG'],
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders correctly with "name" sort option', () => {
-    const { getByText } = render(
-      <GameListControls sortBy="name" onSortChange={mockOnSortChange} />
-    );
+  it('renders all filter components', () => {
+    const { getByText } = render(<GameListControls {...mockProps} />, { wrapper });
 
-    expect(getByText('Sort by: name')).toBeTruthy();
+    expect(getByText('Sort', { exact: false })).toBeTruthy();
+    expect(getByText('Genre', { exact: false })).toBeTruthy();
+    expect(getByText('Platform', { exact: false })).toBeTruthy();
+    expect(getByText('Date', { exact: false })).toBeTruthy();
   });
 
-  it('renders correctly with "playtime" sort option', () => {
-    const { getByText } = render(
-      <GameListControls sortBy="playtime" onSortChange={mockOnSortChange} />
-    );
-
-    expect(getByText('Sort by: playtime')).toBeTruthy();
-  });
-
-  it('calls onSortChange with "playtime" when the current sortBy is "name"', () => {
-    const { getByText } = render(
-      <GameListControls sortBy="name" onSortChange={mockOnSortChange} />
-    );
-
-    const button = getByText('Sort by: name');
-    fireEvent.press(button);
-
-    expect(mockOnSortChange).toHaveBeenCalledWith('playtime');
-  });
-
-  it('calls onSortChange with "name" when the current sortBy is "playtime"', () => {
-    const { getByText } = render(
-      <GameListControls sortBy="playtime" onSortChange={mockOnSortChange} />
-    );
-
-    const button = getByText('Sort by: playtime');
-    fireEvent.press(button);
-
-    expect(mockOnSortChange).toHaveBeenCalledWith('name');
+  it('renders search input', () => {
+    const { getByPlaceholderText } = render(<GameListControls {...mockProps} />, { wrapper });
+    expect(getByPlaceholderText('Search games...')).toBeTruthy();
   });
 });

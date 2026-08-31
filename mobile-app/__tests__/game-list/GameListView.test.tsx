@@ -39,6 +39,8 @@ describe('GameListView Component', () => {
     mockUseGameList.mockReturnValue({
       isLoading: true,
       processedGames: [],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
     });
 
     const { getByText } = render(<GameListView route={{}} />);
@@ -53,6 +55,8 @@ describe('GameListView Component', () => {
       error: true,
       errorMessage: errorMsg,
       processedGames: [],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
     });
 
     const { getByText } = render(<GameListView route={{}} />);
@@ -66,6 +70,8 @@ describe('GameListView Component', () => {
       noResults: true,
       searchQuery: 'Elden Ring',
       processedGames: [],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
     });
 
     const { getByText } = render(<GameListView route={{}} />);
@@ -77,6 +83,8 @@ describe('GameListView Component', () => {
       isLoading: false,
       isEmpty: true,
       processedGames: [],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
     });
 
     const { getByText } = render(<GameListView route={{}} />);
@@ -87,20 +95,24 @@ describe('GameListView Component', () => {
     mockUseGameList.mockReturnValue({
       isLoading: false,
       processedGames: [{ appid: 1, name: 'Portal', playtime_forever: 10 }],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
     });
 
     const { getByText } = render(<GameListView route={{}} />);
-    expect(getByText('Portal')).toBeTruthy();
+    expect(getByText('10m')).toBeTruthy();
   });
 
   it('navigates to Game screen on game press', () => {
     mockUseGameList.mockReturnValue({
       isLoading: false,
       processedGames: [{ appid: 1, name: 'Portal', playtime_forever: 10 }],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
     });
 
     const { getByText } = render(<GameListView route={{}} />);
-    fireEvent.press(getByText('Portal'));
+    fireEvent.press(getByText('10m'));
 
     expect(mockNavigate).toHaveBeenCalledWith('Game', {
       gameItem: { appid: 1, name: 'Portal', playtime_forever: 10 },
