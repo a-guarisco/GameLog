@@ -1,5 +1,5 @@
 import { Box } from '@gamelog/common/gluestack/box';
-import { HStack } from '@gamelog/common/gluestack/hstack';
+import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { ReactNode } from 'react';
 import { PageTitle } from '@gamelog/common/typography/CommonTypography';
@@ -21,16 +21,14 @@ const GameIdentity = ({
   textClassName,
 }: GameIdentityProps) => {
   return (
-    <Box className={`w-full px-4 pt-6 pb-2 ${className ?? ''}`}>
-      <HStack space="md" className="w-full justify-between items-center">
-        <Box className="flex-1">
-          <PageTitle size="2xl" className={`text-left ${textClassName ?? ''}`} numberOfLines={3}>
-            {title}
-          </PageTitle>
-        </Box>
+    <Box className={`w-full px-4 pt-6 pb-1 ${className ?? ''}`}>
+      <VStack space="sm" className="w-full items-center justify-center">
+        <PageTitle size="2xl" className={`text-center ${textClassName ?? ''}`} numberOfLines={3}>
+          {title}
+        </PageTitle>
 
         {(chips || secondaryText) && (
-          <Box className="flex-shrink-0 items-end">
+          <Box className="w-full items-center justify-center">
             {chips}
             {secondaryText && (
               <Box className="bg-background-200 border border-outline-100 rounded-full px-3 py-1 mt-1">
@@ -41,7 +39,7 @@ const GameIdentity = ({
             )}
           </Box>
         )}
-      </HStack>
+      </VStack>
     </Box>
   );
 };

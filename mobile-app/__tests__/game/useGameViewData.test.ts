@@ -23,6 +23,11 @@ jest.mock('@gamelog/api-manager/useApi', () => ({
     },
     isLoadingPlaytimeReport: false,
   })),
+  useGetGameStatus: jest.fn(() => ({
+    gameStatus: 'playing',
+    isLoadingGameStatus: false,
+    refetchGameStatus: jest.fn(),
+  })),
 }));
 
 jest.mock('@gamelog/game/useAchievementsData', () =>

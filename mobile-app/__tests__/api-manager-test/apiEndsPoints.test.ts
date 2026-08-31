@@ -181,6 +181,10 @@ describe('apiEndsPoints', () => {
       );
       expect(EndPoints.getGameStatus()).toBe('https://api.mydomain.dev/games/game_status');
     });
+
+    it('builds the update_game_status endpoint', () => {
+      expect(EndPoints.updateGameStatus()).toBe('https://api.mydomain.dev/games/update_game_status');
+    });
   });
 });
 

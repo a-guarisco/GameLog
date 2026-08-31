@@ -125,6 +125,10 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/games/game_status`;
   },
 
+  updateGameStatus: () => {
+    return `${getBackendBaseUrl()}/games/update_game_status`;
+  },
+
 
   getAuthOutcome: () => {
     return `${getBackendBaseUrl()}/me`;

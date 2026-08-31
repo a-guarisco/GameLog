@@ -392,6 +392,25 @@ describe('ApiManager', () => {
       ]);
     });
 
+    it('updates game status with POST method and body', async () => {
+      const mockResponse = { message: 'Game status updated successfully' };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await ApiManager.updateGameStatus('730', 'to_be_played');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.updateGameStatus(), {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer firebase-id-token',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ app_id: '730', status: 'to_be_played' }),
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
 
 
 

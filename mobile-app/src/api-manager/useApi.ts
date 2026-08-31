@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
@@ -228,6 +228,32 @@ export const useGetGameStatus = (gameID: string) => {
     errorGameStatus: error,
     errorMessageGameStatus: errorMessage,
     refetchGameStatus: refetch,
+  };
+};
+
+export const useUpdateGameStatus = () => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+
+  const updateStatus = useCallback(async (appId: string, status: GameStatus) => {
+    setIsUpdating(true);
+    setUpdateError(null);
+    try {
+      const res = await ApiManager.updateGameStatus(appId, status);
+      return res;
+    } catch (err: any) {
+      const msg = err?.message || 'Failed to update game status';
+      setUpdateError(msg);
+      throw err;
+    } finally {
+      setIsUpdating(false);
+    }
+  }, []);
+
+  return {
+    updateGameStatus: updateStatus,
+    isUpdatingGameStatus: isUpdating,
+    updateGameStatusError: updateError,
   };
 };
 
