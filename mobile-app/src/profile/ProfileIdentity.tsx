@@ -2,7 +2,9 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Avatar, AvatarFallbackText, AvatarImage } from '@gamelog/common/gluestack/avatar';
+import { Box } from '@gamelog/common/gluestack/box';
 import Chip from '@gamelog/common/Chip';
+import { PageTitle } from '@gamelog/common/typography/CommonTypography';
 
 interface ProfileIdentityProps {
   name: string;
@@ -17,39 +19,47 @@ const ProfileIdentity = ({
   avatarUrl,
   streakText,
   memberSinceLabel,
-}: ProfileIdentityProps) => (
-  <>
-    <VStack space="sm" className="items-center bg-background-0 px-5 pb-4">
-      <Avatar size="xl" className="-mt-9 border-4 border-background-0 bg-background-300">
-        <AvatarFallbackText>{name}</AvatarFallbackText>
-        {!!avatarUrl && (
-          <AvatarImage source={{ uri: avatarUrl }} alt={`${name} avatar`} resizeMode="cover" />
-        )}
-      </Avatar>
+}: ProfileIdentityProps) => {
+  return (
+    <Box className="w-full items-center z-10" style={{ height: 0, overflow: 'visible' }}>
+      <VStack space="xs" className="absolute w-full items-center" style={{ top: -136 }}>
+        <Avatar size="xl" className="border-[4px] border-background-0 bg-background-300 z-10">
+          <AvatarFallbackText>{name}</AvatarFallbackText>
+          {!!avatarUrl && (
+            <AvatarImage source={{ uri: avatarUrl }} alt={`${name} avatar`} resizeMode="cover" />
+          )}
+        </Avatar>
 
-      <Text size="2xl" className="text-center font-bold text-typography-0" numberOfLines={1}>
-        {name}
-      </Text>
+        <Box className="bg-background-0 px-4 py-1 rounded-full z-10">
+          <PageTitle size="xl" className="text-center" numberOfLines={1}>
+            {name}
+          </PageTitle>
+        </Box>
 
-      <HStack space="sm" className="flex-wrap items-center justify-center">
-        {/* Solid fill rather than a tint: white on primary-500 holds its contrast in either theme.
-            No leading dot here — useStreakText already opens the label with its own glyph. */}
-        <Chip className="border-primary-500 bg-primary-500" testID="profile-streak-chip">
-          <Text size="xs" className="font-bold text-white">
-            {streakText}
-          </Text>
-        </Chip>
-
-        {!!memberSinceLabel && (
-          <Chip className="border-outline-200 bg-background-200" testID="profile-member-since-chip">
-            <Text size="xs" className="font-bold text-typography-100">
-              {memberSinceLabel}
+        <HStack space="xs" className="flex-wrap items-center justify-center z-10">
+          <Chip
+            className="bg-primary-500 border-[4px] border-background-0"
+            testID="profile-streak-chip"
+          >
+            <Text size="xs" className="font-bold text-white">
+              {streakText}
             </Text>
           </Chip>
-        )}
-      </HStack>
-    </VStack>
-  </>
-);
+
+          {!!memberSinceLabel && (
+            <Chip
+              className="bg-background-200 border-[4px] border-background-0"
+              testID="profile-member-since-chip"
+            >
+              <Text size="xs" className="font-bold text-typography-100">
+                {memberSinceLabel}
+              </Text>
+            </Chip>
+          )}
+        </HStack>
+      </VStack>
+    </Box>
+  );
+};
 
 export default ProfileIdentity;

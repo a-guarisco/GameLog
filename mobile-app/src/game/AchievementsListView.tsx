@@ -5,9 +5,8 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
+import GameIdentity from '@gamelog/game/GameIdentity';
 import HeaderGameImage from '@gamelog/common/HeaderGameImage';
-import BannerInfo from '@gamelog/game/BannerInfo';
-import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { useGetGameStreak } from '@gamelog/api-manager/useApi';
 import { useStreakText } from '@gamelog/common/useStreakText';
 import useAchievementsData from './useAchievementsData';
@@ -37,7 +36,7 @@ const AchievementsListView = ({ route }: any) => {
     error,
   } = useAchievementsData(gameID, playerID, globalAchievements);
 
-  const gameCapsuleImage = steamAssetUrls.getGameCapsuleImage(gameID);
+  // Game capsule image no longer used for game identity
 
   const content = isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
@@ -50,12 +49,7 @@ const AchievementsListView = ({ route }: any) => {
     <>
       <HeaderGameImage appid={gameID} />
       <ScrollablePage>
-        <BannerInfo
-          className="bg-background-0"
-          title={gameName}
-          iconUrl={gameCapsuleImage}
-          secondaryText={secondaryText}
-        />
+        <GameIdentity className="bg-background-0" title={gameName} secondaryText={secondaryText} />
 
         <Box className=" w-80% bg-background-0 pt-6">
           <Box className="mb-5 px-4">
