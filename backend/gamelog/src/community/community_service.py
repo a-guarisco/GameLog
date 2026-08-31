@@ -14,6 +14,7 @@ from src.community.schemas import (
     CommunityMonthlyPlaytimeResponse,
     CommunityScope,
     CommunityWeeklyPlaytimeResponse,
+    CommunityWeeklyTopGameResponse,
 )
 from src.games import game_service
 from src.models import Friendship, FriendshipStatus, Game, Genre, SteamRollingTime, User
@@ -122,6 +123,93 @@ def get_community_monthly_playtime(
 
     return CommunityMonthlyPlaytimeResponse(user=user_hours, community=community_hours)
 
+
+def get_community_weekly_top_games(
+    scope: CommunityScope,
+    start_date: date,
+    end_date: date,
+    user: AuthenticatedUser,
+    db: Session,
+) -> list[CommunityWeeklyTopGameResponse]:
+    """
+    Return the user and community average playtime for the top games (up to 5)
+    sorted by combined highest playtime from user and community in the specified week.
+    """
+    current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+
+    week_dates = [start_date + timedelta(days=i) for i in range(7)]
+
+    user_daily_game_map = _get_user_daily_game_playtimes_map(db, current_user.id, end_date)
+    user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, week_dates)
+
+    community_game_totals: dict[str, int] = defaultdict(int)
+    for target_id in target_user_ids:
+        t_daily_game_map = _get_user_daily_game_playtimes_map(db, target_id, end_date)
+        t_totals = _aggregate_game_playtimes_for_dates(t_daily_game_map, week_dates)
+        for app_id, mins in t_totals.items():
+            community_game_totals[app_id] += mins
+
+    num_target_users = len(target_user_ids)
+    all_game_ids = set(user_game_totals.keys()) | set(community_game_totals.keys())
+
+    candidates: list[CommunityWeeklyTopGameResponse] = []
+    for app_id in all_game_ids:
+        user_hours = round(user_game_totals.get(app_id, 0) / 60.0, 2)
+        comm_hours = round(community_game_totals.get(app_id, 0) / (60.0 * num_target_users), 2)
+        if user_hours > 0 or comm_hours > 0:
+            candidates.append(
+                CommunityWeeklyTopGameResponse(
+                    id=app_id,
+                    user_playtime=user_hours,
+                    community_playtime=comm_hours,
+                )
+            )
+
+    candidates.sort(
+        key=lambda x: (-(x.user_playtime + x.community_playtime), x.id)
+    )
+    return candidates[:5]
+
+
+def _get_user_daily_game_playtimes_map(
+    db: Session, user_id: uuid.UUID, end_date: date
+) -> dict[date, dict[str, int]]:
+    """
+    Returns a dictionary mapping each date to a dictionary of {steam_app_id: playtime_minutes}
+    for the specified user up to end_date.
+    """
+    statement = (
+        select(SteamRollingTime)
+        .where(SteamRollingTime.user_id == user_id)
+        .where(SteamRollingTime.created_at <= end_date)
+        .order_by(col(SteamRollingTime.created_at))
+    )
+    records = db.exec(statement).all()
+    if not records:
+        return {}
+    daily_playtimes = game_service._compute_daily_playtimes(records, days=-1, end_date=end_date)
+    daily_game_map: dict[date, dict[str, int]] = defaultdict(dict)
+    for dp in daily_playtimes:
+        for g in dp.games:
+            if g.playtime_minutes > 0:
+                daily_game_map[dp.date][g.app_id] = g.playtime_minutes
+    return daily_game_map
+
+
+def _aggregate_game_playtimes_for_dates(
+    daily_game_map: dict[date, dict[str, int]],
+    dates: list[date],
+) -> dict[str, int]:
+    """
+    Aggregates per-game playtime minutes across a given list of dates from a user's daily game map.
+    """
+    totals: dict[str, int] = defaultdict(int)
+    for d in dates:
+        if d in daily_game_map:
+            for app_id, mins in daily_game_map[d].items():
+                totals[app_id] += mins
+    return totals
 
 
 def _get_user_daily_playtimes_map(db: Session, user_id: uuid.UUID, end_date: date) -> dict[date, int]:
