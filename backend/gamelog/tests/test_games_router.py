@@ -375,7 +375,7 @@ class TestGetGameStatusEndpoint:
         make_user(session)
         mock_payload = [
             GameStatusesResponse(app_id="570", status="playing"),
-            GameStatusesResponse(app_id="730", status="played"),
+            GameStatusesResponse(app_id="730", status="shelved"),
         ]
         with patch("src.games.games_router.game_service.get_user_game_statuses", return_value=mock_payload) as mock_svc:
             response = client.get(self.ENDPOINT)
@@ -386,7 +386,7 @@ class TestGetGameStatusEndpoint:
         assert response.status_code == 200
         assert response.json() == [
             {"app_id": "570", "status": "playing"},
-            {"app_id": "730", "status": "played"},
+            {"app_id": "730", "status": "shelved"},
         ]
 
 

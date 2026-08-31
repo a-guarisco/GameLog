@@ -137,7 +137,7 @@ def upgrade() -> None:
     op.create_index(op.f("ix_notification_user_id"), "notification", ["user_id"], unique=False)
     op.create_table(
         "shelving",
-        sa.Column("status", sa.Enum("shelved", "to_be_played", "playing", "played", "platinato", name="game_status"), nullable=False),
+        sa.Column("status", sa.Enum("shelved", "to_be_played", "playing", "platinato", name="game_status"), nullable=False),
         sa.Column("owner_id", sa.Uuid(), nullable=False),
         sa.Column("game_id", sa.Uuid(), nullable=False),
         sa.ForeignKeyConstraint(

@@ -14,7 +14,6 @@ class GameStatus(str, Enum):
     SHELVED = "shelved"
     TO_BE_PLAYED = "to_be_played"
     PLAYING = "playing"
-    PLAYED = "played"
     PLATINATO = "platinato"
 
 

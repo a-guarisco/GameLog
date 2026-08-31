@@ -18,7 +18,6 @@ const STATUS_OPTIONS: { key: StatusFilterType; label: string }[] = [
   { key: 'playing', label: GAME_STATUS_LABELS.playing },
   { key: 'to_be_played', label: GAME_STATUS_LABELS.to_be_played },
   { key: 'shelved', label: GAME_STATUS_LABELS.shelved },
-  { key: 'played', label: GAME_STATUS_LABELS.played },
   { key: 'platinato', label: GAME_STATUS_LABELS.platinato },
   { key: 'none', label: 'No Status' },
 ];
