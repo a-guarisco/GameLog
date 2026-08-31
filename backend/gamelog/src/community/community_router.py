@@ -7,7 +7,7 @@ from sqlmodel import Session
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.community import community_service
-from src.community.schemas import (
+from src.community import (
     CommunityGenreHour,
     CommunityMonthlyPlaytimeResponse,
     CommunityMonthlyTopGameResponse,
@@ -122,7 +122,6 @@ def _check_month_is_correct(start_date: date, end_date: date) -> bool:
             detail="start_date must be the first day of a month, end_date must be the last day of a month, and start_date must be on or before end_date.",
         )
     return True
-
 
 
 

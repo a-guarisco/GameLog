@@ -4,12 +4,11 @@ import calendar
 from collections import defaultdict
 from datetime import date, timedelta
 import uuid
-
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 
 from src.auth.schemas import AuthenticatedUser
-from src.community.schemas import (
+from src.community import (
     CommunityGenreHour,
     CommunityMonthlyPlaytimeResponse,
     CommunityMonthlyTopGameResponse,
@@ -134,7 +133,7 @@ def get_community_weekly_top_games(
 ) -> list[CommunityWeeklyTopGameResponse]:
     """
     Return the user and community average playtime for the top games (up to 5)
-    sorted by combined highest playtime from user and community in the specified week.
+    sorted by highest community playtime in the specified week.
     """
     week_dates = [start_date + timedelta(days=i) for i in range(7)]
     return _compute_community_top_games_for_dates(
@@ -156,7 +155,7 @@ def get_community_monthly_top_games(
 ) -> list[CommunityMonthlyTopGameResponse]:
     """
     Return the user and community average playtime for the top games (up to 5)
-    sorted by combined highest playtime from user and community in the specified month(s) period.
+    sorted by highest community playtime in the specified month(s) period.
     """
     num_days = (end_date - start_date).days + 1
     period_dates = [start_date + timedelta(days=i) for i in range(num_days)]
@@ -185,19 +184,26 @@ def _compute_community_top_games_for_dates(
     user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, dates)
 
     community_game_totals: dict[str, int] = defaultdict(int)
+    community_game_player_counts: dict[str, int] = defaultdict(int)
     for target_id in target_user_ids:
         t_daily_game_map = _get_user_daily_game_playtimes_map(db, target_id, end_date)
         t_totals = _aggregate_game_playtimes_for_dates(t_daily_game_map, dates)
         for app_id, mins in t_totals.items():
-            community_game_totals[app_id] += mins
+            if mins > 0:
+                community_game_totals[app_id] += mins
+                community_game_player_counts[app_id] += 1
 
-    num_target_users = len(target_user_ids)
     all_game_ids = set(user_game_totals.keys()) | set(community_game_totals.keys())
 
     candidates = []
     for app_id in all_game_ids:
         user_hours = round(user_game_totals.get(app_id, 0) / 60.0, 2)
-        comm_hours = round(community_game_totals.get(app_id, 0) / (60.0 * num_target_users), 2)
+        player_count = community_game_player_counts.get(app_id, 0)
+        comm_hours = (
+            round(community_game_totals.get(app_id, 0) / (60.0 * player_count), 2)
+            if player_count > 0
+            else 0.0
+        )
         if user_hours > 0 or comm_hours > 0:
             candidates.append(
                 response_cls(
@@ -208,7 +214,7 @@ def _compute_community_top_games_for_dates(
             )
 
     candidates.sort(
-        key=lambda x: (-(x.user_playtime + x.community_playtime), x.id)
+        key=lambda x: (-x.community_playtime, x.id)
     )
     return candidates[:5]
 
