@@ -1,4 +1,4 @@
-import { Image, Pressable } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -62,21 +62,21 @@ const CompactGameList = ({
           },
           ...(game.days_played_count !== undefined
             ? [
-                {
-                  label: 'Days played:',
-                  value: String(game.days_played_count),
-                  valueClassName: 'text-typography-100',
-                },
-              ]
+              {
+                label: 'Days played:',
+                value: String(game.days_played_count),
+                valueClassName: 'text-typography-100',
+              },
+            ]
             : []),
           ...(game.max_playtime_per_day !== undefined
             ? [
-                {
-                  label: 'Max/day:',
-                  value: formatMinutesToHoursShort(game.max_playtime_per_day),
-                  valueClassName: 'text-typography-100',
-                },
-              ]
+              {
+                label: 'Max/day:',
+                value: formatMinutesToHoursShort(game.max_playtime_per_day),
+                valueClassName: 'text-typography-100',
+              },
+            ]
             : []),
         ];
 
@@ -93,7 +93,7 @@ const CompactGameList = ({
                 className="w-16 h-16 rounded-sm bg-background-300 shrink-0"
                 resizeMode="cover"
               />
-              <VStack className="flex-1 justify-center">
+              <VStack className="flex-1 justify-center" space="xs">
                 <Text
                   size="sm"
                   className="font-bold uppercase text-typography-0 leading-tight"
@@ -101,12 +101,12 @@ const CompactGameList = ({
                 >
                   {gameNames[appId] || `App ID: ${appId}`}
                 </Text>
-                <HStack space="md" className="mt-1 flex-wrap">
+                <View className="flex-row flex-wrap items-center">
                   {detailRows.map((row, index) => (
                     <Text
                       key={`${row.label}-${index}`}
                       size="xs"
-                      className="font-medium text-typography-300"
+                      className="font-medium text-typography-300 mr-2.5 mb-0.5"
                     >
                       {row.label}{' '}
                       <Text
@@ -117,7 +117,7 @@ const CompactGameList = ({
                       </Text>
                     </Text>
                   ))}
-                </HStack>
+                </View>
               </VStack>
             </HStack>
           </Pressable>
