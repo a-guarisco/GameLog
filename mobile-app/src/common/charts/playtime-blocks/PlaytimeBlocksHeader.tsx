@@ -86,6 +86,7 @@ export const PlaytimeBlocksHeader = ({
         <HStack space="sm" className="items-center">
           {trendRange === 'week' && (
             <Pressable
+              testID="playtime-blocks-prev-week-btn"
               onPress={() => setWeekOffset((prev) => prev - 1)}
               disabled={
                 !!baseLimitDate && trendDays.length > 0 && trendDays[0].date <= baseLimitDate
@@ -112,6 +113,7 @@ export const PlaytimeBlocksHeader = ({
 
           {trendRange === 'week' && (
             <Pressable
+              testID="playtime-blocks-next-week-btn"
               onPress={() => setWeekOffset((prev) => Math.min(0, prev + 1))}
               disabled={weekOffset >= 0}
               style={{ opacity: weekOffset >= 0 ? 0.3 : 1 }}
