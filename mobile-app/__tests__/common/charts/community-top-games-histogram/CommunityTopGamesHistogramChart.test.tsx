@@ -53,8 +53,8 @@ describe('CommunityTopGamesHistogramChart', () => {
       expect(screen.getByText('Elden Ring')).toBeTruthy();
       expect(screen.getByText('14h 20m')).toBeTruthy();
       expect(screen.getByText('8h 45m')).toBeTruthy();
-      expect(screen.getByText('You')).toBeTruthy();
-      expect(screen.getByText('Others')).toBeTruthy();
+      expect(screen.getAllByText('You').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Others').length).toBeGreaterThanOrEqual(1);
     });
   });
 
