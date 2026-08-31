@@ -43,19 +43,21 @@ function useTestApiHook<TResult extends Record<string, unknown>>({
   apiArgs,
   expectedKeys,
   mockData,
+  emptyData = null,
 }: {
   useHook: () => TResult;
   apiMethod: keyof typeof ApiManager;
   apiArgs: unknown[];
   expectedKeys: { data: keyof TResult; loading: keyof TResult; error: keyof TResult };
   mockData: unknown;
+  emptyData?: unknown;
 }) {
   beforeEach(() => jest.clearAllMocks());
 
   it('returns loading state', () => {
     mockAsyncFetch({ isLoading: true });
     const { result } = renderHook(useHook);
-    expect(result.current[expectedKeys.data]).toBeNull();
+    expect(result.current[expectedKeys.data]).toEqual(emptyData);
     expect(result.current[expectedKeys.loading]).toBe(true);
     expect(result.current[expectedKeys.error]).toBeNull();
   });
@@ -72,7 +74,7 @@ function useTestApiHook<TResult extends Record<string, unknown>>({
     const mockError = new Error('Network error');
     mockAsyncFetch({ error: mockError });
     const { result } = renderHook(useHook);
-    expect(result.current[expectedKeys.data]).toBeNull();
+    expect(result.current[expectedKeys.data]).toEqual(emptyData);
     expect(result.current[expectedKeys.error]).toEqual(mockError);
   });
 
@@ -427,6 +429,7 @@ describe('useGetUserGameStatuses', () => {
       error: 'errorUserGameStatuses',
     },
     mockData: { '730': 'playing' },
+    emptyData: {},
   });
 
   it('maps array response into a key-value record', async () => {

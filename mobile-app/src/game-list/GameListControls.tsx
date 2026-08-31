@@ -4,10 +4,11 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { SearchIcon, CloseIcon } from '@gamelog/common/gluestack/icon';
-import { SortBy, PlatformFilter as PlatformFilterType, DateRange } from './useGameList';
+import { SortBy, PlatformFilter as PlatformFilterType, StatusFilter as StatusFilterType, DateRange } from './useGameList';
 
 import { SortFilter } from './filters/SortFilter';
 import { GenreFilter } from './filters/GenreFilter';
+import { StatusFilter } from './filters/StatusFilter';
 import { PlatformFilter } from './filters/PlatformFilter';
 import { DateFilter } from './filters/DateFilter';
 
@@ -18,6 +19,8 @@ interface GameListControlsProps {
   onSortChange: (sort: SortBy) => void;
   genreFilter: string;
   setGenreFilter: (g: string) => void;
+  statusFilter: StatusFilterType;
+  setStatusFilter: (s: StatusFilterType) => void;
   platformFilter: PlatformFilterType;
   setPlatformFilter: (p: PlatformFilterType) => void;
   dateRangeFilter: DateRange;
@@ -32,6 +35,8 @@ export const GameListControls = ({
   onSortChange,
   genreFilter,
   setGenreFilter,
+  statusFilter,
+  setStatusFilter,
   platformFilter,
   setPlatformFilter,
   dateRangeFilter,
@@ -62,6 +67,7 @@ export const GameListControls = ({
           setGenreFilter={setGenreFilter}
           allAvailableGenres={allAvailableGenres}
         />
+        <StatusFilter statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
         <PlatformFilter platformFilter={platformFilter} setPlatformFilter={setPlatformFilter} />
         <DateFilter dateRangeFilter={dateRangeFilter} setDateRangeFilter={setDateRangeFilter} />
       </ScrollView>

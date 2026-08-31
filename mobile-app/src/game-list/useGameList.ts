@@ -16,6 +16,7 @@ export interface GameListItemData extends GameItem {
 
 export type SortBy = 'last_played' | 'playtime' | 'max_per_day' | 'top_platform';
 export type PlatformFilter = 'All' | 'Windows' | 'Mac' | 'Linux' | 'Deck';
+export type StatusFilter = 'All' | 'none' | GameStatus;
 
 export type DateRange = {
   from?: Date;
@@ -39,6 +40,7 @@ export const useGameList = (playerID: string) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('playtime');
   const [genreFilter, setGenreFilter] = useState<string>('All');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('All');
   const [dateRangeFilter, setDateRangeFilter] = useState<DateRange>({});
   const [isProcessing, setIsProcessing] = useState(false);
@@ -85,13 +87,22 @@ export const useGameList = (playerID: string) => {
       result = result.filter((g) => g.genres.includes(genreFilter));
     }
 
-    // 3. Platform Filter
+    // 3. Status Filter
+    if (statusFilter !== 'All') {
+      if (statusFilter === 'none') {
+        result = result.filter((g) => !g.gameStatus);
+      } else {
+        result = result.filter((g) => g.gameStatus === statusFilter);
+      }
+    }
+
+    // 4. Platform Filter
     if (platformFilter !== 'All') {
       const platformKey = `playtime_${platformFilter.toLowerCase()}_forever` as keyof GameItem;
       result = result.filter((g) => (g[platformKey] as number) > 0);
     }
 
-    // 4. Date Range Filter
+    // 5. Date Range Filter
     if (dateRangeFilter.from) {
       const fromTimestamp = Math.floor(dateRangeFilter.from.getTime() / 1000);
       result = result.filter((g) => g.rtime_last_played >= fromTimestamp);
@@ -101,7 +112,7 @@ export const useGameList = (playerID: string) => {
       result = result.filter((g) => g.rtime_last_played <= toTimestamp);
     }
 
-    // 5. Sorting
+    // 6. Sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'last_played':
@@ -131,7 +142,7 @@ export const useGameList = (playerID: string) => {
     });
 
     return result;
-  }, [unifiedGames, searchQuery, genreFilter, platformFilter, dateRangeFilter, sortBy]);
+  }, [unifiedGames, searchQuery, genreFilter, statusFilter, platformFilter, dateRangeFilter, sortBy]);
 
   const handleSortChange = (newSort: SortBy) => {
     setIsProcessing(true);
@@ -166,6 +177,8 @@ export const useGameList = (playerID: string) => {
     handleSortChange,
     genreFilter,
     setGenreFilter,
+    statusFilter,
+    setStatusFilter,
     platformFilter,
     setPlatformFilter,
     dateRangeFilter,
