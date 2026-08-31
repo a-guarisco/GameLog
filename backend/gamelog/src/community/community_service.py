@@ -6,18 +6,11 @@ from datetime import date, timedelta
 import uuid
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
-
 from src.auth.schemas import AuthenticatedUser
-from src.community import (
-    CommunityGenreHour,
-    CommunityMonthlyPlaytimeResponse,
-    CommunityMonthlyTopGameResponse,
-    CommunityScope,
-    CommunityWeeklyPlaytimeResponse,
-    CommunityWeeklyTopGameResponse,
-)
+from src.community.schemas import CommunityGenreHour, CommunityMonthlyPlaytimeResponse, CommunityMonthlyTopGameResponse, CommunityScope, CommunityWeeklyPlaytimeResponse, CommunityWeeklyTopGameResponse, TopGameReference
 from src.games import game_service
-from src.models import Friendship, FriendshipStatus, Game, Genre, SteamRollingTime, User
+from src.games.schemas import DayByDayPlaytime
+from src.models import Friendship, FriendshipStatus, Game, SteamRollingTime, User
 from src.users import user_service
 
 
@@ -47,7 +40,7 @@ def get_community_weekly_playtime(
     comparing the user vs the community average (excluding the user).
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
 
     week_dates = [start_date + timedelta(days=i) for i in range(7)]
 
@@ -84,7 +77,7 @@ def get_community_monthly_playtime(
     comparing the user vs the community average (excluding the user).
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
 
     months: list[tuple[int, int]] = []
     cur_year = start_date.year
@@ -130,10 +123,11 @@ def get_community_weekly_top_games(
     end_date: date,
     user: AuthenticatedUser,
     db: Session,
+    reference: TopGameReference = TopGameReference.COMMUNITY,
 ) -> list[CommunityWeeklyTopGameResponse]:
     """
     Return the user and community average playtime for the top games (up to 5)
-    sorted by highest community playtime in the specified week.
+    sorted by community or user playtime in the specified week.
     """
     week_dates = [start_date + timedelta(days=i) for i in range(7)]
     return _compute_community_top_games_for_dates(
@@ -142,6 +136,7 @@ def get_community_weekly_top_games(
         end_date=end_date,
         user=user,
         db=db,
+        reference=reference,
         response_cls=CommunityWeeklyTopGameResponse,
     )
 
@@ -152,10 +147,11 @@ def get_community_monthly_top_games(
     end_date: date,
     user: AuthenticatedUser,
     db: Session,
+    reference: TopGameReference = TopGameReference.COMMUNITY,
 ) -> list[CommunityMonthlyTopGameResponse]:
     """
     Return the user and community average playtime for the top games (up to 5)
-    sorted by highest community playtime in the specified month(s) period.
+    sorted by community or user playtime in the specified month(s) period.
     """
     num_days = (end_date - start_date).days + 1
     period_dates = [start_date + timedelta(days=i) for i in range(num_days)]
@@ -166,6 +162,7 @@ def get_community_monthly_top_games(
         user=user,
         db=db,
         response_cls=CommunityMonthlyTopGameResponse,
+        reference=reference,
     )
 
 
@@ -176,9 +173,10 @@ def _compute_community_top_games_for_dates(
     user: AuthenticatedUser,
     db: Session,
     response_cls: type,
+    reference: TopGameReference,
 ) -> list:
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
 
     user_daily_game_map = _get_user_daily_game_playtimes_map(db, current_user.id, end_date)
     user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, dates)
@@ -213,19 +211,22 @@ def _compute_community_top_games_for_dates(
                 )
             )
 
-    candidates.sort(
-        key=lambda x: (-x.community_playtime, x.id)
-    )
+    if reference == TopGameReference.USER:
+        candidates = [c for c in candidates if c.user_playtime > 0]
+        candidates.sort(
+            key=lambda x: (-x.user_playtime, -x.community_playtime, x.id)
+        )
+    else:
+        candidates.sort(
+            key=lambda x: (-x.community_playtime, x.id)
+        )
+
     return candidates[:5]
 
 
-def _get_user_daily_game_playtimes_map(
+def _get_user_daily_playtimes(
     db: Session, user_id: uuid.UUID, end_date: date
-) -> dict[date, dict[str, int]]:
-    """
-    Returns a dictionary mapping each date to a dictionary of {steam_app_id: playtime_minutes}
-    for the specified user up to end_date.
-    """
+) -> list[DayByDayPlaytime]:
     statement = (
         select(SteamRollingTime)
         .where(SteamRollingTime.user_id == user_id)
@@ -234,8 +235,14 @@ def _get_user_daily_game_playtimes_map(
     )
     records = db.exec(statement).all()
     if not records:
-        return {}
-    daily_playtimes = game_service._compute_daily_playtimes(records, days=-1, end_date=end_date)
+        return []
+    return game_service.compute_daily_playtimes(records, days=-1, end_date=end_date)
+
+
+def _get_user_daily_game_playtimes_map(
+    db: Session, user_id: uuid.UUID, end_date: date
+) -> dict[date, dict[str, int]]:
+    daily_playtimes = _get_user_daily_playtimes(db, user_id, end_date)
     daily_game_map: dict[date, dict[str, int]] = defaultdict(dict)
     for dp in daily_playtimes:
         for g in dp.games:
@@ -248,9 +255,6 @@ def _aggregate_game_playtimes_for_dates(
     daily_game_map: dict[date, dict[str, int]],
     dates: list[date],
 ) -> dict[str, int]:
-    """
-    Aggregates per-game playtime minutes across a given list of dates from a user's daily game map.
-    """
     totals: dict[str, int] = defaultdict(int)
     for d in dates:
         if d in daily_game_map:
@@ -260,16 +264,7 @@ def _aggregate_game_playtimes_for_dates(
 
 
 def _get_user_daily_playtimes_map(db: Session, user_id: uuid.UUID, end_date: date) -> dict[date, int]:
-    statement = (
-        select(SteamRollingTime)
-        .where(SteamRollingTime.user_id == user_id)
-        .where(SteamRollingTime.created_at <= end_date)
-        .order_by(col(SteamRollingTime.created_at))
-    )
-    records = db.exec(statement).all()
-    if not records:
-        return {}
-    daily_playtimes = game_service._compute_daily_playtimes(records, days=-1, end_date=end_date)
+    daily_playtimes = _get_user_daily_playtimes(db, user_id, end_date)
     return {dp.date: dp.playtime_minutes for dp in daily_playtimes}
 
 
@@ -277,7 +272,7 @@ def _compute_target_ids(
     scope: CommunityScope,
     current_user: User,
     db: Session,
-    exclude_current_user: bool = False,
+    exclude_current_user: bool = True,
 ) -> list[uuid.UUID]:
     match scope:
         case CommunityScope.GLOBAL:
@@ -306,7 +301,7 @@ def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID | None = None) 
     return list(db.exec(query).all())
 
 
-def _get_regional_user_ids(db: Session, user: User, exclude_current_user: bool = False) -> list[uuid.UUID]:
+def _get_regional_user_ids(db: Session, user: User, exclude_current_user: bool = True) -> list[uuid.UUID]:
     if not user.region or user.region.strip() == "" or user.region == "Unknown":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

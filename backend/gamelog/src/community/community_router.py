@@ -14,6 +14,7 @@ from src.community import (
     CommunityScope,
     CommunityWeeklyPlaytimeResponse,
     CommunityWeeklyTopGameResponse,
+    TopGameReference,
 )
 from src.core.database import get_db
 
@@ -60,12 +61,26 @@ def get_community_weekly_top_game_playtime(
     scope: CommunityScope = Query(..., description="Community scope: global, region, or friends"),
     start_date: date = Query(..., description="Start date of the week (YYYY-MM-DD)"),
     end_date: date = Query(..., description="End date of the week (YYYY-MM-DD)"),
+    reference: TopGameReference | None = Query(
+        None,
+        description="Reference point for ranking: 'community' or 'user'",
+    ),
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if reference is None:
+        raise HTTPException(
+            status_code=400,
+            detail="reference query parameter is required ('community' or 'user').",
+        )
     _check_week_is_correct(start_date, end_date)
     return community_service.get_community_weekly_top_games(
-        scope=scope, start_date=start_date, end_date=end_date, user=auth_user, db=db
+        scope=scope,
+        start_date=start_date,
+        end_date=end_date,
+        user=auth_user,
+        db=db,
+        reference=reference,
     )
 
 
@@ -96,12 +111,26 @@ def get_community_monthly_top_game_playtime(
     scope: CommunityScope = Query(..., description="Community scope: global, region, or friends"),
     start_date: date = Query(..., description="Start date of the period (YYYY-MM-01)"),
     end_date: date = Query(..., description="End date of the period (last day of month)"),
+    reference: TopGameReference | None = Query(
+        None,
+        description="Reference point for ranking: 'community' or 'user'",
+    ),
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if reference is None:
+        raise HTTPException(
+            status_code=400,
+            detail="reference query parameter is required ('community' or 'user').",
+        )
     _check_month_is_correct(start_date, end_date)
     return community_service.get_community_monthly_top_games(
-        scope=scope, start_date=start_date, end_date=end_date, user=auth_user, db=db
+        scope=scope,
+        start_date=start_date,
+        end_date=end_date,
+        user=auth_user,
+        db=db,
+        reference=reference,
     )
 
 
