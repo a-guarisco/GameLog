@@ -3,13 +3,15 @@ import {
   useGetOwnedGames,
   useGetFullPlaytimeReport,
   useGetGenresBatch,
+  useGetUserGameStatuses,
 } from '@gamelog/api-manager/useApi';
-import { GameItem } from '@gamelog/api-manager/dto';
+import { GameItem, GameStatus } from '@gamelog/api-manager/dto';
 
 export interface GameListItemData extends GameItem {
   genres: string[];
   maxPlaytimePerDay: number;
   streak: number;
+  gameStatus?: GameStatus | null;
 }
 
 export type SortBy = 'last_played' | 'playtime' | 'max_per_day' | 'top_platform';
@@ -25,6 +27,7 @@ export const useGameList = (playerID: string) => {
     useGetOwnedGames(playerID, true, true);
 
   const { playtimeReport, isLoadingPlaytimeReport } = useGetFullPlaytimeReport();
+  const { userGameStatuses, isLoadingUserGameStatuses } = useGetUserGameStatuses();
 
   const appIds = useMemo(() => {
     if (!ownedGames?.response?.games) return [];
@@ -49,20 +52,24 @@ export const useGameList = (playerID: string) => {
     }
 
     const genresMap = libraryGenres || {};
+    const statusesMap = userGameStatuses || {};
 
     return ownedGames.response.games.map((game) => {
       const appId = String(game.appid);
       const report = reportsMap.get(appId);
       const genres = genresMap[appId] || [];
+      const gameStatus = statusesMap[appId] || null;
 
       return {
         ...game,
         genres,
         maxPlaytimePerDay: report?.max_playtime_per_day || 0,
         streak: report?.streak || 0,
+        gameStatus,
       };
     });
-  }, [ownedGames, playtimeReport, libraryGenres]);
+  }, [ownedGames, playtimeReport, libraryGenres, userGameStatuses]);
+
 
   const processedGames = useMemo(() => {
     let result = [...unifiedGames];
@@ -141,7 +148,12 @@ export const useGameList = (playerID: string) => {
   return {
     processedGames,
     isLoading:
-      isLoadingOwnedGames || isLoadingPlaytimeReport || isLoadingLibraryGenres || isProcessing,
+      isLoadingOwnedGames ||
+      isLoadingPlaytimeReport ||
+      isLoadingLibraryGenres ||
+      isLoadingUserGameStatuses ||
+      isProcessing,
+
     error: errorOwnedGames,
     errorMessage: errorMessageOwnedGames,
     isEmpty: !ownedGames?.response?.games?.length,
