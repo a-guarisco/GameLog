@@ -12,6 +12,9 @@ export interface FriendActions {
   handleAddFriend: (userId: string) => Promise<void>;
   handleAcceptFriend: (friendshipId: string) => Promise<void>;
   handleRefuseFriend: (friendshipId: string) => Promise<void>;
+  handleBlockFriend: (friendshipId: string) => Promise<void>;
+  handleRemoveFriend: (friendshipId: string) => Promise<void>;
+  handleUnblockFriend: (friendshipId: string) => Promise<void>;
 }
 
 export const useFriendActions = ({
@@ -69,11 +72,44 @@ export const useFriendActions = ({
     [runAction]
   );
 
+  const handleBlockFriend = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.respondToFriend(friendshipId, 'BLOCKED'),
+        'User blocked.',
+        'Failed to block user'
+      ),
+    [runAction]
+  );
+
+  const handleRemoveFriend = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.removeFriend(friendshipId),
+        'Friend removed.',
+        'Failed to remove friend'
+      ),
+    [runAction]
+  );
+
+  const handleUnblockFriend = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.removeFriend(friendshipId),
+        'User unblocked.',
+        'Failed to unblock user'
+      ),
+    [runAction]
+  );
+
   return {
     isActionLoading,
     actionFeedback,
     handleAddFriend,
     handleAcceptFriend,
     handleRefuseFriend,
+    handleBlockFriend,
+    handleRemoveFriend,
+    handleUnblockFriend,
   };
 };

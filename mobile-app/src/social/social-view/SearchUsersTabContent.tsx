@@ -1,3 +1,4 @@
+import React from 'react';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
@@ -53,10 +54,7 @@ export const SearchUsersTabContent: React.FC<SearchUsersTabContentProps> = ({
             <UserCard
               key={item.user.id}
               item={item}
-              onAddFriend={handlers.onAddFriend}
-              onAcceptFriend={handlers.onAcceptFriend}
-              onRefuseFriend={handlers.onRefuseFriend}
-              onSelectRecommendations={handlers.onSelectRecommendations}
+              {...handlers}
               isActionLoading={isActionLoading}
             />
           ))}

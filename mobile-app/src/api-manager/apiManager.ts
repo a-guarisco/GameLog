@@ -188,6 +188,12 @@ export default {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ friendship_id: friendshipId, action }),
     }),
+  removeFriend: (friendshipId: string) =>
+    fetchAuthenticatedData<{ message: string }>(EndPoints.removeFriend(), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ friendship_id: friendshipId }),
+    }),
   getRecommendations: (friendId: string) =>
     fetchAuthenticatedData<RecommendationResponse>(EndPoints.getRecommendations(friendId)),
   registerDeviceToken: (token: string, deviceType: string = 'android') =>

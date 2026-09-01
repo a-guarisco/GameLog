@@ -162,6 +162,10 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/users/respond_to_friend`;
   },
 
+  removeFriend: () => {
+    return `${getBackendBaseUrl()}/users/remove_friend`;
+  },
+
   getRecommendations: (friendId: string, includeTopGames: boolean = true) => {
     return `${getBackendBaseUrl()}/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
   },

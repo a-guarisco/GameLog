@@ -349,24 +349,16 @@ export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT)
 export { useGetGameScreenshots } from './useGetGameScreenshots';
 export type { GameScreenshotsFetcher, UseGetGameScreenshotsResult } from './useGetGameScreenshots';
 
-// export const useGetBackendHealth = () => {
-//   const fetchFunc = useCallback(() => ApiManager.getBackendHealth(), []);
+export const useGetUserMe = () => {
+  const fetchFunc = useCallback(() => ApiManager.getUserMe(), []);
 
-//   const { data, isLoading, error } = useAsyncFetch(fetchFunc);
-//   return {
-//     backendHealth: data,
-//     isLoadingBackendHealth: isLoading,
-//     errorBackendHealth: error,
-//   };
-// };
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    currentUser: data,
+    isLoadingUserMe: isLoading,
+    errorUserMe: error,
+    errorMessageUserMe: errorMessage,
+    refetchUserMe: refetch,
+  };
+};
 
-// export const useGetAuthOutcome = (token: string) => {
-//   const fetchFunc = useCallback(() => ApiManager.getAuthOutcome(token), [token]);
-
-//   const { data, isLoading, error } = useAsyncFetch(fetchFunc);
-//   return {
-//     authOutcome: data,
-//     isLoadingAuthOutcome: isLoading,
-//     errorAuthOutcome: error,
-//   };
-// };
