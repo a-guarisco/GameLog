@@ -3,7 +3,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Box } from '@gamelog/common/gluestack/box';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
-import SectionCard from '@gamelog/common/SectionCard';
+import { CardTitleText } from '@gamelog/common/typography/CardTypography';
 import { UserCard } from '../user-card/UserCard';
 import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 import { UserSearchInput } from './UserSearchInput';
@@ -48,8 +48,9 @@ export const SearchUsersTabContent: React.FC<SearchUsersTabContentProps> = ({
       return <InfoBox message={`No users found matching "${query}".`} className="py-6" />;
     }
     return (
-      <SectionCard label={`Search Results (${results.length})`}>
-        <VStack space="sm" className="pt-1">
+      <VStack space="sm">
+        <CardTitleText>{`Search Results (${results.length})`}</CardTitleText>
+        <VStack space="sm">
           {results.map((item) => (
             <UserCard
               key={item.user.id}
@@ -59,7 +60,7 @@ export const SearchUsersTabContent: React.FC<SearchUsersTabContentProps> = ({
             />
           ))}
         </VStack>
-      </SectionCard>
+      </VStack>
     );
   };
 

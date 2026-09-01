@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
 interface UseFriendActionsParams {
@@ -23,9 +23,30 @@ export const useFriendActions = ({
 }: UseFriendActionsParams): FriendActions => {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (actionFeedback) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setActionFeedback(null);
+      }, 3000);
+    }
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [actionFeedback]);
 
   const runAction = useCallback(
     async (action: () => Promise<void>, successMessage: string, failureMessage: string) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
       setIsActionLoading(true);
       setActionFeedback(null);
       try {
