@@ -7,7 +7,13 @@ from sqlmodel import Session, col, or_, select
 from src.auth.schemas import AuthenticatedUser
 from src.models import Friendship, FriendshipStatus, User
 from src.users import FriendshipInfo, UserSearchResult, notifications_service
-from src.users.schemas import FriendshipResponseStatus, UserRead, UserMeRead, UserRegisterRequest
+from src.users.schemas import (
+    FriendshipManageAction,
+    FriendshipManageRequest,
+    UserRead,
+    UserMeRead,
+    UserRegisterRequest,
+)
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
 
 
@@ -112,6 +118,9 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
 
     search_results = []
     for user, friendship in results:
+        if friendship and friendship.status == FriendshipStatus.BLOCKED and friendship.requester_id != current_user.id:
+            continue
+
         search_results.append(
             UserSearchResult(
                 user=UserRead.model_validate(user),
@@ -206,12 +215,26 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
                 )
             case FriendshipStatus.BLOCKED:
                 if existing.requester_id == requester.id:
+                    existing.status = FriendshipStatus.PENDING
+                    existing.requester_id = requester.id
+                    existing.addressee_id = addressee_id
+                    existing.updated_at = datetime.now(UTC)
+                    session.add(existing)
+                    session.commit()
+                    session.refresh(existing)
+                    notifications_service.send_notification_to_user(
+                        session=session,
+                        target_user_id=addressee_id,
+                        title="New Friend Request",
+                        body=f"{requester.username} wants to add you as a friend.",
+                        data={"friendship_id": str(existing.id)},
+                    )
+                    return {"message": "Friend request sent", "friendship_id": str(existing.id)}
+                else:
                     raise HTTPException(
                         status_code=403,
                         detail="Cannot send a friend request to this user",
                     )
-                else:
-                    _delete_friendship(session, existing.id)
 
     friendship = Friendship(
         requester_id=requester.id,
@@ -231,29 +254,48 @@ def send_friend_request(session: Session, requester_uid: str, addressee_id: uuid
     return {"message": "Friend request sent", "friendship_id": str(friendship.id)}
 
 
-def respond_to_friend_request(
+def manage_friendship(
     session: Session,
-    addressee_uid: str,
-    friendship_id: uuid.UUID,
-    action: FriendshipResponseStatus,
+    current_user_uid: str,
+    payload: FriendshipManageRequest,
 ) -> dict[str, str]:
     """
-    Respond to a friend request (ACCEPTED, BLOCKED, or REJECTED).
+    Unified friendship manager handling ACCEPT, REJECT, CANCEL, REMOVE, BLOCK, and UNBLOCK.
     """
-    addressee = get_user_by_firebase_uid(session, addressee_uid)
+    current_user = get_user_by_firebase_uid(session, current_user_uid)
 
-    friendship = session.get(Friendship, friendship_id)
-    if not friendship:
-        raise HTTPException(status_code=404, detail="Friend request not found")
+    friendship: Friendship | None = None
+    if payload.friendship_id:
+        friendship = session.get(Friendship, payload.friendship_id)
+        if not friendship and not payload.target_user_id:
+            # Check if the provided friendship_id was actually a target_user_id
+            target_user = session.get(User, payload.friendship_id)
+            if target_user:
+                friendship = session.exec(
+                    select(Friendship).where(_friendship_between_clause(current_user.id, target_user.id))
+                ).first()
+                if not friendship and payload.action not in (FriendshipManageAction.BLOCK, FriendshipManageAction.BLOCKED):
+                    raise HTTPException(status_code=404, detail="Friendship not found")
+            else:
+                raise HTTPException(status_code=404, detail="Friendship not found")
+    elif payload.target_user_id:
+        friendship = session.exec(
+            select(Friendship).where(_friendship_between_clause(current_user.id, payload.target_user_id))
+        ).first()
+    else:
+        raise HTTPException(status_code=400, detail="Either friendship_id or target_user_id must be provided")
 
-    if friendship.status != FriendshipStatus.PENDING:
-        raise HTTPException(status_code=400, detail="Friend request is not pending")
-
-    if friendship.addressee_id != addressee.id:
-        raise HTTPException(status_code=400, detail="Only the addressee can respond to a friend request")
+    action = payload.action
 
     match action:
-        case FriendshipResponseStatus.ACCEPTED:
+        case FriendshipManageAction.ACCEPT:
+            if not friendship:
+                raise HTTPException(status_code=404, detail="Friendship not found")
+            if friendship.status != FriendshipStatus.PENDING:
+                raise HTTPException(status_code=400, detail="Friend request is not pending")
+            if friendship.addressee_id != current_user.id:
+                raise HTTPException(status_code=400, detail="Only the addressee can accept a friend request")
+
             friendship.status = FriendshipStatus.ACCEPTED
             friendship.updated_at = datetime.now(UTC)
             session.add(friendship)
@@ -262,21 +304,93 @@ def respond_to_friend_request(
                 session=session,
                 target_user_id=friendship.requester_id,
                 title="New Friend Added",
-                body=f"{addressee.username} accepted your friend request.",
+                body=f"{current_user.username} accepted your friend request.",
                 data={"friendship_id": str(friendship.id)},
             )
             return {"message": "Friend request accepted"}
 
-        case FriendshipResponseStatus.REJECTED:
+        case FriendshipManageAction.REJECT:
+            if not friendship:
+                raise HTTPException(status_code=404, detail="Friendship not found")
+            if friendship.status != FriendshipStatus.PENDING:
+                raise HTTPException(status_code=400, detail="Friend request is not pending")
+            if friendship.addressee_id != current_user.id:
+                raise HTTPException(status_code=400, detail="Only the addressee can reject a friend request")
+
             _delete_friendship(session, friendship.id)
             return {"message": "Friend request rejected"}
 
-        case FriendshipResponseStatus.BLOCKED:
-            friendship.status = FriendshipStatus.BLOCKED
-            friendship.updated_at = datetime.now(UTC)
-            session.add(friendship)
-            session.commit()
-            return {"message": "User blocked"}
+        case FriendshipManageAction.CANCEL:
+            if not friendship:
+                raise HTTPException(status_code=404, detail="Friendship not found")
+            if friendship.status != FriendshipStatus.PENDING:
+                raise HTTPException(status_code=400, detail="Friend request is not pending")
+            if friendship.requester_id != current_user.id:
+                raise HTTPException(status_code=400, detail="Only the sender can cancel a friend request")
+
+            _delete_friendship(session, friendship.id)
+            return {"message": "Friend request cancelled"}
+
+        case FriendshipManageAction.REMOVE:
+            if not friendship:
+                raise HTTPException(status_code=404, detail="Friendship not found")
+            if friendship.status != FriendshipStatus.ACCEPTED:
+                raise HTTPException(status_code=400, detail="Friendship is not accepted")
+            if current_user.id not in (friendship.requester_id, friendship.addressee_id):
+                raise HTTPException(status_code=400, detail="You are not part of this friendship")
+
+            _delete_friendship(session, friendship.id)
+            return {"message": "Friend removed"}
+
+        case FriendshipManageAction.BLOCK:
+            if friendship:
+                if current_user.id not in (friendship.requester_id, friendship.addressee_id):
+                    raise HTTPException(status_code=400, detail="You are not part of this friendship")
+                if friendship.status == FriendshipStatus.BLOCKED:
+                    if friendship.requester_id == current_user.id:
+                        return {"message": "User blocked"}
+                    else:
+                        raise HTTPException(status_code=403, detail="Cannot interact with this user")
+
+                other_user_id = (
+                    friendship.addressee_id if friendship.requester_id == current_user.id else friendship.requester_id
+                )
+                friendship.requester_id = current_user.id
+                friendship.addressee_id = other_user_id
+                friendship.status = FriendshipStatus.BLOCKED
+                friendship.updated_at = datetime.now(UTC)
+                session.add(friendship)
+                session.commit()
+                return {"message": "User blocked"}
+            else:
+                target_id = payload.target_user_id or payload.friendship_id
+                if not target_id:
+                    raise HTTPException(status_code=400, detail="Target user ID required to block")
+                if target_id == current_user.id:
+                    raise HTTPException(status_code=400, detail="Cannot block yourself")
+                target_user = session.get(User, target_id)
+                if not target_user:
+                    raise HTTPException(status_code=404, detail="Target user not found")
+
+                new_block = Friendship(
+                    requester_id=current_user.id,
+                    addressee_id=target_id,
+                    status=FriendshipStatus.BLOCKED,
+                )
+                session.add(new_block)
+                session.commit()
+                return {"message": "User blocked"}
+
+        case FriendshipManageAction.UNBLOCK:
+            if not friendship:
+                raise HTTPException(status_code=404, detail="Friendship not found")
+            if friendship.status != FriendshipStatus.BLOCKED:
+                raise HTTPException(status_code=400, detail="Friendship is not blocked")
+            if friendship.requester_id != current_user.id:
+                raise HTTPException(status_code=403, detail="Only the blocker can unblock this user")
+
+            _delete_friendship(session, friendship.id)
+            return {"message": "User unblocked"}
 
         case _:
             raise HTTPException(status_code=400, detail="Invalid action")

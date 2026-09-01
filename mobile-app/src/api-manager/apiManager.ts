@@ -182,17 +182,19 @@ export default {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ addressee_id: addresseeId }),
     }),
-  respondToFriend: (friendshipId: string, action: 'ACCEPTED' | 'REJECTED' | 'BLOCKED') =>
-    fetchAuthenticatedData<{ message: string }>(EndPoints.respondToFriend(), {
+  manageFriendship: (
+    action: 'ACCEPT' | 'REJECT' | 'CANCEL' | 'REMOVE' | 'BLOCK' | 'UNBLOCK',
+    friendshipId?: string,
+    targetUserId?: string
+  ) =>
+    fetchAuthenticatedData<{ message: string }>(EndPoints.manageFriendship(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ friendship_id: friendshipId, action }),
-    }),
-  removeFriend: (friendshipId: string) =>
-    fetchAuthenticatedData<{ message: string }>(EndPoints.removeFriend(), {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ friendship_id: friendshipId }),
+      body: JSON.stringify({
+        action,
+        friendship_id: friendshipId || undefined,
+        target_user_id: targetUserId || undefined,
+      }),
     }),
   getRecommendations: (friendId: string) =>
     fetchAuthenticatedData<RecommendationResponse>(EndPoints.getRecommendations(friendId)),

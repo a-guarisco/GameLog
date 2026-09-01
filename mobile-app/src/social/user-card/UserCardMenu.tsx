@@ -73,7 +73,9 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
     const { width: screenWidth } = Dimensions.get('window');
 
     if (triggerRef.current) {
+      let measured = false;
       triggerRef.current.measureInWindow((x, y, width, height) => {
+        measured = true;
         const rightOffset = Math.max(12, screenWidth - (x + width));
         const topOffset = y + height + 8;
 
@@ -84,6 +86,14 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
         setIsOpen(true);
         startEnterAnimation();
       });
+      if (!measured) {
+        setMenuPosition({
+          top: 100,
+          right: 16,
+        });
+        setIsOpen(true);
+        startEnterAnimation();
+      }
     } else {
       setMenuPosition({
         top: 100,
@@ -95,9 +105,8 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
   };
 
   const handleItemPress = (item: UserCardMenuItem) => {
-    handleClose(() => {
-      item.onPress();
-    });
+    item.onPress();
+    handleClose();
   };
 
   const animatedStyle = {

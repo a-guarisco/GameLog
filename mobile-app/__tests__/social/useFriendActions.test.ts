@@ -52,7 +52,7 @@ describe('useFriendActions', () => {
 
   it('resets the 3-second timer if a new action is triggered', async () => {
     (ApiManager.addFriend as jest.Mock).mockResolvedValueOnce({ success: true });
-    (ApiManager.respondToFriend as jest.Mock).mockResolvedValueOnce({ success: true });
+    (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ success: true });
 
     const { result } = renderHook(() =>
       useFriendActions({ onFriendListChanged, onSearchResultsChanged })
@@ -100,7 +100,7 @@ describe('useFriendActions', () => {
   });
 
   it('sets error message on failure and clears it after 3 seconds', async () => {
-    (ApiManager.respondToFriend as jest.Mock).mockRejectedValueOnce(
+    (ApiManager.manageFriendship as jest.Mock).mockRejectedValueOnce(
       new Error('Network error occurred')
     );
 
@@ -125,7 +125,7 @@ describe('useFriendActions', () => {
   });
 
   it('cleans up timeout on unmount', async () => {
-    (ApiManager.removeFriend as jest.Mock).mockResolvedValueOnce({ success: true });
+    (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ success: true });
 
     const { result, unmount } = renderHook(() =>
       useFriendActions({ onFriendListChanged, onSearchResultsChanged })

@@ -12,8 +12,9 @@ export interface FriendActions {
   handleAddFriend: (userId: string) => Promise<void>;
   handleAcceptFriend: (friendshipId: string) => Promise<void>;
   handleRefuseFriend: (friendshipId: string) => Promise<void>;
-  handleBlockFriend: (friendshipId: string) => Promise<void>;
+  handleBlockFriend: (id: string) => Promise<void>;
   handleRemoveFriend: (friendshipId: string) => Promise<void>;
+  handleRemovePending: (friendshipId: string) => Promise<void>;
   handleUnblockFriend: (friendshipId: string) => Promise<void>;
 }
 
@@ -76,7 +77,7 @@ export const useFriendActions = ({
   const handleAcceptFriend = useCallback(
     (friendshipId: string) =>
       runAction(
-        () => ApiManager.respondToFriend(friendshipId, 'ACCEPTED'),
+        () => ApiManager.manageFriendship('ACCEPT', friendshipId),
         'Friend request accepted!',
         'Failed to accept friend request'
       ),
@@ -86,7 +87,7 @@ export const useFriendActions = ({
   const handleRefuseFriend = useCallback(
     (friendshipId: string) =>
       runAction(
-        () => ApiManager.respondToFriend(friendshipId, 'REJECTED'),
+        () => ApiManager.manageFriendship('REJECT', friendshipId),
         'Friend request refused.',
         'Failed to refuse friend request'
       ),
@@ -94,9 +95,9 @@ export const useFriendActions = ({
   );
 
   const handleBlockFriend = useCallback(
-    (friendshipId: string) =>
+    (id: string) =>
       runAction(
-        () => ApiManager.respondToFriend(friendshipId, 'BLOCKED'),
+        () => ApiManager.manageFriendship('BLOCK', id),
         'User blocked.',
         'Failed to block user'
       ),
@@ -106,9 +107,19 @@ export const useFriendActions = ({
   const handleRemoveFriend = useCallback(
     (friendshipId: string) =>
       runAction(
-        () => ApiManager.removeFriend(friendshipId),
+        () => ApiManager.manageFriendship('REMOVE', friendshipId),
         'Friend removed.',
         'Failed to remove friend'
+      ),
+    [runAction]
+  );
+
+  const handleRemovePending = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.manageFriendship('CANCEL', friendshipId),
+        'Friend request cancelled.',
+        'Failed to cancel friend request'
       ),
     [runAction]
   );
@@ -116,7 +127,7 @@ export const useFriendActions = ({
   const handleUnblockFriend = useCallback(
     (friendshipId: string) =>
       runAction(
-        () => ApiManager.removeFriend(friendshipId),
+        () => ApiManager.manageFriendship('UNBLOCK', friendshipId),
         'User unblocked.',
         'Failed to unblock user'
       ),
@@ -131,6 +142,7 @@ export const useFriendActions = ({
     handleRefuseFriend,
     handleBlockFriend,
     handleRemoveFriend,
+    handleRemovePending,
     handleUnblockFriend,
   };
 };

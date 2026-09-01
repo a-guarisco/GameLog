@@ -101,7 +101,7 @@ describe('SocialView', () => {
   });
 
   it('allows accepting a friend request', async () => {
-    mockApiManager.respondToFriend.mockResolvedValueOnce({
+    mockApiManager.manageFriendship.mockResolvedValueOnce({
       message: 'Friend request accepted',
     } as any);
     render(<SocialView />);
@@ -109,12 +109,12 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('accept-btn-u2'));
 
     await waitFor(() => {
-      expect(mockApiManager.respondToFriend).toHaveBeenCalledWith('f2', 'ACCEPTED');
+      expect(mockApiManager.manageFriendship).toHaveBeenCalledWith('ACCEPT', 'f2');
     });
   });
 
   it('allows refusing a friend request', async () => {
-    mockApiManager.respondToFriend.mockResolvedValueOnce({
+    mockApiManager.manageFriendship.mockResolvedValueOnce({
       message: 'Friend request rejected',
     } as any);
     render(<SocialView />);
@@ -122,12 +122,12 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('refuse-btn-u2'));
 
     await waitFor(() => {
-      expect(mockApiManager.respondToFriend).toHaveBeenCalledWith('f2', 'REJECTED');
+      expect(mockApiManager.manageFriendship).toHaveBeenCalledWith('REJECT', 'f2');
     });
   });
 
   it('allows blocking a friend request after confirmation via menu and modal', async () => {
-    mockApiManager.respondToFriend.mockResolvedValueOnce({
+    mockApiManager.manageFriendship.mockResolvedValueOnce({
       message: 'User blocked',
     } as any);
     render(<SocialView />);
@@ -143,12 +143,12 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('block-friend-u2-confirm-btn'));
 
     await waitFor(() => {
-      expect(mockApiManager.respondToFriend).toHaveBeenCalledWith('f2', 'BLOCKED');
+      expect(mockApiManager.manageFriendship).toHaveBeenCalledWith('BLOCK', 'f2');
     });
   });
 
   it('allows removing an accepted friendship after confirmation via modal', async () => {
-    mockApiManager.removeFriend.mockResolvedValueOnce({
+    mockApiManager.manageFriendship.mockResolvedValueOnce({
       message: 'Friendship removed',
     } as any);
     render(<SocialView />);
@@ -164,12 +164,12 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('remove-friend-u1-confirm-btn'));
 
     await waitFor(() => {
-      expect(mockApiManager.removeFriend).toHaveBeenCalledWith('f1');
+      expect(mockApiManager.manageFriendship).toHaveBeenCalledWith('REMOVE', 'f1');
     });
   });
 
   it('allows blocking an accepted friend after confirmation via modal', async () => {
-    mockApiManager.respondToFriend.mockResolvedValueOnce({
+    mockApiManager.manageFriendship.mockResolvedValueOnce({
       message: 'User blocked',
     } as any);
     render(<SocialView />);
@@ -185,7 +185,7 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('block-friend-u1-confirm-btn'));
 
     await waitFor(() => {
-      expect(mockApiManager.respondToFriend).toHaveBeenCalledWith('f1', 'BLOCKED');
+      expect(mockApiManager.manageFriendship).toHaveBeenCalledWith('BLOCK', 'f1');
     });
   });
 
@@ -258,7 +258,7 @@ describe('SocialView', () => {
       errorMessageSearch: null,
       refetchSearch: jest.fn(),
     });
-    mockApiManager.removeFriend.mockResolvedValueOnce({
+    mockApiManager.manageFriendship.mockResolvedValueOnce({
       message: 'User unblocked',
     } as any);
 
@@ -281,7 +281,7 @@ describe('SocialView', () => {
     fireEvent.press(screen.getByTestId('unblock-friend-u5-confirm-btn'));
 
     await waitFor(() => {
-      expect(mockApiManager.removeFriend).toHaveBeenCalledWith('f5');
+      expect(mockApiManager.manageFriendship).toHaveBeenCalledWith('UNBLOCK', 'f5');
     });
   });
 
