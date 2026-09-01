@@ -13,7 +13,7 @@ export const SocialIdentity: React.FC<SocialIdentityProps> = ({ className = '' }
         Social Hub
       </PageTitle>
       <Text size="sm" className="text-typography-400 mt-1">
-        Connect with friends, manage requests, and discover recommendations
+        Connect with friends and discover recommendations
       </Text>
     </Box>
   );
