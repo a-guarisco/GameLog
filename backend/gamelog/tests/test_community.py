@@ -32,6 +32,7 @@ class TestCommunityService:
     def test_global_scope_success(self, session: Session):
         u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
         u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="US")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="FR")
 
         g_action = _setup_genre(session, "1", "Action")
         g_rpg = _setup_genre(session, "3", "RPG")
@@ -43,14 +44,17 @@ class TestCommunityService:
         _link_game_genre(session, game2, g_rpg)
         # g_indie is not played
 
-        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=60)
+        # u1 (caller) plays Indie or Action, but will be excluded
+        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=999)
+        # u2 and u3 form the global community
         make_rolling(session, user=u2, steam_app_id="200", last_day_playtime=180)
+        make_rolling(session, user=u3, steam_app_id="100", last_day_playtime=60)
 
         auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
         result = community_service.get_community_genre(CommunityScope.GLOBAL, session, auth_user)
 
         assert len(result) == 2
-        # Total playtime across genres = 60 + 180 = 240
+        # Total playtime across genres = 60 + 180 = 240 (u1's playtime excluded)
         # RPG: 180 / 240 = 75.0%
         # Action: 60 / 240 = 25.0%
         assert result[0].id == "3"
@@ -74,8 +78,11 @@ class TestCommunityService:
         _link_game_genre(session, game1, g_action)
         _link_game_genre(session, game2, g_rpg)
 
-        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=100)
+        # u1 (caller, IT) plays RPG, but is excluded
+        make_rolling(session, user=u1, steam_app_id="200", last_day_playtime=500)
+        # u2 (same region IT) plays Action
         make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=100)
+        # u3 (different region US) plays RPG
         make_rolling(session, user=u3, steam_app_id="200", last_day_playtime=500)
 
         auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
@@ -876,10 +883,11 @@ class TestCommunityService:
 class TestCommunityRouter:
     def test_get_community_genre_endpoint(self, client: TestClient, session: Session):
         u1 = make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="firebase-uid-2", username="user2", steam_id="s2", region="IT")
         g_action = _setup_genre(session, "1", "Action")
         game = make_game(session, steam_app_id="100")
         _link_game_genre(session, game, g_action)
-        make_rolling(session, user=u1, steam_app_id="100", last_day_playtime=60)
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=60)
 
         response = client.get("/community/genre?scope=GLOBAL")
         assert response.status_code == 200
@@ -891,6 +899,12 @@ class TestCommunityRouter:
 
     def test_get_community_genre_endpoint_case_insensitive(self, client: TestClient, session: Session):
         u1 = make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="firebase-uid-2", username="user2", steam_id="s2", region="IT")
+        g_action = _setup_genre(session, "1", "Action")
+        game = make_game(session, steam_app_id="100")
+        _link_game_genre(session, game, g_action)
+        make_rolling(session, user=u2, steam_app_id="100", last_day_playtime=60)
+
         response = client.get("/community/genre?scope=global")
         assert response.status_code == 200
 
