@@ -43,6 +43,27 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const useEmulator = process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR !== 'false';
 const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 
+const getDefaultAuthEmulatorHost = (): string =>
+  Platform.OS === 'android' ? 'http://10.0.2.2:9099' : 'http://localhost:9099';
+
+const getAuthEmulatorHost = (): string => {
+  const configured = process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST?.trim();
+
+  if (!configured) {
+    return getDefaultAuthEmulatorHost();
+  }
+
+  if (Platform.OS === 'android' && configured.includes('localhost')) {
+    return 'http://10.0.2.2:9099';
+  }
+
+  if (Platform.OS === 'ios' && configured.includes('10.0.2.2')) {
+    return 'http://localhost:9099';
+  }
+
+  return configured;
+};
+
 let auth: ReturnType<typeof getAuth>;
 try {
   auth = initializeAuth(app, {
@@ -50,9 +71,7 @@ try {
   });
 
   if (useEmulator) {
-    const authEmulatorHost =
-      process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST ||
-      (Platform.OS === 'android' ? 'http://192.168.240.1:9099' : 'http://127.0.0.1:9099');
+    const authEmulatorHost = getAuthEmulatorHost();
 
     connectAuthEmulator(auth, authEmulatorHost);
     console.log(
