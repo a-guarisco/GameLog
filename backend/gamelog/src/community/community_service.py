@@ -23,7 +23,7 @@ def get_community_genre(
     Returns the percentage share of playtime for each genre for the specified community scope.
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=False)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
 
     return _calculate_genre_percentages(db, target_user_ids)
 
@@ -272,13 +272,12 @@ def _compute_target_ids(
     scope: CommunityScope,
     current_user: User,
     db: Session,
-    exclude_current_user: bool = True,
 ) -> list[uuid.UUID]:
     match scope:
         case CommunityScope.GLOBAL:
-            target_user_ids = _get_global_user_ids(db, current_user.id if exclude_current_user else None)
+            target_user_ids = _get_global_user_ids(db, current_user.id)
         case CommunityScope.REGION:
-            target_user_ids = _get_regional_user_ids(db, current_user, exclude_current_user=exclude_current_user)
+            target_user_ids = _get_regional_user_ids(db, current_user)
         case CommunityScope.FRIENDS:
             target_user_ids = _get_friend_user_ids(db, current_user.id)
         case _:
@@ -294,22 +293,18 @@ def _compute_target_ids(
     return target_user_ids
 
 
-def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID | None = None) -> list[uuid.UUID]:
-    query = select(User.id)
-    if exclude_user_id is not None:
-        query = query.where(User.id != exclude_user_id)
+def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID) -> list[uuid.UUID]:
+    query = select(User.id).where(User.id != exclude_user_id)
     return list(db.exec(query).all())
 
 
-def _get_regional_user_ids(db: Session, user: User, exclude_current_user: bool = True) -> list[uuid.UUID]:
+def _get_regional_user_ids(db: Session, user: User) -> list[uuid.UUID]:
     if not user.region or user.region.strip() == "" or user.region == "Unknown":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User region is not set",
         )
-    query = select(User.id).where(User.region == user.region)
-    if exclude_current_user:
-        query = query.where(User.id != user.id)
+    query = select(User.id).where(User.region == user.region).where(User.id != user.id)
     return list(db.exec(query).all())
 
 
