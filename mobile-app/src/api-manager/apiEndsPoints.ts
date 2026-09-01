@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { getApiProvider } from '@gamelog/api-manager/apiProvider';
 import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { CommunityScope, TopGameReference } from '@gamelog/api-manager/dto';
@@ -5,8 +6,26 @@ import { CommunityScope, TopGameReference } from '@gamelog/api-manager/dto';
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
-const getBackendBaseUrl = (): string =>
-  process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
+const getDefaultBackendUrl = (): string =>
+  Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
+
+const getBackendBaseUrl = (): string => {
+  const configured = process.env.EXPO_PUBLIC_BACKEND_BASE_URL?.trim();
+
+  if (!configured) {
+    return getDefaultBackendUrl();
+  }
+
+  if (Platform.OS === 'android' && configured.includes('localhost')) {
+    return 'http://10.0.2.2:8000';
+  }
+
+  if (Platform.OS === 'ios' && configured.includes('10.0.2.2')) {
+    return 'http://localhost:8000';
+  }
+
+  return configured;
+};
 
 const getRelationship = (includePending: boolean): string => (includePending ? 'all' : 'friend');
 

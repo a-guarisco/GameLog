@@ -1,5 +1,7 @@
 import { Platform } from 'react-native';
 
+const mockConnectAuthEmulator = jest.fn();
+
 jest.unmock('@gamelog/auth/firebaseClient');
 jest.unmock('../../src/auth/firebaseClient');
 
@@ -12,7 +14,7 @@ jest.mock('@firebase/auth', () => ({
   initializeAuth: jest.fn(() => ({})),
   getAuth: jest.fn(() => ({})),
   getReactNativePersistence: jest.fn(),
-  connectAuthEmulator: jest.fn(),
+  connectAuthEmulator: mockConnectAuthEmulator,
 }));
 
 describe('firebaseClient', () => {
@@ -20,6 +22,13 @@ describe('firebaseClient', () => {
 
   beforeEach(() => {
     jest.resetModules();
+    jest.doMock('@firebase/auth', () => ({
+      initializeAuth: jest.fn(() => ({})),
+      getAuth: jest.fn(() => ({})),
+      getReactNativePersistence: jest.fn(),
+      connectAuthEmulator: mockConnectAuthEmulator,
+    }));
+    mockConnectAuthEmulator.mockClear();
     process.env = { ...originalEnv };
   });
 
@@ -62,12 +71,15 @@ describe('firebaseClient', () => {
     expect(auth).toBeDefined();
   });
 
-  it('uses emulator by default on ios', () => {
+  it('uses localhost for ios emulator by default', () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'true';
+    delete process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST;
     Platform.OS = 'ios';
     const { auth } = require('../../src/auth/firebaseClient');
+    const { connectAuthEmulator } = require('@firebase/auth');
     expect(auth).toBeDefined();
+    expect(connectAuthEmulator).toHaveBeenCalledWith(auth, 'http://localhost:9099');
   });
 
   it('skips emulator when EXPO_PUBLIC_USE_FIREBASE_EMULATOR is false', () => {
@@ -118,6 +130,18 @@ describe('firebaseClient', () => {
       expect(app).toBeDefined(); // Just ensuring it doesn't crash
     });
   });
+  it('prefers the platform-specific emulator host when Android-only host is stored in env', () => {
+    setupValidEnv();
+    process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'true';
+    process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST = 'http://10.0.2.2:9099';
+    Platform.OS = 'ios';
+    jest.isolateModules(() => {
+      const { auth } = require('../../src/auth/firebaseClient');
+      expect(auth).toBeDefined();
+      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(auth, 'http://localhost:9099');
+    });
+  });
+
   it('uses custom emulator host when EXPO_PUBLIC_FIREBASE_EMULATOR_HOST is provided', () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'true';
