@@ -158,9 +158,7 @@ describe('apiEndsPoints', () => {
       ).toBe(
         'https://api.mydomain.dev/community/weekly_top_game_playtime?scope=global&start_date=2026-08-01&end_date=2026-08-07&reference=friends'
       );
-      expect(
-        EndPoints.getCommunityWeeklyTopGames('global', '2026-08-01', '2026-08-07')
-      ).toBe(
+      expect(EndPoints.getCommunityWeeklyTopGames('global', '2026-08-01', '2026-08-07')).toBe(
         'https://api.mydomain.dev/community/weekly_top_game_playtime?scope=global&start_date=2026-08-01&end_date=2026-08-07&reference=community'
       );
       expect(
@@ -170,10 +168,21 @@ describe('apiEndsPoints', () => {
       );
     });
 
-    it('falls back to default localhost URL when EXPO_PUBLIC_BACKEND_BASE_URL is not set', () => {
+    it('falls back to platform-appropriate localhost URL when EXPO_PUBLIC_BACKEND_BASE_URL is not set', () => {
       delete process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
       expect(EndPoints.getBackendHealth()).toBe('http://localhost:8000/health');
     });
+
+    it('overrides an Android-only backend host for ios builds', () => {
+      process.env.EXPO_PUBLIC_BACKEND_BASE_URL = 'http://10.0.2.2:8000';
+      const originalPlatform = require('react-native').Platform.OS;
+      require('react-native').Platform.OS = 'ios';
+
+      try {
+        expect(EndPoints.getBackendHealth()).toBe('http://localhost:8000/health');
+      } finally {
+        require('react-native').Platform.OS = originalPlatform;
+      }
+    });
   });
 });
-
