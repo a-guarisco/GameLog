@@ -128,6 +128,7 @@ def search_users_by_username(session: Session, query: str, current_user_uid: str
                     friendship_id=friendship.id if friendship else None,
                     friendship_status=_resolve_friendship_status(friendship, current_user.id) if friendship else None,
                     friendship_requester_id=friendship.requester_id if friendship else None,
+                    since=friendship.updated_at.strftime("%d-%m-%Y") if friendship and friendship.updated_at else None,
                 ),
             )
         )
@@ -161,6 +162,7 @@ def get_friend_list(session: Session, user_uid: str) -> list[UserSearchResult]:
                     friendship_id=friendship.id,
                     friendship_status=_resolve_friendship_status(friendship, current_user.id),
                     friendship_requester_id=friendship.requester_id,
+                    since=friendship.updated_at.strftime("%d-%m-%Y") if friendship.updated_at else None,
                 ),
             )
         )

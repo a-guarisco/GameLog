@@ -92,18 +92,23 @@ class TestUserSearch:
         # None user
         assert results["user_none"]["friendship"]["friendship_status"] is None
         assert results["user_none"]["friendship"]["friendship_requester_id"] is None
+        assert results["user_none"]["friendship"]["since"] is None
 
         # Sent request
         assert results["user_sent"]["friendship"]["friendship_status"] == APIFriendshipStatus.PENDING_OUTGOING.value
         assert results["user_sent"]["friendship"]["friendship_requester_id"] == str(me.id)
+        assert results["user_sent"]["friendship"]["since"] == f_sent.updated_at.strftime("%d-%m-%Y")
 
         # Received request
         assert results["user_rec"]["friendship"]["friendship_status"] == APIFriendshipStatus.PENDING_INCOMING.value
         assert results["user_rec"]["friendship"]["friendship_requester_id"] == str(received_user.id)
+        assert results["user_rec"]["friendship"]["since"] == f_rec.updated_at.strftime("%d-%m-%Y")
 
         # Accepted friend
         assert results["user_friend"]["friendship"]["friendship_status"] == APIFriendshipStatus.ACCEPTED.value
+        assert results["user_friend"]["friendship"]["since"] == f_friend.updated_at.strftime("%d-%m-%Y")
 
         # Blocked
         assert results["user_blocked"]["friendship"]["friendship_status"] == APIFriendshipStatus.BLOCKED.value
         assert results["user_blocked"]["friendship"]["friendship_requester_id"] == str(me.id)
+        assert results["user_blocked"]["friendship"]["since"] == f_blocked.updated_at.strftime("%d-%m-%Y")

@@ -69,6 +69,7 @@ class FriendshipInfo(BaseModel):
     friendship_id: uuid.UUID | None = None
     friendship_status: FriendshipStatus | None = None
     friendship_requester_id: uuid.UUID | None = None
+    since: str | None = None
 
 
 class UserSearchResult(BaseModel):
