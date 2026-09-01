@@ -106,3 +106,4 @@ class TestUserSearch:
 
         # Blocked
         assert results["user_blocked"]["friendship"]["friendship_status"] == APIFriendshipStatus.BLOCKED.value
+        assert results["user_blocked"]["friendship"]["friendship_requester_id"] == str(me.id)

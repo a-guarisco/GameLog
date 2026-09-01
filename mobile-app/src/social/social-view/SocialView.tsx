@@ -37,6 +37,7 @@ export const SocialView: React.FC = () => {
     handleRefuseFriend,
     handleBlockFriend,
     handleRemoveFriend,
+    handleRemovePending,
     handleUnblockFriend,
   } = useFriendActions({
     onFriendListChanged: refetchFriendList,
@@ -87,7 +88,7 @@ export const SocialView: React.FC = () => {
                 onRefuseFriend: handleRefuseFriend,
                 onBlockFriend: handleBlockFriend,
                 onRemoveFriend: handleRemoveFriend,
-                onRemovePending: handleRemoveFriend,
+                onRemovePending: handleRemovePending,
                 onUnblockFriend: handleUnblockFriend,
                 onSelectRecommendations: handleOpenRecommendations,
               }}

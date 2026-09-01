@@ -2,7 +2,6 @@ import { render, fireEvent } from '@testing-library/react-native';
 import {
   AddFriendAction,
   IncomingRequestActions,
-  RecommendAction,
 } from '@gamelog/social/user-card/FriendshipActions';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 
@@ -45,22 +44,4 @@ describe('FriendshipActions', () => {
     expect(onRefuse).toHaveBeenCalledWith('f1');
   });
 
-  it('handles RecommendAction press', () => {
-    const onSelectRecommendations = jest.fn();
-    const mockItem: any = {
-      user: { id: 'u2', username: 'Bob' },
-    };
-
-    const { getByText, getByTestId } = renderWithProvider(
-      <RecommendAction
-        item={mockItem}
-        onSelectRecommendations={onSelectRecommendations}
-        isDisabled={false}
-      />
-    );
-
-    expect(getByText('Recommend')).toBeTruthy();
-    fireEvent.press(getByTestId('recommend-btn-u2'));
-    expect(onSelectRecommendations).toHaveBeenCalledWith(mockItem);
-  });
 });

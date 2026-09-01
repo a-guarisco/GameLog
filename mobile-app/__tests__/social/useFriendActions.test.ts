@@ -79,7 +79,7 @@ describe('useFriendActions', () => {
   });
 
   it('handles acceptFriend success and error', async () => {
-    (ApiManager.respondToFriend as jest.Mock).mockResolvedValueOnce({ message: 'Accepted' });
+    (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ message: 'Accepted' });
 
     const { result } = renderHook(() =>
       useFriendActions({ onFriendListChanged, onSearchResultsChanged })
@@ -94,11 +94,11 @@ describe('useFriendActions', () => {
       await actionPromise;
     });
 
-    expect(ApiManager.respondToFriend).toHaveBeenCalledWith('f1', 'ACCEPTED');
+    expect(ApiManager.manageFriendship).toHaveBeenCalledWith('ACCEPT', 'f1');
     expect(result.current.actionFeedback).toBe('Friend request accepted!');
 
     // Test error
-    (ApiManager.respondToFriend as jest.Mock).mockRejectedValueOnce(new Error('Accept error'));
+    (ApiManager.manageFriendship as jest.Mock).mockRejectedValueOnce(new Error('Accept error'));
     let actionPromiseError: Promise<void>;
     act(() => {
       actionPromiseError = result.current.handleAcceptFriend('f1');
@@ -111,7 +111,7 @@ describe('useFriendActions', () => {
   });
 
   it('handles refuseFriend success and error', async () => {
-    (ApiManager.respondToFriend as jest.Mock).mockResolvedValueOnce({ message: 'Refused' });
+    (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ message: 'Refused' });
 
     const { result } = renderHook(() =>
       useFriendActions({ onFriendListChanged, onSearchResultsChanged })
@@ -126,11 +126,11 @@ describe('useFriendActions', () => {
       await actionPromise;
     });
 
-    expect(ApiManager.respondToFriend).toHaveBeenCalledWith('f1', 'REJECTED');
+    expect(ApiManager.manageFriendship).toHaveBeenCalledWith('REJECT', 'f1');
     expect(result.current.actionFeedback).toBe('Friend request refused.');
 
     // Test error
-    (ApiManager.respondToFriend as jest.Mock).mockRejectedValueOnce(new Error('Refuse error'));
+    (ApiManager.manageFriendship as jest.Mock).mockRejectedValueOnce(new Error('Refuse error'));
     let actionPromiseError: Promise<void>;
     act(() => {
       actionPromiseError = result.current.handleRefuseFriend('f1');
@@ -144,7 +144,7 @@ describe('useFriendActions', () => {
 
   it('resets the 3-second timer if a new action is triggered', async () => {
     (ApiManager.addFriend as jest.Mock).mockResolvedValueOnce({ success: true });
-    (ApiManager.respondToFriend as jest.Mock).mockResolvedValueOnce({ success: true });
+    (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ success: true });
 
     const { result } = renderHook(() =>
       useFriendActions({ onFriendListChanged, onSearchResultsChanged })
@@ -191,8 +191,32 @@ describe('useFriendActions', () => {
     expect(result.current.actionFeedback).toBeNull();
   });
 
+  it('sets error message on failure and clears it after 3 seconds', async () => {
+    (ApiManager.manageFriendship as jest.Mock).mockRejectedValueOnce(
+      new Error('Network error occurred')
+    );
+
+    const { result } = renderHook(() =>
+      useFriendActions({ onFriendListChanged, onSearchResultsChanged })
+    );
+
+    let actionPromise: Promise<void>;
+    act(() => {
+      actionPromise = result.current.handleRefuseFriend('friendship-99');
+    });
+    await act(async () => {
+      await actionPromise;
+    });
+
+    expect(result.current.actionFeedback).toBe('Network error occurred');
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    expect(result.current.actionFeedback).toBeNull();
+  });
   it('cleans up timeout on unmount', async () => {
-    (ApiManager.removeFriend as jest.Mock).mockResolvedValueOnce({ success: true });
+    (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ success: true });
 
     const { result, unmount } = renderHook(() =>
       useFriendActions({ onFriendListChanged, onSearchResultsChanged })

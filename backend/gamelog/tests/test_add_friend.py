@@ -149,10 +149,10 @@ class TestSendFriendRequest:
         addressee = make_user(session, firebase_uid="uid-blk-addr", username="blkaddr", steam_id="1200")
 
         # Requester is the blocker, addressee is blocked.
-        # In our model, requester_id stores the blocked user, and addressee_id stores the blocker.
+        # In our model, requester_id stores the blocker, and addressee_id stores the blocked user.
         friendship = Friendship(
-            requester_id=addressee.id,
-            addressee_id=requester.id,
+            requester_id=requester.id,
+            addressee_id=addressee.id,
             status=FriendshipStatus.BLOCKED,
         )
         session.add(friendship)
@@ -161,14 +161,12 @@ class TestSendFriendRequest:
         result = send_friend_request(session, "uid-blk-req", addressee.id)
 
         assert result["message"] == "Friend request sent"
-        # Verify the old friendship block was deleted
-        assert session.get(Friendship, friendship.id) is None
-        # Verify a new pending friendship request was created
-        new_friendship = session.get(Friendship, uuid.UUID(result["friendship_id"]))
-        assert new_friendship is not None
-        assert new_friendship.status == FriendshipStatus.PENDING
-        assert new_friendship.requester_id == requester.id
-        assert new_friendship.addressee_id == addressee.id
+        # Verify the friendship was transitioned to PENDING
+        updated_friendship = session.get(Friendship, friendship.id)
+        assert updated_friendship is not None
+        assert updated_friendship.status == FriendshipStatus.PENDING
+        assert updated_friendship.requester_id == requester.id
+        assert updated_friendship.addressee_id == addressee.id
 
     # ------------------------------------------------------------------
     # Blocked friendship (addressee blocked requester)
@@ -179,10 +177,10 @@ class TestSendFriendRequest:
         user_b = make_user(session, firebase_uid="uid-blk-b", username="blkb", steam_id="1400")
 
         # B (user_b) has blocked A (user_a).
-        # In our model, requester_id stores the blocked user (user_a), and addressee_id stores the blocker (user_b).
+        # In our model, requester_id stores the blocker (user_b), and addressee_id stores the blocked user (user_a).
         friendship = Friendship(
-            requester_id=user_a.id,
-            addressee_id=user_b.id,
+            requester_id=user_b.id,
+            addressee_id=user_a.id,
             status=FriendshipStatus.BLOCKED,
         )
         session.add(friendship)

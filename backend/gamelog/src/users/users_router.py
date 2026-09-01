@@ -4,7 +4,12 @@ from sqlmodel import Session
 from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
-from src.users import FriendshipRequest, FriendshipResponse, UserSearchResult, user_service
+from src.users import (
+    FriendshipManageRequest,
+    FriendshipRequest,
+    UserSearchResult,
+    user_service,
+)
 from src.users.schemas import UserRead, UserMeRead, UserRegisterRequest, SteamApiKeyUpdateRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -35,12 +40,16 @@ def add_friend(payload: FriendshipRequest, db: Session = Depends(get_db), auth_u
 
 
 @router.post(
-    "/respond_to_friend",
-    summary="Respond to a pending friend request. Action can be ACCEPTED, BLOCKED, or REJECTED. A REJECTED friendship request can be resent by the sender, a BLOCKED friendship request blocks further requests.",
-    status_code=201,
+    "/manage_friendship",
+    summary="Manage friendship state transitions (ACCEPT, REJECT, CANCEL, REMOVE, BLOCK, UNBLOCK).",
+    status_code=200,
 )
-def response_friend(payload: FriendshipResponse, db: Session = Depends(get_db), auth_user: AuthenticatedUser = Depends(get_current_user)):
-    return user_service.respond_to_friend_request(db, auth_user.uid, payload.friendship_id, payload.action)
+def manage_friendship(
+    payload: FriendshipManageRequest,
+    db: Session = Depends(get_db),
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+):
+    return user_service.manage_friendship(db, auth_user.uid, payload)
 
 
 @router.post(

@@ -1,7 +1,8 @@
 from .schemas import (
     FriendshipInfo,
+    FriendshipManageAction,
+    FriendshipManageRequest,
     FriendshipRequest,
-    FriendshipResponse,
     SteamRollingTimeCreate,
     SteamRollingTimeRead,
     UserCreate,
@@ -13,8 +14,9 @@ from .shelving import ShelvingCreate, ShelvingRead, ShelvingStatusUpdate
 
 __all__ = [
     "FriendshipInfo",
+    "FriendshipManageAction",
+    "FriendshipManageRequest",
     "FriendshipRequest",
-    "FriendshipResponse",
     "ShelvingCreate",
     "ShelvingRead",
     "ShelvingStatusUpdate",

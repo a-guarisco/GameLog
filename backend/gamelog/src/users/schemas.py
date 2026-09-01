@@ -80,15 +80,21 @@ class FriendshipRequest(BaseModel):
     addressee_id: uuid.UUID
 
 
-class FriendshipResponseStatus(str, Enum):
-    ACCEPTED = "ACCEPTED"
-    BLOCKED = "BLOCKED"
-    REJECTED = "REJECTED"
 
 
-class FriendshipResponse(BaseModel):
-    friendship_id: uuid.UUID
-    action: FriendshipResponseStatus
+class FriendshipManageAction(str, Enum):
+    ACCEPT = "ACCEPT"
+    REJECT = "REJECT"
+    CANCEL = "CANCEL"
+    REMOVE = "REMOVE"
+    BLOCK = "BLOCK"
+    UNBLOCK = "UNBLOCK"
+
+
+class FriendshipManageRequest(BaseModel):
+    action: FriendshipManageAction
+    friendship_id: uuid.UUID | None = None
+    target_user_id: uuid.UUID | None = None
 
 
 # endregion

@@ -468,21 +468,24 @@ describe('ApiManager', () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it('responds to friend request with POST method and body', async () => {
+    it('manages friendship with POST method and body', async () => {
       const mockResponse = { message: 'Friend request accepted' };
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
 
-      const result = await ApiManager.respondToFriend('f1', 'ACCEPTED');
-      expect(mockFetch).toHaveBeenCalledWith(EndPoints.respondToFriend(), {
+      const result = await ApiManager.manageFriendship('ACCEPT', 'f1');
+      expect(mockFetch).toHaveBeenCalledWith(EndPoints.manageFriendship(), {
         method: 'POST',
         headers: {
           Authorization: 'Bearer firebase-id-token',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ friendship_id: 'f1', action: 'ACCEPTED' }),
+        body: JSON.stringify({
+          action: 'ACCEPT',
+          friendship_id: 'f1',
+        }),
       });
       expect(result).toEqual(mockResponse);
     });
