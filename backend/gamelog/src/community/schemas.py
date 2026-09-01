@@ -1,4 +1,5 @@
 from enum import Enum
+
 from pydantic import BaseModel
 
 
@@ -6,6 +7,7 @@ class CommunityScope(str, Enum):
     GLOBAL = "global"
     REGION = "region"
     FRIENDS = "friends"
+    USER = "user"
 
     @classmethod
     def _missing_(cls, value: object):
@@ -57,6 +59,7 @@ class CommunityMonthlyTopGameResponse(BaseModel):
     id: str
     user_playtime: float
     community_playtime: float
+
 
 from src.models.game import GameStatus
 

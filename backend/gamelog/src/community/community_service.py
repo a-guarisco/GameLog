@@ -1,11 +1,11 @@
-
-
 import calendar
+import uuid
 from collections import defaultdict
 from datetime import date, timedelta
-import uuid
+
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
+
 from src.auth.schemas import AuthenticatedUser
 from src.community.schemas import (
     CommunityGameStatusItem,
@@ -36,12 +36,13 @@ def get_community_genre(
     scope: CommunityScope,
     db: Session,
     user: AuthenticatedUser,
+    user_id: uuid.UUID | None = None,
 ) -> list[CommunityGenreHour]:
     """
     Returns the percentage share of playtime for each genre for the specified community scope.
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db)
+    target_user_ids = _compute_target_ids(scope, current_user, db, user_id=user_id)
 
     return _calculate_genre_percentages(db, target_user_ids)
 
@@ -52,21 +53,19 @@ def get_community_weekly_playtime(
     end_date: date,
     user: AuthenticatedUser,
     db: Session,
+    user_id: uuid.UUID | None = None,
 ) -> CommunityWeeklyPlaytimeResponse:
     """
     Return the weekly playtime comparison for the specified 7-day period (Monday to Sunday)
     comparing the user vs the community average (excluding the user).
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db)
+    target_user_ids = _compute_target_ids(scope, current_user, db, user_id=user_id)
 
     week_dates = [start_date + timedelta(days=i) for i in range(7)]
 
     user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
-    user_hours = [
-        round(user_daily_map.get(d, 0) / 60.0, 2)
-        for d in week_dates
-    ]
+    user_hours = [round(user_daily_map.get(d, 0) / 60.0, 2) for d in week_dates]
 
     community_daily_totals = [0] * 7
     for target_id in target_user_ids:
@@ -75,10 +74,7 @@ def get_community_weekly_playtime(
             community_daily_totals[idx] += t_daily_map.get(d, 0)
 
     num_target_users = len(target_user_ids)
-    community_hours = [
-        round(total_mins / (60.0 * num_target_users), 2)
-        for total_mins in community_daily_totals
-    ]
+    community_hours = [round(total_mins / (60.0 * num_target_users), 2) for total_mins in community_daily_totals]
 
     return CommunityWeeklyPlaytimeResponse(user=user_hours, community=community_hours)
 
@@ -89,13 +85,14 @@ def get_community_monthly_playtime(
     end_date: date,
     user: AuthenticatedUser,
     db: Session,
+    user_id: uuid.UUID | None = None,
 ) -> CommunityMonthlyPlaytimeResponse:
     """
     Return the month-by-month playtime comparison for the specified period
     comparing the user vs the community average (excluding the user).
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db)
+    target_user_ids = _compute_target_ids(scope, current_user, db, user_id=user_id)
 
     months: list[tuple[int, int]] = []
     cur_year = start_date.year
@@ -109,10 +106,7 @@ def get_community_monthly_playtime(
 
     user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
 
-    target_daily_maps = [
-        _get_user_daily_playtimes_map(db, target_id, end_date)
-        for target_id in target_user_ids
-    ]
+    target_daily_maps = [_get_user_daily_playtimes_map(db, target_id, end_date) for target_id in target_user_ids]
 
     user_hours: list[float] = []
     community_hours: list[float] = []
@@ -125,11 +119,7 @@ def get_community_monthly_playtime(
         user_month_mins = sum(user_daily_map.get(d, 0) for d in days_in_month)
         user_hours.append(round(user_month_mins / 60.0, 2))
 
-        community_month_mins = sum(
-            t_map.get(d, 0)
-            for t_map in target_daily_maps
-            for d in days_in_month
-        )
+        community_month_mins = sum(t_map.get(d, 0) for t_map in target_daily_maps for d in days_in_month)
         community_hours.append(round(community_month_mins / (60.0 * num_target_users), 2))
 
     return CommunityMonthlyPlaytimeResponse(user=user_hours, community=community_hours)
@@ -142,6 +132,7 @@ def get_community_weekly_top_games(
     user: AuthenticatedUser,
     db: Session,
     reference: TopGameReference = TopGameReference.COMMUNITY,
+    user_id: uuid.UUID | None = None,
 ) -> list[CommunityWeeklyTopGameResponse]:
     """
     Return the user and community average playtime for the top games (up to 5)
@@ -156,6 +147,7 @@ def get_community_weekly_top_games(
         db=db,
         reference=reference,
         response_cls=CommunityWeeklyTopGameResponse,
+        user_id=user_id,
     )
 
 
@@ -166,6 +158,7 @@ def get_community_monthly_top_games(
     user: AuthenticatedUser,
     db: Session,
     reference: TopGameReference = TopGameReference.COMMUNITY,
+    user_id: uuid.UUID | None = None,
 ) -> list[CommunityMonthlyTopGameResponse]:
     """
     Return the user and community average playtime for the top games (up to 5)
@@ -181,22 +174,23 @@ def get_community_monthly_top_games(
         db=db,
         response_cls=CommunityMonthlyTopGameResponse,
         reference=reference,
+        user_id=user_id,
     )
+
 
 def get_community_game_statuses(
     scope: CommunityScope,
     user: AuthenticatedUser,
     db: Session,
+    user_id: uuid.UUID | None = None,
 ) -> CommunityGameStatusResponse:
     """
     Return the game status breakdown (count and percentage) for the user vs the community average.
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db)
+    target_user_ids = _compute_target_ids(scope, current_user, db, user_id=user_id)
 
-    user_shelvings = db.exec(
-        select(Shelving).where(Shelving.owner_id == current_user.id)
-    ).all()
+    user_shelvings = db.exec(select(Shelving).where(Shelving.owner_id == current_user.id)).all()
     user_counts: dict[GameStatus, int] = {s: 0 for s in GameStatus}
     for shelving in user_shelvings:
         user_counts[shelving.status] += 1
@@ -206,37 +200,25 @@ def get_community_game_statuses(
         CommunityGameStatusItem(
             status=status,
             count=float(user_counts[status]),
-            percentage=round((user_counts[status] / user_num_of_games) * 100.0, 2)
-            if user_num_of_games > 0
-            else 0.0,
+            percentage=round((user_counts[status] / user_num_of_games) * 100.0, 2) if user_num_of_games > 0 else 0.0,
         )
         for status in GameStatus
     ]
 
-    community_shelvings = db.exec(
-        select(Shelving).where(col(Shelving.owner_id).in_(target_user_ids))
-    ).all()
+    community_shelvings = db.exec(select(Shelving).where(col(Shelving.owner_id).in_(target_user_ids))).all()
     num_target_users = len(target_user_ids)
     community_counts: dict[GameStatus, int] = {s: 0 for s in GameStatus}
     for shelving in community_shelvings:
         community_counts[shelving.status] += 1
 
     total_community_games = len(community_shelvings)
-    community_num_of_games = (
-        round(total_community_games / num_target_users, 2)
-        if num_target_users > 0
-        else 0.0
-    )
+    community_num_of_games = round(total_community_games / num_target_users, 2) if num_target_users > 0 else 0.0
 
     community_items = [
         CommunityGameStatusItem(
             status=status,
-            count=round(community_counts[status] / num_target_users, 2)
-            if num_target_users > 0
-            else 0.0,
-            percentage=round((community_counts[status] / total_community_games) * 100.0, 2)
-            if total_community_games > 0
-            else 0.0,
+            count=round(community_counts[status] / num_target_users, 2) if num_target_users > 0 else 0.0,
+            percentage=round((community_counts[status] / total_community_games) * 100.0, 2) if total_community_games > 0 else 0.0,
         )
         for status in GameStatus
     ]
@@ -257,9 +239,10 @@ def _compute_community_top_games_for_dates(
     db: Session,
     response_cls: type,
     reference: TopGameReference,
+    user_id: uuid.UUID | None = None,
 ) -> list:
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db)
+    target_user_ids = _compute_target_ids(scope, current_user, db, user_id=user_id)
 
     user_daily_game_map = _get_user_daily_game_playtimes_map(db, current_user.id, end_date)
     user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, dates)
@@ -280,11 +263,7 @@ def _compute_community_top_games_for_dates(
     for app_id in all_game_ids:
         user_hours = round(user_game_totals.get(app_id, 0) / 60.0, 2)
         player_count = community_game_player_counts.get(app_id, 0)
-        comm_hours = (
-            round(community_game_totals.get(app_id, 0) / (60.0 * player_count), 2)
-            if player_count > 0
-            else 0.0
-        )
+        comm_hours = round(community_game_totals.get(app_id, 0) / (60.0 * player_count), 2) if player_count > 0 else 0.0
         if user_hours > 0 or comm_hours > 0:
             candidates.append(
                 response_cls(
@@ -296,20 +275,14 @@ def _compute_community_top_games_for_dates(
 
     if reference == TopGameReference.USER:
         candidates = [c for c in candidates if c.user_playtime > 0]
-        candidates.sort(
-            key=lambda x: (-x.user_playtime, -x.community_playtime, x.id)
-        )
+        candidates.sort(key=lambda x: (-x.user_playtime, -x.community_playtime, x.id))
     else:
-        candidates.sort(
-            key=lambda x: (-x.community_playtime, x.id)
-        )
+        candidates.sort(key=lambda x: (-x.community_playtime, x.id))
 
     return candidates[:5]
 
 
-def _get_user_daily_playtimes(
-    db: Session, user_id: uuid.UUID, end_date: date
-) -> list[DayByDayPlaytime]:
+def _get_user_daily_playtimes(db: Session, user_id: uuid.UUID, end_date: date) -> list[DayByDayPlaytime]:
     statement = (
         select(SteamRollingTime)
         .where(SteamRollingTime.user_id == user_id)
@@ -322,9 +295,7 @@ def _get_user_daily_playtimes(
     return game_service.compute_daily_playtimes(records, days=-1, end_date=end_date)
 
 
-def _get_user_daily_game_playtimes_map(
-    db: Session, user_id: uuid.UUID, end_date: date
-) -> dict[date, dict[str, int]]:
+def _get_user_daily_game_playtimes_map(db: Session, user_id: uuid.UUID, end_date: date) -> dict[date, dict[str, int]]:
     daily_playtimes = _get_user_daily_playtimes(db, user_id, end_date)
     daily_game_map: dict[date, dict[str, int]] = defaultdict(dict)
     for dp in daily_playtimes:
@@ -355,6 +326,7 @@ def _compute_target_ids(
     scope: CommunityScope,
     current_user: User,
     db: Session,
+    user_id: uuid.UUID | None = None,
 ) -> list[uuid.UUID]:
     match scope:
         case CommunityScope.GLOBAL:
@@ -363,6 +335,8 @@ def _compute_target_ids(
             target_user_ids = _get_regional_user_ids(db, current_user)
         case CommunityScope.FRIENDS:
             target_user_ids = _get_friend_user_ids(db, current_user.id)
+        case CommunityScope.USER:
+            target_user_ids = _get_single_target_user_id(db, current_user.id, user_id)
         case _:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -374,6 +348,44 @@ def _compute_target_ids(
             detail=f"No users found for scope {scope}",
         )
     return target_user_ids
+
+
+def _get_single_target_user_id(
+    db: Session,
+    current_user_id: uuid.UUID,
+    target_user_id: uuid.UUID | None,
+) -> list[uuid.UUID]:
+    if target_user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="user_id is required when scope is 'user'",
+        )
+    if target_user_id == current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot compare with yourself",
+        )
+    target_user = db.get(User, target_user_id)
+    if not target_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    blocked_friendship = db.exec(
+        select(Friendship).where(
+            (Friendship.requester_id == target_user_id)
+            & (Friendship.addressee_id == current_user_id)
+            & (Friendship.status == FriendshipStatus.BLOCKED)
+        )
+    ).first()
+
+    if blocked_friendship:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to user profile is blocked",
+        )
+
+    return [target_user_id]
 
 
 def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID) -> list[uuid.UUID]:
@@ -394,15 +406,11 @@ def _get_regional_user_ids(db: Session, user: User) -> list[uuid.UUID]:
 def _get_friend_user_ids(db: Session, user_id: uuid.UUID) -> list[uuid.UUID]:
     friendships = db.exec(
         select(Friendship).where(
-            ((Friendship.requester_id == user_id) | (Friendship.addressee_id == user_id))
-            & (Friendship.status == FriendshipStatus.ACCEPTED)
+            ((Friendship.requester_id == user_id) | (Friendship.addressee_id == user_id)) & (Friendship.status == FriendshipStatus.ACCEPTED)
         )
     ).all()
 
-    friend_ids = {
-        f.addressee_id if f.requester_id == user_id else f.requester_id
-        for f in friendships
-    }
+    friend_ids = {f.addressee_id if f.requester_id == user_id else f.requester_id for f in friendships}
 
     if not friend_ids:
         raise HTTPException(
@@ -415,9 +423,7 @@ def _get_friend_user_ids(db: Session, user_id: uuid.UUID) -> list[uuid.UUID]:
 
 def _calculate_genre_percentages(db: Session, target_user_ids: list[uuid.UUID]) -> list[CommunityGenreHour]:
     rolling_records = db.exec(
-        select(SteamRollingTime)
-        .where(col(SteamRollingTime.user_id).in_(target_user_ids))
-        .order_by(col(SteamRollingTime.created_at).desc())
+        select(SteamRollingTime).where(col(SteamRollingTime.user_id).in_(target_user_ids)).order_by(col(SteamRollingTime.created_at).desc())
     ).all()
 
     latest_by_user_game: dict[tuple[uuid.UUID, str], int] = {}
@@ -435,9 +441,7 @@ def _calculate_genre_percentages(db: Session, target_user_ids: list[uuid.UUID]) 
         return []
 
     played_app_ids = list(app_playtimes.keys())
-    games = db.exec(
-        select(Game).where(col(Game.steam_app_id).in_(played_app_ids))
-    ).all()
+    games = db.exec(select(Game).where(col(Game.steam_app_id).in_(played_app_ids))).all()
 
     genre_playtime_minutes: dict[str, int] = defaultdict(int)
     genre_descriptions: dict[str, str] = {}
