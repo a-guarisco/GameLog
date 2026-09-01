@@ -7,10 +7,28 @@ import uuid
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 from src.auth.schemas import AuthenticatedUser
-from src.community.schemas import CommunityGenreHour, CommunityMonthlyPlaytimeResponse, CommunityMonthlyTopGameResponse, CommunityScope, CommunityWeeklyPlaytimeResponse, CommunityWeeklyTopGameResponse, TopGameReference
+from src.community.schemas import (
+    CommunityGameStatusItem,
+    CommunityGameStatusResponse,
+    CommunityGenreHour,
+    CommunityMonthlyPlaytimeResponse,
+    CommunityMonthlyTopGameResponse,
+    CommunityScope,
+    CommunityWeeklyPlaytimeResponse,
+    CommunityWeeklyTopGameResponse,
+    TopGameReference,
+)
 from src.games import game_service
 from src.games.schemas import DayByDayPlaytime
-from src.models import Friendship, FriendshipStatus, Game, SteamRollingTime, User
+from src.models import (
+    Friendship,
+    FriendshipStatus,
+    Game,
+    GameStatus,
+    Shelving,
+    SteamRollingTime,
+    User,
+)
 from src.users import user_service
 
 
@@ -163,6 +181,71 @@ def get_community_monthly_top_games(
         db=db,
         response_cls=CommunityMonthlyTopGameResponse,
         reference=reference,
+    )
+
+def get_community_game_statuses(
+    scope: CommunityScope,
+    user: AuthenticatedUser,
+    db: Session,
+) -> CommunityGameStatusResponse:
+    """
+    Return the game status breakdown (count and percentage) for the user vs the community average.
+    """
+    current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
+
+    user_shelvings = db.exec(
+        select(Shelving).where(Shelving.owner_id == current_user.id)
+    ).all()
+    user_counts: dict[GameStatus, int] = {s: 0 for s in GameStatus}
+    for shelving in user_shelvings:
+        user_counts[shelving.status] += 1
+
+    user_num_of_games = len(user_shelvings)
+    user_items = [
+        CommunityGameStatusItem(
+            status=status,
+            count=float(user_counts[status]),
+            percentage=round((user_counts[status] / user_num_of_games) * 100.0, 2)
+            if user_num_of_games > 0
+            else 0.0,
+        )
+        for status in GameStatus
+    ]
+
+    community_shelvings = db.exec(
+        select(Shelving).where(col(Shelving.owner_id).in_(target_user_ids))
+    ).all()
+    num_target_users = len(target_user_ids)
+    community_counts: dict[GameStatus, int] = {s: 0 for s in GameStatus}
+    for shelving in community_shelvings:
+        community_counts[shelving.status] += 1
+
+    total_community_games = len(community_shelvings)
+    community_num_of_games = (
+        round(total_community_games / num_target_users, 2)
+        if num_target_users > 0
+        else 0.0
+    )
+
+    community_items = [
+        CommunityGameStatusItem(
+            status=status,
+            count=round(community_counts[status] / num_target_users, 2)
+            if num_target_users > 0
+            else 0.0,
+            percentage=round((community_counts[status] / total_community_games) * 100.0, 2)
+            if total_community_games > 0
+            else 0.0,
+        )
+        for status in GameStatus
+    ]
+
+    return CommunityGameStatusResponse(
+        user=user_items,
+        community=community_items,
+        user_num_of_games=user_num_of_games,
+        community_num_of_games=community_num_of_games,
     )
 
 
