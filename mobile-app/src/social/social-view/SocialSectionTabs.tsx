@@ -5,6 +5,7 @@ import { ActionFeedbackBanner } from './ActionFeedbackBanner';
 import { FriendsTabContent } from './FriendsTabContent';
 import { SearchUsersTabContent } from './SearchUsersTabContent';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
+import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 
 interface SocialSectionTabsProps {
   // Friends Tab Props
@@ -25,12 +26,7 @@ interface SocialSectionTabsProps {
   // Shared Action Props
   isActionLoading: boolean;
   actionFeedback: string | null;
-  handlers: {
-    onAddFriend: (userId: string) => void;
-    onAcceptFriend: (userId: string) => void;
-    onRefuseFriend: (userId: string) => void;
-    onSelectRecommendations: (item: UserSearchResult) => void;
-  };
+  handlers: UserCardActionHandlers;
 }
 
 const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
@@ -82,11 +78,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
           errorMessage={errorMessageFriendList || undefined}
           pendingRequests={pendingRequests}
           acceptedFriends={acceptedFriends}
-          handlers={{
-            onAcceptFriend: handlers.onAcceptFriend,
-            onRefuseFriend: handlers.onRefuseFriend,
-            onSelectRecommendations: handlers.onSelectRecommendations,
-          }}
+          handlers={handlers}
           isActionLoading={isActionLoading}
         />
       )}

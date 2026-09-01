@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
-import { useGetFriendList, useSearchUsers } from '@gamelog/api-manager/useApi';
+import { useGetFriendList, useSearchUsers, useGetUserMe } from '@gamelog/api-manager/useApi';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import SocialIdentity from './SocialIdentity';
 import RecommenderSummaryCard from './RecommenderSummaryCard';
@@ -15,6 +15,8 @@ import { selectPendingRequests, selectAcceptedFriends } from './friendListSelect
 export const SocialView: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const { currentUser } = useGetUserMe();
 
   const {
     friendList,
@@ -33,6 +35,9 @@ export const SocialView: React.FC = () => {
     handleAddFriend,
     handleAcceptFriend,
     handleRefuseFriend,
+    handleBlockFriend,
+    handleRemoveFriend,
+    handleUnblockFriend,
   } = useFriendActions({
     onFriendListChanged: refetchFriendList,
     onSearchResultsChanged: refetchSearch,
@@ -76,9 +81,14 @@ export const SocialView: React.FC = () => {
               isActionLoading={isActionLoading}
               actionFeedback={actionFeedback}
               handlers={{
+                currentUserId: currentUser?.id,
                 onAddFriend: handleAddFriend,
                 onAcceptFriend: handleAcceptFriend,
                 onRefuseFriend: handleRefuseFriend,
+                onBlockFriend: handleBlockFriend,
+                onRemoveFriend: handleRemoveFriend,
+                onRemovePending: handleRemoveFriend,
+                onUnblockFriend: handleUnblockFriend,
                 onSelectRecommendations: handleOpenRecommendations,
               }}
             />
