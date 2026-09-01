@@ -212,6 +212,10 @@ const EndPoints = {
   ) => {
     return `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
   },
+
+  getCommunityGameStatuses: (scope: CommunityScope) => {
+    return `${getBackendBaseUrl()}/community/game_statuses?scope=${scope}`;
+  },
 };
 
 export { isBackendProvider };
