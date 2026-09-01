@@ -215,6 +215,7 @@ describe('useFriendActions', () => {
     });
     expect(result.current.actionFeedback).toBeNull();
   });
+
   it('cleans up timeout on unmount', async () => {
     (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({ success: true });
 
