@@ -15,6 +15,7 @@ from src.community import (
     CommunityWeeklyPlaytimeResponse,
     CommunityWeeklyTopGameResponse,
     TopGameReference,
+    CommunityGameStatusResponse
 )
 from src.core.database import get_db
 
@@ -131,6 +132,23 @@ def get_community_monthly_top_game_playtime(
         user=auth_user,
         db=db,
         reference=reference,
+    )
+
+
+@router.get(
+    "/game_statuses",
+    summary="Return the game status breakdown for user and community scope",
+    response_model=CommunityGameStatusResponse,
+)
+def get_community_game_statuses(
+    scope: CommunityScope = Query(..., description="Community scope: global, region, or friends"),
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return community_service.get_community_game_statuses(
+        scope=scope,
+        user=auth_user,
+        db=db,
     )
 
 

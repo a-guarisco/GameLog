@@ -57,3 +57,18 @@ class CommunityMonthlyTopGameResponse(BaseModel):
     id: str
     user_playtime: float
     community_playtime: float
+
+from src.models.game import GameStatus
+
+
+class CommunityGameStatusItem(BaseModel):
+    status: GameStatus
+    count: float
+    percentage: float
+
+
+class CommunityGameStatusResponse(BaseModel):
+    user: list[CommunityGameStatusItem]
+    community: list[CommunityGameStatusItem]
+    user_num_of_games: int
+    community_num_of_games: float

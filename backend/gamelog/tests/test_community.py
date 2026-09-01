@@ -8,8 +8,15 @@ from sqlmodel import Session
 from src.auth.schemas import AuthenticatedUser
 from src.community import community_service
 from src.community.schemas import CommunityScope, TopGameReference
-from src.models import Friendship, FriendshipStatus, Game, GameGenreLink, Genre
-from tests.conftest import make_game, make_rolling, make_user
+from src.models import (
+    Friendship,
+    FriendshipStatus,
+    Game,
+    GameGenreLink,
+    GameStatus,
+    Genre,
+)
+from tests.conftest import make_game, make_rolling, make_shelving, make_user
 
 
 def _setup_genre(session: Session, genre_id: str, description: str) -> Genre:
@@ -879,6 +886,135 @@ class TestCommunityService:
         assert result[1].user_playtime == 1.0
         assert result[1].community_playtime == 5.0
 
+    def test_get_community_game_statuses_global_success(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="US")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="FR")
+
+        g1 = make_game(session, steam_app_id="10")
+        g2 = make_game(session, steam_app_id="20")
+        g3 = make_game(session, steam_app_id="30")
+        g4 = make_game(session, steam_app_id="40")
+        g5 = make_game(session, steam_app_id="50")
+        g6 = make_game(session, steam_app_id="60")
+        g7 = make_game(session, steam_app_id="70")
+
+        # u1 (caller): 3 games
+        make_shelving(session, user=u1, game=g1, status=GameStatus.SHELVED)
+        make_shelving(session, user=u1, game=g2, status=GameStatus.PLAYING)
+        make_shelving(session, user=u1, game=g3, status=GameStatus.PLATINATO)
+
+        # u2 (target): 2 games
+        make_shelving(session, user=u2, game=g1, status=GameStatus.SHELVED)
+        make_shelving(session, user=u2, game=g4, status=GameStatus.PLAYING)
+
+        # u3 (target): 4 games
+        make_shelving(session, user=u3, game=g2, status=GameStatus.TO_BE_PLAYED)
+        make_shelving(session, user=u3, game=g5, status=GameStatus.PLAYING)
+        make_shelving(session, user=u3, game=g6, status=GameStatus.PLATINATO)
+        make_shelving(session, user=u3, game=g7, status=GameStatus.PLATINATO)
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        result = community_service.get_community_game_statuses(CommunityScope.GLOBAL, auth_user, session)
+
+        # Verify user totals and items
+        assert result.user_num_of_games == 3
+        assert len(result.user) == 4
+        assert [item.status for item in result.user] == [
+            GameStatus.SHELVED,
+            GameStatus.TO_BE_PLAYED,
+            GameStatus.PLAYING,
+            GameStatus.PLATINATO,
+        ]
+        # u1: shelved=1 (33.33%), to_be_played=0 (0.0%), playing=1 (33.33%), platinato=1 (33.33%)
+        assert result.user[0].count == 1.0
+        assert result.user[0].percentage == 33.33
+        assert result.user[1].count == 0.0
+        assert result.user[1].percentage == 0.0
+        assert result.user[2].count == 1.0
+        assert result.user[2].percentage == 33.33
+        assert result.user[3].count == 1.0
+        assert result.user[3].percentage == 33.33
+
+        # Verify community totals and items (2 target users, 6 games total)
+        assert result.community_num_of_games == 3.0  # 6 games / 2 users
+        assert len(result.community) == 4
+        # shelved: 1 game total => avg count = 1/2 = 0.5, pct = (1/6)*100 = 16.67
+        assert result.community[0].status == GameStatus.SHELVED
+        assert result.community[0].count == 0.5
+        assert result.community[0].percentage == 16.67
+
+        # to_be_played: 1 game total => avg count = 1/2 = 0.5, pct = (1/6)*100 = 16.67
+        assert result.community[1].status == GameStatus.TO_BE_PLAYED
+        assert result.community[1].count == 0.5
+        assert result.community[1].percentage == 16.67
+
+        # playing: 2 games total => avg count = 2/2 = 1.0, pct = (2/6)*100 = 33.33
+        assert result.community[2].status == GameStatus.PLAYING
+        assert result.community[2].count == 1.0
+        assert result.community[2].percentage == 33.33
+
+        # platinato: 2 games total => avg count = 2/2 = 1.0, pct = (2/6)*100 = 33.33
+        assert result.community[3].status == GameStatus.PLATINATO
+        assert result.community[3].count == 1.0
+        assert result.community[3].percentage == 33.33
+
+    def test_get_community_game_statuses_region_and_friends_scope(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+        u3 = make_user(session, firebase_uid="u3", username="user3", steam_id="s3", region="US")
+
+        g1 = make_game(session, steam_app_id="10")
+        g2 = make_game(session, steam_app_id="20")
+
+        # u2 is IT, u3 is US
+        make_shelving(session, user=u2, game=g1, status=GameStatus.PLAYING)
+        make_shelving(session, user=u3, game=g2, status=GameStatus.PLATINATO)
+
+        # Region scope (only u2 in IT)
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        region_res = community_service.get_community_game_statuses(CommunityScope.REGION, auth_user, session)
+        assert region_res.community_num_of_games == 1.0
+        assert region_res.community[2].status == GameStatus.PLAYING
+        assert region_res.community[2].count == 1.0
+        assert region_res.community[2].percentage == 100.0
+
+        # Friends scope (make u3 friend of u1)
+        f = Friendship(requester_id=u1.id, addressee_id=u3.id, status=FriendshipStatus.ACCEPTED)
+        session.add(f)
+        session.commit()
+
+        friends_res = community_service.get_community_game_statuses(CommunityScope.FRIENDS, auth_user, session)
+        assert friends_res.community_num_of_games == 1.0
+        assert friends_res.community[3].status == GameStatus.PLATINATO
+        assert friends_res.community[3].count == 1.0
+        assert friends_res.community[3].percentage == 100.0
+
+    def test_get_community_game_statuses_empty_libraries(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="u2", username="user2", steam_id="s2", region="IT")
+
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+        res = community_service.get_community_game_statuses(CommunityScope.GLOBAL, auth_user, session)
+
+        assert res.user_num_of_games == 0
+        for item in res.user:
+            assert item.count == 0.0
+            assert item.percentage == 0.0
+
+        assert res.community_num_of_games == 0.0
+        for item in res.community:
+            assert item.count == 0.0
+            assert item.percentage == 0.0
+
+    def test_get_community_game_statuses_no_target_users_raises_404(self, session: Session):
+        u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")
+        auth_user = AuthenticatedUser(uid="u1", email="u1@test.com")
+
+        with pytest.raises(HTTPException) as exc:
+            community_service.get_community_game_statuses(CommunityScope.GLOBAL, auth_user, session)
+        assert exc.value.status_code == 404
+
 
 class TestCommunityRouter:
     def test_get_community_genre_endpoint(self, client: TestClient, session: Session):
@@ -1188,6 +1324,59 @@ class TestCommunityRouter:
         assert data[0]["id"] == "100"
         assert data[0]["user_playtime"] == 1.0
         assert data[0]["community_playtime"] == 0.0
+
+    def test_get_game_statuses_endpoint_success(self, client: TestClient, session: Session):
+        u1 = make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="firebase-uid-2", username="user2", steam_id="s2", region="IT")
+
+        g1 = make_game(session, steam_app_id="10")
+        g2 = make_game(session, steam_app_id="20")
+
+        make_shelving(session, user=u1, game=g1, status=GameStatus.PLAYING)
+        make_shelving(session, user=u2, game=g2, status=GameStatus.PLATINATO)
+
+        response = client.get("/community/game_statuses?scope=global")
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["user_num_of_games"] == 1
+        assert data["community_num_of_games"] == 1.0
+        assert len(data["user"]) == 4
+        assert len(data["community"]) == 4
+
+        # User: playing has 1 game (100%), others 0
+        user_playing = next(item for item in data["user"] if item["status"] == "playing")
+        assert user_playing["count"] == 1.0
+        assert user_playing["percentage"] == 100.0
+
+        # Community: platinato has 1 game (100%), others 0
+        comm_platinato = next(item for item in data["community"] if item["status"] == "platinato")
+        assert comm_platinato["count"] == 1.0
+        assert comm_platinato["percentage"] == 100.0
+
+    def test_get_game_statuses_endpoint_case_insensitive_scope(self, client: TestClient, session: Session):
+        u1 = make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        u2 = make_user(session, firebase_uid="firebase-uid-2", username="user2", steam_id="s2", region="IT")
+
+        response = client.get("/community/game_statuses?scope=GLOBAL")
+        assert response.status_code == 200
+
+    def test_get_game_statuses_endpoint_region_not_set(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region=None)
+        response = client.get("/community/game_statuses?scope=REGION")
+        assert response.status_code == 400
+        assert response.json()["detail"] == "User region is not set"
+
+    def test_get_game_statuses_endpoint_no_friends(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        response = client.get("/community/game_statuses?scope=FRIENDS")
+        assert response.status_code == 400
+        assert response.json()["detail"] == "User has no friends"
+
+    def test_get_game_statuses_endpoint_invalid_scope(self, client: TestClient, session: Session):
+        make_user(session, firebase_uid="firebase-uid-1", username="user1", steam_id="s1", region="IT")
+        response = client.get("/community/game_statuses?scope=INVALID_SCOPE")
+        assert response.status_code == 422
 
 
 
