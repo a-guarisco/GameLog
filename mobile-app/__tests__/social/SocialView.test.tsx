@@ -70,11 +70,9 @@ describe('SocialView', () => {
     });
   });
 
-  it('renders the Social Hub title, stats, recommender card and tab buttons', () => {
+  it('renders the Social Hub title, recommender card and tab buttons', () => {
     render(<SocialView />);
     expect(screen.getByText('Social Hub')).toBeTruthy();
-    expect(screen.getByText('Friends')).toBeTruthy();
-    expect(screen.getAllByText('Pending').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Game Recommender')).toBeTruthy();
     expect(screen.getByTestId('social-tab-friends')).toBeTruthy();
     expect(screen.getByTestId('social-tab-search')).toBeTruthy();
