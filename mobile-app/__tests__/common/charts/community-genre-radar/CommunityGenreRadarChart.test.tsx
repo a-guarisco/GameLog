@@ -89,7 +89,7 @@ describe('CommunityGenreRadarChart', () => {
     expect(screen.getByText('User region is not set')).toBeTruthy();
   });
 
-  it('renders RadarChart with dataSet, legend, and chips when data is available', () => {
+  it('renders RadarChart and legend, hides breakdown bars by default, and reveals them when toggle is pressed', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [
         [50, 20],
@@ -108,13 +108,11 @@ describe('CommunityGenreRadarChart', () => {
 
     const { UNSAFE_getByType } = render(<CommunityGenreRadarChart ownedGames={null} />);
 
+    // Legend is visible
     expect(screen.getByText('You (%)')).toBeTruthy();
     expect(screen.getByText('Others (%)')).toBeTruthy();
-    expect(screen.getByText('50%')).toBeTruthy();
-    expect(screen.getByText('30%')).toBeTruthy();
-    expect(screen.getByTestId('user-progress-1')).toBeTruthy();
-    expect(screen.getByTestId('others-progress-1')).toBeTruthy();
 
+    // Radar chart is rendered
     const radarChart = UNSAFE_getByType('RadarChart' as any);
     expect(radarChart.props.dataSet).toEqual([
       [50, 20],
@@ -122,5 +120,27 @@ describe('CommunityGenreRadarChart', () => {
     ]);
     expect(radarChart.props.labels).toEqual(['Action', 'RPG']);
     expect(radarChart.props.maxValue).toBe(50);
+
+    // Breakdown bars are hidden by default
+    expect(screen.queryByText('50%')).toBeNull();
+    expect(screen.queryByTestId('user-progress-1')).toBeNull();
+
+    // Expand toggle button exists
+    const toggleButton = screen.getByTestId('community-genre-expand-toggle');
+    expect(toggleButton).toBeTruthy();
+
+    // Press toggle button to expand
+    fireEvent.press(toggleButton);
+
+    expect(screen.getByText('50%')).toBeTruthy();
+    expect(screen.getByText('30%')).toBeTruthy();
+    expect(screen.getByTestId('user-progress-1')).toBeTruthy();
+    expect(screen.getByTestId('others-progress-1')).toBeTruthy();
+
+    // Press toggle button again to collapse
+    fireEvent.press(toggleButton);
+
+    expect(screen.queryByText('50%')).toBeNull();
+    expect(screen.queryByTestId('user-progress-1')).toBeNull();
   });
 });

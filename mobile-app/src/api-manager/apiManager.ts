@@ -32,6 +32,7 @@ import type {
   TopGameReference,
   GameStatus,
   GameStatusesResponse,
+  CommunityGameStatusResponse,
 } from '@gamelog/api-manager/dto';
 
 
@@ -231,4 +232,6 @@ export default {
     fetchAuthenticatedData<CommunityTopGame[]>(
       EndPoints.getCommunityMonthlyTopGames(scope, startDate, endDate, reference)
     ),
+  getCommunityGameStatuses: (scope: CommunityScope) =>
+    fetchAuthenticatedData<CommunityGameStatusResponse>(EndPoints.getCommunityGameStatuses(scope)),
 };
