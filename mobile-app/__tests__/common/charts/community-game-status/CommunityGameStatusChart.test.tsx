@@ -117,7 +117,7 @@ describe('CommunityGameStatusChart', () => {
 
     // Breakdown items and "Others" legend should be hidden by default
     expect(screen.queryByText('Others')).toBeNull();
-    expect(screen.queryByText('PLAYING')).toBeNull();
+    expect(screen.queryByText('Playing')).toBeNull();
     expect(screen.queryByText('67.31%')).toBeNull();
     expect(screen.queryByTestId('user-status-progress-playing')).toBeNull();
 
@@ -132,10 +132,10 @@ describe('CommunityGameStatusChart', () => {
     expect(screen.getByText('Others')).toBeTruthy();
 
     // Check status breakdown titles and percentages now visible
-    expect(screen.getByText('PLAYING')).toBeTruthy();
-    expect(screen.getByText('TO BE PLAYED')).toBeTruthy();
-    expect(screen.getByText('SHELVED')).toBeTruthy();
-    expect(screen.getByText('PLATINATO')).toBeTruthy();
+    expect(screen.getByText('Playing')).toBeTruthy();
+    expect(screen.getByText('To Be Played')).toBeTruthy();
+    expect(screen.getByText('Shelved')).toBeTruthy();
+    expect(screen.getByText('Platinato')).toBeTruthy();
 
     expect(screen.getByText('67.31%')).toBeTruthy();
     expect(screen.getByText('88.89%')).toBeTruthy();
@@ -149,7 +149,7 @@ describe('CommunityGameStatusChart', () => {
     fireEvent.press(toggleButton);
 
     expect(screen.queryByText('Others')).toBeNull();
-    expect(screen.queryByText('PLAYING')).toBeNull();
+    expect(screen.queryByText('Playing')).toBeNull();
     expect(screen.queryByText('67.31%')).toBeNull();
     expect(screen.queryByTestId('user-status-progress-playing')).toBeNull();
   });
