@@ -10,5 +10,6 @@ export interface UserCardActionHandlers {
   onRemovePending?: (friendshipId: string) => void;
   onUnblockFriend?: (friendshipId: string) => void;
   onSelectRecommendations?: (item: UserSearchResult) => void;
+  onSelectUser?: (item: UserSearchResult) => void;
 }
 

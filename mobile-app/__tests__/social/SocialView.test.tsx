@@ -294,4 +294,16 @@ describe('SocialView', () => {
       friendItem: undefined,
     });
   });
+
+  it('navigates to OtherUserProfile screen when clicking a user card', () => {
+    render(<SocialView />);
+
+    fireEvent.press(screen.getByTestId('user-card-pressable-u1'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('OtherUserProfile', {
+      item: mockFriendList[0],
+      user: mockFriendList[0].user,
+      friendship: mockFriendList[0].friendship,
+    });
+  });
 });

@@ -3,8 +3,11 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import type { CommunityGenreHour, CommunityScope } from '@gamelog/api-manager/dto';
 
-export const useCommunityGenre = (scope: CommunityScope) => {
-  const fetchFunc = useCallback(() => ApiManager.getCommunityGenre(scope), [scope]);
+export const useCommunityGenre = (scope: CommunityScope, userId?: string) => {
+  const fetchFunc = useCallback(
+    () => ApiManager.getCommunityGenre(scope, userId),
+    [scope, userId]
+  );
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch<CommunityGenreHour[]>(fetchFunc);
 

@@ -15,6 +15,7 @@ export interface UseCommunityTopGamesProps {
   reference?: TopGameReference;
   offset: number;
   currentDate?: Date;
+  targetUserId?: string;
 }
 
 export const useCommunityTopGames = ({
@@ -23,6 +24,7 @@ export const useCommunityTopGames = ({
   reference = 'community',
   offset,
   currentDate = new Date(),
+  targetUserId,
 }: UseCommunityTopGamesProps) => {
   const dateRangeInfo: CommunityDateRangeInfo = useMemo(() => {
     if (periodRange === 'week') {
@@ -37,16 +39,18 @@ export const useCommunityTopGames = ({
         scope,
         dateRangeInfo.startDate,
         dateRangeInfo.endDate,
-        reference
+        reference,
+        targetUserId
       );
     }
     return ApiManager.getCommunityMonthlyTopGames(
       scope,
       dateRangeInfo.startDate,
       dateRangeInfo.endDate,
-      reference
+      reference,
+      targetUserId
     );
-  }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate]);
+  }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate, targetUserId]);
 
   const { data, isLoading, error, errorMessage, refetch } =
     useAsyncFetch<CommunityTopGame[]>(fetchFunc);

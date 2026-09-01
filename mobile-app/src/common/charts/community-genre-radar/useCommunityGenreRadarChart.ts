@@ -12,7 +12,8 @@ export interface CommunityGenreComparisonItem {
 
 export const useCommunityGenreRadarChart = (
   ownedGames: OwnedGames | null | undefined,
-  scope: CommunityScope
+  scope: CommunityScope,
+  userId?: string
 ) => {
   const {
     communityGenres,
@@ -20,7 +21,7 @@ export const useCommunityGenreRadarChart = (
     errorCommunity,
     errorMessageCommunity,
     refetchCommunity,
-  } = useCommunityGenre(scope);
+  } = useCommunityGenre(scope, userId);
 
   const [userGenreData, setUserGenreData] = useState<GenreChartItem[]>([]);
   const [isLoadingUserGenres, setIsLoadingUserGenres] = useState(false);

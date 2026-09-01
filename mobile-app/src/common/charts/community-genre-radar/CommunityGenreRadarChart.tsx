@@ -18,6 +18,11 @@ import type { OwnedGames, CommunityScope } from '@gamelog/api-manager/dto';
 
 interface CommunityGenreRadarChartProps {
   ownedGames?: OwnedGames | null;
+  scope?: CommunityScope;
+  targetUserId?: string;
+  targetUserName?: string;
+  chartTitle?: string;
+  hideScopeSelector?: boolean;
 }
 
 const SCOPE_OPTIONS: GLSegmentOption<CommunityScope>[] = [
@@ -81,11 +86,20 @@ const MemoizedCommunityRadar = memo(
 );
 MemoizedCommunityRadar.displayName = 'MemoizedCommunityRadar';
 
-const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps) => {
-  const [scope, setScope] = useState<CommunityScope>('global');
+const CommunityGenreRadarChart = ({
+  ownedGames,
+  scope: initialScope = 'global',
+  targetUserId,
+  targetUserName,
+  chartTitle,
+  hideScopeSelector = false,
+}: CommunityGenreRadarChartProps) => {
+  const [scope, setScope] = useState<CommunityScope>(initialScope);
   const [isExpanded, setIsExpanded] = useState(false);
   const { isLandscape } = useOrientation();
   const radarPadding = isLandscape ? 8 : 16;
+
+  const currentScope = hideScopeSelector || targetUserId ? initialScope : scope;
 
   const {
     dataSet,
@@ -95,7 +109,7 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
     isLoading,
     errorCommunity,
     errorMessageCommunity,
-  } = useCommunityGenreRadarChart(ownedGames, scope);
+  } = useCommunityGenreRadarChart(ownedGames, currentScope, targetUserId);
 
   const renderError = () => (
     <Box className="py-6 items-center justify-center w-full">
@@ -106,18 +120,25 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
     </Box>
   );
 
+  const displayTitle =
+    chartTitle || (targetUserName ? `${targetUserName}'s Radar` : 'Community Radar');
+  const othersLabel = targetUserName ? `${targetUserName} (%)` : 'Others (%)';
+  const showScopeControl = !hideScopeSelector && !targetUserId && currentScope !== 'user';
+
   return (
     <ChartWrapperCard
-      label="Community Radar"
+      label={displayTitle}
       headerRight={
-        <Box className="w-[190px]">
-          <GLSegmentedControl<CommunityScope>
-            options={SCOPE_OPTIONS}
-            activeId={scope}
-            onSelect={setScope}
-            isOnCard
-          />
-        </Box>
+        showScopeControl ? (
+          <Box className="w-[190px]">
+            <GLSegmentedControl<CommunityScope>
+              options={SCOPE_OPTIONS}
+              activeId={scope}
+              onSelect={setScope}
+              isOnCard
+            />
+          </Box>
+        ) : undefined
       }
       isLoading={isLoading}
       error={errorCommunity}
@@ -161,7 +182,7 @@ const CommunityGenreRadarChart = ({ ownedGames }: CommunityGenreRadarChartProps)
                   style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
                 />
                 <Text size="xs" className="font-bold text-purple-500">
-                  Others (%)
+                  {othersLabel}
                 </Text>
               </HStack>
             </HStack>

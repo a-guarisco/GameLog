@@ -183,38 +183,62 @@ const EndPoints = {
     return url;
   },
 
-  getCommunityGenre: (scope: CommunityScope) => {
-    return `${getBackendBaseUrl()}/community/genre?scope=${scope}`;
+  getCommunityGenre: (scope: CommunityScope, userId?: string) => {
+    let url = `${getBackendBaseUrl()}/community/genre?scope=${scope}`;
+    if (userId) url += `&user_id=${userId}`;
+    return url;
   },
 
-  getCommunityWeeklyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) => {
-    return `${getBackendBaseUrl()}/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  getCommunityWeeklyPlaytime: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ) => {
+    let url = `${getBackendBaseUrl()}/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+    if (userId) url += `&user_id=${userId}`;
+    return url;
   },
 
-  getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) => {
-    return `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  getCommunityMonthlyPlaytime: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ) => {
+    let url = `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+    if (userId) url += `&user_id=${userId}`;
+    return url;
   },
 
   getCommunityWeeklyTopGames: (
     scope: CommunityScope,
     startDate: string,
     endDate: string,
-    reference: TopGameReference = 'community'
+    reference: TopGameReference = 'community',
+    userId?: string
   ) => {
-    return `${getBackendBaseUrl()}/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    let url = `${getBackendBaseUrl()}/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    if (userId) url += `&user_id=${userId}`;
+    return url;
   },
 
   getCommunityMonthlyTopGames: (
     scope: CommunityScope,
     startDate: string,
     endDate: string,
-    reference: TopGameReference = 'community'
+    reference: TopGameReference = 'community',
+    userId?: string
   ) => {
-    return `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    let url = `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    if (userId) url += `&user_id=${userId}`;
+    return url;
   },
 
-  getCommunityGameStatuses: (scope: CommunityScope) => {
-    return `${getBackendBaseUrl()}/community/game_statuses?scope=${scope}`;
+  getCommunityGameStatuses: (scope: CommunityScope, userId?: string) => {
+    let url = `${getBackendBaseUrl()}/community/game_statuses?scope=${scope}`;
+    if (userId) url += `&user_id=${userId}`;
+    return url;
   },
 };
 

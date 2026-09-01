@@ -1,4 +1,4 @@
-export type CommunityScope = 'global' | 'region' | 'friends';
+export type CommunityScope = 'global' | 'region' | 'friends' | 'user';
 
 export interface CommunityGenreHour {
   id: string;
