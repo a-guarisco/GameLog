@@ -36,10 +36,11 @@ describe('SocialStack structure', () => {
     const screens = Object.keys(SocialStack.config.screens);
     expect(screens).toContain('SocialHome');
     expect(screens).toContain('FriendRecommendations');
+    expect(screens).toContain('OtherUserProfile');
   });
 
-  it('registers exactly 2 screens', () => {
-    expect(Object.keys(SocialStack.config.screens)).toHaveLength(2);
+  it('registers exactly 3 screens', () => {
+    expect(Object.keys(SocialStack.config.screens)).toHaveLength(3);
   });
 
   it('assigns the correct component to SocialHome', () => {
@@ -52,6 +53,13 @@ describe('SocialStack structure', () => {
       '@gamelog/social/social-view/FriendRecommendationsView'
     ).default;
     expect(SocialStack.config.screens.FriendRecommendations.screen).toBe(FriendRecs);
+  });
+
+  it('assigns the correct component to OtherUserProfile', () => {
+    const OtherUserProfile = jest.requireActual(
+      '@gamelog/social/other-user-profile/OtherUserProfileView'
+    ).default;
+    expect(SocialStack.config.screens.OtherUserProfile.screen).toBe(OtherUserProfile);
   });
 });
 

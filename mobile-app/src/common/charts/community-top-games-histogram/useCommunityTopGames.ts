@@ -35,21 +35,35 @@ export const useCommunityTopGames = ({
 
   const fetchFunc = useCallback(() => {
     if (periodRange === 'week') {
-      return ApiManager.getCommunityWeeklyTopGames(
-        scope,
-        dateRangeInfo.startDate,
-        dateRangeInfo.endDate,
-        reference,
-        targetUserId
-      );
+      return targetUserId
+        ? ApiManager.getCommunityWeeklyTopGames(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate,
+            reference,
+            targetUserId
+          )
+        : ApiManager.getCommunityWeeklyTopGames(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate,
+            reference
+          );
     }
-    return ApiManager.getCommunityMonthlyTopGames(
-      scope,
-      dateRangeInfo.startDate,
-      dateRangeInfo.endDate,
-      reference,
-      targetUserId
-    );
+    return targetUserId
+      ? ApiManager.getCommunityMonthlyTopGames(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate,
+          reference,
+          targetUserId
+        )
+      : ApiManager.getCommunityMonthlyTopGames(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate,
+          reference
+        );
   }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate, targetUserId]);
 
   const { data, isLoading, error, errorMessage, refetch } =

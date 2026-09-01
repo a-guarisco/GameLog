@@ -5,7 +5,10 @@ import type { CommunityGameStatusResponse, CommunityScope } from '@gamelog/api-m
 
 export const useCommunityGameStatus = (scope: CommunityScope, userId?: string) => {
   const fetchFunc = useCallback(
-    () => ApiManager.getCommunityGameStatuses(scope, userId),
+    () =>
+      userId
+        ? ApiManager.getCommunityGameStatuses(scope, userId)
+        : ApiManager.getCommunityGameStatuses(scope),
     [scope, userId]
   );
 

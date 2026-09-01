@@ -83,19 +83,31 @@ export const useCommunityPlaytime = ({
 
   const fetchFunc = useCallback(() => {
     if (periodRange === 'week') {
-      return ApiManager.getCommunityWeeklyPlaytime(
-        scope,
-        dateRangeInfo.startDate,
-        dateRangeInfo.endDate,
-        targetUserId
-      );
+      return targetUserId
+        ? ApiManager.getCommunityWeeklyPlaytime(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate,
+            targetUserId
+          )
+        : ApiManager.getCommunityWeeklyPlaytime(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate
+          );
     }
-    return ApiManager.getCommunityMonthlyPlaytime(
-      scope,
-      dateRangeInfo.startDate,
-      dateRangeInfo.endDate,
-      targetUserId
-    );
+    return targetUserId
+      ? ApiManager.getCommunityMonthlyPlaytime(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate,
+          targetUserId
+        )
+      : ApiManager.getCommunityMonthlyPlaytime(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate
+        );
   }, [scope, periodRange, dateRangeInfo.startDate, dateRangeInfo.endDate, targetUserId]);
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch<CommunityPlaytimeResponse>(fetchFunc);

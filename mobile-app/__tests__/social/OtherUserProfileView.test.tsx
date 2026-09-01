@@ -113,7 +113,8 @@ describe('OtherUserProfileView', () => {
     render(<OtherUserProfileView user={mockUser} friendship={mockFriendship} />);
 
     expect(await screen.findByText('GamerGuy Persona')).toBeTruthy();
-    expect(screen.getByText('Friend')).toBeTruthy();
+    expect(screen.getByTestId('other-user-status-chip')).toBeTruthy();
+    expect(screen.getAllByText('Friend')).toHaveLength(2);
     expect(screen.getByTestId('other-user-stat-band')).toBeTruthy();
     expect(screen.getByText('Owned')).toBeTruthy();
     expect(screen.getByText('Total')).toBeTruthy();

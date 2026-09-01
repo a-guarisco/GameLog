@@ -5,7 +5,10 @@ import type { CommunityGenreHour, CommunityScope } from '@gamelog/api-manager/dt
 
 export const useCommunityGenre = (scope: CommunityScope, userId?: string) => {
   const fetchFunc = useCallback(
-    () => ApiManager.getCommunityGenre(scope, userId),
+    () =>
+      userId
+        ? ApiManager.getCommunityGenre(scope, userId)
+        : ApiManager.getCommunityGenre(scope),
     [scope, userId]
   );
 

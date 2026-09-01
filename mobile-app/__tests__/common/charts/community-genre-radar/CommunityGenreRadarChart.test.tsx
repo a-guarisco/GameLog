@@ -70,7 +70,7 @@ describe('CommunityGenreRadarChart', () => {
 
     fireEvent.press(screen.getByTestId('community-radar-scope-region'));
 
-    expect(useCommunityGenreRadarChart).toHaveBeenCalledWith(null, 'region');
+    expect(useCommunityGenreRadarChart).toHaveBeenCalledWith(null, 'region', undefined);
   });
 
   it('renders warning when backend returns error (e.g. 400 no region set)', () => {
