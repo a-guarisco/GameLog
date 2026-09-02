@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -18,6 +19,8 @@ interface ReportResultsCardProps {
   sortOrder: 'playtime' | 'streak' | 'alpha';
   setSortOrder: (order: 'playtime' | 'streak' | 'alpha') => void;
   handleGamePress: (appId: string, playTime: number) => void;
+  className?: string;
+  onUnexpandedLayout?: (height: number) => void;
 }
 
 const ReportResultsCard = ({
@@ -28,13 +31,26 @@ const ReportResultsCard = ({
   sortOrder,
   setSortOrder,
   handleGamePress,
+  className = '',
+  onUnexpandedLayout,
 }: ReportResultsCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
 
   if (!report) return null;
 
   return (
-    <SectionCard testID="report-results-card" label="Report">
+    <Box
+      className={className}
+      onLayout={(e) => {
+        if (!showDetails && onUnexpandedLayout) {
+          const h = e.nativeEvent.layout.height;
+          if (h > 0) {
+            onUnexpandedLayout(h);
+          }
+        }
+      }}
+    >
+      <SectionCard testID="report-results-card" label="Report" className="w-full">
       <VStack space="sm">
         {!report.game_reports || report.game_reports.length === 0 ? (
           <InfoBox message="No games played in this period." className="mt-2" />
@@ -126,7 +142,8 @@ const ReportResultsCard = ({
         ) : null}
       </VStack>
     </SectionCard>
-  );
+  </Box>
+);
 };
 
 export default ReportResultsCard;

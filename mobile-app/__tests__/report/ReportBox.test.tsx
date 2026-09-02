@@ -2,6 +2,7 @@ import { render, fireEvent, within } from '@testing-library/react-native';
 import { ReportBox } from '../../src/report/ReportBox';
 import { useReport } from '../../src/report/useReport';
 import { useNavigation } from '@react-navigation/native';
+import * as OrientationHook from '@gamelog/common/useOrientation';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 import { config } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 
@@ -398,5 +399,113 @@ describe('ReportBox', () => {
         },
       },
     });
+  });
+
+  it('renders landscape empty state prompt when isLandscape is true and report is null', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 800,
+      height: 400,
+    });
+
+    const { getByText, getByTestId } = renderComponent();
+
+    expect(getByTestId('report-retrieval-card')).toBeTruthy();
+    expect(getByTestId('report-empty-card')).toBeTruthy();
+    expect(
+      getByText(
+        'Select a date range on the left and tap Generate Report to view your playtime summary.'
+      )
+    ).toBeTruthy();
+  });
+
+  it('renders landscape ReportResultsCard when isLandscape is true and report is present', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 800,
+      height: 400,
+    });
+
+    (useReport as jest.Mock).mockReturnValue({
+      startDate: new Date('2023-10-01'),
+      endDate: new Date('2023-10-10'),
+      appliedStartDate: new Date('2023-10-01'),
+      appliedEndDate: new Date('2023-10-10'),
+      loading: false,
+      error: null,
+      report: {
+        date: '2023-10-10',
+        game_reports: [{ app_id: '123', today_play_time: 120, streak: 5 }],
+      },
+      gameNames: {
+        '123': 'Test Game',
+      },
+      handleFetchReport: mockHandleFetchReport,
+      handleClearDates: mockHandleClearDates,
+    });
+
+    const { getByTestId, queryByTestId } = renderComponent();
+
+    expect(getByTestId('report-retrieval-card')).toBeTruthy();
+    expect(getByTestId('report-results-card')).toBeTruthy();
+    expect(queryByTestId('report-empty-card')).toBeNull();
+  });
+
+  it('locks ReportRetrievalCard height to unexpanded report height and maintains it when expanded', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 800,
+      height: 400,
+    });
+
+    (useReport as jest.Mock).mockReturnValue({
+      startDate: new Date('2023-10-01'),
+      endDate: new Date('2023-10-10'),
+      appliedStartDate: new Date('2023-10-01'),
+      appliedEndDate: new Date('2023-10-10'),
+      loading: false,
+      error: null,
+      report: {
+        date: '2023-10-10',
+        game_reports: [{ app_id: '123', today_play_time: 120, streak: 5 }],
+      },
+      gameNames: {
+        '123': 'Test Game',
+      },
+      handleFetchReport: mockHandleFetchReport,
+      handleClearDates: mockHandleClearDates,
+    });
+
+    const { getByTestId, getByText } = renderComponent();
+
+    // Trigger onLayout on ReportResultsCard in unexpanded state
+    const resultsCard = getByTestId('report-results-card');
+    fireEvent(resultsCard, 'layout', {
+      nativeEvent: { layout: { height: 260, width: 500 } },
+    });
+
+    // The minHeight is on the wrapper Box (parent of the retrieval card)
+    const retrievalWrapper = getByTestId('retrieval-wrapper');
+    expect(retrievalWrapper.props.style).toEqual(
+      expect.objectContaining({ minHeight: 260 })
+    );
+
+    // Expand breakdown
+    fireEvent.press(getByText('Show game breakdown'));
+
+    // Trigger onLayout again with larger height (e.g. 500)
+    fireEvent(resultsCard, 'layout', {
+      nativeEvent: { layout: { height: 500, width: 500 } },
+    });
+
+    // Height remains locked to 260
+    expect(retrievalWrapper.props.style).toEqual(
+      expect.objectContaining({ minHeight: 260 })
+    );
+
+    // Press Reset button
+    const clearButton = getByText('Reset');
+    fireEvent.press(clearButton);
+    expect(mockHandleClearDates).toHaveBeenCalled();
   });
 });
