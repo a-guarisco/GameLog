@@ -1,3 +1,4 @@
+import { ViewStyle } from 'react-native';
 import { RadarChart } from 'react-native-gifted-charts';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -11,15 +12,26 @@ import type { OwnedGames } from '@gamelog/api-manager/dto';
 
 interface GameGenreRadarChartProps {
   ownedGames?: OwnedGames | null;
+  targetHeight?: number;
+  style?: ViewStyle;
 }
 
-const GameGenreRadarChart = ({ ownedGames }: GameGenreRadarChartProps) => {
+const GameGenreRadarChart = ({ ownedGames, targetHeight, style }: GameGenreRadarChartProps) => {
   const { values, labels, isLoadingGenres } = useGenreRadarChart(ownedGames);
-  const { isLandscape } = useOrientation();
+  const { isLandscape, height } = useOrientation();
   const radarPadding = isLandscape ? 8 : 16;
 
   return (
-    <ChartWrapperCard label="Genre Radar" isLoading={isLoadingGenres} error={false}>
+    <ChartWrapperCard
+      label="Genre Radar"
+      isLoading={isLoadingGenres}
+      error={false}
+      style={
+        targetHeight
+          ? { minHeight: targetHeight, height: targetHeight, maxHeight: targetHeight, ...style }
+          : style
+      }
+    >
       {({ theme, cardWidth }) => {
         if (values.length === 0) {
           return (
@@ -29,17 +41,24 @@ const GameGenreRadarChart = ({ ownedGames }: GameGenreRadarChartProps) => {
           );
         }
 
+        const targetSize = isLandscape
+          ? Math.min(Math.round(height * 0.60), cardWidth ? cardWidth - radarPadding : 260)
+          : (cardWidth ? cardWidth - radarPadding : 320);
+
         return (
-          <Box style={{ marginTop: -25, marginBottom: -0 }}>
+          <Box
+            className="items-center justify-center w-full flex-1"
+            style={{ marginTop: isLandscape ? -5 : -25, marginBottom: 0 }}
+          >
             <RadarChart
-              chartSize={cardWidth ? cardWidth - radarPadding : 320}
+              chartSize={targetSize}
               data={values}
               labels={labels}
               maxValue={Math.max(...values, 1)}
               noOfSections={5}
               isAnimated
               animationDuration={500}
-              labelsPositionOffset={Math.max(...values, 1) * 0.08}
+              labelsPositionOffset={Math.max(...values, 1) * (isLandscape ? 0.05 : 0.08)}
               gridConfig={{
                 stroke: parseRGB(theme['--color-outline-100']),
                 strokeWidth: 1,
@@ -53,6 +72,7 @@ const GameGenreRadarChart = ({ ownedGames }: GameGenreRadarChartProps) => {
               }}
               labelConfig={{
                 stroke: parseRGB(theme['--color-typography-400']),
+                fontSize: isLandscape ? 11 : 12,
               }}
               polygonConfig={{
                 stroke: parseRGB(brand.primary['500']),
