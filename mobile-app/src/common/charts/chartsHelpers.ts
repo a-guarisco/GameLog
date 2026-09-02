@@ -57,7 +57,7 @@ export const computePieRadius = (cardWidth: number, isLandscape = false) => {
     return Math.min(145, Math.max(130, Math.floor(cardWidth * 0.18)));
   }
   // In portrait, scale with card width capped at 140px
-  return Math.min(140, Math.floor(cardWidth * 0.35));
+  return Math.min(140, Math.floor(cardWidth * 0.45));
 };
 export const computePieInnerRadius = (r: number) => Math.floor(r * 0.7);
 
