@@ -4,6 +4,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Pressable, View } from 'react-native';
+import { useOrientation } from '@gamelog/common/useOrientation';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import { selectPlaytimeTrend } from './selectPlaytimeTrend';
 import { LineChart } from 'react-native-gifted-charts';
@@ -37,6 +38,9 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
   const [trendRange, setTrendRange] = useState<number>(14);
   const [trendMode, setTrendMode] = useState<'avg' | 'tot'>('avg');
   const [activePoint, setActivePoint] = useState<any>(null);
+  const { isLandscape } = useOrientation();
+  const chartHeight = isLandscape ? 220 : 140;
+  const chartContainerHeight = isLandscape ? 240 : 160;
 
   const {
     trend,
@@ -142,7 +146,7 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
                   width: '100%',
                   alignItems: 'center',
                   marginLeft: -10,
-                  height: 160,
+                  height: chartContainerHeight,
                 }}
               >
                 <LineChart
@@ -152,7 +156,7 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
                   initialSpacing={0}
                   endSpacing={0}
                   data={trendLineData}
-                  height={140}
+                  height={chartHeight}
                   yAxisOffset={Math.max(
                     0,
                     chartBounds.min - (chartBounds.max - chartBounds.min) * 0.1
@@ -161,14 +165,14 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
                   isAnimated
                   animationDuration={600}
                   color={primaryColor}
-                  thickness={3}
+                  thickness={isLandscape ? 4 : 3}
                   hideDataPoints
                   yAxisThickness={0}
                   xAxisThickness={0}
                   hideRules
                   hideYAxisText
                   pointerConfig={{
-                    pointerStripHeight: 140,
+                    pointerStripHeight: chartHeight,
                     pointerStripColor: primaryColor,
                     pointerStripWidth: 2,
                     pointerColor: primaryColor,

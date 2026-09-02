@@ -48,8 +48,8 @@ export const getPercentileInfoGradient = (
   return INFO_GRADIENT_TIERS[tierIndex];
 };
 
-export const computePieRadius = (cardWidth: number) =>
-  cardWidth > 0 ? Math.floor(cardWidth * 0.35) : 140;
+export const computePieRadius = (cardWidth: number, isLandscape = false) =>
+  cardWidth > 0 ? Math.floor(cardWidth * (isLandscape ? 0.42 : 0.35)) : 140;
 export const computePieInnerRadius = (r: number) => Math.floor(r * 0.7);
 
 export const getTopGames = (games: OwnedGames['response']['games'], gamesToFetch: number) => {

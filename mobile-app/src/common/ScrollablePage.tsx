@@ -4,6 +4,8 @@ import { BlurTargetView } from 'expo-blur';
 import { Box } from './gluestack/box';
 import TopNotchBlurOverlay from './TopNotchBlurOverlay';
 import { Animated, useColorScheme } from 'react-native';
+import { useOrientation } from '@gamelog/common/useOrientation';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ScrollablePageProps = {
   children: React.ReactNode;
@@ -17,6 +19,8 @@ const ScrollablePage = ({
   contentPaddingTop,
 }: ScrollablePageProps) => {
   const isDark = useColorScheme() === 'dark';
+  const { isLandscape } = useOrientation();
+  const insets = useSafeAreaInsets();
   const { MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO } = getDefaultBannerParams();
   const { bannerHeight, insetsTop, notchBlurOpacity, onScroll, scrollBlurTargetRef } =
     useTopNotchBlurOverlay(
@@ -25,9 +29,10 @@ const ScrollablePage = ({
     );
 
   const paddingTop = contentPaddingTop ?? (hasBanner ? bannerHeight : insetsTop + 16);
+  const leftPadding = isLandscape ? insets.left + 74 : 0;
 
   return (
-    <Box className="flex-1 relative">
+    <Box className="flex-1 relative" style={{ paddingLeft: leftPadding }}>
       <BlurTargetView ref={scrollBlurTargetRef} className="absolute inset-0 z-40">
         <Animated.ScrollView
           contentContainerStyle={{

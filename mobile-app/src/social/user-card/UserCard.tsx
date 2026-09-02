@@ -40,13 +40,12 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
           <Text size="xs" className="font-medium text-typography-200 mt-0.5">
             <Text
               size="xs"
-              className={`font-bold ${
-                isFriend
+              className={`font-bold ${isFriend
                   ? 'text-primary-500 dark:text-primary-400'
                   : isPending
                     ? 'text-warning-500 dark:text-warning-400'
                     : 'text-typography-300 dark:text-typography-400'
-              }`}
+                }`}
             >
               {isFriend ? 'Friend' : isPending ? 'Pending' : 'Player'}
             </Text>{' '}
