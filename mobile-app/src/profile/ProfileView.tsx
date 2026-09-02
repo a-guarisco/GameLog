@@ -6,6 +6,7 @@ import { getReportTotalMinutes } from '@gamelog/common/selectPlaytimeReport';
 import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useStreakText } from '@gamelog/common/useStreakText';
+import VSpace from '@gamelog/common/VSpace';
 import ProfileIdentity from './ProfileIdentity';
 import ProfileStats from './ProfileStats';
 import ProfileSectionTabs from './ProfileSectionTabs';
@@ -14,10 +15,12 @@ import { selectPlaytimeTrend } from '@gamelog/common/charts/playtime-trend/selec
 import { selectPlatformSplit } from '@gamelog/common/charts/platform-split/selectPlatformSplit';
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
+import { useProfileSpacing } from './useProfileSpacing';
 import { useProfileChartsFetch } from './useProfileChartsFetch';
 
 const ProfileView = () => {
   const USER_ID = getSteamId();
+  const { vspaceHeight } = useProfileSpacing();
   const { data, isLoading, errors, isLoadingStates } = useProfileChartsFetch(USER_ID);
   const { ownedGames, playersInfo, userStreak, playtimeReport, playtimeByUser } = data;
   const player = playersInfo?.response?.players?.[0];
@@ -35,6 +38,7 @@ const ProfileView = () => {
       <HeaderGameImage appid={mostPlayedGame?.appid} />
 
       <ScrollablePage>
+        <VSpace size={vspaceHeight} testID="profile-vspace" />
         <ProfileIdentity
           name={player?.personaname ?? 'Unknown User'}
           avatarUrl={player?.avatarfull}
@@ -42,7 +46,6 @@ const ProfileView = () => {
           memberSinceLabel={selectMemberSinceLabel(player?.timecreated)}
           mostPlayedName={mostPlayedGame?.name}
         />
-
         <Box className="bg-background-0 pb-6">
           <VStack space="xl" className="pt-6">
             <Box className="px-4">
