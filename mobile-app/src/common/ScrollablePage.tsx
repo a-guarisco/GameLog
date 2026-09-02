@@ -7,20 +7,31 @@ import { Animated, useColorScheme } from 'react-native';
 
 type ScrollablePageProps = {
   children: React.ReactNode;
+  hasBanner?: boolean;
+  contentPaddingTop?: number;
 };
 
-const ScrollablePage = ({ children }: ScrollablePageProps) => {
+const ScrollablePage = ({
+  children,
+  hasBanner = true,
+  contentPaddingTop,
+}: ScrollablePageProps) => {
   const isDark = useColorScheme() === 'dark';
   const { MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO } = getDefaultBannerParams();
   const { bannerHeight, insetsTop, notchBlurOpacity, onScroll, scrollBlurTargetRef } =
-    useTopNotchBlurOverlay(MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO);
+    useTopNotchBlurOverlay(
+      hasBanner ? MIN_BANNER_HEIGHT : 0,
+      hasBanner ? BANNER_HEIGHT_SCREEN_RATIO : 0
+    );
+
+  const paddingTop = contentPaddingTop ?? (hasBanner ? bannerHeight : insetsTop + 16);
 
   return (
     <Box className="flex-1 relative">
       <BlurTargetView ref={scrollBlurTargetRef} className="absolute inset-0 z-40">
         <Animated.ScrollView
           contentContainerStyle={{
-            paddingTop: bannerHeight,
+            paddingTop,
             paddingHorizontal: 0,
             paddingBottom: 24,
           }}

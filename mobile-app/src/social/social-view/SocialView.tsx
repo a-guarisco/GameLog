@@ -1,20 +1,21 @@
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
-import HeaderGameImage from '@gamelog/common/HeaderGameImage';
+import { VStack } from '@gamelog/common/gluestack/vstack';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useGetFriendList, useSearchUsers } from '@gamelog/api-manager/useApi';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
-import { SocialHubBanner } from './SocialHubBanner';
+import SocialIdentity from './SocialIdentity';
+import SocialStats from './SocialStats';
+import RecommenderSummaryCard from './RecommenderSummaryCard';
 import SocialSectionTabs from './SocialSectionTabs';
-import { RecommendationsModal } from './RecommendationsModal';
 import { useFriendActions } from './useFriendActions';
 import { selectPendingRequests, selectAcceptedFriends } from './friendListSelectors';
 
-const BANNER_APPID = '730';
-
-const SocialView: React.FC = () => {
+export const SocialView: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFriend, setSelectedFriend] = useState<UserSearchResult | null>(null);
 
   const {
     friendList,
@@ -41,38 +42,57 @@ const SocialView: React.FC = () => {
   const pendingRequests = selectPendingRequests(friendList);
   const acceptedFriends = selectAcceptedFriends(friendList);
 
+  const handleOpenRecommendations = (friendItem?: UserSearchResult) => {
+    navigation.navigate('FriendRecommendations', {
+      friendItem,
+    });
+  };
+
   return (
     <Box className="flex-1 relative bg-background-0">
-      <HeaderGameImage appid={BANNER_APPID} />
-      <ScrollablePage>
-        <SocialHubBanner />
+      <ScrollablePage hasBanner={false}>
+        <SocialIdentity />
 
-        <Box className="flex-1 bg-background-0 pt-6">
-          <SocialSectionTabs
-            isLoadingFriendList={isLoadingFriendList}
-            errorFriendList={!!errorFriendList}
-            errorMessageFriendList={errorMessageFriendList}
-            pendingRequests={pendingRequests}
-            acceptedFriends={acceptedFriends}
-            searchQuery={searchQuery}
-            onQueryChange={setSearchQuery}
-            searchResults={searchResults}
-            isLoadingSearch={isLoadingSearch}
-            errorSearch={!!errorSearch}
-            errorMessageSearch={errorMessageSearch}
-            isActionLoading={isActionLoading}
-            actionFeedback={actionFeedback}
-            handlers={{
-              onAddFriend: handleAddFriend,
-              onAcceptFriend: handleAcceptFriend,
-              onRefuseFriend: handleRefuseFriend,
-              onSelectRecommendations: setSelectedFriend,
-            }}
-          />
+        <Box className="bg-background-0 pb-6">
+          <VStack space="xl" className="pt-4">
+            <Box className="px-4">
+              <SocialStats
+                acceptedCount={acceptedFriends.length}
+                pendingCount={pendingRequests.length}
+              />
+            </Box>
+
+            <Box className="px-4">
+              <RecommenderSummaryCard
+                onPress={() => handleOpenRecommendations()}
+                testID="social-recommender-card"
+              />
+            </Box>
+
+            <SocialSectionTabs
+              isLoadingFriendList={isLoadingFriendList}
+              errorFriendList={!!errorFriendList}
+              errorMessageFriendList={errorMessageFriendList}
+              pendingRequests={pendingRequests}
+              acceptedFriends={acceptedFriends}
+              searchQuery={searchQuery}
+              onQueryChange={setSearchQuery}
+              searchResults={searchResults}
+              isLoadingSearch={isLoadingSearch}
+              errorSearch={!!errorSearch}
+              errorMessageSearch={errorMessageSearch}
+              isActionLoading={isActionLoading}
+              actionFeedback={actionFeedback}
+              handlers={{
+                onAddFriend: handleAddFriend,
+                onAcceptFriend: handleAcceptFriend,
+                onRefuseFriend: handleRefuseFriend,
+                onSelectRecommendations: handleOpenRecommendations,
+              }}
+            />
+          </VStack>
         </Box>
       </ScrollablePage>
-
-      <RecommendationsModal friendItem={selectedFriend} onClose={() => setSelectedFriend(null)} />
     </Box>
   );
 };
