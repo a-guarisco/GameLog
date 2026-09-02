@@ -3,6 +3,8 @@ import GameView from '@gamelog/game/GameView';
 import { useGetPlaytimeReport } from '@gamelog/api-manager/useApi';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
 
+import * as OrientationHook from '@gamelog/common/useOrientation';
+
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
 
@@ -54,9 +56,11 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('@gamelog/game/GlobalAchievementsPreview', () => {
-  const { Text } = jest.requireActual<typeof import('react-native')>('react-native');
-  const GlobalAchievementsPreview = ({ gameID }: any) => (
-    <Text>Mock Achievements for {gameID}</Text>
+  const { Text, Pressable } = jest.requireActual<typeof import('react-native')>('react-native');
+  const GlobalAchievementsPreview = ({ gameID, onSeeAll }: any) => (
+    <Pressable onPress={onSeeAll} testID="mock-global-achievements">
+      <Text>Mock Achievements for {gameID}</Text>
+    </Pressable>
   );
   return GlobalAchievementsPreview;
 });
@@ -133,7 +137,7 @@ describe('GameView', () => {
     expect(screen.getByText('—')).toBeTruthy();
   });
 
-  it('opens the achievements list when the achievements progress summary is pressed', () => {
+  it('opens the achievements list when the achievements progress summary is pressed in portrait', () => {
     render(<GameView />);
 
     fireEvent.press(screen.getByTestId('achievements-summary'));
@@ -142,5 +146,75 @@ describe('GameView', () => {
       'AchievementsList',
       expect.objectContaining({ gameID: '123' })
     );
+  });
+
+  describe('landscape mode', () => {
+    beforeEach(() => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: true,
+        width: 844,
+        height: 390,
+      });
+    });
+
+    it('renders the 2-column landscape layout with 4 tabs and full-width banner', () => {
+      render(<GameView />);
+
+      expect(screen.getByText('Test Game')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-achievements')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-news')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-guides')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-screenshots')).toBeTruthy();
+    });
+
+    it('goes back from floating back button in landscape', () => {
+      render(<GameView />);
+
+      fireEvent.press(screen.getByTestId('game-back'));
+      expect(mockGoBack).toHaveBeenCalledTimes(1);
+    });
+
+    it('displays inline achievements detail when achievements summary is pressed in landscape without navigating away', () => {
+      render(<GameView />);
+
+      fireEvent.press(screen.getByTestId('achievements-summary'));
+
+      expect(mockNavigate).not.toHaveBeenCalled();
+      expect(screen.getByTestId('back-to-tabs')).toBeTruthy();
+    });
+
+    it('returns to tabs when Back to Tabs is pressed', () => {
+      render(<GameView />);
+
+      fireEvent.press(screen.getByTestId('achievements-summary'));
+      expect(screen.getByTestId('back-to-tabs')).toBeTruthy();
+
+      fireEvent.press(screen.getByTestId('back-to-tabs'));
+      expect(screen.getByTestId('game-tab-achievements')).toBeTruthy();
+    });
+
+    it('opens inline achievements detail when See All is pressed on achievements preview in landscape', () => {
+      render(<GameView />);
+
+      fireEvent.press(screen.getByTestId('mock-global-achievements'));
+
+      expect(mockNavigate).not.toHaveBeenCalled();
+      expect(screen.getByTestId('back-to-tabs')).toBeTruthy();
+    });
+
+    it('switches to screenshots tab in landscape and renders screenshots grid', () => {
+      render(<GameView />);
+
+      fireEvent.press(screen.getByTestId('game-tab-screenshots'));
+      expect(screen.getByText('Community in-game screenshots')).toBeTruthy();
+    });
+
+    it('renders wrapped stat labels and centered values in landscape', () => {
+      render(<GameView />);
+
+      expect(screen.getByText('Last played')).toBeTruthy();
+      expect(screen.getByText('Total')).toBeTruthy();
+      expect(screen.getByText('2 weeks')).toBeTruthy();
+    });
   });
 });

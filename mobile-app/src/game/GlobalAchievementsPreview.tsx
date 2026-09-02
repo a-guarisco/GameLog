@@ -16,9 +16,10 @@ interface Props {
     name: string;
     streak?: number;
   };
+  onSeeAll?: () => void;
 }
 
-export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Props) {
+export default function GlobalAchievementsBox({ gameID, playerID, gameItem, onSeeAll }: Props) {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const { globalAchievements, isLoadingGlobalAchievements, errorGlobalAchievements } =
@@ -59,13 +60,15 @@ export default function GlobalAchievementsBox({ gameID, playerID, gameItem }: Pr
       <SeeAllLink
         label={totalCount > 3 ? `See all ${totalCount} achievements` : 'See more'}
         accessibilityRole="button"
-        onPress={() =>
-          navigation.navigate('AchievementsList', {
-            globalAchievements,
-            gameID,
-            playerID,
-            gameItem,
-          })
+        onPress={
+          onSeeAll ??
+          (() =>
+            navigation.navigate('AchievementsList', {
+              globalAchievements,
+              gameID,
+              playerID,
+              gameItem,
+            }))
         }
       />
     </Box>

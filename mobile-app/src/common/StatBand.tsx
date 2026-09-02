@@ -13,21 +13,29 @@ const StatBand = ({
   stats,
   isOnCard = false,
   testID,
+  isLandscape = false,
 }: {
   stats: GameStat[];
   isOnCard?: boolean;
   testID?: string;
+  isLandscape?: boolean;
 }) => (
   <Card
     testID={testID}
     variant="elevated"
-    className={`overflow-hidden p-0 ${isOnCard ? 'bg-background-100 dark:bg-background-100 shadow-none' : ''}`}
+    className={`overflow-hidden p-0 ${isLandscape ? 'min-h-[96px]' : ''} ${isOnCard ? 'bg-background-100 dark:bg-background-100 shadow-none' : ''}`}
   >
-    <HStack className="w-full">
+    <HStack className={`w-full ${isLandscape ? 'min-h-[96px]' : ''}`}>
       {stats.map((stat, index) => (
         <HStack key={stat.label} className="flex-1">
           {index > 0 && <Box className="w-px bg-outline-100" />}
-          <StatBlock value={stat.value} label={stat.label} valueClassName={stat.valueClassName} isOnCard={isOnCard} />
+          <StatBlock
+            value={stat.value}
+            label={stat.label}
+            valueClassName={stat.valueClassName}
+            isOnCard={isOnCard}
+            isLandscape={isLandscape}
+          />
         </HStack>
       ))}
     </HStack>
