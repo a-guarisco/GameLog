@@ -223,7 +223,7 @@ def _get_latest_steam_rolling(session: Session, user_id: uuid.UUID, steam_app_id
     ).first()
 
 
-def _compute_daily_playtimes(
+def compute_daily_playtimes(
     steam_rolling_times: Sequence[SteamRollingTime],
     days: int,
     end_date: date | None = None,
@@ -312,6 +312,9 @@ def _compute_daily_playtimes(
         ))
 
     return result
+
+
+_compute_daily_playtimes = compute_daily_playtimes
 
 
 def _get_steam_rolling_by_user(session: Session, user_id: str, steam_app_id: str | None = None) -> Sequence[SteamRollingTime]:

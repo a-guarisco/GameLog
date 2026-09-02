@@ -26,7 +26,9 @@ import type {
   RecommendationResponse,
   CommunityGenreHour,
   CommunityPlaytimeResponse,
+  CommunityTopGame,
   CommunityScope,
+  TopGameReference,
 } from '@gamelog/api-manager/dto';
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
@@ -189,5 +191,23 @@ export default {
   getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) =>
     fetchAuthenticatedData<CommunityPlaytimeResponse>(
       EndPoints.getCommunityMonthlyPlaytime(scope, startDate, endDate)
+    ),
+  getCommunityWeeklyTopGames: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    reference: TopGameReference = 'community'
+  ) =>
+    fetchAuthenticatedData<CommunityTopGame[]>(
+      EndPoints.getCommunityWeeklyTopGames(scope, startDate, endDate, reference)
+    ),
+  getCommunityMonthlyTopGames: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    reference: TopGameReference = 'community'
+  ) =>
+    fetchAuthenticatedData<CommunityTopGame[]>(
+      EndPoints.getCommunityMonthlyTopGames(scope, startDate, endDate, reference)
     ),
 };

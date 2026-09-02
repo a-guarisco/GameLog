@@ -10,3 +10,12 @@ export interface CommunityPlaytimeResponse {
   user: number[];
   community: number[];
 }
+
+export interface CommunityTopGame {
+  id: string;
+  user_playtime: number;
+  community_playtime: number;
+}
+
+export type TopGameReference = 'community' | 'user';
+

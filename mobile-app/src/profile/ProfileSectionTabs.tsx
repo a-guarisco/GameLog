@@ -75,7 +75,7 @@ const ProfileSectionTabs = ({
 
             {activeTab === 'genres' && <ProfileGenresTab ownedGames={ownedGames} />}
 
-            {activeTab === 'community' && <ProfileCommunityTab />}
+            {activeTab === 'community' && <ProfileCommunityTab ownedGames={ownedGames} />}
           </>
         )}
       </VStack>

@@ -1,6 +1,6 @@
 import { getApiProvider } from '@gamelog/api-manager/apiProvider';
 import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
-import { CommunityScope } from '@gamelog/api-manager/dto';
+import { CommunityScope, TopGameReference } from '@gamelog/api-manager/dto';
 
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
@@ -181,6 +181,24 @@ const EndPoints = {
 
   getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) => {
     return `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+  },
+
+  getCommunityWeeklyTopGames: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    reference: TopGameReference = 'community'
+  ) => {
+    return `${getBackendBaseUrl()}/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+  },
+
+  getCommunityMonthlyTopGames: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    reference: TopGameReference = 'community'
+  ) => {
+    return `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
   },
 };
 
