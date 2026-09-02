@@ -174,4 +174,73 @@ describe('FriendRecommendationsView', () => {
 
     expect(openURLSpy).toHaveBeenCalledWith('https://store.steampowered.com/app/570');
   });
+
+  it('shows loading, empty, and no-match states for friend selection', () => {
+    mockUseGetFriendList.mockReturnValue({
+      friendList: [],
+      isLoadingFriendList: true,
+      errorFriendList: null,
+      errorMessageFriendList: null,
+    });
+
+    render(<FriendRecommendationsView />);
+    expect(screen.getByText('Loading friends...')).toBeTruthy();
+
+    mockUseGetFriendList.mockReturnValue({
+      friendList: [],
+      isLoadingFriendList: false,
+      errorFriendList: null,
+      errorMessageFriendList: null,
+    });
+
+    render(<FriendRecommendationsView />);
+    expect(
+      screen.getByText(
+        "You don't have any friends added yet. Add friends from the Social tab to compare recommendations!"
+      )
+    ).toBeTruthy();
+
+    mockUseGetFriendList.mockReturnValue({
+      friendList: [mockFriendAlice, mockFriendBob],
+      isLoadingFriendList: false,
+      errorFriendList: null,
+      errorMessageFriendList: null,
+    });
+
+    render(<FriendRecommendationsView />);
+    fireEvent.changeText(screen.getByTestId('friend-search-input'), 'zzz');
+    expect(screen.getByText('No friends found matching "zzz".')).toBeTruthy();
+  });
+
+  it('renders recommendation loading, error, and empty-data states', () => {
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: true,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+    });
+
+    render(<FriendRecommendationsView friendItem={mockFriendAlice} />);
+    expect(screen.getByText('Analyzing games for Alice...')).toBeTruthy();
+
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: null,
+      isLoadingRecommendations: false,
+      errorRecommendations: new Error('failed'),
+      errorMessageRecommendations: 'Recommendations failed to load',
+    });
+
+    render(<FriendRecommendationsView friendItem={mockFriendAlice} />);
+    expect(screen.getByText('Recommendations failed to load')).toBeTruthy();
+
+    mockUseGetFriendRecommendations.mockReturnValue({
+      recommendations: { common_games: [], common_genres: [], top_games: [] },
+      isLoadingRecommendations: false,
+      errorRecommendations: null,
+      errorMessageRecommendations: null,
+    });
+
+    render(<FriendRecommendationsView friendItem={mockFriendAlice} />);
+    expect(screen.getByText('No recommendation data available with Alice.')).toBeTruthy();
+  });
 });
