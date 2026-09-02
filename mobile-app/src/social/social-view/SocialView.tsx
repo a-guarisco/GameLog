@@ -7,7 +7,6 @@ import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { useGetFriendList, useSearchUsers } from '@gamelog/api-manager/useApi';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import SocialIdentity from './SocialIdentity';
-import SocialStats from './SocialStats';
 import RecommenderSummaryCard from './RecommenderSummaryCard';
 import SocialSectionTabs from './SocialSectionTabs';
 import { useFriendActions } from './useFriendActions';
@@ -55,13 +54,6 @@ export const SocialView: React.FC = () => {
 
         <Box className="bg-background-0 pb-6">
           <VStack space="xl" className="pt-4">
-            <Box className="px-4">
-              <SocialStats
-                acceptedCount={acceptedFriends.length}
-                pendingCount={pendingRequests.length}
-              />
-            </Box>
-
             <Box className="px-4">
               <RecommenderSummaryCard
                 onPress={() => handleOpenRecommendations()}

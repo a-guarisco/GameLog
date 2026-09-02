@@ -22,7 +22,7 @@ const useAchievementsData = (
 
   const unlockedCount = mergedAchievements.filter((a) => a.unlockTime).length;
   const totalCount = mergedAchievements.length;
-  const completionPercent = totalCount ? Math.round((unlockedCount / totalCount) * 100) : 0;
+  const completionPercent = totalCount ? Math.round((unlockedCount / totalCount) * 100) : 100;
   const gameName = personalAchievements?.playerstats?.gameName ?? 'Unknown Game';
 
   return {

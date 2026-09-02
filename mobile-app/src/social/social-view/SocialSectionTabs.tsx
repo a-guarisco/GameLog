@@ -61,7 +61,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
 
   return (
     <>
-      <Box className="mb-5">
+      <Box className="mb-0">
         <Box className="px-4">
           <SectionTabs
             tabs={tabs}
