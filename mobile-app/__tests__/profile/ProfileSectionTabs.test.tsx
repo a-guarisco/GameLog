@@ -16,6 +16,13 @@ jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
     default: (props: any) => <View testID="genre-radar-chart" {...props} />,
   };
 });
+jest.mock('@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart', () => {
+  const { View } = jest.requireActual('react-native');
+  return {
+    __esModule: true,
+    default: (props: any) => <View testID="community-genre-radar-chart" {...props} />,
+  };
+});
 jest.mock('@gamelog/common/charts/playtime-trend/PlaytimeTrendChart', () => {
   const { View } = jest.requireActual('react-native');
   return {
@@ -106,6 +113,7 @@ describe('ProfileSectionTabs', () => {
     fireEvent.press(screen.getByTestId('profile-tab-genres'));
 
     expect(screen.getByTestId('genre-radar-chart')).toBeTruthy();
+    expect(screen.getByTestId('community-genre-radar-chart')).toBeTruthy();
     expect(screen.queryByTestId('report-box')).toBeNull();
   });
 

@@ -140,3 +140,77 @@ class TestSteamFetcherGetFriendList:
 
         assert isinstance(response, GetFriendListResponse)
         assert len(response.friends) == 0
+
+
+class TestSteamPlayerSummaryAndValidation:
+    def test_get_steam_player_summary_sync_success_with_region(self):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "response": {
+                "players": [
+                    {
+                        "steamid": "76561197960265730",
+                        "personaname": "Gamer123",
+                        "loccountrycode": "IT",
+                    }
+                ]
+            }
+        }
+
+        with patch("httpx.get", return_value=mock_resp) as mock_get:
+            summary = steam_fetcher_service.get_steam_player_summary_sync("76561197960265730", "CUSTOM_KEY")
+            mock_get.assert_called_once()
+            called_url = mock_get.call_args[0][0]
+            assert "CUSTOM_KEY" in called_url
+            assert "76561197960265730" in called_url
+
+        assert summary is not None
+        assert summary["loccountrycode"] == "IT"
+        assert summary["steamid"] == "76561197960265730"
+
+    def test_get_steam_player_summary_sync_uses_default_key_when_omitted(self):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "response": {
+                "players": [
+                    {
+                        "steamid": "76561197960265730",
+                        "personaname": "Gamer123",
+                    }
+                ]
+            }
+        }
+
+        with patch("httpx.get", return_value=mock_resp) as mock_get:
+            summary = steam_fetcher_service.get_steam_player_summary_sync("76561197960265730", None)
+            called_url = mock_get.call_args[0][0]
+            assert steam_fetcher_service.DEFAULT_STEAM_API_KEY in called_url
+
+        assert summary is not None
+        assert "loccountrycode" not in summary
+
+    def test_get_steam_player_summary_sync_returns_none_on_empty_steam_id(self):
+        assert steam_fetcher_service.get_steam_player_summary_sync("") is None
+
+    def test_get_steam_player_summary_sync_returns_none_when_player_not_found(self):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"response": {"players": []}}
+
+        with patch("httpx.get", return_value=mock_resp):
+            summary = steam_fetcher_service.get_steam_player_summary_sync("invalid_steam_id")
+
+        assert summary is None
+
+    def test_validate_steam_credentials_sync_true(self):
+        with patch.object(
+            steam_fetcher_service,
+            "get_steam_player_summary_sync",
+            return_value={"steamid": "76561197960265730"},
+        ):
+            assert steam_fetcher_service.validate_steam_credentials_sync("76561197960265730", "VALID_KEY") is True
+
+    def test_validate_steam_credentials_sync_false_when_missing_key(self):
+        assert steam_fetcher_service.validate_steam_credentials_sync("76561197960265730", "") is False

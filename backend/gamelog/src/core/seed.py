@@ -210,6 +210,7 @@ def _users() -> list[User]:
             username="test-01",
             steam_id="76561198077919169",
             steam_api_key="4C67D2313547027F4ECB151CD10E76EC",
+            region="IT",
         ),
         User(
             id=DEMO_USER_2_ID,
@@ -217,6 +218,7 @@ def _users() -> list[User]:
             username="test-02",
             steam_id="76561198000000002",
             steam_api_key="",
+            region="IT",
         ),
         User(
             id=DEMO_USER_3_ID,
@@ -224,6 +226,7 @@ def _users() -> list[User]:
             username="test-03",
             steam_id="76561198000000003",
             steam_api_key="",
+            region="DE",
         ),
         User(
             id=DEMO_USER_4_ID,
@@ -231,6 +234,7 @@ def _users() -> list[User]:
             username="test-04",
             steam_id="76561198000000004",
             steam_api_key="",
+            region="FR",
         ),
         User(
             id=DEMO_USER_5_ID,
@@ -238,6 +242,7 @@ def _users() -> list[User]:
             username="test-05",
             steam_id="76561198000000005",
             steam_api_key="",
+            region="GB",
         ),
         User(
             id=SLAIT_GRAPH_USER_ID,
@@ -245,6 +250,7 @@ def _users() -> list[User]:
             username="slait-graph",
             steam_id=os.getenv("SLAIT_GRAPH_STEAM_ID", "dummy_slait_graph_id"),
             steam_api_key=os.getenv("SLAIT_GRAPH_STEAM_API_KEY", "dummy_slait_graph_key"),
+            region="US",
         ),
     ]
 
