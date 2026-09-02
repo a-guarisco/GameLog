@@ -243,4 +243,27 @@ describe('FriendRecommendationsView', () => {
     render(<FriendRecommendationsView friendItem={mockFriendAlice} />);
     expect(screen.getByText('No recommendation data available with Alice.')).toBeTruthy();
   });
+
+  it('handles back button when selecting friend with an active friend already set', () => {
+    render(<FriendRecommendationsView friendItem={mockFriendAlice} />);
+    // Press change friend
+    fireEvent.press(screen.getByTestId('search-another-friend-btn'));
+    expect(screen.getByTestId('friend-search-input')).toBeTruthy();
+
+    // Now press back
+    fireEvent.press(screen.getByTestId('recommendations-back-btn'));
+    // Should return to active friend view without navigating back
+    expect(screen.getByText('Comparing games and shared tastes with Alice')).toBeTruthy();
+  });
+
+  it('calls custom onClose callback when provided', () => {
+    const onClose = jest.fn();
+    render(<FriendRecommendationsView friendItem={mockFriendAlice} onClose={onClose} />);
+
+    fireEvent.press(screen.getByTestId('recommendations-back-btn'));
+    expect(onClose).toHaveBeenCalled();
+  });
 });
+
+
+
