@@ -28,20 +28,27 @@ const AchievementsSummary = ({
     testID="achievements-summary"
     hitSlop={{ top: 8, bottom: 8 }}
   >
-    <VStack space="sm">
-      <HStack className="items-center justify-between">
-        <Text size="sm" className="font-bold text-typography-0">
-          Achievements
-        </Text>
-        <HStack space="xs" className="items-center">
+    <HStack className="w-full items-center justify-between">
+      <VStack space="sm" className="flex-1 pr-3">
+        <HStack className="items-center justify-between">
+          <Text size="sm" className="font-bold text-typography-0">
+            Game Completion
+          </Text>
           <Text size="sm" className="font-bold text-typography-200">
             {unlockedCount} / {totalCount} · {completionPercent}%
           </Text>
-          <Ionicons name="chevron-forward" size={14} color={toHex(brand.primary['300'])} />
         </HStack>
+        <ProgressTrack
+          className="w-full"
+          percent={completionPercent}
+          testID="achievements-summary-fill"
+        />
+      </VStack>
+
+      <HStack className="h-10 items-center justify-center">
+        <Ionicons name="chevron-forward" size={14} color={toHex(brand.primary['300'])} />
       </HStack>
-      <ProgressTrack percent={completionPercent} testID="achievements-summary-fill" />
-    </VStack>
+    </HStack>
   </Pressable>
 );
 
