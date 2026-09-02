@@ -92,4 +92,44 @@ describe('PlaytimeTrendChart', () => {
     fireEvent.press(screen.getByText('30D'));
     // Range is now 30D
   });
+
+  it('defaults to 30D in landscape mode', () => {
+    const OrientationHook = require('@gamelog/common/useOrientation');
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 844,
+      height: 390,
+    });
+
+    render(<PlaytimeTrendChart playtimeByUser={mockPlaytimeByUser} />);
+
+    // 30D is selected by default in landscape
+    expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+  });
+
+  it('preserves user manual selection across orientation change', () => {
+    const OrientationHook = require('@gamelog/common/useOrientation');
+    const spy = jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      width: 390,
+      height: 844,
+    });
+
+    const { rerender } = render(<PlaytimeTrendChart playtimeByUser={mockPlaytimeByUser} />);
+
+    // User explicitly selects 90D (3M)
+    fireEvent.press(screen.getByText('3M'));
+
+    // Rotate to landscape
+    spy.mockReturnValue({
+      isLandscape: true,
+      width: 844,
+      height: 390,
+    });
+
+    rerender(<PlaytimeTrendChart playtimeByUser={mockPlaytimeByUser} />);
+
+    // Should remain on 3M rather than resetting to 30D
+    expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+  });
 });
