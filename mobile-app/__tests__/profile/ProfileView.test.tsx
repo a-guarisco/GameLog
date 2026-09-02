@@ -51,6 +51,10 @@ jest.mock('@gamelog/common/charts/genre-radar/GameGenreRadarChart', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, default: () => <View testID="genre-radar-chart" /> };
 });
+jest.mock('@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart', () => {
+  const { View } = jest.requireActual('react-native');
+  return { __esModule: true, default: () => <View testID="community-genre-radar-chart" /> };
+});
 jest.mock('@gamelog/report/ReportBox', () => {
   const { View } = jest.requireActual('react-native');
   return { __esModule: true, ReportBox: () => <View testID="report-box" /> };
@@ -323,6 +327,7 @@ describe('ProfileView — loaded', () => {
     render(<ProfileView />);
 
     expect(screen.getByTestId('profile-playtime-trend')).toBeTruthy();
+    expect(screen.getByTestId('profile-platform-split')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('profile-tab-time'));
     expect(screen.getByTestId('total-hours-chart')).toBeTruthy();
@@ -331,7 +336,7 @@ describe('ProfileView — loaded', () => {
     fireEvent.press(screen.getByTestId('profile-tab-genres'));
     expect(screen.getByTestId('genre-radar-chart')).toBeTruthy();
 
-    fireEvent.press(screen.getByTestId('profile-tab-platforms'));
-    expect(screen.getByTestId('profile-platform-split')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('profile-tab-community'));
+    expect(screen.getByTestId('profile-community-tab')).toBeTruthy();
   });
 });

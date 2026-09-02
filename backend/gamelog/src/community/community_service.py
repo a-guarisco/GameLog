@@ -1,13 +1,21 @@
 
 
+import calendar
 from collections import defaultdict
+from datetime import date, timedelta
 import uuid
 
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 
 from src.auth.schemas import AuthenticatedUser
-from src.community.schemas import CommunityGenreHour, CommunityScope
+from src.community.schemas import (
+    CommunityGenreHour,
+    CommunityMonthlyPlaytimeResponse,
+    CommunityScope,
+    CommunityWeeklyPlaytimeResponse,
+)
+from src.games import game_service
 from src.models import Friendship, FriendshipStatus, Game, Genre, SteamRollingTime, User
 from src.users import user_service
 
@@ -21,12 +29,126 @@ def get_community_genre(
     Returns the percentage share of playtime for each genre for the specified community scope.
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=False)
 
+    return _calculate_genre_percentages(db, target_user_ids)
+
+
+def get_community_weekly_playtime(
+    scope: CommunityScope,
+    start_date: date,
+    end_date: date,
+    user: AuthenticatedUser,
+    db: Session,
+) -> CommunityWeeklyPlaytimeResponse:
+    """
+    Return the weekly playtime comparison for the specified 7-day period (Monday to Sunday)
+    comparing the user vs the community average (excluding the user).
+    """
+    current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+
+    week_dates = [start_date + timedelta(days=i) for i in range(7)]
+
+    user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
+    user_hours = [
+        round(user_daily_map.get(d, 0) / 60.0, 2)
+        for d in week_dates
+    ]
+
+    community_daily_totals = [0] * 7
+    for target_id in target_user_ids:
+        t_daily_map = _get_user_daily_playtimes_map(db, target_id, end_date)
+        for idx, d in enumerate(week_dates):
+            community_daily_totals[idx] += t_daily_map.get(d, 0)
+
+    num_target_users = len(target_user_ids)
+    community_hours = [
+        round(total_mins / (60.0 * num_target_users), 2)
+        for total_mins in community_daily_totals
+    ]
+
+    return CommunityWeeklyPlaytimeResponse(user=user_hours, community=community_hours)
+
+
+def get_community_monthly_playtime(
+    scope: CommunityScope,
+    start_date: date,
+    end_date: date,
+    user: AuthenticatedUser,
+    db: Session,
+) -> CommunityMonthlyPlaytimeResponse:
+    """
+    Return the month-by-month playtime comparison for the specified period
+    comparing the user vs the community average (excluding the user).
+    """
+    current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=True)
+
+    months: list[tuple[int, int]] = []
+    cur_year = start_date.year
+    cur_month = start_date.month
+    while (cur_year < end_date.year) or (cur_year == end_date.year and cur_month <= end_date.month):
+        months.append((cur_year, cur_month))
+        cur_month += 1
+        if cur_month > 12:
+            cur_month = 1
+            cur_year += 1
+
+    user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
+
+    target_daily_maps = [
+        _get_user_daily_playtimes_map(db, target_id, end_date)
+        for target_id in target_user_ids
+    ]
+
+    user_hours: list[float] = []
+    community_hours: list[float] = []
+    num_target_users = len(target_user_ids)
+
+    for y, m in months:
+        last_day = calendar.monthrange(y, m)[1]
+        days_in_month = [date(y, m, d) for d in range(1, last_day + 1)]
+
+        user_month_mins = sum(user_daily_map.get(d, 0) for d in days_in_month)
+        user_hours.append(round(user_month_mins / 60.0, 2))
+
+        community_month_mins = sum(
+            t_map.get(d, 0)
+            for t_map in target_daily_maps
+            for d in days_in_month
+        )
+        community_hours.append(round(community_month_mins / (60.0 * num_target_users), 2))
+
+    return CommunityMonthlyPlaytimeResponse(user=user_hours, community=community_hours)
+
+
+
+def _get_user_daily_playtimes_map(db: Session, user_id: uuid.UUID, end_date: date) -> dict[date, int]:
+    statement = (
+        select(SteamRollingTime)
+        .where(SteamRollingTime.user_id == user_id)
+        .where(SteamRollingTime.created_at <= end_date)
+        .order_by(col(SteamRollingTime.created_at))
+    )
+    records = db.exec(statement).all()
+    if not records:
+        return {}
+    daily_playtimes = game_service._compute_daily_playtimes(records, days=-1, end_date=end_date)
+    return {dp.date: dp.playtime_minutes for dp in daily_playtimes}
+
+
+def _compute_target_ids(
+    scope: CommunityScope,
+    current_user: User,
+    db: Session,
+    exclude_current_user: bool = False,
+) -> list[uuid.UUID]:
     match scope:
         case CommunityScope.GLOBAL:
-            target_user_ids = _get_global_user_ids(db)
+            target_user_ids = _get_global_user_ids(db, current_user.id if exclude_current_user else None)
         case CommunityScope.REGION:
-            target_user_ids = _get_regional_user_ids(db, current_user)
+            target_user_ids = _get_regional_user_ids(db, current_user, exclude_current_user=exclude_current_user)
         case CommunityScope.FRIENDS:
             target_user_ids = _get_friend_user_ids(db, current_user.id)
         case _:
@@ -34,27 +156,31 @@ def get_community_genre(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid community scope: {scope}",
             )
-
-    if not target_user_ids:
+    if len(target_user_ids) == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No matching user found for community scope {scope}",
+            detail=f"No users found for scope {scope}",
         )
-
-    return _calculate_genre_percentages(db, target_user_ids)
-
-
-def _get_global_user_ids(db: Session) -> list[uuid.UUID]:
-    return list(db.exec(select(User.id)).all())
+    return target_user_ids
 
 
-def _get_regional_user_ids(db: Session, user: User) -> list[uuid.UUID]:
+def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID | None = None) -> list[uuid.UUID]:
+    query = select(User.id)
+    if exclude_user_id is not None:
+        query = query.where(User.id != exclude_user_id)
+    return list(db.exec(query).all())
+
+
+def _get_regional_user_ids(db: Session, user: User, exclude_current_user: bool = False) -> list[uuid.UUID]:
     if not user.region or user.region.strip() == "" or user.region == "Unknown":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User region is not set",
         )
-    return list(db.exec(select(User.id).where(User.region == user.region)).all())
+    query = select(User.id).where(User.region == user.region)
+    if exclude_current_user:
+        query = query.where(User.id != user.id)
+    return list(db.exec(query).all())
 
 
 def _get_friend_user_ids(db: Session, user_id: uuid.UUID) -> list[uuid.UUID]:
@@ -130,4 +256,3 @@ def _calculate_genre_percentages(db: Session, target_user_ids: list[uuid.UUID]) 
 
     result.sort(key=lambda x: x.percentage, reverse=True)
     return result
-
