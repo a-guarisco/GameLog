@@ -24,6 +24,8 @@ interface ReportRetrievalCardProps {
   handleClearDates: () => void;
   formatDate: (d?: Date) => string;
   hasReport: boolean;
+  className?: string;
+  style?: any;
 }
 
 const ReportRetrievalCard = ({
@@ -42,6 +44,8 @@ const ReportRetrievalCard = ({
   handleClearDates,
   formatDate,
   hasReport,
+  className = '',
+  style,
 }: ReportRetrievalCardProps) => {
   // Calculate dynamic text info
   const getDynamicInfoText = () => {
@@ -76,6 +80,8 @@ const ReportRetrievalCard = ({
     <SectionCard
       testID="report-retrieval-card"
       label="Report Retrieval"
+      className={className}
+      style={style}
       headerRight={
         (!!startDate || !!endDate || hasReport) ? (
           <Pressable onPress={handleClearDates} hitSlop={12}>
@@ -84,7 +90,7 @@ const ReportRetrievalCard = ({
         ) : null
       }
     >
-      <VStack space="md">
+      <VStack space="md" className="flex-1 justify-center">
         <HStack space="md" className="justify-center pt-2">
           <VStack space="xs" className="items-center flex-1">
             <Text size="xs" className="font-medium text-typography-400">

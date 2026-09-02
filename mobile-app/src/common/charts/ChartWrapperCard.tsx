@@ -1,5 +1,5 @@
 import { useState, ReactNode, ComponentType } from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, ViewStyle } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
 import SectionCard from '@gamelog/common/SectionCard';
@@ -14,6 +14,7 @@ interface ChartCardProps {
   error: boolean;
   ErrorBehaviour?: ComponentType;
   testID?: string;
+  style?: ViewStyle;
 }
 
 const useChartTheme = () => {
@@ -30,6 +31,7 @@ const ChartWrapperCard = ({
   error,
   ErrorBehaviour,
   testID,
+  style,
 }: ChartCardProps) => {
   // Per-instance measured width — not shared. This ensures re-layout on rotation
   // is always picked up; each card measures its own container independently.
@@ -37,7 +39,7 @@ const ChartWrapperCard = ({
   const theme = useChartTheme();
 
   return (
-    <Box className="w-full items-center">
+    <Box className="w-full items-center" style={style}>
       <SectionCard label={label} headerRight={headerRight} className="w-full" testID={testID}>
         <Box
           testID="card"
