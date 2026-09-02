@@ -274,7 +274,7 @@ def manage_friendship(
                 friendship = session.exec(
                     select(Friendship).where(_friendship_between_clause(current_user.id, target_user.id))
                 ).first()
-                if not friendship and payload.action not in (FriendshipManageAction.BLOCK, FriendshipManageAction.BLOCKED):
+                if not friendship and payload.action != FriendshipManageAction.BLOCK:
                     raise HTTPException(status_code=404, detail="Friendship not found")
             else:
                 raise HTTPException(status_code=404, detail="Friendship not found")
