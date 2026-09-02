@@ -30,4 +30,24 @@ describe('usePlaytimeTrendChart', () => {
     const { result } = renderHook(() => usePlaytimeTrendChart(null, 14, 'avg'));
     expect(result.current.trend.hasPlaytime).toBe(false);
   });
+
+  it('uses weekly granularity for 90D in portrait mode', () => {
+    const { result } = renderHook(() => usePlaytimeTrendChart(mockPlaytime, 90, 'avg', false));
+    expect(result.current.timeGroupMode).toBe('W');
+  });
+
+  it('retains daily granularity for 90D in landscape mode', () => {
+    const { result } = renderHook(() => usePlaytimeTrendChart(mockPlaytime, 90, 'avg', true));
+    expect(result.current.timeGroupMode).toBe('D');
+  });
+
+  it('uses weekly granularity for 180D in landscape mode', () => {
+    const { result } = renderHook(() => usePlaytimeTrendChart(mockPlaytime, 180, 'avg', true));
+    expect(result.current.timeGroupMode).toBe('W');
+  });
+
+  it('uses monthly granularity for >180D in landscape mode', () => {
+    const { result } = renderHook(() => usePlaytimeTrendChart(mockPlaytime, 365, 'avg', true));
+    expect(result.current.timeGroupMode).toBe('M');
+  });
 });

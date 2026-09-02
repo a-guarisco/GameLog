@@ -5,7 +5,8 @@ import { selectPlaytimeTrend } from './selectPlaytimeTrend';
 export const usePlaytimeTrendChart = (
   playtimeByUser: any,
   trendRange: number,
-  trendMode: 'avg' | 'tot'
+  trendMode: 'avg' | 'tot',
+  isLandscape: boolean = false
 ) => {
   const trend = useMemo(
     () => selectPlaytimeTrend(playtimeByUser, trendRange),
@@ -18,8 +19,16 @@ export const usePlaytimeTrendChart = (
     baselineAverageFormatted,
   } = useMemo(() => {
     let m: 'D' | 'W' | 'M' = 'D';
-    if (trendRange > 30 && trendRange <= 180) m = 'W';
-    if (trendRange > 180) m = 'M';
+    if (isLandscape) {
+      // In landscape: retain daily granularity ('D') for ranges up to 90 days (60-90 days),
+      // producing a smooth, high-density line curve rather than coarse weekly steps.
+      if (trendRange > 90 && trendRange <= 180) m = 'W';
+      if (trendRange > 180) m = 'M';
+    } else {
+      // In portrait: ranges >30 days group by weekly averages ('W')
+      if (trendRange > 30 && trendRange <= 180) m = 'W';
+      if (trendRange > 180) m = 'M';
+    }
 
     const baselineAveragePerDay = trendRange > 0 ? trend.previousTotalMinutes / trendRange : 0;
     let baselineAveragePerUnit = baselineAveragePerDay;
@@ -31,7 +40,7 @@ export const usePlaytimeTrendChart = (
       baselineAveragePerUnit,
       baselineAverageFormatted: formatMinutesWithSeconds(baselineAveragePerUnit),
     };
-  }, [trend.previousTotalMinutes, trendRange]);
+  }, [trend.previousTotalMinutes, trendRange, isLandscape]);
 
   const lineData = useMemo(() => {
     const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
