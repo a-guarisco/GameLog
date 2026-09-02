@@ -109,7 +109,7 @@ const AnimatedPieChart = memo(({ pieData, theme, cardWidth, totalMinutes, isLand
   const radius = computePieRadius(cardWidth, isLandscape);
   const innerRadius = computePieInnerRadius(radius);
   const legendHeight = Math.floor(innerRadius * Math.SQRT2);
-  const legendWidth = legendHeight - 20;
+  const legendWidth = Math.max(legendHeight - 4, 0);
 
   // Custom entrance animation to bypass gifted-charts bugs
   const scale = useRef(new Animated.Value(0.3)).current;
