@@ -1,3 +1,4 @@
+import { StyleProp, ViewStyle } from 'react-native';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import { Card } from '@gamelog/common/gluestack/card';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -7,22 +8,64 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface HeaderGameImageProps {
   appid?: string;
+  compact?: boolean;
+  contained?: boolean;
+  className?: string;
+  style?: StyleProp<ViewStyle>;
+  height?: number;
+  scrollable?: boolean;
 }
 
-const HeaderGameImage = ({ appid }: HeaderGameImageProps) => {
+const HeaderGameImage = ({
+  appid,
+  compact = false,
+  contained = false,
+  className = '',
+  style,
+  height,
+  scrollable = false,
+}: HeaderGameImageProps) => {
   const gameHeaderImage = appid ? steamAssetUrls.getGameHeaderImage(appid) : undefined;
   const { isLandscape } = useOrientation();
   const insets = useSafeAreaInsets();
   const leftOffset = isLandscape ? insets.left + 74 : 0;
 
+  const minHeight = compact ? 100 : 140;
+  const heightPercentage = compact ? 12 : 18;
+
+  if (contained) {
+    return (
+      <Card
+        variant="elevated"
+        className={`w-full relative border-b border-outline-100 overflow-hidden rounded-none p-0 ${className}`}
+        style={[{ height }, style]}
+      >
+        <Box className="w-full h-full overflow-hidden">
+          <Banner
+            imageUrl={gameHeaderImage}
+            minHeight={minHeight}
+            heightPercentage={heightPercentage}
+            height={height}
+            scrollable={scrollable}
+          />
+        </Box>
+      </Card>
+    );
+  }
+
   return (
     <Card
       variant="elevated"
-      className="absolute top-0 right-0 z-0 border-b border-outline-100 overflow-hidden rounded-none p-0"
-      style={{ left: leftOffset }}
+      className={`absolute top-0 right-0 z-0 border-b border-outline-100 overflow-hidden rounded-none p-0 ${className}`}
+      style={[{ left: leftOffset }, style]}
     >
-      <Box className="overflow-hidden">
-        <Banner imageUrl={gameHeaderImage} minHeight={140} heightPercentage={18} />
+      <Box className="w-full overflow-hidden">
+        <Banner
+          imageUrl={gameHeaderImage}
+          minHeight={minHeight}
+          heightPercentage={heightPercentage}
+          height={height}
+        />
       </Box>
     </Card>
   );

@@ -283,4 +283,25 @@ describe('GameSectionTabs', () => {
       expect(screen.getByText('No guides yet')).toBeTruthy();
     });
   });
+
+  describe('screenshots tab and sticky header', () => {
+    it('renders 4 tabs when screenshotsSlot is provided', () => {
+      render(
+        <GameSectionTabs
+          appid="236390"
+          achievementsSlot={<Text>Achievements slot</Text>}
+          screenshotsSlot={<Text>Screenshots slot</Text>}
+          stickyHeader
+        />
+      );
+
+      expect(screen.getByTestId('game-tab-achievements')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-news')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-guides')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-screenshots')).toBeTruthy();
+
+      fireEvent.press(screen.getByTestId('game-tab-screenshots'));
+      expect(screen.getByText('Screenshots slot')).toBeTruthy();
+    });
+  });
 });
