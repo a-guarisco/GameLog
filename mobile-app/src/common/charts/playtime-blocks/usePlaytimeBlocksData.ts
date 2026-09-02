@@ -23,29 +23,28 @@ export const usePlaytimeBlocksData = (
     }
   }, [playtimeByUser, daysToFetch]);
 
-  const trend = useMemo(
-    () =>
-      selectPlaytimeTrend(
-        playtimeByUser,
-        trendRange === 'week'
-          ? 'week'
-          : playtimeByUser?.length
-            ? Math.max(14, playtimeByUser.length)
-            : 14,
-        weekOffset,
-        new Date(),
-        baseLimitDate
-      ),
-    [playtimeByUser, trendRange, weekOffset, baseLimitDate]
-  );
+  const trend = useMemo(() => {
+    const rangeLimit = trendRange === '30' ? 30 : 14;
+    return selectPlaytimeTrend(
+      playtimeByUser,
+      trendRange === 'week'
+        ? 'week'
+        : playtimeByUser?.length
+          ? Math.max(rangeLimit, playtimeByUser.length)
+          : rangeLimit,
+      weekOffset,
+      new Date(),
+      baseLimitDate
+    );
+  }, [playtimeByUser, trendRange, weekOffset, baseLimitDate]);
 
   const summaryDays = useMemo(() => {
-    return trendRange === '14'
-      ? trend.days.slice(
-          visibleStartIndex ?? Math.max(0, trend.days.length - 14),
-          (visibleStartIndex ?? Math.max(0, trend.days.length - 14)) + 14
-        )
-      : trend.days;
+    if (trendRange === '30' || trendRange === '14') {
+      const windowSize = trendRange === '30' ? 30 : 14;
+      const startIndex = visibleStartIndex ?? Math.max(0, trend.days.length - windowSize);
+      return trend.days.slice(startIndex, startIndex + windowSize);
+    }
+    return trend.days;
   }, [trend.days, trendRange, visibleStartIndex]);
 
   const maxVisiblePlaytime = useMemo(() => {
@@ -106,10 +105,12 @@ export const usePlaytimeBlocksData = (
       return {
         ...data,
         label:
-          trendRange === '14' ? new Date(trend.days[index].date).getDate().toString() : data.label,
+          trendRange === '14' || trendRange === '30'
+            ? new Date(trend.days[index].date).getDate().toString()
+            : data.label,
         labelTextStyle: {
           ...getChartAxisStyle(textColor, trend.days[index].isToday),
-          textAlign: 'center',
+          textAlign: 'center' as const,
         },
       };
     });

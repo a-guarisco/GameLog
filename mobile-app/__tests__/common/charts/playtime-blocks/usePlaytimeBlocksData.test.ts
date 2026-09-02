@@ -41,6 +41,15 @@ describe('usePlaytimeBlocksData', () => {
     expect(result.current.summaryDays.length).toBeGreaterThan(0);
   });
 
+  it('calculates data for 30D mode correctly', () => {
+    const { result } = renderHook(() =>
+      usePlaytimeBlocksData(mockPlaytime, '30', 0, 0, 'red', 'blue', theme)
+    );
+
+    expect(result.current.summaryDays.length).toBe(30);
+    expect(result.current.trend.days.length).toBeGreaterThanOrEqual(30);
+  });
+
   it('handles empty playtime', () => {
     const { result } = renderHook(() =>
       usePlaytimeBlocksData(null, 'week', 0, null, 'red', 'blue', theme)
