@@ -97,4 +97,69 @@ describe('PlaytimeBlocksChart', () => {
       expect(screen.getByText(/Played 2 days of 14/)).toBeTruthy();
     });
   });
+
+  it('renders portrait options (Week, 14D) by default and does not show 30D', () => {
+    render(<PlaytimeBlocksChart playtimeByUser={mockPlaytimeByUser} />);
+
+    expect(screen.getByText('Week')).toBeTruthy();
+    expect(screen.getByText('14D')).toBeTruthy();
+    expect(screen.queryByText('30D')).toBeNull();
+  });
+
+  it('expands range options to include 30D in landscape mode', () => {
+    const OrientationHook = require('@gamelog/common/useOrientation');
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 844,
+      height: 390,
+    });
+
+    render(<PlaytimeBlocksChart playtimeByUser={mockPlaytimeByUser} />);
+
+    expect(screen.getByText('Week')).toBeTruthy();
+    expect(screen.getByText('14D')).toBeTruthy();
+    expect(screen.getByText('30D')).toBeTruthy();
+  });
+
+  it('switches to 30D range and displays days of 30 in landscape mode', () => {
+    const OrientationHook = require('@gamelog/common/useOrientation');
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 844,
+      height: 390,
+    });
+
+    render(<PlaytimeBlocksChart playtimeByUser={mockPlaytimeByUser} />);
+
+    fireEvent.press(screen.getByText('30D'));
+
+    expect(screen.getByText(/Played 2 days of 30/)).toBeTruthy();
+  });
+
+  it('preserves manual selection across orientation change, falling back from 30D to 14D in portrait', () => {
+    const OrientationHook = require('@gamelog/common/useOrientation');
+    const spy = jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      width: 844,
+      height: 390,
+    });
+
+    const { rerender } = render(<PlaytimeBlocksChart playtimeByUser={mockPlaytimeByUser} />);
+
+    // User explicitly selects 30D in landscape
+    fireEvent.press(screen.getByText('30D'));
+    expect(screen.getByText(/Played 2 days of 30/)).toBeTruthy();
+
+    // Rotate back to portrait
+    spy.mockReturnValue({
+      isLandscape: false,
+      width: 390,
+      height: 844,
+    });
+
+    rerender(<PlaytimeBlocksChart playtimeByUser={mockPlaytimeByUser} />);
+
+    // In portrait, 30D is not available so it falls back to 14D
+    expect(screen.getByText(/Played 2 days of 14/)).toBeTruthy();
+  });
 });

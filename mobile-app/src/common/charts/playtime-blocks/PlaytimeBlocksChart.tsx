@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -10,7 +10,7 @@ import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { GLSegmentedControl } from '@gamelog/common/GLSegmentedControl';
 import { ChartAxisText } from '@gamelog/common/typography/ChartTypography';
-import { formatMinutesToHours, formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
+import { formatMinutesToHours, formatMinutesToHoursShort, toIsoDate } from '@gamelog/utils/formatUtils';
 import { usePlaytimeBlocksData } from './usePlaytimeBlocksData';
 import { useChartScrollShimmer } from './useChartScrollShimmer';
 import { PlaytimeBlocksHeader, ShimmerBox } from './PlaytimeBlocksHeader';
@@ -19,9 +19,15 @@ import type { PlaytimeByUser } from '@gamelog/api-manager/dto';
 
 const MemoizedBarChart = memo(BarChart);
 
-const RANGE_OPTIONS = [
+const PORTRAIT_RANGE_OPTIONS = [
   { id: 'week', label: 'Week' },
   { id: '14', label: '14D' },
+];
+
+const LANDSCAPE_RANGE_OPTIONS = [
+  { id: 'week', label: 'Week' },
+  { id: '14', label: '14D' },
+  { id: '30', label: '30D' },
 ];
 
 interface PlaytimeBlocksChartProps {
@@ -29,14 +35,48 @@ interface PlaytimeBlocksChartProps {
 }
 
 const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
-  const [trendRange, setTrendRange] = useState<string>('week');
+  const { isLandscape } = useOrientation();
+  const hasManualSelection = useRef(false);
+
+  const hasSufficientDataFor30 = useMemo(() => {
+    if (!playtimeByUser || playtimeByUser.length === 0) return false;
+    if (playtimeByUser.length >= 15) return true;
+    const fourteenDaysAgoIso = toIsoDate(new Date(Date.now() - 14 * 86400000));
+    return playtimeByUser.some((d) => d.date < fourteenDaysAgoIso);
+  }, [playtimeByUser]);
+
+  const defaultLandscapeRange = hasSufficientDataFor30 ? '30' : '14';
+
+  const [trendRange, setTrendRange] = useState<string>(() =>
+    isLandscape ? defaultLandscapeRange : 'week'
+  );
   const [weekOffset, setWeekOffset] = useState<number>(0);
   const [visibleStartIndex, setVisibleStartIndex] = useState<number | null>(null);
 
-  const { isScrolling, setIsScrolling, shimmerAnim } = useChartScrollShimmer();
-  const { isLandscape } = useOrientation();
+  useEffect(() => {
+    if (!hasManualSelection.current) {
+      if (isLandscape) {
+        setTrendRange(defaultLandscapeRange);
+      } else {
+        setTrendRange('week');
+      }
+      setWeekOffset(0);
+    } else if (!isLandscape && trendRange === '30') {
+      // 30 is not available in portrait mode; fallback to 14
+      setTrendRange('14');
+      setWeekOffset(0);
+    }
+  }, [isLandscape, defaultLandscapeRange]);
 
-  const barWidth = isLandscape ? 24 : 18;
+  const { isScrolling, setIsScrolling, shimmerAnim } = useChartScrollShimmer();
+
+  const barWidth = isLandscape
+    ? trendRange === '30'
+      ? 12
+      : trendRange === '14'
+        ? 22
+        : 26
+    : 18;
   const barChartHeight = isLandscape ? 200 : 140;
   const containerHeight = isLandscape ? 240 : 180;
 
@@ -78,11 +118,12 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
     <ChartWrapperCard
       label={`Playtime Blocks`}
       headerRight={
-        <Box className="w-[120px] ml-auto">
+        <Box className={isLandscape ? "w-[170px] ml-auto" : "w-[120px] ml-auto"}>
           <GLSegmentedControl
-            options={RANGE_OPTIONS}
+            options={isLandscape ? LANDSCAPE_RANGE_OPTIONS : PORTRAIT_RANGE_OPTIONS}
             activeId={trendRange}
             onSelect={(id) => {
+              hasManualSelection.current = true;
               setTrendRange(id);
               setWeekOffset(0);
             }}
@@ -100,15 +141,15 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
       )}
     >
       {({ cardWidth }) => {
-        const availableWidth = (cardWidth || 350) - 10;
+        const availableWidth = (cardWidth || (isLandscape ? 700 : 350)) - 10;
         const maxDrawingWidth = availableWidth - 44;
 
-        let spacing = Math.max(4, Math.floor((maxDrawingWidth - barWidth * 7) / 7));
-        if (trendRange === '14') {
-          spacing = Math.max(4, Math.floor((maxDrawingWidth - barWidth * 14) / 14));
-        }
+        const visibleBarsCount = trendRange === '30' ? 30 : trendRange === '14' ? 14 : 7;
+        let spacing = Math.max(
+          isLandscape && trendRange === '30' ? 3 : 4,
+          Math.floor((maxDrawingWidth - barWidth * visibleBarsCount) / visibleBarsCount)
+        );
 
-        const visibleBarsCount = trendRange === '14' ? 14 : 7;
         const exactDrawingWidth = barWidth * visibleBarsCount + spacing * visibleBarsCount;
         const exactTotalWidth = exactDrawingWidth + 44;
 
@@ -123,7 +164,7 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
             const itemWidth = barWidth + spacing;
             const nearestIndex = Math.round(offsetX / itemWidth);
             const targetIndex = Math.min(
-              Math.max(0, trend.days.length - 14),
+              Math.max(0, trend.days.length - visibleBarsCount),
               Math.max(0, nearestIndex)
             );
             const targetOffsetX = targetIndex * itemWidth;
@@ -152,15 +193,19 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
             : 0;
 
         const displayTotalLabel =
-          trendRange === '14'
+          trendRange === '14' || trendRange === '30'
             ? formatMinutesToHours(totalVisibleMinutes) || '0m'
             : trend.totalLabel;
 
         const displayActiveDaysLabel =
-          trendRange === '14' ? `${visibleActiveDays} days of 14` : trend.activeDaysLabel;
+          trendRange === '30'
+            ? `${visibleActiveDays} days of 30`
+            : trendRange === '14'
+              ? `${visibleActiveDays} days of 14`
+              : trend.activeDaysLabel;
 
         const displayPeakLabel =
-          trendRange === '14'
+          trendRange === '14' || trendRange === '30'
             ? (() => {
                 const peakDay = summaryDays.find((d) => d.minutes === maxVisiblePlaytime);
                 return peakDay && maxVisiblePlaytime > 0
@@ -271,9 +316,9 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
                   yAxisLabelWidth={44}
                   showFractionalValues={false}
                   xAxisColor={axisColor}
-                  disableScroll={trendRange === 'week'}
+                  disableScroll={trendRange === 'week' || (isLandscape && trend.days.length <= visibleBarsCount)}
                   dashWidth={0}
-                  scrollToEnd={trendRange === '14'}
+                  scrollToEnd={trendRange === '14' || trendRange === '30'}
                   scrollAnimation={false}
                   onScroll={handleScroll}
                   scrollRef={chartScrollRef}
