@@ -1,8 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import CommunityGenreRadarChart from '@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart';
 import { useCommunityGenreRadarChart } from '@gamelog/common/charts/community-genre-radar/useCommunityGenreRadarChart';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 jest.mock('react-native-gifted-charts', () => ({ RadarChart: 'RadarChart' }));
+
+jest.mock('@gamelog/common/useOrientation', () => ({
+  useOrientation: jest.fn(() => ({
+    isLandscape: false,
+    width: 400,
+    height: 800,
+  })),
+}));
 
 jest.mock('@gamelog/common/charts/community-genre-radar/useCommunityGenreRadarChart', () => ({
   useCommunityGenreRadarChart: jest.fn(),
@@ -143,4 +152,51 @@ describe('CommunityGenreRadarChart', () => {
     expect(screen.queryByText('50%')).toBeNull();
     expect(screen.queryByTestId('user-progress-1')).toBeNull();
   });
+
+  it('calls onExpandedChange when expand toggle is pressed', () => {
+    (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
+      dataSet: [[50, 20]],
+      labels: ['Action'],
+      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      maxValue: 50,
+      isLoading: false,
+      errorCommunity: false,
+      errorMessageCommunity: null,
+    });
+
+    const onExpandedChange = jest.fn();
+    render(<CommunityGenreRadarChart ownedGames={null} onExpandedChange={onExpandedChange} />);
+
+    const toggleButton = screen.getByTestId('community-genre-expand-toggle');
+
+    fireEvent.press(toggleButton);
+    expect(onExpandedChange).toHaveBeenCalledWith(true);
+
+    fireEvent.press(toggleButton);
+    expect(onExpandedChange).toHaveBeenCalledWith(false);
+  });
+
+  it('scales chartSize proportionally to 55% of height in landscape mode', () => {
+    (useOrientation as jest.Mock).mockReturnValue({
+      isLandscape: true,
+      width: 800,
+      height: 400,
+    });
+    (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
+      dataSet: [[50, 20]],
+      labels: ['Action'],
+      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      maxValue: 50,
+      isLoading: false,
+      errorCommunity: false,
+      errorMessageCommunity: null,
+    });
+
+    const { UNSAFE_getByType } = render(<CommunityGenreRadarChart ownedGames={null} />);
+    const radarChart = UNSAFE_getByType('RadarChart' as any);
+
+    // Height 400 * 0.55 = 220, cardWidth 350 - 8 = 342 => min(220, 342) = 220
+    expect(radarChart.props.chartSize).toBe(220);
+  });
 });
+
