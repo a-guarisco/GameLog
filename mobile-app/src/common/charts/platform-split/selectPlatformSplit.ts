@@ -17,7 +17,7 @@ export interface PlatformSplit {
   hasPlaytime: boolean;
 }
 
-const PLATFORMS: { id: string; name: string; icon: string; field: keyof GameItem }[] = [
+export const PLATFORMS: { id: string; name: string; icon: string; field: keyof GameItem }[] = [
   { id: 'windows', name: 'Windows', icon: 'logo-windows', field: 'playtime_windows_forever' },
   { id: 'deck', name: 'Steam Deck', icon: 'logo-steam', field: 'playtime_deck_forever' },
   { id: 'linux', name: 'Linux', icon: 'logo-tux', field: 'playtime_linux_forever' },

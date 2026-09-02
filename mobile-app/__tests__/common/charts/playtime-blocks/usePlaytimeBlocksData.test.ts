@@ -3,7 +3,7 @@ import { usePlaytimeBlocksData } from '@gamelog/common/charts/playtime-blocks/us
 import { toIsoDate } from '@gamelog/utils/formatUtils';
 
 describe('usePlaytimeBlocksData', () => {
-  const MOCK_TODAY = new Date('2023-10-18T12:00:00Z');
+  const MOCK_TODAY = new Date('2023-10-15T12:00:00Z');
 
   const getOffsetDateString = (offsetDays: number) => {
     const d = new Date(MOCK_TODAY);
@@ -12,10 +12,7 @@ describe('usePlaytimeBlocksData', () => {
   };
 
   const theme = { '--color-primary-200': '1,1,1', '--color-background-100': '0,0,0' };
-  const mockPlaytime = [
-    { date: getOffsetDateString(0), playtime_minutes: 120 },
-    { date: getOffsetDateString(-1), playtime_minutes: 60 },
-  ];
+  const mockPlaytime = [{ date: "2023-10-15", playtime_minutes: 120 }, { date: "2023-10-14", playtime_minutes: 60 }];
 
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(MOCK_TODAY);

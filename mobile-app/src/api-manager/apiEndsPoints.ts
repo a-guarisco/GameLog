@@ -110,6 +110,10 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/games/report?start_date=${startDate}&end_date=${endDate}`;
   },
 
+  getGenresBatch: () => {
+    return `${getBackendBaseUrl()}/games/genres_batch`;
+  },
+
   getPlaytimeByUser: (days: number) => {
     return `${getBackendBaseUrl()}/games/playtime_by_user?days=${days}`;
   },

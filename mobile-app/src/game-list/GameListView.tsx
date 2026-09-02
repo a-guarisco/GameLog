@@ -2,8 +2,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { FlatList } from 'react-native';
-import { OwnedGames } from '@gamelog/api-manager/dto';
-import { GameOverviewStatsCard } from './GameOverviewStatsCard';
+import { GameListCard } from './GameListCard';
 import { useGameList } from './useGameList';
 import { ErrorBox, LoadingBox, InfoBox, WarningBox } from '@gamelog/common/feedbacks';
 import { GameListControls } from './GameListControls';
@@ -29,11 +28,31 @@ const GameListView = () => {
     sortBy,
     handleSortChange,
     searchQuery,
+    setSearchQuery,
+    genreFilter,
+    setGenreFilter,
+    platformFilter,
+    setPlatformFilter,
+    dateRangeFilter,
+    setDateRangeFilter,
+    allAvailableGenres,
   } = useGameList(playerID);
 
   return (
     <Box className="flex-1" style={{ paddingLeft: leftPadding }}>
-      <GameListControls sortBy={sortBy} onSortChange={handleSortChange} />
+      <GameListControls
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={handleSortChange}
+        genreFilter={genreFilter}
+        setGenreFilter={setGenreFilter}
+        platformFilter={platformFilter}
+        setPlatformFilter={setPlatformFilter}
+        dateRangeFilter={dateRangeFilter}
+        setDateRangeFilter={setDateRangeFilter}
+        allAvailableGenres={allAvailableGenres}
+      />
       {isLoading ? (
         <LoadingBox className="flex-1" message="Loading games..." />
       ) : error ? (
@@ -45,10 +64,12 @@ const GameListView = () => {
       ) : (
         <FlatList
           data={processedGames}
-          renderItem={({ item }: { item: OwnedGames['response']['games'][0] }) => (
+          renderItem={({ item }) => (
             <Box className={isLandscape ? 'w-1/3 p-1' : 'w-1/2 p-1'}>
-              <GameOverviewStatsCard
+              <GameListCard
                 gameItem={item}
+                sortBy={sortBy}
+                platformFilter={platformFilter}
                 onPress={() => navigation.navigate('Game', { gameItem: item })}
               />
             </Box>

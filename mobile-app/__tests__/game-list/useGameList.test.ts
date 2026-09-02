@@ -1,12 +1,16 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useGameList } from '@gamelog/game-list/useGameList';
-import { useGetOwnedGames } from '@gamelog/api-manager/useApi';
+import { useGetOwnedGames, useGetFullPlaytimeReport, useGetGenresBatch } from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetOwnedGames: jest.fn(),
+  useGetFullPlaytimeReport: jest.fn(),
+  useGetGenresBatch: jest.fn(),
 }));
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
+const mockUseGetFullPlaytimeReport = useGetFullPlaytimeReport as jest.Mock;
+const mockUseGetGenresBatch = useGetGenresBatch as jest.Mock;
 
 const mockGames = {
   response: {
@@ -16,6 +20,12 @@ const mockGames = {
     ],
   },
 };
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseGetFullPlaytimeReport.mockReturnValue({ playtimeReport: null, isLoadingPlaytimeReport: false });
+  mockUseGetGenresBatch.mockReturnValue({ libraryGenres: new Map(), isLoadingLibraryGenres: false });
+});
 
 describe('useGameList hook', () => {
   it('should filter games based on search query', () => {
@@ -44,20 +54,37 @@ describe('useGameList hook', () => {
     expect(result.current.isEmpty).toBe(true);
   });
 
-  it('should sort games by name', () => {
+  it('should sort games by max_per_day', () => {
     mockUseGetOwnedGames.mockReturnValue({
-      ownedGames: mockGames,
+      ownedGames: {
+        response: {
+          games: [
+            { appid: 1, name: 'Game A', playtime_forever: 100 },
+            { appid: 2, name: 'Game B', playtime_forever: 500 },
+          ],
+        },
+      },
       isLoadingOwnedGames: false,
+    });
+
+    mockUseGetFullPlaytimeReport.mockReturnValue({
+      playtimeReport: {
+        game_reports: [
+          { app_id: '1', max_playtime_per_day: 50 },
+          { app_id: '2', max_playtime_per_day: 150 },
+        ],
+      },
     });
 
     const { result } = renderHook(() => useGameList('123'));
 
     act(() => {
-      result.current.handleSortChange('name');
+      result.current.handleSortChange('max_per_day');
     });
 
-    expect(result.current.processedGames[0].name).toBe('Half-Life');
-    expect(result.current.processedGames[1].name).toBe('Portal');
+    // Descending order expected
+    expect(result.current.processedGames[0].name).toBe('Game B');
+    expect(result.current.processedGames[1].name).toBe('Game A');
   });
 
   it('should sort games by playtime', () => {

@@ -127,6 +127,11 @@ export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
   };
 };
 
+export const useGetFullPlaytimeReport = () => {
+  // 10000 days is ~27 years, which covers Steam's existence (since 2003)
+  return useGetPlaytimeReport(10000);
+};
+
 /**
  * Per-day playtime across the library. The daily report answers "which games", this answers
  * "which days" � the profile trend needs the second, and only the backend has it.
@@ -158,6 +163,22 @@ export const useGetGameGenreChartData = (
     genreChartData: data ?? [],
     isLoadingGenreChart: isLoading,
     errorGenreChart: error,
+  };
+};
+
+export const useGetGenresBatch = (appIds: string[]) => {
+  const fetchFunc = useCallback(() => {
+    if (!appIds || appIds.length === 0) return Promise.resolve({});
+    return ApiManager.getGenresBatch(appIds);
+  }, [appIds]);
+
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
+  return {
+    libraryGenres: data,
+    isLoadingLibraryGenres: isLoading,
+    errorLibraryGenres: error,
+    errorMessageLibraryGenres: errorMessage,
+    refetchLibraryGenres: refetch,
   };
 };
 
