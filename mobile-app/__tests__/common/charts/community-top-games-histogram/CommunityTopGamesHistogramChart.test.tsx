@@ -27,9 +27,15 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   };
 });
 
+const mockUseOrientation = jest.fn(() => ({ isLandscape: false }));
+jest.mock('@gamelog/common/useOrientation', () => ({
+  useOrientation: () => mockUseOrientation(),
+}));
+
 describe('CommunityTopGamesHistogramChart', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseOrientation.mockReturnValue({ isLandscape: false });
   });
 
   it('renders top games chart items and legend with data', async () => {
@@ -55,6 +61,47 @@ describe('CommunityTopGamesHistogramChart', () => {
       expect(screen.getByText('8h 45m')).toBeTruthy();
       expect(screen.getAllByText('You').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Others').length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  it('slices top 5 games in portrait mode even if backend returns more', async () => {
+    const mockGames = Array.from({ length: 8 }, (_, i) => ({
+      id: `app_${i}`,
+      user_playtime: 10 - i,
+      community_playtime: 5,
+    }));
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue(mockGames);
+    (ApiManager.getGameBasicInfo as jest.Mock).mockImplementation((appId) =>
+      Promise.resolve({ [appId]: { data: { name: `Game ${appId}` } } })
+    );
+
+    render(<CommunityTopGamesHistogramChart scope="global" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('top-game-item-app_0')).toBeTruthy();
+      expect(screen.getByTestId('top-game-item-app_4')).toBeTruthy();
+      expect(screen.queryByTestId('top-game-item-app_5')).toBeNull();
+    });
+  });
+
+  it('slices up to 10 games in landscape mode', async () => {
+    mockUseOrientation.mockReturnValue({ isLandscape: true });
+    const mockGames = Array.from({ length: 12 }, (_, i) => ({
+      id: `app_${i}`,
+      user_playtime: 15 - i,
+      community_playtime: 6,
+    }));
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue(mockGames);
+    (ApiManager.getGameBasicInfo as jest.Mock).mockImplementation((appId) =>
+      Promise.resolve({ [appId]: { data: { name: `Game ${appId}` } } })
+    );
+
+    render(<CommunityTopGamesHistogramChart scope="global" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('top-game-item-app_0')).toBeTruthy();
+      expect(screen.getByTestId('top-game-item-app_9')).toBeTruthy();
+      expect(screen.queryByTestId('top-game-item-app_10')).toBeNull();
     });
   });
 

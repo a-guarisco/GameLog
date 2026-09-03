@@ -28,8 +28,14 @@ export const useCommunityPlaytimeHistogramData = ({
   purpleColor,
   theme,
   barWidth = 12,
-  currentDate = new Date(),
+  currentDate,
 }: UseCommunityPlaytimeHistogramDataProps) => {
+  const dateTimestamp = currentDate ? currentDate.getTime() : null;
+  const effectiveDate = useMemo(
+    () => (dateTimestamp ? new Date(dateTimestamp) : new Date()),
+    [dateTimestamp]
+  );
+
   const userValues = useMemo(() => data?.user ?? [], [data?.user]);
   const communityValues = useMemo(() => data?.community ?? [], [data?.community]);
 
@@ -53,7 +59,9 @@ export const useCommunityPlaytimeHistogramData = ({
 
   const maxVisibleHours = useMemo(() => {
     const all = [...userValues, ...communityValues].map((v) => Number(v) || 0);
-    return all.length > 0 ? Math.max(0, ...all) : 0;
+    if (all.length === 0) return 0;
+    const maxVal = Math.max(...all);
+    return Math.ceil(maxVal);
   }, [userValues, communityValues]);
 
   const minVisibleHours = useMemo(() => {
@@ -73,11 +81,19 @@ export const useCommunityPlaytimeHistogramData = ({
   const currentDayIndex = useMemo(() => {
     if (offset !== 0) return -1;
     if (periodRange === 'week') {
-      const day = currentDate.getDay();
+      const day = effectiveDate.getDay();
       return day === 0 ? 6 : day - 1; // 0 = Mon, 6 = Sun
     }
-    return currentDate.getMonth() % 6;
-  }, [offset, periodRange, currentDate]);
+    if (periodRange === 'twoWeeks') {
+      const day = effectiveDate.getDay();
+      const dayInWeek = day === 0 ? 6 : day - 1;
+      return 7 + dayInWeek;
+    }
+    if (periodRange === 'year') {
+      return effectiveDate.getMonth();
+    }
+    return effectiveDate.getMonth() % 6;
+  }, [offset, periodRange, effectiveDate]);
 
   const barData = useMemo(() => {
     const items: any[] = [];
