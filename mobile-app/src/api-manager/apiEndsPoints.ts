@@ -6,27 +6,6 @@ import { CommunityScope, TopGameReference } from '@gamelog/api-manager/dto';
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
-const getDefaultBackendUrl = (): string =>
-  Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
-
-const getBackendBaseUrl = (): string => {
-  const configured = process.env.EXPO_PUBLIC_BACKEND_BASE_URL?.trim();
-
-  if (!configured) {
-    return getDefaultBackendUrl();
-  }
-
-  if (Platform.OS === 'android' && configured.includes('localhost')) {
-    return 'http://10.0.2.2:8000';
-  }
-
-  if (Platform.OS === 'ios' && configured.includes('10.0.2.2')) {
-    return 'http://localhost:8000';
-  }
-
-  return configured;
-};
-
 const getRelationship = (includePending: boolean): string => (includePending ? 'all' : 'friend');
 
 /**
@@ -118,83 +97,83 @@ const EndPoints = {
   },
 
   getStreakByUser: () => {
-    return `${getBackendBaseUrl()}/games/streak_by_user`;
+    return `/games/streak_by_user`;
   },
 
   getStreakByGame: (appId: string) => {
-    return `${getBackendBaseUrl()}/games/streak_by_game?steam_app_id=${appId}`;
+    return `/games/streak_by_game?steam_app_id=${appId}`;
   },
 
   getPlaytimeReport: (startDate: string, endDate: string) => {
-    return `${getBackendBaseUrl()}/games/report?start_date=${startDate}&end_date=${endDate}`;
+    return `/games/report?start_date=${startDate}&end_date=${endDate}`;
   },
 
   getGenresBatch: () => {
-    return `${getBackendBaseUrl()}/games/genres_batch`;
+    return `/games/genres_batch`;
   },
 
   getPlaytimeByUser: (days: number) => {
-    return `${getBackendBaseUrl()}/games/playtime_by_user?days=${days}`;
+    return `/games/playtime_by_user?days=${days}`;
   },
 
   getGameStatus: (steamAppId?: string) => {
     if (steamAppId) {
-      return `${getBackendBaseUrl()}/games/game_status?steam_app_id=${steamAppId}`;
+      return `/games/game_status?steam_app_id=${steamAppId}`;
     }
-    return `${getBackendBaseUrl()}/games/game_status`;
+    return `/games/game_status`;
   },
 
   updateGameStatus: () => {
-    return `${getBackendBaseUrl()}/games/update_game_status`;
+    return `/games/update_game_status`;
   },
 
 
   getAuthOutcome: () => {
-    return `${getBackendBaseUrl()}/me`;
+    return `/me`;
   },
 
   getBackendHealth: () => {
-    return `${getBackendBaseUrl()}/health`;
+    return `/health`;
   },
 
   registerUser: () => {
-    return `${getBackendBaseUrl()}/users/register`;
+    return `/users/register`;
   },
 
   getUserMe: () => {
-    return `${getBackendBaseUrl()}/users/me`;
+    return `/users/me`;
   },
 
   searchUsers: (query: string) => {
-    return `${getBackendBaseUrl()}/users/search?q=${encodeURIComponent(query)}`;
+    return `/users/search?q=${encodeURIComponent(query)}`;
   },
 
   getFriendList: () => {
-    return `${getBackendBaseUrl()}/users/friend_list`;
+    return `/users/friend_list`;
   },
 
   addFriend: () => {
-    return `${getBackendBaseUrl()}/users/add_friend`;
+    return `/users/add_friend`;
   },
 
   manageFriendship: () => {
-    return `${getBackendBaseUrl()}/users/manage_friendship`;
+    return `/users/manage_friendship`;
   },
 
   getRecommendations: (friendId: string, includeTopGames: boolean = true) => {
-    return `${getBackendBaseUrl()}/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
+    return `/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
   },
 
   registerDeviceToken: () => {
-    return `${getBackendBaseUrl()}/notifications/register_device`;
+    return `/notifications/register_device`;
   },
 
   unregisterDeviceToken: () => {
-    return `${getBackendBaseUrl()}/notifications/unregister_device`;
+    return `/notifications/unregister_device`;
   },
 
   getDailyReport: (startDate?: string, endDate?: string) => {
-    let url = `${getBackendBaseUrl()}/games/report`;
+    let url = `/games/report`;
     const params = new URLSearchParams();
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
@@ -203,7 +182,7 @@ const EndPoints = {
   },
 
   getCommunityGenre: (scope: CommunityScope, userId?: string) => {
-    let url = `${getBackendBaseUrl()}/community/genre?scope=${scope}`;
+    let url = `/community/genre?scope=${scope}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -214,7 +193,7 @@ const EndPoints = {
     endDate: string,
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+    let url = `/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -225,7 +204,7 @@ const EndPoints = {
     endDate: string,
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+    let url = `/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -237,7 +216,7 @@ const EndPoints = {
     reference: TopGameReference = 'community',
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    let url = `/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -249,13 +228,13 @@ const EndPoints = {
     reference: TopGameReference = 'community',
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    let url = `/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
 
   getCommunityGameStatuses: (scope: CommunityScope, userId?: string) => {
-    let url = `${getBackendBaseUrl()}/community/game_statuses?scope=${scope}`;
+    let url = `/community/game_statuses?scope=${scope}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },

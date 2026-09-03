@@ -100,12 +100,12 @@ describe('apiEndsPoints', () => {
     });
 
     it('builds social backend endpoints correctly', () => {
-      expect(EndPoints.searchUsers('alex')).toBe('https://api.mydomain.dev/users/search?q=alex');
-      expect(EndPoints.getFriendList()).toBe('https://api.mydomain.dev/users/friend_list');
-      expect(EndPoints.addFriend()).toBe('https://api.mydomain.dev/users/add_friend');
-      expect(EndPoints.manageFriendship()).toBe('https://api.mydomain.dev/users/manage_friendship');
+      expect(EndPoints.searchUsers('alex')).toBe('/users/search?q=alex');
+      expect(EndPoints.getFriendList()).toBe('/users/friend_list');
+      expect(EndPoints.addFriend()).toBe('/users/add_friend');
+      expect(EndPoints.manageFriendship()).toBe('/users/manage_friendship');
       expect(EndPoints.getRecommendations('user-123')).toBe(
-        'https://api.mydomain.dev/games/recommendations?friend=user-123&include_top_games=true'
+        '/games/recommendations?friend=user-123&include_top_games=true'
       );
     });
 
@@ -113,87 +113,70 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.getGameBasicInfo('440')).toBe(
         'https://store.steampowered.com/api/appdetails?appids=440&filters=basic'
       );
-      expect(EndPoints.getStreakByUser()).toBe('https://api.mydomain.dev/games/streak_by_user');
+      expect(EndPoints.getStreakByUser()).toBe('/games/streak_by_user');
       expect(EndPoints.getStreakByGame('440')).toBe(
-        'https://api.mydomain.dev/games/streak_by_game?steam_app_id=440'
+        '/games/streak_by_game?steam_app_id=440'
       );
-      expect(EndPoints.getGenresBatch()).toBe('https://api.mydomain.dev/games/genres_batch');
-      expect(EndPoints.getAuthOutcome()).toBe('https://api.mydomain.dev/me');
-      expect(EndPoints.getBackendHealth()).toBe('https://api.mydomain.dev/health');
-      expect(EndPoints.registerUser()).toBe('https://api.mydomain.dev/users/register');
-      expect(EndPoints.getUserMe()).toBe('https://api.mydomain.dev/users/me');
+      expect(EndPoints.getGenresBatch()).toBe('/games/genres_batch');
+      expect(EndPoints.getAuthOutcome()).toBe('/me');
+      expect(EndPoints.getBackendHealth()).toBe('/health');
+      expect(EndPoints.registerUser()).toBe('/users/register');
+      expect(EndPoints.getUserMe()).toBe('/users/me');
       expect(EndPoints.registerDeviceToken()).toBe(
-        'https://api.mydomain.dev/notifications/register_device'
+        '/notifications/register_device'
       );
       expect(EndPoints.unregisterDeviceToken()).toBe(
-        'https://api.mydomain.dev/notifications/unregister_device'
+        '/notifications/unregister_device'
       );
     });
 
     it('builds daily report endpoint with optional parameters', () => {
-      expect(EndPoints.getDailyReport()).toBe('https://api.mydomain.dev/games/report');
+      expect(EndPoints.getDailyReport()).toBe('/games/report');
       expect(EndPoints.getDailyReport('2026-08-01')).toBe(
-        'https://api.mydomain.dev/games/report?start_date=2026-08-01'
+        '/games/report?start_date=2026-08-01'
       );
       expect(EndPoints.getDailyReport(undefined, '2026-08-10')).toBe(
-        'https://api.mydomain.dev/games/report?end_date=2026-08-10'
+        '/games/report?end_date=2026-08-10'
       );
       expect(EndPoints.getDailyReport('2026-08-01', '2026-08-10')).toBe(
-        'https://api.mydomain.dev/games/report?start_date=2026-08-01&end_date=2026-08-10'
+        '/games/report?start_date=2026-08-01&end_date=2026-08-10'
       );
     });
 
     it('builds community endpoints correctly', () => {
       expect(EndPoints.getCommunityGenre('global')).toBe(
-        'https://api.mydomain.dev/community/genre?scope=global'
+        '/community/genre?scope=global'
       );
       expect(EndPoints.getCommunityWeeklyPlaytime('friends', '2026-08-01', '2026-08-07')).toBe(
-        'https://api.mydomain.dev/community/weekly_playtime?scope=friends&start_date=2026-08-01&end_date=2026-08-07'
+        '/community/weekly_playtime?scope=friends&start_date=2026-08-01&end_date=2026-08-07'
       );
       expect(EndPoints.getCommunityMonthlyPlaytime('region', '2026-08-01', '2026-08-31')).toBe(
-        'https://api.mydomain.dev/community/monthly_playtime?scope=region&start_date=2026-08-01&end_date=2026-08-31'
+        '/community/monthly_playtime?scope=region&start_date=2026-08-01&end_date=2026-08-31'
       );
       expect(
         EndPoints.getCommunityWeeklyTopGames('global', '2026-08-01', '2026-08-07', 'friends')
       ).toBe(
-        'https://api.mydomain.dev/community/weekly_top_game_playtime?scope=global&start_date=2026-08-01&end_date=2026-08-07&reference=friends'
+        '/community/weekly_top_game_playtime?scope=global&start_date=2026-08-01&end_date=2026-08-07&reference=friends'
       );
       expect(EndPoints.getCommunityWeeklyTopGames('global', '2026-08-01', '2026-08-07')).toBe(
-        'https://api.mydomain.dev/community/weekly_top_game_playtime?scope=global&start_date=2026-08-01&end_date=2026-08-07&reference=community'
+        '/community/weekly_top_game_playtime?scope=global&start_date=2026-08-01&end_date=2026-08-07&reference=community'
       );
       expect(
         EndPoints.getCommunityMonthlyTopGames('region', '2026-08-01', '2026-08-31', 'community')
       ).toBe(
-        'https://api.mydomain.dev/community/monthly_top_game_playtime?scope=region&start_date=2026-08-01&end_date=2026-08-31&reference=community'
+        '/community/monthly_top_game_playtime?scope=region&start_date=2026-08-01&end_date=2026-08-31&reference=community'
       );
-    });
-
-    it('falls back to platform-appropriate localhost URL when EXPO_PUBLIC_BACKEND_BASE_URL is not set', () => {
-      delete process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
-      expect(EndPoints.getBackendHealth()).toBe('http://localhost:8000/health');
     });
 
     it('builds the game_status endpoint with and without steam_app_id', () => {
       expect(EndPoints.getGameStatus('730')).toBe(
-        'https://api.mydomain.dev/games/game_status?steam_app_id=730'
+        '/games/game_status?steam_app_id=730'
       );
-      expect(EndPoints.getGameStatus()).toBe('https://api.mydomain.dev/games/game_status');
+      expect(EndPoints.getGameStatus()).toBe('/games/game_status');
     });
 
     it('builds the update_game_status endpoint', () => {
-      expect(EndPoints.updateGameStatus()).toBe('https://api.mydomain.dev/games/update_game_status');
-    });
-
-    it('overrides an Android-only backend host for ios builds', () => {
-      process.env.EXPO_PUBLIC_BACKEND_BASE_URL = 'http://10.0.2.2:8000';
-      const originalPlatform = require('react-native').Platform.OS;
-      require('react-native').Platform.OS = 'ios';
-
-      try {
-        expect(EndPoints.getBackendHealth()).toBe('http://localhost:8000/health');
-      } finally {
-        require('react-native').Platform.OS = originalPlatform;
-      }
+      expect(EndPoints.updateGameStatus()).toBe('/games/update_game_status');
     });
   });
 });
