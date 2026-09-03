@@ -35,7 +35,7 @@ export const useGameList = (playerID: string) => {
     return ownedGames.response.games.map((g) => String(g.appid));
   }, [ownedGames]);
 
-  const { libraryGenres, isLoadingLibraryGenres } = useGetGenresBatch(appIds);
+  const { libraryGenres, isLoadingLibraryGenres, errorLibraryGenres } = useGetGenresBatch(appIds);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('playtime');
@@ -163,7 +163,8 @@ export const useGameList = (playerID: string) => {
       isLoadingPlaytimeReport ||
       isLoadingLibraryGenres ||
       isLoadingUserGameStatuses ||
-      isProcessing,
+      isProcessing ||
+      (appIds.length > 0 && !libraryGenres && !errorLibraryGenres),
 
     error: errorOwnedGames,
     errorMessage: errorMessageOwnedGames,
