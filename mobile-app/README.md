@@ -91,7 +91,6 @@ cp .env.example .env
 Set these variables in `.env`:
 
 - `EXPO_PUBLIC_BACKEND_BASE_URL`: backend base URL used by backend provider (example: `http://192.168.1.11:8000` for Waydroid/device, `http://localhost:8000` for web).
-- `EXPO_PUBLIC_API_PROVIDER` (optional): default provider if you run `npm run start` directly (`steam` or `backend`).
 - `EXPO_PUBLIC_FIREBASE_API_KEY`: Firebase client API key.
 - `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN`: Firebase auth domain.
 - `EXPO_PUBLIC_FIREBASE_PROJECT_ID`: Firebase project id.
@@ -142,7 +141,6 @@ EXPO_PUBLIC_BACKEND_BASE_URL=http://192.168.1.11:8000 npm run android:backend
 
 Note: if Expo is already running, stop and restart it after changing `EXPO_PUBLIC_BACKEND_BASE_URL`.
 
-The provider is selected with `EXPO_PUBLIC_API_PROVIDER` and defaults to `steam`.
 
 ## Dev View auth tools
 
