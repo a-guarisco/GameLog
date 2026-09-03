@@ -11,6 +11,7 @@ import { GameListItemData, SortBy, PlatformFilter } from './useGameList';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GameListCardBadges } from './GameListCardBadges';
 import { GameListCardExpandedDetails } from './GameListCardExpandedDetails';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 interface GameListCardProps {
   gameItem: GameListItemData;
@@ -20,6 +21,7 @@ interface GameListCardProps {
 }
 
 export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: GameListCardProps) => {
+  const { isTablet } = useOrientation();
   const [isExpanded, setIsExpanded] = useState(false);
   const headerUrl = steamAssetUrls.getGameHeaderImage(gameItem.appid);
   const logoUrl = steamAssetUrls.getGameClearLogoImage(gameItem.appid);
@@ -64,7 +66,9 @@ export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: Game
       className="m-1 overflow-hidden p-0"
     >
       <Pressable onPress={onPress} accessibilityRole="button">
-        <Box className="bg-background-100 items-center justify-center overflow-hidden h-24 w-full">
+        <Box
+          className={`bg-background-100 items-center justify-center overflow-hidden w-full ${isTablet ? 'h-36' : 'h-24'}`}
+        >
           {imageState === 'header' ? (
             <Image
               source={headerUrl}
