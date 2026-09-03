@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { DeviceEventEmitter } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -44,12 +45,28 @@ export const SocialView: React.FC = () => {
     onSearchResultsChanged: refetchSearch,
   });
 
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener('friendListChanged', () => {
+      refetchFriendList();
+      refetchSearch();
+    });
+    return () => sub.remove();
+  }, [refetchFriendList, refetchSearch]);
+
   const pendingRequests = selectPendingRequests(friendList);
   const acceptedFriends = selectAcceptedFriends(friendList);
 
   const handleOpenRecommendations = (friendItem?: UserSearchResult) => {
     navigation.navigate('FriendRecommendations', {
       friendItem,
+    });
+  };
+
+  const handleSelectUser = (item: UserSearchResult) => {
+    navigation.navigate('OtherUserProfile', {
+      item,
+      user: item.user,
+      friendship: item.friendship,
     });
   };
 
@@ -91,6 +108,7 @@ export const SocialView: React.FC = () => {
                 onRemovePending: handleRemovePending,
                 onUnblockFriend: handleUnblockFriend,
                 onSelectRecommendations: handleOpenRecommendations,
+                onSelectUser: handleSelectUser,
               }}
             />
           </VStack>

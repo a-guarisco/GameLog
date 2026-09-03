@@ -7,6 +7,7 @@ import GameView from '@gamelog/game/GameView';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import SocialView from '@gamelog/social/social-view/SocialView';
 import FriendRecommendationsView from '@gamelog/social/social-view/FriendRecommendationsView';
+import OtherUserProfileView from '@gamelog/social/other-user-profile/OtherUserProfileView';
 import {
   DevView,
   DevEnvView,
@@ -51,6 +52,10 @@ export const SocialStack = createNativeStackNavigator({
     },
     FriendRecommendations: {
       screen: FriendRecommendationsView,
+      options: { headerShown: false },
+    },
+    OtherUserProfile: {
+      screen: OtherUserProfileView,
       options: { headerShown: false },
     },
   },

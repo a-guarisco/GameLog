@@ -9,8 +9,20 @@ export type GameStat = {
   valueClassName?: string;
 };
 
-const StatBand = ({ stats, isOnCard = false }: { stats: GameStat[]; isOnCard?: boolean }) => (
-  <Card variant="elevated" className={`overflow-hidden p-0 ${isOnCard ? 'bg-background-100 dark:bg-background-100 shadow-none' : ''}`}>
+const StatBand = ({
+  stats,
+  isOnCard = false,
+  testID,
+}: {
+  stats: GameStat[];
+  isOnCard?: boolean;
+  testID?: string;
+}) => (
+  <Card
+    testID={testID}
+    variant="elevated"
+    className={`overflow-hidden p-0 ${isOnCard ? 'bg-background-100 dark:bg-background-100 shadow-none' : ''}`}
+  >
     <HStack className="w-full">
       {stats.map((stat, index) => (
         <HStack key={stat.label} className="flex-1">

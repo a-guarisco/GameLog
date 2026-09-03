@@ -32,10 +32,16 @@ const RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
 
 interface CommunityPlaytimeHistogramChartProps {
   scope?: CommunityScope;
+  targetUserId?: string;
+  targetUserName?: string;
+  chartTitle?: string;
 }
 
 const CommunityPlaytimeHistogramChart = ({
   scope = 'global',
+  targetUserId,
+  targetUserName,
+  chartTitle,
 }: CommunityPlaytimeHistogramChartProps) => {
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
   const [offset, setOffset] = useState<number>(0);
@@ -55,6 +61,7 @@ const CommunityPlaytimeHistogramChart = ({
     scope,
     periodRange,
     offset,
+    targetUserId,
   });
 
   const {
@@ -86,9 +93,20 @@ const CommunityPlaytimeHistogramChart = ({
     </Box>
   );
 
+  const displayTitle =
+    chartTitle || (targetUserName ? `${targetUserName}'s Playtime` : 'Community Playtime');
+  const othersLabel = targetUserName || 'Others';
+  const comparisonScopeText = targetUserName
+    ? targetUserName
+    : scope === 'global'
+      ? 'the global community'
+      : scope === 'region'
+        ? 'your region'
+        : 'your friends';
+
   return (
     <ChartWrapperCard
-      label="Community Playtime"
+      label={displayTitle}
       headerRight={
         <Box className="w-[100px] ml-auto">
           <GLSegmentedControl<CommunityPeriodRange>
@@ -286,19 +304,13 @@ const CommunityPlaytimeHistogramChart = ({
                     style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
                   />
                   <Text size="xs" className="font-bold text-purple-500">
-                    Others
+                    {othersLabel}
                   </Text>
                 </HStack>
               </HStack>
 
               <Text size="xs" className="text-typography-300 text-center">
-                Comparing your hours with{' '}
-                {scope === 'global'
-                  ? 'the global community'
-                  : scope === 'region'
-                    ? 'your region'
-                    : 'your friends'}
-                .
+                Comparing your hours with {comparisonScopeText}.
               </Text>
             </VStack>
           </VStack>

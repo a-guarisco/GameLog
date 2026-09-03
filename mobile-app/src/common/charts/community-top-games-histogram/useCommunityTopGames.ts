@@ -15,6 +15,7 @@ export interface UseCommunityTopGamesProps {
   reference?: TopGameReference;
   offset: number;
   currentDate?: Date;
+  targetUserId?: string;
 }
 
 export const useCommunityTopGames = ({
@@ -23,6 +24,7 @@ export const useCommunityTopGames = ({
   reference = 'community',
   offset,
   currentDate = new Date(),
+  targetUserId,
 }: UseCommunityTopGamesProps) => {
   const dateRangeInfo: CommunityDateRangeInfo = useMemo(() => {
     if (periodRange === 'week') {
@@ -33,20 +35,36 @@ export const useCommunityTopGames = ({
 
   const fetchFunc = useCallback(() => {
     if (periodRange === 'week') {
-      return ApiManager.getCommunityWeeklyTopGames(
-        scope,
-        dateRangeInfo.startDate,
-        dateRangeInfo.endDate,
-        reference
-      );
+      return targetUserId
+        ? ApiManager.getCommunityWeeklyTopGames(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate,
+            reference,
+            targetUserId
+          )
+        : ApiManager.getCommunityWeeklyTopGames(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate,
+            reference
+          );
     }
-    return ApiManager.getCommunityMonthlyTopGames(
-      scope,
-      dateRangeInfo.startDate,
-      dateRangeInfo.endDate,
-      reference
-    );
-  }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate]);
+    return targetUserId
+      ? ApiManager.getCommunityMonthlyTopGames(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate,
+          reference,
+          targetUserId
+        )
+      : ApiManager.getCommunityMonthlyTopGames(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate,
+          reference
+        );
+  }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate, targetUserId]);
 
   const { data, isLoading, error, errorMessage, refetch } =
     useAsyncFetch<CommunityTopGame[]>(fetchFunc);

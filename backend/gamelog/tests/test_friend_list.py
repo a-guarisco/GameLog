@@ -66,14 +66,17 @@ class TestFriendList:
         assert "acc_req_user" in results_by_name
         assert results_by_name["acc_req_user"]["friendship"]["friendship_status"] == APIFriendshipStatus.ACCEPTED.value
         assert results_by_name["acc_req_user"]["friendship"]["friendship_requester_id"] == str(me.id)
+        assert results_by_name["acc_req_user"]["friendship"]["since"] == f_acc_req.updated_at.strftime("%d-%m-%Y")
 
         assert "acc_add_user" in results_by_name
         assert results_by_name["acc_add_user"]["friendship"]["friendship_status"] == APIFriendshipStatus.ACCEPTED.value
         assert results_by_name["acc_add_user"]["friendship"]["friendship_requester_id"] == str(friend_acc_add.id)
+        assert results_by_name["acc_add_user"]["friendship"]["since"] == f_acc_add.updated_at.strftime("%d-%m-%Y")
 
         assert "pend_inc_user" in results_by_name
         assert results_by_name["pend_inc_user"]["friendship"]["friendship_status"] == APIFriendshipStatus.PENDING_INCOMING.value
         assert results_by_name["pend_inc_user"]["friendship"]["friendship_requester_id"] == str(friend_pend_inc.id)
+        assert results_by_name["pend_inc_user"]["friendship"]["since"] == f_pend_inc.updated_at.strftime("%d-%m-%Y")
 
         # Ensure excluded users are not present
         assert "pend_out_user" not in results_by_name
@@ -93,3 +96,4 @@ class TestFriendList:
         assert len(results) == 1
         assert results[0].user.id == other.id
         assert results[0].friendship.friendship_status == APIFriendshipStatus.PENDING_INCOMING
+        assert results[0].friendship.since == f.updated_at.strftime("%d-%m-%Y")

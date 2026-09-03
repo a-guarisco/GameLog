@@ -187,7 +187,7 @@ export default {
     friendshipId?: string,
     targetUserId?: string
   ) =>
-    fetchAuthenticatedData<{ message: string }>(EndPoints.manageFriendship(), {
+    fetchAuthenticatedData<{ message: string; friendship_id?: string }>(EndPoints.manageFriendship(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -212,34 +212,48 @@ export default {
     }),
   getDailyReport: (startDate?: string, endDate?: string) =>
     fetchAuthenticatedData<DailyReport>(EndPoints.getDailyReport(startDate, endDate)),
-  getCommunityGenre: (scope: CommunityScope) =>
-    fetchAuthenticatedData<CommunityGenreHour[]>(EndPoints.getCommunityGenre(scope)),
-  getCommunityWeeklyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) =>
+  getCommunityGenre: (scope: CommunityScope, userId?: string) =>
+    fetchAuthenticatedData<CommunityGenreHour[]>(EndPoints.getCommunityGenre(scope, userId)),
+  getCommunityWeeklyPlaytime: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ) =>
     fetchAuthenticatedData<CommunityPlaytimeResponse>(
-      EndPoints.getCommunityWeeklyPlaytime(scope, startDate, endDate)
+      EndPoints.getCommunityWeeklyPlaytime(scope, startDate, endDate, userId)
     ),
-  getCommunityMonthlyPlaytime: (scope: CommunityScope, startDate: string, endDate: string) =>
+  getCommunityMonthlyPlaytime: (
+    scope: CommunityScope,
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ) =>
     fetchAuthenticatedData<CommunityPlaytimeResponse>(
-      EndPoints.getCommunityMonthlyPlaytime(scope, startDate, endDate)
+      EndPoints.getCommunityMonthlyPlaytime(scope, startDate, endDate, userId)
     ),
   getCommunityWeeklyTopGames: (
     scope: CommunityScope,
     startDate: string,
     endDate: string,
-    reference: TopGameReference = 'community'
+    reference: TopGameReference = 'community',
+    userId?: string
   ) =>
     fetchAuthenticatedData<CommunityTopGame[]>(
-      EndPoints.getCommunityWeeklyTopGames(scope, startDate, endDate, reference)
+      EndPoints.getCommunityWeeklyTopGames(scope, startDate, endDate, reference, userId)
     ),
   getCommunityMonthlyTopGames: (
     scope: CommunityScope,
     startDate: string,
     endDate: string,
-    reference: TopGameReference = 'community'
+    reference: TopGameReference = 'community',
+    userId?: string
   ) =>
     fetchAuthenticatedData<CommunityTopGame[]>(
-      EndPoints.getCommunityMonthlyTopGames(scope, startDate, endDate, reference)
+      EndPoints.getCommunityMonthlyTopGames(scope, startDate, endDate, reference, userId)
     ),
-  getCommunityGameStatuses: (scope: CommunityScope) =>
-    fetchAuthenticatedData<CommunityGameStatusResponse>(EndPoints.getCommunityGameStatuses(scope)),
+  getCommunityGameStatuses: (scope: CommunityScope, userId?: string) =>
+    fetchAuthenticatedData<CommunityGameStatusResponse>(
+      EndPoints.getCommunityGameStatuses(scope, userId)
+    ),
 };

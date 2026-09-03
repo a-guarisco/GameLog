@@ -4,6 +4,7 @@ import { Card } from '@gamelog/common/gluestack/card';
 import { Text } from '@gamelog/common/gluestack/text';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
+import { Pressable } from 'react-native';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { UserAvatar } from './UserAvatar';
 import { UserCardActions } from './UserCardActions';
@@ -40,6 +41,12 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
         ? 'text-red-400 dark:text-red-400'
         : 'text-typography-300 dark:text-typography-400';
 
+  const handleCardPress = () => {
+    if (handlers.onSelectUser) {
+      handlers.onSelectUser(item);
+    }
+  };
+
   return (
     <Card
       variant="elevated"
@@ -47,20 +54,26 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
       testID={`user-card-${user.id}`}
     >
       <HStack space="md" className="items-center justify-between px-3 py-3">
-        <HStack space="md" className="items-center flex-1 pr-2">
-          <UserAvatar username={user.username} isHighlighted={isFriend} />
+        <Pressable
+          onPress={handleCardPress}
+          className="flex-1 flex-row items-center pr-2"
+          testID={`user-card-pressable-${user.id}`}
+        >
+          <HStack space="md" className="items-center flex-1">
+            <UserAvatar username={user.username} isHighlighted={isFriend} />
 
-          <VStack className="flex-1">
-            <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
-              {user.username}
-            </Text>
-            <Text size="xs" className="font-medium text-typography-200 mt-0.5" numberOfLines={1}>
-              <Text size="xs" className={`font-bold ${statusColorClass}`}>
-                {statusLabel}
+            <VStack className="flex-1">
+              <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>
+                {user.username}
               </Text>
-            </Text>
-          </VStack>
-        </HStack>
+              <Text size="xs" className="font-medium text-typography-200 mt-0.5" numberOfLines={1}>
+                <Text size="xs" className={`font-bold ${statusColorClass}`}>
+                  {statusLabel}
+                </Text>
+              </Text>
+            </VStack>
+          </HStack>
+        </Pressable>
 
         <Box className="shrink-0">
           <UserCardActions item={item} handlers={handlers} isActionLoading={isActionLoading} />

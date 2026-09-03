@@ -28,11 +28,17 @@ const RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
 interface CommunityTopGamesHistogramChartProps {
   scope?: CommunityScope;
   ownedGames?: OwnedGames | null;
+  targetUserId?: string;
+  targetUserName?: string;
+  chartTitle?: string;
 }
 
 const CommunityTopGamesHistogramChart = ({
   scope = 'global',
   ownedGames,
+  targetUserId,
+  targetUserName,
+  chartTitle,
 }: CommunityTopGamesHistogramChartProps) => {
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
   const [reference, setReference] = useState<TopGameReference>('community');
@@ -43,6 +49,7 @@ const CommunityTopGamesHistogramChart = ({
     periodRange,
     reference,
     offset,
+    targetUserId,
   });
 
   const { topGamesItems, hasData } = useCommunityTopGamesHistogramData({
@@ -95,9 +102,20 @@ const CommunityTopGamesHistogramChart = ({
     </HStack>
   );
 
+  const displayTitle =
+    chartTitle || (targetUserName ? `${targetUserName}'s Top Games` : 'Top Community Games');
+  const othersLabel = targetUserName || 'Others';
+  const comparisonScopeText = targetUserName
+    ? targetUserName
+    : scope === 'global'
+      ? 'the global community'
+      : scope === 'region'
+        ? 'your region'
+        : 'your friends';
+
   return (
     <ChartWrapperCard
-      label="Top Community Games"
+      label={displayTitle}
       headerRight={
         <Box className="w-[100px] ml-auto">
           <GLSegmentedControl<CommunityPeriodRange>
@@ -141,8 +159,9 @@ const CommunityTopGamesHistogramChart = ({
                           ? 'text-typography-0 font-bold'
                           : 'text-typography-300 font-medium'
                       }
+                      numberOfLines={1}
                     >
-                      Others
+                      {othersLabel}
                     </Text>
                   </Pressable>
 
@@ -160,6 +179,7 @@ const CommunityTopGamesHistogramChart = ({
                           ? 'text-typography-0 font-bold'
                           : 'text-typography-300 font-medium'
                       }
+                      numberOfLines={1}
                     >
                       You
                     </Text>
@@ -263,27 +283,19 @@ const CommunityTopGamesHistogramChart = ({
                   style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
                 />
                 <Text size="xs" className="font-bold text-purple-500">
-                  Others
+                  {othersLabel}
                 </Text>
               </HStack>
             </HStack>
 
             <Text size="xs" className="text-typography-300 text-center">
               {reference === 'user'
-                ? `Comparing your top played games against ${
-                    scope === 'global'
-                      ? 'the global community'
-                      : scope === 'region'
-                        ? 'your region'
-                        : 'your friends'
-                  } averages.`
-                : `Comparing community trending titles in ${
-                    scope === 'global'
-                      ? 'the global community'
-                      : scope === 'region'
-                        ? 'your region'
-                        : 'your friends'
-                  } with your playtime.`}
+                ? targetUserName
+                  ? `Comparing your top played games against ${targetUserName}'s averages.`
+                  : `Comparing your top played games against ${comparisonScopeText} averages.`
+                : targetUserName
+                  ? `Comparing ${targetUserName}'s top played games with your playtime.`
+                  : `Comparing community trending titles in ${comparisonScopeText} with your playtime.`}
             </Text>
           </VStack>
         );

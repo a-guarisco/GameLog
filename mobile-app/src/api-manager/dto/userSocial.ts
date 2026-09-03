@@ -22,6 +22,7 @@ export interface FriendshipInfo {
   friendship_id?: string | null;
   friendship_status?: FriendshipStatus | null;
   friendship_requester_id?: string | null;
+  since?: string | null;
 }
 
 export interface UserSearchResult {

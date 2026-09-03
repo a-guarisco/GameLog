@@ -64,6 +64,7 @@ export interface UseCommunityPlaytimeProps {
   periodRange: CommunityPeriodRange;
   offset: number;
   currentDate?: Date;
+  targetUserId?: string;
 }
 
 export const useCommunityPlaytime = ({
@@ -71,6 +72,7 @@ export const useCommunityPlaytime = ({
   periodRange,
   offset,
   currentDate = new Date(),
+  targetUserId,
 }: UseCommunityPlaytimeProps) => {
   const dateRangeInfo = useMemo(() => {
     if (periodRange === 'week') {
@@ -81,10 +83,32 @@ export const useCommunityPlaytime = ({
 
   const fetchFunc = useCallback(() => {
     if (periodRange === 'week') {
-      return ApiManager.getCommunityWeeklyPlaytime(scope, dateRangeInfo.startDate, dateRangeInfo.endDate);
+      return targetUserId
+        ? ApiManager.getCommunityWeeklyPlaytime(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate,
+            targetUserId
+          )
+        : ApiManager.getCommunityWeeklyPlaytime(
+            scope,
+            dateRangeInfo.startDate,
+            dateRangeInfo.endDate
+          );
     }
-    return ApiManager.getCommunityMonthlyPlaytime(scope, dateRangeInfo.startDate, dateRangeInfo.endDate);
-  }, [scope, periodRange, dateRangeInfo.startDate, dateRangeInfo.endDate]);
+    return targetUserId
+      ? ApiManager.getCommunityMonthlyPlaytime(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate,
+          targetUserId
+        )
+      : ApiManager.getCommunityMonthlyPlaytime(
+          scope,
+          dateRangeInfo.startDate,
+          dateRangeInfo.endDate
+        );
+  }, [scope, periodRange, dateRangeInfo.startDate, dateRangeInfo.endDate, targetUserId]);
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch<CommunityPlaytimeResponse>(fetchFunc);
 

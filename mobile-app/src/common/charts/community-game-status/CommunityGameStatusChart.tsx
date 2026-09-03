@@ -18,6 +18,9 @@ import type { CommunityScope } from '@gamelog/api-manager/dto';
 
 interface CommunityGameStatusChartProps {
   scope?: CommunityScope;
+  targetUserId?: string;
+  targetUserName?: string;
+  chartTitle?: string;
 }
 
 interface DonutItemProps {
@@ -121,7 +124,7 @@ const SingleDonut = memo(
 
     return (
       <VStack className="items-center flex-1" space="xs" testID={testID}>
-        <Text size="sm" className="font-bold text-typography-0 text-center mb-1">
+        <Text size="sm" className="font-bold text-typography-0 text-center mb-1" numberOfLines={1}>
           {title}
         </Text>
         <Animated.View
@@ -157,10 +160,15 @@ const computeDonutRadius = (cardWidth: number, isLandscape: boolean) => {
   return Math.min(isLandscape ? 76 : 68, Math.max(48, target));
 };
 
-const CommunityGameStatusChart = ({ scope = 'global' }: CommunityGameStatusChartProps) => {
+const CommunityGameStatusChart = ({
+  scope = 'global',
+  targetUserId,
+  targetUserName,
+  chartTitle = 'Library Status Breakdown',
+}: CommunityGameStatusChartProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { isLandscape } = useOrientation();
-  const { data, isLoading, error, errorMessage } = useCommunityGameStatus(scope);
+  const { data, isLoading, error, errorMessage } = useCommunityGameStatus(scope, targetUserId);
 
   const {
     comparisonItems,
@@ -180,9 +188,20 @@ const CommunityGameStatusChart = ({ scope = 'global' }: CommunityGameStatusChart
     </Box>
   );
 
+  const othersLabel = targetUserName || 'Others';
+  const othersDonutTitle = targetUserName || 'Others (avg)';
+  const othersDonutSubtitle = targetUserName ? 'Games' : 'Games avg';
+  const comparisonScopeText = targetUserName
+    ? targetUserName
+    : scope === 'global'
+      ? 'the global community'
+      : scope === 'region'
+        ? 'your region'
+        : 'your friends';
+
   return (
     <ChartWrapperCard
-      label="Library Status Breakdown"
+      label={chartTitle}
       isLoading={isLoading}
       error={error}
       ErrorBehaviour={renderError}
@@ -215,10 +234,10 @@ const CommunityGameStatusChart = ({ scope = 'global' }: CommunityGameStatusChart
                 testID="user-donut-chart"
               />
               <SingleDonut
-                title="Others (avg)"
+                title={othersDonutTitle}
                 data={communityPieData}
                 count={communityTotalGamesFormatted}
-                subtitle="Games avg"
+                subtitle={othersDonutSubtitle}
                 radius={radius}
                 innerRadius={innerRadius}
                 theme={theme}
@@ -227,13 +246,7 @@ const CommunityGameStatusChart = ({ scope = 'global' }: CommunityGameStatusChart
             </HStack>
 
             <Text size="xs" className="text-typography-300 text-center">
-              Comparing your game statuses with{' '}
-              {scope === 'global'
-                ? 'the global community'
-                : scope === 'region'
-                  ? 'your region'
-                  : 'your friends'}
-              .
+              Comparing your game statuses with {comparisonScopeText}.
             </Text>
 
             {/* Status Breakdown List & Legend */}
@@ -256,7 +269,7 @@ const CommunityGameStatusChart = ({ scope = 'global' }: CommunityGameStatusChart
                       style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
                     />
                     <Text size="xs" className="font-bold text-purple-500">
-                      Others
+                      {othersLabel}
                     </Text>
                   </HStack>
                 </HStack>
