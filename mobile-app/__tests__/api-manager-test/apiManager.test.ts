@@ -4,6 +4,10 @@ import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import { auth } from '@gamelog/auth/firebaseClient';
 
+jest.mock('@gamelog/api-manager/backendResolver', () => ({
+  resolveBackendUrl: jest.fn().mockResolvedValue(''),
+}));
+
 const mockFetch = jest.fn();
 window.fetch = mockFetch;
 

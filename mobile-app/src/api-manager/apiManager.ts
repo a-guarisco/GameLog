@@ -37,7 +37,15 @@ import type {
 
 
 
+import { resolveBackendUrl } from '@gamelog/api-manager/backendResolver';
+
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
+  let finalUrl = url;
+  if (finalUrl.startsWith('/')) {
+    const baseUrl = await resolveBackendUrl();
+    finalUrl = baseUrl + finalUrl;
+  }
+
   const options = {
     ...init,
     headers: {
@@ -45,10 +53,10 @@ async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
       ...init?.headers,
     },
   };
-  const response = await fetch(url, options);
+  const response = await fetch(finalUrl, options);
 
   if (!response.ok) {
-    let detail = `HTTP error: ${response.status}. url Called: ${url}`;
+    let detail = `HTTP error: ${response.status}. url Called: ${finalUrl}`;
     try {
       const errorData = await response.json();
       detail = errorData.detail || detail;
