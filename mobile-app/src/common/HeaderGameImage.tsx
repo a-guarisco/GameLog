@@ -26,12 +26,12 @@ const HeaderGameImage = ({
   scrollable = false,
 }: HeaderGameImageProps) => {
   const gameHeaderImage = appid ? steamAssetUrls.getGameHeaderImage(appid) : undefined;
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
   const leftOffset = isLandscape ? insets.left + 74 : 0;
 
-  const minHeight = compact ? 100 : 140;
-  const heightPercentage = compact ? 12 : 18;
+  const minHeight = isTablet ? 260 : compact ? 100 : 140;
+  const heightPercentage = isTablet ? 26 : compact ? 12 : 18;
 
   if (contained) {
     return (

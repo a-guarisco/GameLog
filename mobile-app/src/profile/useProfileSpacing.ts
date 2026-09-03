@@ -1,5 +1,6 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getDefaultBannerParams, useGetBannerHeight } from '@gamelog/utils/bannerUtils';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 export interface ProfileVSpaceOptions {
   bannerHeight: number;
@@ -31,7 +32,8 @@ export const calculateProfileVSpace = ({
 
 export const useProfileSpacing = (options?: Partial<ProfileVSpaceOptions>) => {
   const insets = useSafeAreaInsets();
-  const { MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO } = getDefaultBannerParams();
+  const { isTablet } = useOrientation();
+  const { MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO } = getDefaultBannerParams(isTablet);
   const bannerHeight = useGetBannerHeight(MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO);
 
   const { vspaceHeight, avatarTop, bannerOverlap } = calculateProfileVSpace({

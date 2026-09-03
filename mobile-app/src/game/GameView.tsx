@@ -23,7 +23,7 @@ import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 const GameView = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
   const [showInlineAchievements, setShowInlineAchievements] = useState(false);
   const { gameItem } = route.params;
@@ -123,6 +123,7 @@ const GameView = () => {
   }
 
   const leftRailOffset = insets.left + 74;
+  const bannerHeight = isTablet ? 280 : 120;
 
   return (
     <Box
@@ -134,8 +135,14 @@ const GameView = () => {
       }}
     >
       {/* Full-width Game Banner spanning across both columns */}
-      <Box className="w-full relative" style={{ height: 120 }}>
-        <HeaderGameImage appid={gameItem.appid} compact contained height={120} scrollable />
+      <Box className="w-full relative" style={{ height: bannerHeight }}>
+        <HeaderGameImage
+          appid={gameItem.appid}
+          compact={!isTablet}
+          contained
+          height={bannerHeight}
+          scrollable
+        />
         <BackButton
           onPress={() => navigation.goBack()}
           testID="game-back"
@@ -171,7 +178,7 @@ const GameView = () => {
 
             <Box className="pt-3 px-4">
               <VStack space="xl">
-                <GameStatBand stats={stats} isLandscape />
+                <GameStatBand stats={stats} isLandscape={isLandscape && !isTablet} />
 
                 <AchievementsSummary
                   unlockedCount={unlockedCount}
