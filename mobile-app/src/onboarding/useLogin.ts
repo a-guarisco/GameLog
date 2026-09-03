@@ -5,7 +5,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 
 export type AuthMode = 'signin' | 'signup';
 
@@ -59,11 +59,11 @@ export function useLogin() {
 
     try {
       if (authMode === 'signup') {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
         await sendEmailVerification(cred.user);
         // We do NOT sign out. onAuthStateChanged will route them to UnverifiedScreen.
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
         // We do NOT check emailVerified here and sign out.
         // onAuthStateChanged will pick up the user and route to UnverifiedScreen if needed.
       }

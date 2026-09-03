@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearAllSecureStorage } from '@gamelog/storage/secureStorage';
 import { clearSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Card } from '@gamelog/common/gluestack/card';
@@ -20,11 +20,11 @@ import { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest
 import { SteamApiKeyUpdateTest } from './SteamApiKeyUpdateTest';
 
 export const DevAuthView = () => {
-  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
+  const [currentUser, setCurrentUser] = useState<User | null>(getFirebaseAuth().currentUser);
   const [sessionMessage, setSessionMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       setCurrentUser(user);
     });
     return () => unsubscribe();
@@ -32,7 +32,7 @@ export const DevAuthView = () => {
 
   const handleSignOutAndClearStorage = async () => {
     try {
-      await signOut(auth);
+      await signOut(getFirebaseAuth());
       await AsyncStorage.clear();
       await clearAllSecureStorage();
       await clearSteamApiKey();

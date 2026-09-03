@@ -7,6 +7,12 @@ jest.mock('@gamelog/auth/googleAuth', () => ({
   signOutGoogle: jest.fn(),
 }));
 
+jest.mock('@gamelog/auth/firebaseClient', () => ({
+  getFirebaseAuth: () => ({
+    currentUser: null,
+  }),
+}));
+
 describe('GoogleAuthTest Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();

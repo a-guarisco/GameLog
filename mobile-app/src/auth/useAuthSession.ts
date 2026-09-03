@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { onIdTokenChanged, type User } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
 import {
   setSteamApiKey,
@@ -64,7 +64,7 @@ export const useAuthSession = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onIdTokenChanged(auth, async (user) => {
+    const unsubscribe = onIdTokenChanged(getFirebaseAuth(), async (user) => {
       setFirebaseUser(user);
       if (user) {
         if (!user.emailVerified && user.providerData.some((p) => p.providerId === 'password')) {
@@ -94,7 +94,7 @@ export const useAuthSession = () => {
     if (firebaseUser) {
       setAuthState('loading');
       await firebaseUser.reload();
-      const updatedUser = auth.currentUser;
+      const updatedUser = getFirebaseAuth().currentUser;
       setFirebaseUser(updatedUser);
 
       // FORZA l'aggiornamento del token Firebase.

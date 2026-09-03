@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { sendEmailVerification } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { useAuthSession } from '@gamelog/auth/useAuthSession';
 
 export function useUnverifiedScreen() {
@@ -18,7 +18,7 @@ export function useUnverifiedScreen() {
       await checkEmailVerification();
       // If the user is still not verified, checkEmailVerification will just reset authState to 'unverified'.
       // So we can show a manual error message here.
-      if (auth.currentUser && !auth.currentUser.emailVerified) {
+      if (getFirebaseAuth().currentUser && !getFirebaseAuth().currentUser.emailVerified) {
         setErrorCode('auth/unverified-email');
       }
     } catch (err: any) {
@@ -50,7 +50,7 @@ export function useUnverifiedScreen() {
   };
 
   const handleSignOut = async () => {
-    await auth.signOut();
+    await getFirebaseAuth().signOut();
   };
 
   return {

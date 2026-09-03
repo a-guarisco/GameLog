@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-native';
 import { useUnverifiedScreen } from '../../src/onboarding/useUnverifiedScreen';
 import { sendEmailVerification } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { useAuthSession } from '@gamelog/auth/useAuthSession';
 
 jest.mock('firebase/auth', () => ({
@@ -9,11 +9,13 @@ jest.mock('firebase/auth', () => ({
 }));
 
 jest.mock('@gamelog/auth/firebaseClient', () => ({
-  auth: {
-    signOut: jest.fn(),
-    currentUser: null,
-  },
+  getFirebaseAuth: () => mockAuth,
 }));
+
+const mockAuth: any = {
+  signOut: jest.fn(),
+  currentUser: null,
+};
 
 jest.mock('@gamelog/auth/useAuthSession', () => ({
   useAuthSession: jest.fn(),
@@ -29,7 +31,7 @@ describe('useUnverifiedScreen', () => {
       firebaseUser: { uid: '123', email: 'test@example.com' },
       checkEmailVerification: mockCheckEmailVerification,
     });
-    auth.currentUser = null;
+    mockAuth.currentUser = null;
   });
 
   it('initializes with default values', () => {
@@ -43,7 +45,7 @@ describe('useUnverifiedScreen', () => {
 
   describe('handleCheckVerification', () => {
     it('sets unverified error if currentUser is still unverified', async () => {
-      auth.currentUser = { emailVerified: false } as any;
+      mockAuth.currentUser = { emailVerified: false } as any;
       const { result } = renderHook(() => useUnverifiedScreen());
 
       await act(async () => {
@@ -56,7 +58,7 @@ describe('useUnverifiedScreen', () => {
     });
 
     it('does not set error if currentUser is verified', async () => {
-      auth.currentUser = { emailVerified: true } as any;
+      mockAuth.currentUser = { emailVerified: true } as any;
       const { result } = renderHook(() => useUnverifiedScreen());
 
       await act(async () => {
@@ -158,14 +160,14 @@ describe('useUnverifiedScreen', () => {
   });
 
   describe('handleSignOut', () => {
-    it('calls auth.signOut', async () => {
+    it('calls mockAuth.signOut', async () => {
       const { result } = renderHook(() => useUnverifiedScreen());
 
       await act(async () => {
         await result.current.handleSignOut();
       });
 
-      expect(auth.signOut).toHaveBeenCalled();
+      expect(mockAuth.signOut).toHaveBeenCalled();
     });
   });
 });

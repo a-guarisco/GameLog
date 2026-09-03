@@ -59,6 +59,16 @@ const initializeFirebaseAuth = () => {
   return auth;
 };
 
+export const getFirebaseAuth = () => {
+  if (!auth) {
+    // During Metro Fast Refresh, the module is re-evaluated and `auth` becomes undefined.
+    // Since App state is preserved, setupAuthEmulator() won't be called again.
+    // We lazily re-initialize it here to survive hot reloads.
+    initializeFirebaseAuth();
+  }
+  return auth;
+};
+
 const globalAny = global as any;
 
 export const setupAuthEmulator = async () => {
@@ -98,5 +108,5 @@ if (!useEmulator) {
   console.log(`[Firebase Auth] ☁️ Mode: LIVE (Cloud) | Project: ${projectId}`);
 }
 
-export { app, auth };
+export { app };
 

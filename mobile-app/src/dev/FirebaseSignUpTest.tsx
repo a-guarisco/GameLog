@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   type User,
 } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
@@ -33,10 +33,10 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [backendUser, setBackendUser] = useState<any | null>(null);
 
-  const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
+  const [currentUser, setCurrentUser] = useState<User | null>(getFirebaseAuth().currentUser);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       setCurrentUser(user);
     });
     return () => unsubscribe();
@@ -69,7 +69,7 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
     }
     setIsLoading(true);
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
       setStatusMessage(`Firebase user created! UID: ${cred.user.uid}`);
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Sign Up failed');
@@ -81,15 +81,15 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
   // Step 2: Send Email Verification
   const handleSendVerification = async () => {
     clearMessages();
-    if (!auth.currentUser) {
+    if (!getFirebaseAuth().currentUser) {
       setErrorMessage('No Firebase user logged in');
       return;
     }
     setIsLoading(true);
     try {
-      await sendEmailVerification(auth.currentUser);
+      await sendEmailVerification(getFirebaseAuth().currentUser);
       setStatusMessage(
-        `Verification email sent to ${auth.currentUser.email}! (Check emulator console or inbox)`
+        `Verification email sent to ${getFirebaseAuth().currentUser.email}! (Check emulator console or inbox)`
       );
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Failed to send verification email');
@@ -101,14 +101,14 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
   // Step 3: Check / Reload Verification Status
   const handleCheckStatus = async () => {
     clearMessages();
-    if (!auth.currentUser) {
+    if (!getFirebaseAuth().currentUser) {
       setErrorMessage('No Firebase user logged in');
       return;
     }
     setIsLoading(true);
     try {
-      await auth.currentUser.reload();
-      const verified = auth.currentUser.emailVerified;
+      await getFirebaseAuth().currentUser.reload();
+      const verified = getFirebaseAuth().currentUser.emailVerified;
       if (verified) {
         setStatusMessage('Reloaded Firebase user! Email Verified: YES (true)');
       } else {
@@ -124,7 +124,7 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
   // Step 4: Register User in Backend
   const handleRegisterBackend = async () => {
     clearMessages();
-    if (!auth.currentUser) {
+    if (!getFirebaseAuth().currentUser) {
       setErrorMessage('No Firebase user logged in');
       return;
     }
@@ -132,9 +132,9 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
     setIsLoading(true);
     try {
       // Reload user to ensure currentUser.emailVerified is fresh
-      await auth.currentUser.reload();
+      await getFirebaseAuth().currentUser.reload();
 
-      if (!auth.currentUser.emailVerified) {
+      if (!getFirebaseAuth().currentUser.emailVerified) {
         setErrorMessage(
           'Email is not verified! Please confirm your email address (Step 2 & 3) before completing backend registration.'
         );
@@ -147,7 +147,7 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
 
       setBackendUser(null);
       // Force refresh token so the JWT contains updated email_verified: true claim
-      const token = await auth.currentUser.getIdToken(true);
+      const token = await getFirebaseAuth().currentUser.getIdToken(true);
       const response = await fetch(EndPoints.registerUser(), {
         method: 'POST',
         headers: {

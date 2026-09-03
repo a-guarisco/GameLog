@@ -5,7 +5,7 @@ import {
   setSteamApiKey as globalSetSteamApiKey,
   setSteamId as globalSetSteamId,
 } from '@gamelog/api-manager/steamApiKey';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 
 export function useProfileSetup() {
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ export function useProfileSetup() {
   };
 
   const handleSignOut = () => {
-    auth.signOut();
+    getFirebaseAuth().signOut();
   };
 
   return {

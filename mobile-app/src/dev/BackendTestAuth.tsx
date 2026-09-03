@@ -1,4 +1,4 @@
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { useState } from 'react';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
@@ -32,7 +32,7 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
       setErrorMessage(null);
 
       // Fetch live token from active user session
-      const currentUser = auth.currentUser;
+      const currentUser = getFirebaseAuth().currentUser;
       const token = currentUser ? await currentUser.getIdToken() : null;
 
       if (!token) {
@@ -77,7 +77,7 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
       <Button isOnCard onPress={testAuthEndpoint} isDisabled={isLoading}>
         <ButtonText>Test Backend Auth</ButtonText>
       </Button>
-      {isLoading ? <LoadingBox message="Testing auth endpoint..." /> : null}
+      {isLoading ? <LoadingBox message="Testing getFirebaseAuth() endpoint..." /> : null}
       {statusMessage ? (
         <SuccessBox
           message={`Auth test result: ${statusMessage}${requestUrl ? ` (${requestUrl})` : ''}`}
