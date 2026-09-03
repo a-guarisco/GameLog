@@ -18,6 +18,13 @@ const AuthNavigation = createStaticNavigation(AuthNavigator);
 const OnboardingNavigation = createStaticNavigation(OnboardingNavigator);
 const UnverifiedNavigation = createStaticNavigation(UnverifiedNavigator);
 
+const navigators: Record<string, React.ComponentType<any>> = {
+  unauthenticated: AuthNavigation,
+  onboarding: OnboardingNavigation,
+  unverified: UnverifiedNavigation,
+  authenticated: MainNavigation,
+};
+
 const AppContent = () => {
   const { authState, refreshBackendUser } = useAuthSession();
   const { colorScheme } = useColorScheme();
@@ -35,14 +42,7 @@ const AppContent = () => {
     return <SplashScreen />;
   }
 
-  let NavigationToRender = MainNavigation;
-  if (authState === 'unauthenticated') {
-    NavigationToRender = AuthNavigation;
-  } else if (authState === 'onboarding') {
-    NavigationToRender = OnboardingNavigation;
-  } else if (authState === 'unverified') {
-    NavigationToRender = UnverifiedNavigation;
-  }
+  const NavigationToRender = navigators[authState] || MainNavigation;
 
   return (
     <>
@@ -56,20 +56,10 @@ const App = () => {
   const { isReady } = useAppInit();
   const { colorScheme } = useColorScheme();
 
-  if (!isReady) {
-    return (
-      <SafeAreaProvider>
-        <GluestackUIProvider mode={colorScheme ?? 'light'}>
-          <SplashScreen />
-        </GluestackUIProvider>
-      </SafeAreaProvider>
-    );
-  }
-
   return (
     <SafeAreaProvider>
       <GluestackUIProvider mode={colorScheme ?? 'light'}>
-        <AppContent />
+        {!isReady ? <SplashScreen /> : <AppContent />}
       </GluestackUIProvider>
     </SafeAreaProvider>
   );
