@@ -363,7 +363,7 @@ def manage_friendship(
                 friendship.updated_at = datetime.now(UTC)
                 session.add(friendship)
                 session.commit()
-                return {"message": "User blocked"}
+                return {"message": "User blocked", "friendship_id": str(friendship.id)}
             else:
                 target_id = payload.target_user_id or payload.friendship_id
                 if not target_id:
@@ -381,7 +381,7 @@ def manage_friendship(
                 )
                 session.add(new_block)
                 session.commit()
-                return {"message": "User blocked"}
+                return {"message": "User blocked", "friendship_id": str(new_block.id)}
 
         case FriendshipManageAction.UNBLOCK:
             if not friendship:

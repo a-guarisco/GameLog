@@ -128,10 +128,11 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
   const handleBlockFriend = useCallback(async (friendshipIdOrUserId: string) => {
     setIsActionLoading(true);
     try {
-      await ApiManager.manageFriendship('BLOCK', friendshipIdOrUserId, user.id);
+      const res = await ApiManager.manageFriendship('BLOCK', friendshipIdOrUserId, user.id);
       setFriendship((prev) => ({
         ...prev,
         friendship_status: 'blocked',
+        friendship_id: res.friendship_id ?? prev?.friendship_id,
         since: new Date().toISOString(),
       }));
       DeviceEventEmitter.emit('friendListChanged');

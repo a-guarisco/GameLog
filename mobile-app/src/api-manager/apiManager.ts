@@ -187,7 +187,7 @@ export default {
     friendshipId?: string,
     targetUserId?: string
   ) =>
-    fetchAuthenticatedData<{ message: string }>(EndPoints.manageFriendship(), {
+    fetchAuthenticatedData<{ message: string; friendship_id?: string }>(EndPoints.manageFriendship(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
