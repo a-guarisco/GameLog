@@ -1,6 +1,5 @@
-import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import { setSteamApiKey } from '@gamelog/api-manager/steamApiKey';
-import { setApiProvider } from '@gamelog/api-manager/apiManager';
 
 describe('apiEndsPoints', () => {
   const originalBackendBaseUrl = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
@@ -18,26 +17,10 @@ describe('apiEndsPoints', () => {
     } else {
       process.env.EXPO_PUBLIC_BACKEND_BASE_URL = originalBackendBaseUrl;
     }
-    setApiProvider('steam');
-  });
 
-  describe('isBackendProvider', () => {
-    it('returns false when steam provider is selected', () => {
-      setApiProvider('steam');
-      expect(isBackendProvider()).toBe(false);
-    });
-
-    it('returns true when backend provider is selected', () => {
-      setApiProvider('backend');
-      expect(isBackendProvider()).toBe(true);
-    });
   });
 
   describe('Steam endpoints', () => {
-    beforeEach(() => {
-      setApiProvider('steam');
-    });
-
     it('builds steam endpoints correctly', () => {
       expect(EndPoints.getNewsForApp('440', 2, 300)).toBe(
         'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=440&count=2&maxlength=300'
@@ -88,17 +71,7 @@ describe('apiEndsPoints', () => {
     });
   });
 
-  describe('Backend provider selection', () => {
-    it('currently defaults to steam endpoints even with backend provider selected', () => {
-      setApiProvider('backend');
-      // For now, all endpoints return Steam URLs
-      // This test documents the current behavior and serves as a placeholder
-      // for future implementation of backend-specific endpoints
-      expect(EndPoints.getNewsForApp('440', 2, 300)).toBe(
-        'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=440&count=2&maxlength=300'
-      );
-    });
-
+  describe('Backend endpoints', () => {
     it('builds social backend endpoints correctly', () => {
       expect(EndPoints.searchUsers('alex')).toBe('/users/search?q=alex');
       expect(EndPoints.getFriendList()).toBe('/users/friend_list');
