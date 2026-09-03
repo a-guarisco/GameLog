@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, useState } from 'react';
+import { memo, useRef, useEffect, useState, useCallback } from 'react';
 import { Animated, Easing, Pressable } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { PieChart } from 'react-native-gifted-charts';
@@ -30,6 +30,42 @@ interface DonutItemProps {
   theme: any;
   testID?: string;
 }
+
+const Tooltip = memo(({ item, theme }: any) => {
+  return (
+    <Box
+      style={{
+        backgroundColor: `rgb(${theme['--color-background-50']})`,
+        padding: 6,
+        borderRadius: 6,
+        maxWidth: 100,
+        borderWidth: 1,
+        borderColor: `rgb(${theme['--color-outline-100']})`,
+      }}
+    >
+      <Text
+        style={{
+          color: `rgb(${theme['--color-typography-0']})`,
+          fontSize: 12,
+          textAlign: 'center',
+          fontWeight: 'bold',
+        }}
+      >
+        {item.label}
+      </Text>
+      <Text
+        style={{
+          color: `rgb(${theme['--color-typography-200']})`,
+          fontSize: 10,
+          textAlign: 'center',
+        }}
+      >
+        {item.value}%
+      </Text>
+    </Box>
+  );
+});
+Tooltip.displayName = 'Tooltip';
 
 const SingleDonut = memo(
   ({ title, data, count, subtitle, radius, innerRadius, theme, testID }: DonutItemProps) => {
@@ -78,6 +114,11 @@ const SingleDonut = memo(
       </VStack>
     );
 
+    const renderTooltip = useCallback(
+      (index: number) => <Tooltip item={data[index]} theme={theme} />,
+      [data, theme]
+    );
+
     return (
       <VStack className="items-center flex-1" space="xs" testID={testID}>
         <Text size="sm" className="font-bold text-typography-0 text-center mb-1">
@@ -100,6 +141,8 @@ const SingleDonut = memo(
             centerLabelComponent={renderCenter}
             showValuesAsLabels={false}
             showTextBackground={false}
+            showTooltip
+            tooltipComponent={renderTooltip}
           />
         </Animated.View>
       </VStack>
