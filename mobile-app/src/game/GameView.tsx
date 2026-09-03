@@ -34,6 +34,7 @@ const GameView = () => {
     livePlayers,
     stats,
     gameStatus,
+    refetchGameStatus,
   } = useGameViewData(gameItem, playerID);
 
   const openAchievementsList = () =>
@@ -58,6 +59,7 @@ const GameView = () => {
               streakText={streakText}
               appId={String(gameItem.appid)}
               status={gameStatus}
+              onStatusChange={refetchGameStatus}
             />
           }
         />

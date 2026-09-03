@@ -40,10 +40,14 @@ export const GameStatusSelectorChip = ({
   useEffect(() => {
     if (initialStatus !== undefined) {
       setSelectedStatus(initialStatus);
-    } else if (gameStatus) {
+    }
+  }, [initialStatus]);
+
+  useEffect(() => {
+    if (initialStatus === undefined && gameStatus) {
       setSelectedStatus(gameStatus);
     }
-  }, [initialStatus, gameStatus]);
+  }, [gameStatus, initialStatus]);
 
   const handleSelectStatus = async (status: GameStatus) => {
     if (status === selectedStatus && !errorMessage) {
