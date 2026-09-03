@@ -65,6 +65,7 @@ const HeaderGameImage = ({
           minHeight={minHeight}
           heightPercentage={heightPercentage}
           height={height}
+          scrollable={scrollable}
         />
       </Box>
     </Card>

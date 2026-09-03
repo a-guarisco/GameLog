@@ -51,5 +51,13 @@ describe('Banner', () => {
       const box = getByTestId('banner-box');
       expect(box.props.className).toContain('bg-red-500');
     });
+
+    it('attaches panHandlers when scrollable=true', () => {
+      const { getByTestId } = render(
+        <Banner {...defaultProps} imageUrl="https://example.com/banner.jpg" scrollable={true} />
+      );
+      const box = getByTestId('banner-box');
+      expect(box.props.onMoveShouldSetResponder).toBeDefined();
+    });
   });
 });
