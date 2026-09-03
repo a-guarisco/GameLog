@@ -333,15 +333,15 @@ describe('useGetGameGenreChartData', () => {
 });
 
 describe('useGetGenresBatch', () => {
-  it('returns empty object if appIds is empty', async () => {
-    mockAsyncFetch({ data: {} });
+  it('returns null if appIds is empty', async () => {
+    mockAsyncFetch({ data: null });
     const { useGetGenresBatch } = require('@gamelog/api-manager/useApi');
     const { result } = renderHook(() => useGetGenresBatch([]));
 
-    expect(result.current.libraryGenres).toEqual({});
+    expect(result.current.libraryGenres).toBeNull();
     const fetchFunc = mockUseAsyncFetch.mock.lastCall[0];
     const res = await fetchFunc();
-    expect(res).toEqual({});
+    expect(res).toBeNull();
     expect(mockApiManager.getGenresBatch).not.toHaveBeenCalled();
   });
 
