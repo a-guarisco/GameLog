@@ -132,10 +132,10 @@ describe('GameSectionTabs', () => {
       fireEvent.press(screen.getByTestId('game-tab-news'));
     };
 
-    it('asks for the five most recent items of the current game', () => {
+    it('asks for the items of the current game', () => {
       openNewsTab();
 
-      expect(mockUseGetGameNews).toHaveBeenCalledWith('236390');
+      expect(mockUseGetGameNews).toHaveBeenCalledWith('236390', expect.any(Number));
     });
 
     it('shows the byline, the short date and the title of every item', () => {

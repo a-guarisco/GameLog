@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import HeaderGameImage from '@gamelog/common/HeaderGameImage';
+import * as OrientationHook from '@gamelog/common/useOrientation';
 
 jest.mock('@gamelog/common/Banner', () => {
   const { View } = jest.requireActual('react-native');
@@ -31,6 +32,12 @@ const defaultProps = {
 describe('HeaderGameImage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: false,
+      width: 390,
+      height: 844,
+    });
   });
 
   it('renders the banner image content', () => {
@@ -53,6 +60,21 @@ describe('HeaderGameImage', () => {
     const banner = screen.getByTestId('banner');
 
     expect(banner.props.accessibilityLabel).toContain('-140-18');
+  });
+
+  it('passes tablet banner sizing when isTablet is true', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: true,
+      width: 800,
+      height: 1280,
+    });
+
+    render(<HeaderGameImage {...defaultProps} />);
+
+    const banner = screen.getByTestId('banner');
+
+    expect(banner.props.accessibilityLabel).toContain('-260-26');
   });
 
   it('renders without appid', () => {
