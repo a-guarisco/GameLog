@@ -53,12 +53,10 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
 
-  const railBg = parseRGB(theme['--color-background-50']);
-  const bottomBg = parseRGB(theme['--color-background-0']);
+  const barBg = parseRGB(theme['--color-background-0']);
   const borderColor = parseRGB(theme['--color-outline-100']);
   const activeColor = parseRGB(theme['--color-primary-400']);
   const inactiveColor = parseRGB(theme['--color-typography-400']);
-  const activeBg = `${activeColor}20`;
 
   const handlePress = useCallback(
     (routeName: string, isFocused: boolean) => {
@@ -83,7 +81,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
           styles.rail,
           {
             width: railWidth,
-            backgroundColor: railBg,
+            backgroundColor: barBg,
             borderRightColor: borderColor,
             paddingLeft: insets.left,
             paddingTop: insets.top,
@@ -104,10 +102,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
               <TouchableOpacity
                 key={route.key}
                 onPress={() => handlePress(route.name, focused)}
-                style={[
-                  styles.railItem,
-                  focused && { backgroundColor: activeBg },
-                ]}
+                style={styles.railItem}
                 accessibilityRole="tab"
                 accessibilityLabel={config.label}
                 accessibilityState={{ selected: focused }}
@@ -146,7 +141,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
       style={[
         styles.bottomBar,
         {
-          backgroundColor: bottomBg,
+          backgroundColor: barBg,
           borderTopColor: borderColor,
           paddingBottom: bottomPadding,
         },

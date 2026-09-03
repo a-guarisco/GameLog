@@ -72,6 +72,13 @@ describe('AdaptiveTabBar', () => {
     expect(getByText('Social')).toBeTruthy();
     expect(getByText('Dev')).toBeTruthy();
 
+    const gamesTab = getByLabelText('Games');
+    expect(gamesTab).toBeTruthy();
+    // Verify focused item does not have a background color highlight applied
+    expect(gamesTab.props.style).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ backgroundColor: expect.anything() })])
+    );
+
     const socialTab = getByLabelText('Social');
     expect(socialTab).toBeTruthy();
 
