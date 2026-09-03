@@ -2,8 +2,14 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { ErrorBox, InfoBox } from './feedbacks';
 
-export const SectionSpinner = ({ className = 'items-center py-8' }: { className?: string }) => (
-  <Box className={className}>
+export const SectionSpinner = ({
+  className = 'items-center py-8',
+  testID = 'section-spinner',
+}: {
+  className?: string;
+  testID?: string;
+}) => (
+  <Box className={className} testID={testID}>
     <Spinner />
   </Box>
 );
