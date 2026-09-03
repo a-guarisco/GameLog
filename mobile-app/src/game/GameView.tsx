@@ -33,6 +33,8 @@ const GameView = () => {
     isLoadingMoreScreenshots,
     livePlayers,
     stats,
+    gameStatus,
+    refetchGameStatus,
   } = useGameViewData(gameItem, playerID);
 
   const openAchievementsList = () =>
@@ -51,10 +53,18 @@ const GameView = () => {
         <GameIdentity
           className="bg-background-0"
           title={gameItem.name}
-          chips={<GameStatusChips livePlayers={livePlayers} streakText={streakText} />}
+          chips={
+            <GameStatusChips
+              livePlayers={livePlayers}
+              streakText={streakText}
+              appId={String(gameItem.appid)}
+              status={gameStatus}
+              onStatusChange={refetchGameStatus}
+            />
+          }
         />
 
-        <Box className="pt-6 pb-6 bg-background-0">
+        <Box className="pt-3 pb-6 bg-background-0">
           <VStack space="xl">
             <Box className="px-4">
               <GameStatBand stats={stats} />

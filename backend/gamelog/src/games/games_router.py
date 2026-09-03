@@ -8,7 +8,9 @@ from src.auth.auth import get_current_user
 from src.auth.schemas import AuthenticatedUser
 from src.core.database import get_db
 from src.games import game_service, recommendations_service
-from src.games.schemas import DailyReport, RecommendationResponse, UpdateStatus
+from src.games.schemas import DailyReport, GameGenres, GameStatusesResponse, GenresBatchRequest, RecommendationResponse, UpdateStatus
+from src.models import GameStatus
+
 
 router = APIRouter(prefix="/games", tags=["games"])
 
@@ -118,20 +120,42 @@ async def update_game_status(
     return {"message": "Game status updated successfully"}
 
 
+@router.get(
+    "/game_status",
+    summary="Get user game status",
+    response_model=GameStatus | list[GameStatusesResponse],
+    status_code=200,
+)
+def get_game_status(
+    steam_app_id: str | None = None,
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GameStatus | list[GameStatusesResponse]:
+
+    """
+    Get the status of a game for the current user, or all game statuses if steam_app_id is not provided.
+    """
+    if steam_app_id is not None:
+        return game_service.get_game_status(session=db, user_id=auth_user.uid, steam_app_id=steam_app_id)
+    return game_service.get_user_game_statuses(session=db, user_id=auth_user.uid)
+
 
 @router.post(
     "/genres_batch",
     summary="Get all genres for a list of app_ids",
+    response_model=list[GameGenres],
     status_code=200,
 )
 def get_genres_batch(
-    app_ids: list[str],
-    db: Session = Depends(get_db),
+    payload: GenresBatchRequest,
     auth_user: AuthenticatedUser = Depends(get_current_user),
-) -> dict[str, list[str]]:
+    db: Session = Depends(get_db),
+) -> list[GameGenres]:
     """
-    Returns a mapping of steam_app_id to a list of genre descriptions for the requested app_ids.
+    Returns a list of GameGenres containing the app_id and genre descriptions for the requested app_ids.
     """
-    if len(app_ids) > 1000:
+    if len(payload.app_ids) > 1000:
         raise HTTPException(status_code=400, detail="Too many app_ids requested. Max 1000.")
-    return game_service.get_genres_for_apps(session=db, app_ids=app_ids)
+    genres_map = game_service.get_genres_for_apps(session=db, app_ids=payload.app_ids)
+    return [GameGenres(app_id=app_id, genres=genres) for app_id, genres in genres_map.items()]
+

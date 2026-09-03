@@ -1,6 +1,19 @@
 import { render, screen } from '@testing-library/react-native';
 import GameStatusChips from '@gamelog/game/GameStatusChips';
 
+jest.mock('@gamelog/api-manager/useApi', () => ({
+  useGetGameStatus: jest.fn(() => ({
+    gameStatus: 'playing',
+    isLoadingGameStatus: false,
+    refetchGameStatus: jest.fn(),
+  })),
+  useUpdateGameStatus: jest.fn(() => ({
+    updateGameStatus: jest.fn(),
+    isUpdatingGameStatus: false,
+    updateGameStatusError: null,
+  })),
+}));
+
 const defaultProps = {
   livePlayers: 412249,
   streakText: '0 day streak',
@@ -29,5 +42,11 @@ describe('GameStatusChips', () => {
     render(<GameStatusChips {...defaultProps} />);
 
     expect(screen.getByText('0 day streak').props.className).toContain('text-typography-100');
+  });
+
+  it('renders GameStatusSelectorChip when appId is provided', () => {
+    render(<GameStatusChips {...defaultProps} appId="730" status="playing" />);
+
+    expect(screen.getByText(/Playing/)).toBeTruthy();
   });
 });

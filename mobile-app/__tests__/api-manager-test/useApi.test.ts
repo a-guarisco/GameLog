@@ -12,8 +12,12 @@ import {
   useGetGameGuides,
   useGetPlaytimeReport,
   useGetPlaytimeByUser,
+  useGetUserGameStatuses,
+  useGetGameStatus,
+  useUpdateGameStatus,
 } from '@gamelog/api-manager/useApi';
-import { renderHook } from '@testing-library/react-native';
+import { renderHook, act } from '@testing-library/react-native';
+
 
 jest.mock('@gamelog/api-manager/apiManager');
 jest.mock('@gamelog/common/useAsyncFetch');
@@ -40,19 +44,21 @@ function useTestApiHook<TResult extends Record<string, unknown>>({
   apiArgs,
   expectedKeys,
   mockData,
+  emptyData = null,
 }: {
   useHook: () => TResult;
   apiMethod: keyof typeof ApiManager;
   apiArgs: unknown[];
   expectedKeys: { data: keyof TResult; loading: keyof TResult; error: keyof TResult };
   mockData: unknown;
+  emptyData?: unknown;
 }) {
   beforeEach(() => jest.clearAllMocks());
 
   it('returns loading state', () => {
     mockAsyncFetch({ isLoading: true });
     const { result } = renderHook(useHook);
-    expect(result.current[expectedKeys.data]).toBeNull();
+    expect(result.current[expectedKeys.data]).toEqual(emptyData);
     expect(result.current[expectedKeys.loading]).toBe(true);
     expect(result.current[expectedKeys.error]).toBeNull();
   });
@@ -69,7 +75,7 @@ function useTestApiHook<TResult extends Record<string, unknown>>({
     const mockError = new Error('Network error');
     mockAsyncFetch({ error: mockError });
     const { result } = renderHook(useHook);
-    expect(result.current[expectedKeys.data]).toBeNull();
+    expect(result.current[expectedKeys.data]).toEqual(emptyData);
     expect(result.current[expectedKeys.error]).toEqual(mockError);
   });
 
@@ -411,4 +417,99 @@ describe('useGetFriendRecommendations', () => {
   });
 });
 
+
+
+describe('useGetUserGameStatuses', () => {
+  useTestApiHook({
+    useHook: useGetUserGameStatuses,
+    apiMethod: 'getUserGameStatuses',
+    apiArgs: [],
+    expectedKeys: {
+      data: 'userGameStatuses',
+      loading: 'isLoadingUserGameStatuses',
+      error: 'errorUserGameStatuses',
+    },
+    mockData: { '730': 'playing' },
+    emptyData: {},
+  });
+
+  it('maps array response into a key-value record', async () => {
+    mockAsyncFetch();
+    renderHook(useGetUserGameStatuses);
+    const fetchFunc = mockUseAsyncFetch.mock.calls[0][0];
+    mockApiManager.getUserGameStatuses.mockResolvedValueOnce([
+      { app_id: '730', status: 'playing' },
+      { app_id: '570', status: 'played' },
+    ] as any);
+    const mapped = await fetchFunc();
+    expect(mapped).toEqual({ '730': 'playing', '570': 'played' });
+  });
+});
+
+
+describe('useGetGameStatus', () => {
+  useTestApiHook({
+    useHook: () => useGetGameStatus('730'),
+    apiMethod: 'getGameStatus',
+    apiArgs: ['730'],
+    expectedKeys: {
+      data: 'gameStatus',
+      loading: 'isLoadingGameStatus',
+      error: 'errorGameStatus',
+    },
+    mockData: 'playing',
+  });
+});
+
+describe('useUpdateGameStatus', () => {
+  it('calls ApiManager.updateGameStatus and manages loading/error state', async () => {
+    mockApiManager.updateGameStatus.mockResolvedValueOnce({ message: 'Success' });
+    const { result } = renderHook(() => useUpdateGameStatus());
+
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBeNull();
+
+    let response: any;
+    await act(async () => {
+      response = await result.current.updateGameStatus('730', 'to_be_played');
+    });
+
+    expect(response).toEqual({ message: 'Success' });
+    expect(mockApiManager.updateGameStatus).toHaveBeenCalledWith('730', 'to_be_played');
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBeNull();
+  });
+
+  it('handles errors when updateGameStatus fails', async () => {
+    mockApiManager.updateGameStatus.mockRejectedValueOnce(new Error('Update failed'));
+    const { result } = renderHook(() => useUpdateGameStatus());
+
+    await act(async () => {
+      try {
+        await result.current.updateGameStatus('730', 'to_be_played');
+      } catch (e) {
+        // Expected error
+      }
+    });
+
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBe('Update failed');
+  });
+
+  it('handles generic error objects without message', async () => {
+    mockApiManager.updateGameStatus.mockRejectedValueOnce({});
+    const { result } = renderHook(() => useUpdateGameStatus());
+
+    await act(async () => {
+      try {
+        await result.current.updateGameStatus('730', 'to_be_played');
+      } catch (e) {
+        // Expected error
+      }
+    });
+
+    expect(result.current.isUpdatingGameStatus).toBe(false);
+    expect(result.current.updateGameStatusError).toBe('Failed to update game status');
+  });
+});
 

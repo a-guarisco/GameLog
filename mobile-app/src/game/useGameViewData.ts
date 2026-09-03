@@ -2,6 +2,7 @@ import useAchievementsData from '@gamelog/game/useAchievementsData';
 import { GameScreenshot } from '@gamelog/game/GameScreenshotsStrip';
 import {
   useGetGameScreenshots,
+  useGetGameStatus,
   useGetGameStreak,
   useGetGlobalAchievement,
   useGetNumberOfCurrentPlayers,
@@ -43,6 +44,9 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
   const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
   const recentMinutes = getReportMinutesForGame(playtimeReport, gameItem.appid);
+  const { gameStatus, isLoadingGameStatus, refetchGameStatus } = useGetGameStatus(
+    String(gameItem.appid)
+  );
 
   const stats = [
     { value: formatMinutesToHoursShort(gameItem.playtime_forever), label: 'Total' },
@@ -67,6 +71,9 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
     isLoadingMoreScreenshots,
     livePlayers,
     stats,
+    gameStatus,
+    isLoadingGameStatus,
+    refetchGameStatus,
   };
 };
 

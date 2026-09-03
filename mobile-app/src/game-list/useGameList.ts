@@ -3,17 +3,20 @@ import {
   useGetOwnedGames,
   useGetFullPlaytimeReport,
   useGetGenresBatch,
+  useGetUserGameStatuses,
 } from '@gamelog/api-manager/useApi';
-import { GameItem } from '@gamelog/api-manager/dto';
+import { GameItem, GameStatus } from '@gamelog/api-manager/dto';
 
 export interface GameListItemData extends GameItem {
   genres: string[];
   maxPlaytimePerDay: number;
   streak: number;
+  gameStatus?: GameStatus | null;
 }
 
 export type SortBy = 'last_played' | 'playtime' | 'max_per_day' | 'top_platform';
 export type PlatformFilter = 'All' | 'Windows' | 'Mac' | 'Linux' | 'Deck';
+export type StatusFilter = 'All' | 'none' | GameStatus;
 
 export type DateRange = {
   from?: Date;
@@ -25,6 +28,7 @@ export const useGameList = (playerID: string) => {
     useGetOwnedGames(playerID, true, true);
 
   const { playtimeReport, isLoadingPlaytimeReport } = useGetFullPlaytimeReport();
+  const { userGameStatuses, isLoadingUserGameStatuses } = useGetUserGameStatuses();
 
   const appIds = useMemo(() => {
     if (!ownedGames?.response?.games) return [];
@@ -36,6 +40,7 @@ export const useGameList = (playerID: string) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('playtime');
   const [genreFilter, setGenreFilter] = useState<string>('All');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('All');
   const [dateRangeFilter, setDateRangeFilter] = useState<DateRange>({});
   const [isProcessing, setIsProcessing] = useState(false);
@@ -49,20 +54,24 @@ export const useGameList = (playerID: string) => {
     }
 
     const genresMap = libraryGenres || {};
+    const statusesMap = userGameStatuses || {};
 
     return ownedGames.response.games.map((game) => {
       const appId = String(game.appid);
       const report = reportsMap.get(appId);
       const genres = genresMap[appId] || [];
+      const gameStatus = statusesMap[appId] || null;
 
       return {
         ...game,
         genres,
         maxPlaytimePerDay: report?.max_playtime_per_day || 0,
         streak: report?.streak || 0,
+        gameStatus,
       };
     });
-  }, [ownedGames, playtimeReport, libraryGenres]);
+  }, [ownedGames, playtimeReport, libraryGenres, userGameStatuses]);
+
 
   const processedGames = useMemo(() => {
     let result = [...unifiedGames];
@@ -78,13 +87,22 @@ export const useGameList = (playerID: string) => {
       result = result.filter((g) => g.genres.includes(genreFilter));
     }
 
-    // 3. Platform Filter
+    // 3. Status Filter
+    if (statusFilter !== 'All') {
+      if (statusFilter === 'none') {
+        result = result.filter((g) => !g.gameStatus);
+      } else {
+        result = result.filter((g) => g.gameStatus === statusFilter);
+      }
+    }
+
+    // 4. Platform Filter
     if (platformFilter !== 'All') {
       const platformKey = `playtime_${platformFilter.toLowerCase()}_forever` as keyof GameItem;
       result = result.filter((g) => (g[platformKey] as number) > 0);
     }
 
-    // 4. Date Range Filter
+    // 5. Date Range Filter
     if (dateRangeFilter.from) {
       const fromTimestamp = Math.floor(dateRangeFilter.from.getTime() / 1000);
       result = result.filter((g) => g.rtime_last_played >= fromTimestamp);
@@ -94,7 +112,7 @@ export const useGameList = (playerID: string) => {
       result = result.filter((g) => g.rtime_last_played <= toTimestamp);
     }
 
-    // 5. Sorting
+    // 6. Sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'last_played':
@@ -124,7 +142,7 @@ export const useGameList = (playerID: string) => {
     });
 
     return result;
-  }, [unifiedGames, searchQuery, genreFilter, platformFilter, dateRangeFilter, sortBy]);
+  }, [unifiedGames, searchQuery, genreFilter, statusFilter, platformFilter, dateRangeFilter, sortBy]);
 
   const handleSortChange = (newSort: SortBy) => {
     setIsProcessing(true);
@@ -141,7 +159,12 @@ export const useGameList = (playerID: string) => {
   return {
     processedGames,
     isLoading:
-      isLoadingOwnedGames || isLoadingPlaytimeReport || isLoadingLibraryGenres || isProcessing,
+      isLoadingOwnedGames ||
+      isLoadingPlaytimeReport ||
+      isLoadingLibraryGenres ||
+      isLoadingUserGameStatuses ||
+      isProcessing,
+
     error: errorOwnedGames,
     errorMessage: errorMessageOwnedGames,
     isEmpty: !ownedGames?.response?.games?.length,
@@ -154,6 +177,8 @@ export const useGameList = (playerID: string) => {
     handleSortChange,
     genreFilter,
     setGenreFilter,
+    statusFilter,
+    setStatusFilter,
     platformFilter,
     setPlatformFilter,
     dateRangeFilter,

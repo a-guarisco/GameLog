@@ -18,3 +18,5 @@ export * from './dailyReport';
 export * from './playtimeByUser';
 export * from './report';
 export * from './community';
+export * from './gameStatus';
+

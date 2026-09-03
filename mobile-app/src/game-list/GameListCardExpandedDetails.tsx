@@ -4,7 +4,9 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
+import { formatGameStatus } from '@gamelog/api-manager/dto';
 import { GameListItemData } from './useGameList';
+
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { METRICS } from '@gamelog/theme/metrics';
 
@@ -78,8 +80,22 @@ export const GameListCardExpandedDetails = ({
 
       <Box className="mt-2" />
 
+      {/* STATUS */}
+      <HStack space="sm" className="items-center">
+        <Ionicons name="bookmark-outline" size={16} color={METRICS.status.hex} />
+        <Text size="xs" className="font-bold text-typography-300 uppercase">
+          Status
+        </Text>
+      </HStack>
+      <Text size="sm" className="text-typography-100 ml-6">
+        {formatGameStatus(gameItem.gameStatus)}
+      </Text>
+
+      <Box className="mt-2" />
+
       {/* PLATFORMS */}
       <HStack space="sm" className="items-center mb-1">
+
         <Ionicons name="hardware-chip-outline" size={16} color={METRICS.topPlatform.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Platform Split

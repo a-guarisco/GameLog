@@ -8,6 +8,7 @@ import type {
   PlaytimeByUser,
   GameBasicInfo,
   GameGenres,
+  BackendGameGenres,
   GlobalAchievement,
   GameSchema,
   OwnedGames,
@@ -29,7 +30,12 @@ import type {
   CommunityTopGame,
   CommunityScope,
   TopGameReference,
+  GameStatus,
+  GameStatusesResponse,
+  CommunityGameStatusResponse,
 } from '@gamelog/api-manager/dto';
+
+
 
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
   const options = {
@@ -130,13 +136,29 @@ export default {
     fetchAuthenticatedData<DailyReport>(EndPoints.getPlaytimeReport(startDate, endDate)),
 
   getGenresBatch: (appIds: string[]) =>
-    fetchAuthenticatedData<Record<string, string[]>>(EndPoints.getGenresBatch(), {
+    fetchAuthenticatedData<BackendGameGenres[]>(EndPoints.getGenresBatch(), {
       method: 'POST',
-      body: JSON.stringify(appIds),
+      body: JSON.stringify({ app_ids: appIds }),
     }),
 
   getPlaytimeByUser: (days: number) =>
     fetchAuthenticatedData<PlaytimeByUser>(EndPoints.getPlaytimeByUser(days)),
+
+  getGameStatus: (steamAppId: string) =>
+    fetchAuthenticatedData<GameStatus>(EndPoints.getGameStatus(steamAppId)),
+
+  updateGameStatus: (appId: string, status: GameStatus) =>
+    fetchAuthenticatedData<{ message: string }>(EndPoints.updateGameStatus(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_id: appId, status }),
+    }),
+
+  getUserGameStatuses: () =>
+    fetchAuthenticatedData<GameStatusesResponse[]>(EndPoints.getGameStatus()),
+
+
+
 
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),
@@ -210,4 +232,6 @@ export default {
     fetchAuthenticatedData<CommunityTopGame[]>(
       EndPoints.getCommunityMonthlyTopGames(scope, startDate, endDate, reference)
     ),
+  getCommunityGameStatuses: (scope: CommunityScope) =>
+    fetchAuthenticatedData<CommunityGameStatusResponse>(EndPoints.getCommunityGameStatuses(scope)),
 };

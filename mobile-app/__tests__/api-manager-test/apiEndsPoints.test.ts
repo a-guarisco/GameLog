@@ -174,6 +174,17 @@ describe('apiEndsPoints', () => {
       delete process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
       expect(EndPoints.getBackendHealth()).toBe('http://localhost:8000/health');
     });
+
+    it('builds the game_status endpoint with and without steam_app_id', () => {
+      expect(EndPoints.getGameStatus('730')).toBe(
+        'https://api.mydomain.dev/games/game_status?steam_app_id=730'
+      );
+      expect(EndPoints.getGameStatus()).toBe('https://api.mydomain.dev/games/game_status');
+    });
+
+    it('builds the update_game_status endpoint', () => {
+      expect(EndPoints.updateGameStatus()).toBe('https://api.mydomain.dev/games/update_game_status');
+    });
   });
 });
 

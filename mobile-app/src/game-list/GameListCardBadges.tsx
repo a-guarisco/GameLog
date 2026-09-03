@@ -5,8 +5,10 @@ import { formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
 import { METRICS } from '@gamelog/theme/metrics';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GameListItemData, SortBy, PlatformFilter } from './useGameList';
+import { formatGameStatus } from '@gamelog/api-manager/dto';
 
 const MinimalBadge = ({
+
   iconName,
   text,
   colorHex = '#737373',
@@ -87,6 +89,14 @@ export const GameListCardBadges = ({
       hideText: false,
     },
     {
+      id: 'game_status',
+      text: formatGameStatus(gameItem.gameStatus),
+      icon: 'bookmark-outline',
+      metric: METRICS.status,
+      show: isExpanded && Boolean(gameItem.gameStatus),
+      hideText: false,
+    },
+    {
       id: 'top_platform',
       text: topPlatform.name,
       icon: topPlatform.iconName,
@@ -105,7 +115,8 @@ export const GameListCardBadges = ({
     return false;
   };
 
-  const defaultOrder = ['playtime', 'streak', 'max_per_day', 'last_played', 'top_platform'];
+  const defaultOrder = ['playtime', 'streak', 'max_per_day', 'last_played', 'game_status', 'top_platform'];
+
   
   activeChips.sort((a, b) => {
     const aPrio = isPriority(a.id);

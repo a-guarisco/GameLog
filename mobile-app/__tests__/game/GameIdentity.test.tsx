@@ -12,11 +12,11 @@ jest.mock('@gamelog/common/gluestack/text', () => {
   return { Text: ({ children, ...props }: any) => <Text {...props}>{children}</Text> };
 });
 
-jest.mock('@gamelog/common/gluestack/hstack', () => {
+jest.mock('@gamelog/common/gluestack/vstack', () => {
   const { View } = jest.requireActual('react-native');
   return {
-    HStack: ({ children, className, ...props }: any) => (
-      <View testID="hstack" {...props}>
+    VStack: ({ children, className, ...props }: any) => (
+      <View testID="vstack" {...props}>
         {children}
       </View>
     ),
@@ -31,7 +31,7 @@ describe('GameIdentity', () => {
   describe('required props', () => {
     it('renders without crashing with only title', () => {
       const { getByTestId } = render(<GameIdentity {...defaultProps} />);
-      expect(getByTestId('hstack')).toBeTruthy();
+      expect(getByTestId('vstack')).toBeTruthy();
     });
 
     it('displays the title text', () => {

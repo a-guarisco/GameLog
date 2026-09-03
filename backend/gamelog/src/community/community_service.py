@@ -7,10 +7,28 @@ import uuid
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 from src.auth.schemas import AuthenticatedUser
-from src.community.schemas import CommunityGenreHour, CommunityMonthlyPlaytimeResponse, CommunityMonthlyTopGameResponse, CommunityScope, CommunityWeeklyPlaytimeResponse, CommunityWeeklyTopGameResponse, TopGameReference
+from src.community.schemas import (
+    CommunityGameStatusItem,
+    CommunityGameStatusResponse,
+    CommunityGenreHour,
+    CommunityMonthlyPlaytimeResponse,
+    CommunityMonthlyTopGameResponse,
+    CommunityScope,
+    CommunityWeeklyPlaytimeResponse,
+    CommunityWeeklyTopGameResponse,
+    TopGameReference,
+)
 from src.games import game_service
 from src.games.schemas import DayByDayPlaytime
-from src.models import Friendship, FriendshipStatus, Game, SteamRollingTime, User
+from src.models import (
+    Friendship,
+    FriendshipStatus,
+    Game,
+    GameStatus,
+    Shelving,
+    SteamRollingTime,
+    User,
+)
 from src.users import user_service
 
 
@@ -23,7 +41,7 @@ def get_community_genre(
     Returns the percentage share of playtime for each genre for the specified community scope.
     """
     current_user = user_service.get_user_by_firebase_uid(db, user.uid)
-    target_user_ids = _compute_target_ids(scope, current_user, db, exclude_current_user=False)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
 
     return _calculate_genre_percentages(db, target_user_ids)
 
@@ -165,6 +183,71 @@ def get_community_monthly_top_games(
         reference=reference,
     )
 
+def get_community_game_statuses(
+    scope: CommunityScope,
+    user: AuthenticatedUser,
+    db: Session,
+) -> CommunityGameStatusResponse:
+    """
+    Return the game status breakdown (count and percentage) for the user vs the community average.
+    """
+    current_user = user_service.get_user_by_firebase_uid(db, user.uid)
+    target_user_ids = _compute_target_ids(scope, current_user, db)
+
+    user_shelvings = db.exec(
+        select(Shelving).where(Shelving.owner_id == current_user.id)
+    ).all()
+    user_counts: dict[GameStatus, int] = {s: 0 for s in GameStatus}
+    for shelving in user_shelvings:
+        user_counts[shelving.status] += 1
+
+    user_num_of_games = len(user_shelvings)
+    user_items = [
+        CommunityGameStatusItem(
+            status=status,
+            count=float(user_counts[status]),
+            percentage=round((user_counts[status] / user_num_of_games) * 100.0, 2)
+            if user_num_of_games > 0
+            else 0.0,
+        )
+        for status in GameStatus
+    ]
+
+    community_shelvings = db.exec(
+        select(Shelving).where(col(Shelving.owner_id).in_(target_user_ids))
+    ).all()
+    num_target_users = len(target_user_ids)
+    community_counts: dict[GameStatus, int] = {s: 0 for s in GameStatus}
+    for shelving in community_shelvings:
+        community_counts[shelving.status] += 1
+
+    total_community_games = len(community_shelvings)
+    community_num_of_games = (
+        round(total_community_games / num_target_users, 2)
+        if num_target_users > 0
+        else 0.0
+    )
+
+    community_items = [
+        CommunityGameStatusItem(
+            status=status,
+            count=round(community_counts[status] / num_target_users, 2)
+            if num_target_users > 0
+            else 0.0,
+            percentage=round((community_counts[status] / total_community_games) * 100.0, 2)
+            if total_community_games > 0
+            else 0.0,
+        )
+        for status in GameStatus
+    ]
+
+    return CommunityGameStatusResponse(
+        user=user_items,
+        community=community_items,
+        user_num_of_games=user_num_of_games,
+        community_num_of_games=community_num_of_games,
+    )
+
 
 def _compute_community_top_games_for_dates(
     scope: CommunityScope,
@@ -272,13 +355,12 @@ def _compute_target_ids(
     scope: CommunityScope,
     current_user: User,
     db: Session,
-    exclude_current_user: bool = True,
 ) -> list[uuid.UUID]:
     match scope:
         case CommunityScope.GLOBAL:
-            target_user_ids = _get_global_user_ids(db, current_user.id if exclude_current_user else None)
+            target_user_ids = _get_global_user_ids(db, current_user.id)
         case CommunityScope.REGION:
-            target_user_ids = _get_regional_user_ids(db, current_user, exclude_current_user=exclude_current_user)
+            target_user_ids = _get_regional_user_ids(db, current_user)
         case CommunityScope.FRIENDS:
             target_user_ids = _get_friend_user_ids(db, current_user.id)
         case _:
@@ -294,22 +376,18 @@ def _compute_target_ids(
     return target_user_ids
 
 
-def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID | None = None) -> list[uuid.UUID]:
-    query = select(User.id)
-    if exclude_user_id is not None:
-        query = query.where(User.id != exclude_user_id)
+def _get_global_user_ids(db: Session, exclude_user_id: uuid.UUID) -> list[uuid.UUID]:
+    query = select(User.id).where(User.id != exclude_user_id)
     return list(db.exec(query).all())
 
 
-def _get_regional_user_ids(db: Session, user: User, exclude_current_user: bool = True) -> list[uuid.UUID]:
+def _get_regional_user_ids(db: Session, user: User) -> list[uuid.UUID]:
     if not user.region or user.region.strip() == "" or user.region == "Unknown":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User region is not set",
         )
-    query = select(User.id).where(User.region == user.region)
-    if exclude_current_user:
-        query = query.where(User.id != user.id)
+    query = select(User.id).where(User.region == user.region).where(User.id != user.id)
     return list(db.exec(query).all())
 
 

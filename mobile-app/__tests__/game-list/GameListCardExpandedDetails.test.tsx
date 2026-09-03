@@ -3,7 +3,7 @@ import { render } from '@testing-library/react-native';
 import { GameListCardExpandedDetails } from '@gamelog/game-list/GameListCardExpandedDetails';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 
-const mockGameItem = {
+const mockGameItem: any = {
   appid: 1,
   name: 'Test Game',
   playtime_forever: 100,
@@ -17,6 +17,7 @@ const mockGameItem = {
   genres: ['Action', 'Adventure'],
   maxPlaytimePerDay: 50,
   streak: 3,
+  gameStatus: 'playing',
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -39,6 +40,8 @@ describe('GameListCardExpandedDetails', () => {
 
     expect(getByText(/Jan 1, 2023/)).toBeTruthy();
     expect(getByText('Action, Adventure')).toBeTruthy();
+    expect(getByText('Status')).toBeTruthy();
+    expect(getByText('Playing')).toBeTruthy();
     expect(getByText('Windows')).toBeTruthy();
     expect(getAllByText('50m')).toBeTruthy();
     expect(getByText('Mac')).toBeTruthy();
@@ -70,4 +73,19 @@ describe('GameListCardExpandedDetails', () => {
 
     expect(getByText('None')).toBeTruthy();
   });
+
+  it('renders correctly with no game status', () => {
+    const { getByText, getAllByText } = render(
+      <GameListCardExpandedDetails
+        gameItem={{ ...mockGameItem, gameStatus: null, genres: ['Action'] }}
+        exactDateString="Jan 1, 2023"
+        platforms={[]}
+      />,
+      { wrapper }
+    );
+
+    expect(getByText('Status')).toBeTruthy();
+    expect(getByText('None')).toBeTruthy();
+  });
 });
+

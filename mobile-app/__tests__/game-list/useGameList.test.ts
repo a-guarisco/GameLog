@@ -1,16 +1,23 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useGameList } from '@gamelog/game-list/useGameList';
-import { useGetOwnedGames, useGetFullPlaytimeReport, useGetGenresBatch } from '@gamelog/api-manager/useApi';
+import {
+  useGetOwnedGames,
+  useGetFullPlaytimeReport,
+  useGetGenresBatch,
+  useGetUserGameStatuses,
+} from '@gamelog/api-manager/useApi';
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetOwnedGames: jest.fn(),
   useGetFullPlaytimeReport: jest.fn(),
   useGetGenresBatch: jest.fn(),
+  useGetUserGameStatuses: jest.fn(),
 }));
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
 const mockUseGetFullPlaytimeReport = useGetFullPlaytimeReport as jest.Mock;
 const mockUseGetGenresBatch = useGetGenresBatch as jest.Mock;
+const mockUseGetUserGameStatuses = useGetUserGameStatuses as jest.Mock;
 
 const mockGames = {
   response: {
@@ -25,7 +32,9 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockUseGetFullPlaytimeReport.mockReturnValue({ playtimeReport: null, isLoadingPlaytimeReport: false });
   mockUseGetGenresBatch.mockReturnValue({ libraryGenres: new Map(), isLoadingLibraryGenres: false });
+  mockUseGetUserGameStatuses.mockReturnValue({ userGameStatuses: {}, isLoadingUserGameStatuses: false });
 });
+
 
 describe('useGameList hook', () => {
   it('should filter games based on search query', () => {
@@ -159,4 +168,52 @@ describe('useGameList hook', () => {
     const { result } = renderHook(() => useGameList('123'));
     expect(result.current.processedGames).toEqual([]);
   });
+
+  it('should map gameStatus from userGameStatuses', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: mockGames,
+      isLoadingOwnedGames: false,
+    });
+    mockUseGetUserGameStatuses.mockReturnValue({
+      userGameStatuses: { '1': 'playing', '2': 'platinato' },
+      isLoadingUserGameStatuses: false,
+    });
+
+    const { result } = renderHook(() => useGameList('123'));
+    // Half-Life (appid 2, playtime 500) is sorted first, Portal (appid 1, playtime 100) is second
+    expect(result.current.processedGames[0].gameStatus).toBe('platinato');
+    expect(result.current.processedGames[1].gameStatus).toBe('playing');
+  });
+
+  it('should filter games based on statusFilter', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: mockGames,
+      isLoadingOwnedGames: false,
+    });
+    mockUseGetUserGameStatuses.mockReturnValue({
+      userGameStatuses: { '1': 'playing' },
+      isLoadingUserGameStatuses: false,
+    });
+
+    const { result } = renderHook(() => useGameList('123'));
+
+    act(() => {
+      result.current.setStatusFilter('playing');
+    });
+    expect(result.current.processedGames).toHaveLength(1);
+    expect(result.current.processedGames[0].appid).toBe(1);
+
+    act(() => {
+      result.current.setStatusFilter('none');
+    });
+    expect(result.current.processedGames).toHaveLength(1);
+    expect(result.current.processedGames[0].appid).toBe(2);
+
+    act(() => {
+      result.current.setStatusFilter('All');
+    });
+    expect(result.current.processedGames).toHaveLength(2);
+  });
 });
+
+

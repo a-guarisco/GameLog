@@ -118,6 +118,18 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/games/playtime_by_user?days=${days}`;
   },
 
+  getGameStatus: (steamAppId?: string) => {
+    if (steamAppId) {
+      return `${getBackendBaseUrl()}/games/game_status?steam_app_id=${steamAppId}`;
+    }
+    return `${getBackendBaseUrl()}/games/game_status`;
+  },
+
+  updateGameStatus: () => {
+    return `${getBackendBaseUrl()}/games/update_game_status`;
+  },
+
+
   getAuthOutcome: () => {
     return `${getBackendBaseUrl()}/me`;
   },
@@ -199,6 +211,10 @@ const EndPoints = {
     reference: TopGameReference = 'community'
   ) => {
     return `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+  },
+
+  getCommunityGameStatuses: (scope: CommunityScope) => {
+    return `${getBackendBaseUrl()}/community/game_statuses?scope=${scope}`;
   },
 };
 

@@ -31,6 +31,8 @@ const GameListView = () => {
     setSearchQuery,
     genreFilter,
     setGenreFilter,
+    statusFilter,
+    setStatusFilter,
     platformFilter,
     setPlatformFilter,
     dateRangeFilter,
@@ -47,6 +49,8 @@ const GameListView = () => {
         onSortChange={handleSortChange}
         genreFilter={genreFilter}
         setGenreFilter={setGenreFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
         platformFilter={platformFilter}
         setPlatformFilter={setPlatformFilter}
         dateRangeFilter={dateRangeFilter}

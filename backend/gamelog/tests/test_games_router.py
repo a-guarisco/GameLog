@@ -26,8 +26,9 @@ os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/dummy_credentials.
 os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 
-from src.games.schemas import DayByDayPlaytime
+from src.games.schemas import DayByDayPlaytime, GameStatusesResponse
 from tests.conftest import make_user
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -339,4 +340,115 @@ class TestUpdateGameStatusEndpoint:
         ):
             response = client.post(self.ENDPOINT, json={"app_id": "570", "status": "playing"})
         assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# /games/game_status
+# ---------------------------------------------------------------------------
+
+
+class TestGetGameStatusEndpoint:
+    ENDPOINT = "/games/game_status"
+
+    def test_requires_auth(self):
+        from src.main import app as _app
+
+        _app.dependency_overrides.clear()
+
+        plain_client = TestClient(_app, raise_server_exceptions=False)
+        response = plain_client.get(self.ENDPOINT, params={"steam_app_id": "570"})
+        assert response.status_code == 401
+
+    def test_get_status_success(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_game_status", return_value="playing") as mock_svc:
+            response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
+            mock_svc.assert_called_once()
+            _, kwargs = mock_svc.call_args
+            assert kwargs.get("user_id") == "firebase-uid-1"
+            assert kwargs.get("steam_app_id") == "570"
+
+        assert response.status_code == 200
+        assert response.json() == "playing"
+
+    def test_get_all_statuses_success(self, client, session):
+        make_user(session)
+        mock_payload = [
+            GameStatusesResponse(app_id="570", status="playing"),
+            GameStatusesResponse(app_id="730", status="shelved"),
+        ]
+        with patch("src.games.games_router.game_service.get_user_game_statuses", return_value=mock_payload) as mock_svc:
+            response = client.get(self.ENDPOINT)
+            mock_svc.assert_called_once()
+            _, kwargs = mock_svc.call_args
+            assert kwargs.get("user_id") == "firebase-uid-1"
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"app_id": "570", "status": "playing"},
+            {"app_id": "730", "status": "shelved"},
+        ]
+
+
+
+
+    def test_propagates_404_from_service(self, client, session):
+        make_user(session)
+        with patch(
+            "src.games.games_router.game_service.get_game_status",
+            side_effect=HTTPException(status_code=404, detail="Game not found in user's shelf."),
+        ):
+            response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
+        assert response.status_code == 404
+
+
+
+# ---------------------------------------------------------------------------
+# /games/genres_batch
+# ---------------------------------------------------------------------------
+
+
+class TestGenresBatchEndpoint:
+    ENDPOINT = "/games/genres_batch"
+
+    def test_requires_auth(self):
+        from src.main import app as _app
+
+        _app.dependency_overrides.clear()
+
+        plain_client = TestClient(_app, raise_server_exceptions=False)
+        response = plain_client.post(self.ENDPOINT, json={"app_ids": ["570", "730"]})
+        assert response.status_code == 401
+
+    def test_get_genres_batch_success(self, client, session):
+        make_user(session)
+        mock_data = {"570": ["Action", "Strategy"], "730": ["Shooter"]}
+        with patch("src.games.games_router.game_service.get_genres_for_apps", return_value=mock_data) as mock_svc:
+            response = client.post(self.ENDPOINT, json={"app_ids": ["570", "730"]})
+            mock_svc.assert_called_once()
+            _, kwargs = mock_svc.call_args
+            assert kwargs.get("app_ids") == ["570", "730"]
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"app_id": "570", "genres": ["Action", "Strategy"]},
+            {"app_id": "730", "genres": ["Shooter"]},
+        ]
+
+    def test_get_genres_batch_empty_list(self, client, session):
+        make_user(session)
+        with patch("src.games.games_router.game_service.get_genres_for_apps", return_value={}):
+            response = client.post(self.ENDPOINT, json={"app_ids": []})
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    def test_get_genres_batch_too_many_ids(self, client, session):
+        make_user(session)
+        too_many = [str(i) for i in range(1001)]
+        response = client.post(self.ENDPOINT, json={"app_ids": too_many})
+        assert response.status_code == 400
+        assert "Too many app_ids requested" in response.json()["detail"]
+
+
 

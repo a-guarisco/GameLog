@@ -3,6 +3,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import SectionTabs, { SectionTab } from '@gamelog/common/SectionTabs';
 import CommunityPlaytimeHistogramChart from '@gamelog/common/charts/community-playtime-histogram/CommunityPlaytimeHistogramChart';
 import CommunityTopGamesHistogramChart from '@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart';
+import CommunityGameStatusChart from '@gamelog/common/charts/community-game-status/CommunityGameStatusChart';
 import type { CommunityScope, OwnedGames } from '@gamelog/api-manager/dto';
 
 const COMMUNITY_SCOPES: SectionTab<CommunityScope>[] = [
@@ -28,6 +29,7 @@ const ProfileCommunityTab = ({ ownedGames }: ProfileCommunityTabProps) => {
       />
       <CommunityPlaytimeHistogramChart scope={scope} />
       <CommunityTopGamesHistogramChart scope={scope} ownedGames={ownedGames} />
+      <CommunityGameStatusChart scope={scope} />
     </VStack>
   );
 };
