@@ -6,6 +6,8 @@ import { METRICS } from '@gamelog/theme/metrics';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GameListItemData, SortBy, PlatformFilter } from './useGameList';
 import { formatGameStatus } from '@gamelog/api-manager/dto';
+import { useOrientation } from '@gamelog/common/useOrientation';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MinimalBadge = ({
 
@@ -31,7 +33,7 @@ const MinimalBadge = ({
   >
     <Ionicons name={iconName} size={12} color={colorHex} />
     {!hideText && (
-      <Text style={{ fontSize: 10 }} className={`font-bold ${textColorClass}`}>
+      <Text style={{ fontSize: 10 }} className={`font-bold ${textColorClass}`} numberOfLines={1}>
         {text}
       </Text>
     )}
@@ -55,6 +57,9 @@ export const GameListCardBadges = ({
   sortBy, 
   platformFilter 
 }: GameListCardBadgesProps) => {
+  const { isLandscape, width: screenWidth } = useOrientation();
+  const insets = useSafeAreaInsets() ?? { top: 0, left: 0, right: 0, bottom: 0 };
+
   const allChips = [
     {
       id: 'playtime',
@@ -93,7 +98,7 @@ export const GameListCardBadges = ({
       text: formatGameStatus(gameItem.gameStatus),
       icon: 'bookmark-outline',
       metric: METRICS.status,
-      show: isExpanded && Boolean(gameItem.gameStatus),
+      show: (isExpanded || isLandscape) && Boolean(gameItem.gameStatus),
       hideText: false,
     },
     {
@@ -115,7 +120,9 @@ export const GameListCardBadges = ({
     return false;
   };
 
-  const defaultOrder = ['playtime', 'streak', 'max_per_day', 'last_played', 'game_status', 'top_platform'];
+  const defaultOrder = isLandscape
+    ? ['playtime', 'streak', 'game_status', 'max_per_day', 'last_played', 'top_platform']
+    : ['playtime', 'streak', 'max_per_day', 'last_played', 'game_status', 'top_platform'];
 
   
   activeChips.sort((a, b) => {
@@ -126,27 +133,55 @@ export const GameListCardBadges = ({
     return defaultOrder.indexOf(a.id) - defaultOrder.indexOf(b.id);
   });
 
-  const charWidth = 6;
-  const baseChipWidth = 24; 
-  const MAX_WIDTH = 145; // Cards are in a 2-column grid, max width is roughly 160-180px
-
   if (!isExpanded) {
-    let estimatedWidth = 0;
-    activeChips.forEach((c) => {
-      estimatedWidth += c.hideText ? baseChipWidth : ((c.text.length * charWidth) + baseChipWidth);
-    });
+    if (isLandscape) {
+      // Dynamic width calculation in 3-column landscape grid
+      const safeLeft = insets?.left ?? 0;
+      const safeRight = insets?.right ?? 0;
+      const usableWidth = Math.max(0, screenWidth - (safeLeft + 74) - safeRight - 16);
+      const colWidth = usableWidth / 3;
+      const availableWidth = Math.max(160, Math.floor(colWidth - 32));
 
-    // Iterate from right to left (least priority to highest priority)
-    for (let i = activeChips.length - 1; i >= 0; i--) {
-      if (estimatedWidth > MAX_WIDTH) {
-        const c = activeChips[i];
-        const chipW = c.hideText ? baseChipWidth : ((c.text.length * charWidth) + baseChipWidth);
-        estimatedWidth -= chipW;
-        (c as any).hidden = true;
+      const getChipWidth = (c: (typeof allChips)[0]) =>
+        c.hideText ? 32 : 28 + Math.ceil(c.text.length * 7);
+
+      const calculateTotalWidth = (chips: typeof activeChips) => {
+        if (chips.length === 0) return 0;
+        const chipsWidth = chips.reduce((sum, c) => sum + getChipWidth(c), 0);
+        const gapsWidth = (chips.length - 1) * 2;
+        return chipsWidth + gapsWidth;
+      };
+
+      const fittingChips: typeof activeChips = [];
+      for (const chip of activeChips) {
+        const candidateList = [...fittingChips, chip];
+        if (calculateTotalWidth(candidateList) <= availableWidth) {
+          fittingChips.push(chip);
+        }
       }
+      activeChips = fittingChips;
+    } else {
+      const charWidth = 6;
+      const baseChipWidth = 24; 
+      const MAX_WIDTH = 145; // Cards are in a 2-column grid, max width is roughly 160-180px
+
+      let estimatedWidth = 0;
+      activeChips.forEach((c) => {
+        estimatedWidth += c.hideText ? baseChipWidth : ((c.text.length * charWidth) + baseChipWidth);
+      });
+
+      // Iterate from right to left (least priority to highest priority)
+      for (let i = activeChips.length - 1; i >= 0; i--) {
+        if (estimatedWidth > MAX_WIDTH) {
+          const c = activeChips[i];
+          const chipW = c.hideText ? baseChipWidth : ((c.text.length * charWidth) + baseChipWidth);
+          estimatedWidth -= chipW;
+          (c as any).hidden = true;
+        }
+      }
+      
+      activeChips = activeChips.filter((c: any) => !c.hidden);
     }
-    
-    activeChips = activeChips.filter((c: any) => !c.hidden);
   }
 
   return (
