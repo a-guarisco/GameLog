@@ -114,16 +114,12 @@ export const useCommunityTopGamesHistogramData = ({
 
     return data.map((item, index) => {
       const appId = String(item.id);
-      const name =
-        ownedGameNames.get(appId) || fetchedNames[appId] || `Game #${appId}`;
+      const name = ownedGameNames.get(appId) || fetchedNames[appId] || `Game #${appId}`;
       const userPlaytime = Number(item.user_playtime) || 0;
       const communityPlaytime = Number(item.community_playtime) || 0;
 
       const userPercent = Math.min(100, Math.max(0, (userPlaytime / maxPlaytime) * 100));
-      const communityPercent = Math.min(
-        100,
-        Math.max(0, (communityPlaytime / maxPlaytime) * 100)
-      );
+      const communityPercent = Math.min(100, Math.max(0, (communityPlaytime / maxPlaytime) * 100));
 
       return {
         id: appId,

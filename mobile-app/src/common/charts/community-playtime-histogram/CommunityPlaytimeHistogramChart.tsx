@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, useRef, useEffect } from 'react';
 import { useColorScheme, Pressable } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -25,9 +25,15 @@ import type { CommunityScope } from '@gamelog/api-manager/dto';
 
 const MemoizedBarChart = memo(BarChart);
 
-const RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
+const PORTRAIT_RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
   { id: 'week', label: '1W', testID: 'community-histogram-range-week' },
   { id: 'month', label: '6M', testID: 'community-histogram-range-month' },
+];
+
+const LANDSCAPE_RANGE_OPTIONS: GLSegmentOption<CommunityPeriodRange>[] = [
+  { id: 'twoWeeks', label: '2W', testID: 'community-histogram-range-two-weeks' },
+  { id: 'month', label: '6M', testID: 'community-histogram-range-month' },
+  { id: 'year', label: '1Y', testID: 'community-histogram-range-year' },
 ];
 
 interface CommunityPlaytimeHistogramChartProps {
@@ -43,11 +49,45 @@ const CommunityPlaytimeHistogramChart = ({
   targetUserName,
   chartTitle,
 }: CommunityPlaytimeHistogramChartProps) => {
-  const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
+  const { isLandscape } = useOrientation();
+  const hasUserSelectedRange = useRef(false);
+  const prevIsLandscapeRef = useRef(isLandscape);
+
+  const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>(() =>
+    isLandscape ? 'twoWeeks' : 'week'
+  );
   const [offset, setOffset] = useState<number>(0);
 
-  const { isLandscape } = useOrientation();
-  const barWidth = isLandscape ? 16 : 12;
+  useEffect(() => {
+    if (prevIsLandscapeRef.current !== isLandscape) {
+      prevIsLandscapeRef.current = isLandscape;
+      if (!hasUserSelectedRange.current) {
+        setPeriodRange(isLandscape ? 'twoWeeks' : 'week');
+        setOffset(0);
+      } else if (!isLandscape) {
+        if (periodRange === 'twoWeeks') {
+          setPeriodRange('week');
+          setOffset(0);
+        } else if (periodRange === 'year') {
+          setPeriodRange('month');
+          setOffset(0);
+        }
+      } else if (isLandscape) {
+        if (periodRange === 'week') {
+          setPeriodRange('twoWeeks');
+          setOffset(0);
+        }
+      }
+    }
+  }, [isLandscape, periodRange]);
+
+  const barWidth = isLandscape
+    ? periodRange === 'year' || periodRange === 'twoWeeks'
+      ? 14
+      : periodRange === 'month'
+        ? 20
+        : 18
+    : 12;
   const barChartHeight = isLandscape ? 200 : 140;
   const containerHeight = isLandscape ? 240 : 180;
 
@@ -108,11 +148,12 @@ const CommunityPlaytimeHistogramChart = ({
     <ChartWrapperCard
       label={displayTitle}
       headerRight={
-        <Box className="w-[100px] ml-auto">
+        <Box className={`${isLandscape ? 'w-[150px]' : 'w-[100px]'} ml-auto`}>
           <GLSegmentedControl<CommunityPeriodRange>
-            options={RANGE_OPTIONS}
+            options={isLandscape ? LANDSCAPE_RANGE_OPTIONS : PORTRAIT_RANGE_OPTIONS}
             activeId={periodRange}
             onSelect={(id) => {
+              hasUserSelectedRange.current = true;
               setPeriodRange(id);
               setOffset(0);
             }}
@@ -131,12 +172,30 @@ const CommunityPlaytimeHistogramChart = ({
 
         const availableWidth = (cardWidth || 350) - 10;
         const maxDrawingWidth = availableWidth - 44;
-        const groupCount = dateRangeInfo.labels.length || (periodRange === 'week' ? 7 : 6);
+        const groupCount =
+          dateRangeInfo.labels.length ||
+          (periodRange === 'week'
+            ? 7
+            : periodRange === 'twoWeeks'
+              ? 14
+              : periodRange === 'year'
+                ? 12
+                : 6);
         const pairWidth = 2 * barWidth + 2;
         const totalPairsWidth = groupCount * pairWidth;
         const remainingWidth = Math.max(4, maxDrawingWidth - totalPairsWidth);
-        const groupSpacing = Math.max(4, Math.floor(remainingWidth / groupCount));
-        const exactDrawingWidth = totalPairsWidth + groupSpacing * groupCount;
+
+        const minSpacing = isLandscape
+          ? periodRange === 'twoWeeks' || periodRange === 'year'
+            ? 12
+            : periodRange === 'month'
+              ? 32
+              : 26
+          : 4;
+        const dynamicSpacing = Math.floor(remainingWidth / (groupCount + 0.5));
+        const groupSpacing = Math.max(minSpacing, dynamicSpacing);
+        const initialSpacing = Math.max(2, Math.floor(groupSpacing / 2));
+        const exactDrawingWidth = totalPairsWidth + groupSpacing * groupCount + initialSpacing;
         const exactTotalWidth = exactDrawingWidth + 44;
 
         const finalBarData = barData.map((item, idx) => {
@@ -178,7 +237,9 @@ const CommunityPlaytimeHistogramChart = ({
                     </Pressable>
 
                     <ChartDateRangeText>
-                      {formatShortDate(startTimestamp)} - {formatShortDate(endTimestamp)}
+                      {periodRange === 'year'
+                        ? `${new Date(startTimestamp * 1000).getFullYear()}`
+                        : `${formatShortDate(startTimestamp)} - ${formatShortDate(endTimestamp)}`}
                     </ChartDateRangeText>
 
                     <Pressable
@@ -211,7 +272,14 @@ const CommunityPlaytimeHistogramChart = ({
                     style={{ top: -20 }}
                   >
                     <Text className="text-typography-400 font-medium">
-                      No playtime for the selected {periodRange === 'week' ? 'week' : 'period'}
+                      No playtime for the selected{' '}
+                      {periodRange === 'week'
+                        ? 'week'
+                        : periodRange === 'twoWeeks'
+                          ? '2-week period'
+                          : periodRange === 'year'
+                            ? 'year'
+                            : 'period'}
                     </Text>
                   </Box>
                 )}
@@ -261,11 +329,11 @@ const CommunityPlaytimeHistogramChart = ({
                 </Box>
 
                 <MemoizedBarChart
-                  key={`${periodRange}-${offset}-${scope}`}
+                  key={`${periodRange}-${offset}-${scope}-${isLandscape}`}
                   data={finalBarData}
                   width={exactTotalWidth}
                   spacing={groupSpacing}
-                  initialSpacing={groupSpacing / 2}
+                  initialSpacing={initialSpacing}
                   maxValue={chartMaxValue}
                   barWidth={barWidth}
                   height={barChartHeight}

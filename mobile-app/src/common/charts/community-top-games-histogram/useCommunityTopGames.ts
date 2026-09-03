@@ -3,7 +3,9 @@ import ApiManager from '@gamelog/api-manager/apiManager';
 import { useAsyncFetch } from '@gamelog/common/useAsyncFetch';
 import {
   getCommunityWeekRange,
+  getCommunityTwoWeeksRange,
   getCommunityMonthRange,
+  getCommunityYearRange,
   CommunityPeriodRange,
   CommunityDateRangeInfo,
 } from '@gamelog/common/charts/community-playtime-histogram/useCommunityPlaytime';
@@ -23,48 +25,41 @@ export const useCommunityTopGames = ({
   periodRange,
   reference = 'community',
   offset,
-  currentDate = new Date(),
+  currentDate,
   targetUserId,
 }: UseCommunityTopGamesProps) => {
+  const dateTimestamp = currentDate ? currentDate.getTime() : null;
+  const effectiveDate = useMemo(
+    () => (dateTimestamp ? new Date(dateTimestamp) : new Date()),
+    [dateTimestamp]
+  );
+
   const dateRangeInfo: CommunityDateRangeInfo = useMemo(() => {
     if (periodRange === 'week') {
-      return getCommunityWeekRange(currentDate, offset);
+      return getCommunityWeekRange(effectiveDate, offset);
     }
-    return getCommunityMonthRange(currentDate, offset);
-  }, [periodRange, offset, currentDate]);
+    if (periodRange === 'twoWeeks') {
+      return getCommunityTwoWeeksRange(effectiveDate, offset);
+    }
+    if (periodRange === 'year') {
+      return getCommunityYearRange(effectiveDate, offset);
+    }
+    return getCommunityMonthRange(effectiveDate, offset);
+  }, [periodRange, offset, effectiveDate]);
+
+  const startDate = dateRangeInfo.startDate;
+  const endDate = dateRangeInfo.endDate;
 
   const fetchFunc = useCallback(() => {
-    if (periodRange === 'week') {
+    if (periodRange === 'week' || periodRange === 'twoWeeks') {
       return targetUserId
-        ? ApiManager.getCommunityWeeklyTopGames(
-            scope,
-            dateRangeInfo.startDate,
-            dateRangeInfo.endDate,
-            reference,
-            targetUserId
-          )
-        : ApiManager.getCommunityWeeklyTopGames(
-            scope,
-            dateRangeInfo.startDate,
-            dateRangeInfo.endDate,
-            reference
-          );
+        ? ApiManager.getCommunityWeeklyTopGames(scope, startDate, endDate, reference, targetUserId)
+        : ApiManager.getCommunityWeeklyTopGames(scope, startDate, endDate, reference);
     }
     return targetUserId
-      ? ApiManager.getCommunityMonthlyTopGames(
-          scope,
-          dateRangeInfo.startDate,
-          dateRangeInfo.endDate,
-          reference,
-          targetUserId
-        )
-      : ApiManager.getCommunityMonthlyTopGames(
-          scope,
-          dateRangeInfo.startDate,
-          dateRangeInfo.endDate,
-          reference
-        );
-  }, [scope, periodRange, reference, dateRangeInfo.startDate, dateRangeInfo.endDate, targetUserId]);
+      ? ApiManager.getCommunityMonthlyTopGames(scope, startDate, endDate, reference, targetUserId)
+      : ApiManager.getCommunityMonthlyTopGames(scope, startDate, endDate, reference);
+  }, [scope, periodRange, reference, startDate, endDate, targetUserId]);
 
   const { data, isLoading, error, errorMessage, refetch } =
     useAsyncFetch<CommunityTopGame[]>(fetchFunc);

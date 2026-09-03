@@ -12,6 +12,7 @@ import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { ChartDateRangeText } from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
 import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
+import { useOrientation } from '@gamelog/common/useOrientation';
 import { useCommunityTopGames } from './useCommunityTopGames';
 import {
   useCommunityTopGamesHistogramData,
@@ -40,6 +41,7 @@ const CommunityTopGamesHistogramChart = ({
   targetUserName,
   chartTitle,
 }: CommunityTopGamesHistogramChartProps) => {
+  const { isLandscape } = useOrientation();
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
   const [reference, setReference] = useState<TopGameReference>('community');
   const [offset, setOffset] = useState<number>(0);
@@ -56,6 +58,8 @@ const CommunityTopGamesHistogramChart = ({
     data,
     ownedGames,
   });
+
+  const displayItems = isLandscape ? topGamesItems.slice(0, 10) : topGamesItems.slice(0, 5);
 
   const renderError = () => (
     <Box className="py-6 items-center justify-center w-full">
@@ -222,9 +226,53 @@ const CommunityTopGamesHistogramChart = ({
                   No top community games found for this period
                 </Text>
               </Box>
+            ) : isLandscape ? (
+              <Box className="flex-row flex-wrap w-full -mx-2">
+                {displayItems.map((item) => (
+                  <Box key={item.id} className="w-1/2 px-2 mb-4">
+                    <HStack
+                      space="md"
+                      className="items-start w-full"
+                      testID={`top-game-item-${item.id}`}
+                    >
+                      {/* Left: Capsule Image with height matching title + 2 bars */}
+                      <Image
+                        source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
+                        style={{
+                          width: 105,
+                          height: 62,
+                          borderRadius: 6,
+                          backgroundColor: '#333',
+                        }}
+                        resizeMode="cover"
+                        testID={`game-capsule-${item.id}`}
+                      />
+
+                      {/* Right: Title and Dual Bars */}
+                      <VStack className="flex-1" space="xs">
+                        <Text size="md" className="font-bold text-typography-0" numberOfLines={1}>
+                          {item.name}
+                        </Text>
+
+                        {reference === 'user' ? (
+                          <>
+                            {renderUserBar(item)}
+                            {renderCommunityBar(item)}
+                          </>
+                        ) : (
+                          <>
+                            {renderCommunityBar(item)}
+                            {renderUserBar(item)}
+                          </>
+                        )}
+                      </VStack>
+                    </HStack>
+                  </Box>
+                ))}
+              </Box>
             ) : (
               <VStack space="md" className="w-full">
-                {topGamesItems.map((item) => (
+                {displayItems.map((item) => (
                   <HStack
                     key={item.id}
                     space="md"
@@ -241,11 +289,7 @@ const CommunityTopGamesHistogramChart = ({
 
                     {/* Right: Title and Dual Bars */}
                     <VStack className="flex-1" space="xs">
-                      <Text
-                        size="md"
-                        className="font-bold text-typography-0"
-                        numberOfLines={1}
-                      >
+                      <Text size="md" className="font-bold text-typography-0" numberOfLines={1}>
                         {item.name}
                       </Text>
 
