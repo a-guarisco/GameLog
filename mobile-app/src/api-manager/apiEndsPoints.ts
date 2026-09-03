@@ -158,8 +158,8 @@ const EndPoints = {
     return `${getBackendBaseUrl()}/users/add_friend`;
   },
 
-  respondToFriend: () => {
-    return `${getBackendBaseUrl()}/users/respond_to_friend`;
+  manageFriendship: () => {
+    return `${getBackendBaseUrl()}/users/manage_friendship`;
   },
 
   getRecommendations: (friendId: string, includeTopGames: boolean = true) => {

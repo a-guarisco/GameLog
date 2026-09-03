@@ -103,7 +103,7 @@ describe('apiEndsPoints', () => {
       expect(EndPoints.searchUsers('alex')).toBe('https://api.mydomain.dev/users/search?q=alex');
       expect(EndPoints.getFriendList()).toBe('https://api.mydomain.dev/users/friend_list');
       expect(EndPoints.addFriend()).toBe('https://api.mydomain.dev/users/add_friend');
-      expect(EndPoints.respondToFriend()).toBe('https://api.mydomain.dev/users/respond_to_friend');
+      expect(EndPoints.manageFriendship()).toBe('https://api.mydomain.dev/users/manage_friendship');
       expect(EndPoints.getRecommendations('user-123')).toBe(
         'https://api.mydomain.dev/games/recommendations?friend=user-123&include_top_games=true'
       );

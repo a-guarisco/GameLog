@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
 interface UseFriendActionsParams {
@@ -12,6 +12,10 @@ export interface FriendActions {
   handleAddFriend: (userId: string) => Promise<void>;
   handleAcceptFriend: (friendshipId: string) => Promise<void>;
   handleRefuseFriend: (friendshipId: string) => Promise<void>;
+  handleBlockFriend: (id: string) => Promise<void>;
+  handleRemoveFriend: (friendshipId: string) => Promise<void>;
+  handleRemovePending: (friendshipId: string) => Promise<void>;
+  handleUnblockFriend: (friendshipId: string) => Promise<void>;
 }
 
 export const useFriendActions = ({
@@ -20,9 +24,30 @@ export const useFriendActions = ({
 }: UseFriendActionsParams): FriendActions => {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (actionFeedback) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        setActionFeedback(null);
+      }, 3000);
+    }
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [actionFeedback]);
 
   const runAction = useCallback(
     async (action: () => Promise<void>, successMessage: string, failureMessage: string) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
       setIsActionLoading(true);
       setActionFeedback(null);
       try {
@@ -52,7 +77,7 @@ export const useFriendActions = ({
   const handleAcceptFriend = useCallback(
     (friendshipId: string) =>
       runAction(
-        () => ApiManager.respondToFriend(friendshipId, 'ACCEPTED'),
+        () => ApiManager.manageFriendship('ACCEPT', friendshipId),
         'Friend request accepted!',
         'Failed to accept friend request'
       ),
@@ -62,9 +87,49 @@ export const useFriendActions = ({
   const handleRefuseFriend = useCallback(
     (friendshipId: string) =>
       runAction(
-        () => ApiManager.respondToFriend(friendshipId, 'REJECTED'),
+        () => ApiManager.manageFriendship('REJECT', friendshipId),
         'Friend request refused.',
         'Failed to refuse friend request'
+      ),
+    [runAction]
+  );
+
+  const handleBlockFriend = useCallback(
+    (id: string) =>
+      runAction(
+        () => ApiManager.manageFriendship('BLOCK', id),
+        'User blocked.',
+        'Failed to block user'
+      ),
+    [runAction]
+  );
+
+  const handleRemoveFriend = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.manageFriendship('REMOVE', friendshipId),
+        'Friend removed.',
+        'Failed to remove friend'
+      ),
+    [runAction]
+  );
+
+  const handleRemovePending = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.manageFriendship('CANCEL', friendshipId),
+        'Friend request cancelled.',
+        'Failed to cancel friend request'
+      ),
+    [runAction]
+  );
+
+  const handleUnblockFriend = useCallback(
+    (friendshipId: string) =>
+      runAction(
+        () => ApiManager.manageFriendship('UNBLOCK', friendshipId),
+        'User unblocked.',
+        'Failed to unblock user'
       ),
     [runAction]
   );
@@ -75,5 +140,9 @@ export const useFriendActions = ({
     handleAddFriend,
     handleAcceptFriend,
     handleRefuseFriend,
+    handleBlockFriend,
+    handleRemoveFriend,
+    handleRemovePending,
+    handleUnblockFriend,
   };
 };
