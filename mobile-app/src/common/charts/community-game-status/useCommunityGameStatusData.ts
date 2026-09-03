@@ -24,11 +24,13 @@ export interface StatusComparisonItem {
 
 export const STATUS_ORDER: GameStatus[] = ['playing', 'to_be_played', 'shelved', 'platinato'];
 
+import { METRICS } from '@gamelog/theme/metrics';
+
 export const STATUS_COLORS: Record<GameStatus, string> = {
-  playing: parseRGB(tailwindColors.cyan[500]),
-  to_be_played: parseRGB(tailwindColors.emerald[500]),
-  shelved: parseRGB(tailwindColors.slate[400]),
-  platinato: parseRGB(tailwindColors.amber[500]),
+  playing: METRICS.gameStatus.playing.hex,
+  to_be_played: METRICS.gameStatus.to_be_played.hex,
+  shelved: METRICS.gameStatus.shelved.hex,
+  platinato: METRICS.gameStatus.platinato.hex,
 };
 
 export const formatCommunityGameCount = (count?: number | null): string => {

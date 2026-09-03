@@ -51,6 +51,32 @@ export const METRICS = {
     hex: parseRGB(tailwindColors.cyan[600]),
     gradientHex: parseRGB(tailwindColors.cyan[400]),
   },
+  gameStatus: {
+    playing: {
+      borderClass: 'border-cyan-600',
+      textClass: 'text-cyan-600',
+      bgClass: 'bg-cyan-100 dark:bg-cyan-900/40',
+      hex: parseRGB(tailwindColors.cyan[500]),
+    },
+    to_be_played: {
+      borderClass: 'border-emerald-600',
+      textClass: 'text-emerald-600',
+      bgClass: 'bg-emerald-100 dark:bg-emerald-900/40',
+      hex: parseRGB(tailwindColors.emerald[500]),
+    },
+    shelved: {
+      borderClass: 'border-slate-500',
+      textClass: 'text-slate-500',
+      bgClass: 'bg-slate-100 dark:bg-slate-800/40',
+      hex: parseRGB(tailwindColors.slate[400]),
+    },
+    platinato: {
+      borderClass: 'border-amber-600',
+      textClass: 'text-amber-600',
+      bgClass: 'bg-amber-100 dark:bg-amber-900/40',
+      hex: parseRGB(tailwindColors.amber[500]),
+    },
+  },
 } as const;
 
 

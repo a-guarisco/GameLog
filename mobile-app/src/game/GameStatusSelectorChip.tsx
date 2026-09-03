@@ -92,14 +92,14 @@ export const GameStatusSelectorChip = ({
         <Chip
           className={
             selectedStatus
-              ? `${METRICS.status.bgClass} ${METRICS.status.borderClass}`
+              ? `${METRICS.gameStatus[selectedStatus].bgClass} ${METRICS.gameStatus[selectedStatus].borderClass}`
               : 'bg-background-200 border-outline-100'
           }
         >
           <Text
             size="xs"
             className={`font-bold ${
-              selectedStatus ? METRICS.status.textClass : 'text-typography-100'
+              selectedStatus ? METRICS.gameStatus[selectedStatus].textClass : 'text-typography-100'
             }`}
           >
             {getDisplayLabel()}
@@ -107,7 +107,7 @@ export const GameStatusSelectorChip = ({
           <Ionicons
             name="chevron-down"
             size={12}
-            color={selectedStatus ? METRICS.status.hex : '#a3a3a3'}
+            color={selectedStatus ? METRICS.gameStatus[selectedStatus].hex : '#a3a3a3'}
           />
         </Chip>
       </Pressable>
@@ -143,7 +143,7 @@ export const GameStatusSelectorChip = ({
                   <HStack className="justify-between items-center py-2">
                     <ModalOptionText isActive={isCurrent}>{option.label}</ModalOptionText>
                     {isThisUpdating && (
-                      <ActivityIndicator size="small" color={METRICS.status.hex} />
+                      <ActivityIndicator size="small" color={METRICS.gameStatus[option.key].hex} />
                     )}
                   </HStack>
                 </Pressable>
