@@ -1,4 +1,4 @@
-import ApiManager, { setApiProvider, fetchData } from '@gamelog/api-manager/apiManager';
+import ApiManager, { fetchData } from '@gamelog/api-manager/apiManager';
 import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
@@ -51,7 +51,6 @@ const testHelper = (
 describe('ApiManager', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    setApiProvider('steam');
   });
 
   testHelper(
@@ -509,22 +508,6 @@ describe('ApiManager', () => {
     });
   });
 
-  it('allows provider switching at runtime (currently all endpoints use steam)', async () => {
-    setApiProvider('backend');
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ response: { games: [] } }),
-    });
-
-    await ApiManager.getOwnedGames(steamId, false, false);
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=false&include_played_free_games=false`,
-      expect.objectContaining({
-        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
-      })
-    );
-  });
 
   describe('additional authenticated endpoints', () => {
     beforeEach(() => {
