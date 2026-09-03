@@ -9,6 +9,8 @@ import {
 } from '@firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { resolveServiceUrl } from '@gamelog/api-manager/serviceDiscovery';
+
 const getRequiredEnv = (value: string | undefined, name: string): string => {
   if (!value) {
     throw new Error(`Missing required env var: ${name}`);
@@ -43,45 +45,58 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const useEmulator = process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR !== 'false';
 const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 
-const getDefaultAuthEmulatorHost = (): string =>
-  Platform.OS === 'android' ? 'http://10.0.2.2:9099' : 'http://localhost:9099';
+let auth: ReturnType<typeof getAuth>;
 
-const getAuthEmulatorHost = (): string => {
-  const configured = process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST?.trim();
-
-  if (!configured) {
-    return getDefaultAuthEmulatorHost();
+const initializeFirebaseAuth = () => {
+  if (auth) return auth;
+  try {
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+  } catch {
+    auth = getAuth(app);
   }
-
-  if (Platform.OS === 'android' && configured.includes('localhost')) {
-    return 'http://10.0.2.2:9099';
-  }
-
-  if (Platform.OS === 'ios' && configured.includes('10.0.2.2')) {
-    return 'http://localhost:9099';
-  }
-
-  return configured;
+  return auth;
 };
 
-let auth: ReturnType<typeof getAuth>;
-try {
-  auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage),
-  });
+const globalAny = global as any;
 
-  if (useEmulator) {
-    const authEmulatorHost = getAuthEmulatorHost();
+export const setupAuthEmulator = async () => {
+  if (!useEmulator || globalAny.__isAuthEmulatorConnected) {
+    initializeFirebaseAuth();
+    return;
+  }
 
-    connectAuthEmulator(auth, authEmulatorHost);
+  try {
+    const isDev = process.env.EXPO_PUBLIC_IS_DEV === 'true';
+    const authEmulatorHost = await resolveServiceUrl(
+      process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST,
+      'FirebaseAuth',
+      9099,
+      '/',
+      isDev
+    );
+    
+    if (globalAny.__isAuthEmulatorConnected) return;
+    
+    // Initialize Auth IMMEDIATELY before connecting the emulator
+    // to absolutely guarantee no network requests are fired beforehand.
+    initializeFirebaseAuth();
+    
+    connectAuthEmulator(auth, authEmulatorHost, { disableWarnings: true });
+    globalAny.__isAuthEmulatorConnected = true;
     console.log(
       `[Firebase Auth] 🛠️ Mode: EMULATOR | Project: ${projectId} | Host: ${authEmulatorHost}`
     );
-  } else {
-    console.log(`[Firebase Auth] ☁️ Mode: LIVE (Cloud) | Project: ${projectId}`);
+  } catch (error) {
+    console.warn('[Firebase Auth] Failed to connect emulator:', error);
+    initializeFirebaseAuth(); // Ensure auth is initialized even on failure
   }
-} catch {
-  auth = getAuth(app);
+};
+
+if (!useEmulator) {
+  console.log(`[Firebase Auth] ☁️ Mode: LIVE (Cloud) | Project: ${projectId}`);
 }
 
 export { app, auth };
+
