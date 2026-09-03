@@ -17,11 +17,14 @@ jest.mock('firebase/auth', () => ({
     credential: jest.fn(() => 'mock-credential'),
   },
   signInWithCredential: jest.fn(),
+  signOut: jest.fn(),
 }));
 
 jest.mock('@gamelog/auth/firebaseClient', () => ({
-  auth: {},
+  getFirebaseAuth: () => mockAuth,
 }));
+
+const mockAuth: any = {};
 
 const mockGoogleSignin = {
   configure: jest.fn(),

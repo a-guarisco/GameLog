@@ -1,6 +1,6 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { GoogleAuthProvider, signInWithCredential, type User } from 'firebase/auth';
-import { auth } from './firebaseClient';
+import { getFirebaseAuth } from './firebaseClient';
 
 const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
@@ -48,7 +48,7 @@ export const signInWithGoogle = async (): Promise<User> => {
   }
 
   const credential = GoogleAuthProvider.credential(idToken);
-  const userCredential = await signInWithCredential(auth, credential);
+  const userCredential = await signInWithCredential(getFirebaseAuth(), credential);
 
   return userCredential.user;
 };

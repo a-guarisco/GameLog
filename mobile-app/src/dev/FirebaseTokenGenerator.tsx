@@ -1,4 +1,4 @@
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
@@ -33,7 +33,7 @@ export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProp
         );
       }
 
-      const credential = await signInWithEmailAndPassword(auth, email, pwd);
+      const credential = await signInWithEmailAndPassword(getFirebaseAuth(), email, pwd);
       const token = await credential.user.getIdToken(true);
       setIdToken(token);
       console.log('Generated Firebase ID Token:', token);

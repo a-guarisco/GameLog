@@ -2,7 +2,13 @@ import ApiManager, { fetchData } from '@gamelog/api-manager/apiManager';
 import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
+
+jest.mock('@gamelog/auth/firebaseClient', () => ({
+  getFirebaseAuth: () => mockAuth,
+}));
+
+const mockAuth: any = {};
 
 jest.mock('@gamelog/api-manager/backendResolver', () => ({
   resolveBackendUrl: jest.fn().mockResolvedValue(''),
@@ -262,13 +268,13 @@ describe('ApiManager', () => {
 
   describe('authenticated backend streak endpoints', () => {
     beforeEach(() => {
-      (auth as any).currentUser = {
+      mockAuth.currentUser = {
         getIdToken: jest.fn().mockResolvedValue('firebase-id-token'),
       };
     });
 
     afterEach(() => {
-      (auth as any).currentUser = null;
+      mockAuth.currentUser = null;
     });
 
     it('fetches user streak with the current Firebase token', async () => {
@@ -357,7 +363,7 @@ describe('ApiManager', () => {
     });
 
     it('does not call streak endpoints without an active Firebase session', async () => {
-      (auth as any).currentUser = null;
+      mockAuth.currentUser = null;
 
       await expect(ApiManager.getStreakByUser()).rejects.toThrow('No active Firebase user session');
       expect(mockFetch).not.toHaveBeenCalled();
@@ -511,7 +517,7 @@ describe('ApiManager', () => {
 
   describe('additional authenticated endpoints', () => {
     beforeEach(() => {
-      (auth as any).currentUser = {
+      mockAuth.currentUser = {
         getIdToken: jest.fn().mockResolvedValue('mock-token-123'),
       };
     });
@@ -598,7 +604,7 @@ describe('ApiManager', () => {
     });
 
     it('throws error when no Firebase user token is available', async () => {
-      (auth as any).currentUser = null;
+      mockAuth.currentUser = null;
       await expect(ApiManager.getUserMe()).rejects.toThrow(
         'No active Firebase user session. Sign in before calling authenticated backend endpoints.'
       );

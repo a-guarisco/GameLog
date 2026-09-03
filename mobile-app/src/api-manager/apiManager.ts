@@ -1,6 +1,6 @@
 import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import type {
   CurrentPlayers,
   DailyReport,
@@ -70,7 +70,7 @@ async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promise<T> {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await getFirebaseAuth().currentUser?.getIdToken();
 
   if (!token) {
     throw new Error(
