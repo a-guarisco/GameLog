@@ -1,5 +1,4 @@
-import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
-import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
 import { auth } from '@gamelog/auth/firebaseClient';
 import type {
@@ -88,7 +87,7 @@ async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promi
   });
 }
 
-export { getApiProvider, setApiProvider, isBackendProvider, fetchData, fetchAuthenticatedData };
+export { fetchData, fetchAuthenticatedData };
 export default {
   getNumberOfCurrentPlayers: (appId: string) =>
     fetchData<CurrentPlayers>(EndPoints.getNumberOfCurrentPlayers(appId)),

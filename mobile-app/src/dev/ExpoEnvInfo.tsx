@@ -28,7 +28,6 @@ export const ExpoEnvInfo = () => {
   const publicKeys = Object.keys(envObj).filter((key) => key.startsWith('EXPO_PUBLIC_'));
 
   const defaultKeys = [
-    'EXPO_PUBLIC_API_PROVIDER',
     'EXPO_PUBLIC_BACKEND_BASE_URL',
     'EXPO_PUBLIC_STEAM_API_KEY',
   ];
