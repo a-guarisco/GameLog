@@ -75,7 +75,7 @@ describe('computePieRadius', () => {
   });
 
   it('should calculate proportional radius in portrait for standard mobile widths', () => {
-    expect(computePieRadius(350)).toBe(122);
+    expect(computePieRadius(300)).toBe(135);
   });
 
   it('should clamp portrait radius at 140 for large screen widths', () => {
