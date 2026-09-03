@@ -3,10 +3,10 @@ import HeaderGameImage from '@gamelog/common/HeaderGameImage';
 
 jest.mock('@gamelog/common/Banner', () => {
   const { View } = jest.requireActual('react-native');
-  const MockBanner = ({ imageUrl, minHeight, heightPercentage }: any) => (
+  const MockBanner = ({ imageUrl, minHeight, heightPercentage, scrollable }: any) => (
     <View
       testID="banner"
-      accessibilityLabel={`banner-${imageUrl}-${minHeight}-${heightPercentage}`}
+      accessibilityLabel={`banner-${imageUrl}-${minHeight}-${heightPercentage}-${scrollable ? 'scrollable' : 'static'}`}
     />
   );
   MockBanner.displayName = 'MockBanner';
@@ -58,6 +58,24 @@ describe('HeaderGameImage', () => {
   it('renders without appid', () => {
     render(<HeaderGameImage />);
     expect(screen.getByTestId('banner')).toBeTruthy();
+  });
+
+  it('passes scrollable=true to shared Banner component when not contained', () => {
+    render(<HeaderGameImage {...defaultProps} scrollable={true} />);
+    const banner = screen.getByTestId('banner');
+    expect(banner.props.accessibilityLabel).toContain('-scrollable');
+  });
+
+  it('passes scrollable=true to shared Banner component when contained', () => {
+    render(<HeaderGameImage {...defaultProps} contained={true} scrollable={true} />);
+    const banner = screen.getByTestId('banner');
+    expect(banner.props.accessibilityLabel).toContain('-scrollable');
+  });
+
+  it('passes scrollable=false by default', () => {
+    render(<HeaderGameImage {...defaultProps} />);
+    const banner = screen.getByTestId('banner');
+    expect(banner.props.accessibilityLabel).toContain('-static');
   });
 });
 

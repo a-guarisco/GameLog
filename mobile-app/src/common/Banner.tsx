@@ -32,7 +32,8 @@ export default function Banner({
   const activeWidth = containerWidth || screenWidth;
   // Steam header image ratio (460 x 215)
   const naturalImageHeight = Math.round(activeWidth * (215 / 460));
-  const imageScaledHeight = Math.max(naturalImageHeight, calculatedHeight);
+  const minScaledHeight = scrollable ? Math.max(naturalImageHeight, Math.round(calculatedHeight * 1.35)) : naturalImageHeight;
+  const imageScaledHeight = Math.max(minScaledHeight, calculatedHeight);
   const maxScroll = Math.max(0, imageScaledHeight - calculatedHeight);
   const initialOffset = -Math.round(maxScroll / 2);
 
@@ -54,6 +55,8 @@ export default function Banner({
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) =>
+        scrollableRef.current && maxScrollRef.current > 0 && Math.abs(gestureState.dy) > 2,
+      onMoveShouldSetPanResponderCapture: (_, gestureState) =>
         scrollableRef.current && maxScrollRef.current > 0 && Math.abs(gestureState.dy) > 2,
       onPanResponderGrant: () => {
         translateY.stopAnimation((val) => {

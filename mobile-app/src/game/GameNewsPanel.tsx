@@ -7,6 +7,7 @@ import type { SteamNewsItem } from '@gamelog/api-manager/dto';
 import GoToLink from '@gamelog/common/GoToLink';
 import SectionState from '@gamelog/common/SectionState';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 const openExternalUrl = (url: string) => {
   Linking.openURL(url).catch((error) => console.warn(`Could not open ${url}`, error));
@@ -49,7 +50,9 @@ interface GameNewsPanelProps {
 }
 
 const GameNewsPanel = ({ appid }: GameNewsPanelProps) => {
-  const { gameNews, isLoadingGameNews, errorGameNews } = useGetGameNews(appid);
+  const { isLandscape, isTablet } = useOrientation();
+  const newsCount = (!isLandscape || isTablet) ? 8 : 5;
+  const { gameNews, isLoadingGameNews, errorGameNews } = useGetGameNews(appid, newsCount);
   const newsItems = gameNews?.appnews?.newsitems ?? [];
 
   return (

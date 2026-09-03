@@ -1,4 +1,6 @@
 import React from 'react';
+import { ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -39,7 +41,8 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
     propFriendship ?? propItem?.friendship ?? routeItem?.friendship ?? route.params?.friendship;
 
   const { vspaceHeight } = useProfileSpacing();
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
+  const insets = useSafeAreaInsets();
   const horizontalPadding = isLandscape ? 'px-8' : 'px-4';
 
   const {
@@ -78,6 +81,111 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
   }
 
   const username = user.username;
+
+  if (isLandscape) {
+    const leftRailOffset = insets.left + 74;
+    const bannerHeight = isTablet ? 280 : 120;
+
+    return (
+      <Box
+        className="flex-1 bg-background-0"
+        style={{
+          paddingLeft: leftRailOffset,
+          paddingRight: insets.right,
+          paddingBottom: insets.bottom,
+        }}
+        testID="other-user-profile-view"
+      >
+        <Box className="w-full relative" style={{ height: bannerHeight }}>
+          <HeaderGameImage
+            appid={mostPlayedGame?.appid}
+            compact={!isTablet}
+            contained
+            height={bannerHeight}
+            scrollable
+          />
+          <BackButton
+            onPress={handleBack}
+            testID="other-user-profile-back-btn"
+            style={{ top: Math.max(insets.top, 8), left: 12 }}
+          />
+        </Box>
+
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ paddingBottom: 24 }}
+          showsVerticalScrollIndicator={true}
+        >
+          <Box className="pt-2">
+            <OtherUserIdentity
+              user={user}
+              player={player}
+              friendship={friendship}
+              isActionLoading={isActionLoading}
+              onAddFriend={handleAddFriend}
+              onAcceptFriend={handleAcceptFriend}
+              onRefuseFriend={handleRefuseFriend}
+              onBlockFriend={handleBlockFriend}
+              onRemoveFriend={handleRemoveFriend}
+              onRemovePending={handleRemovePending}
+              onUnblockFriend={handleUnblockFriend}
+            />
+          </Box>
+
+          <Box className="bg-background-0 pb-10">
+            <VStack space="xl" className="pt-6">
+              <Box className={horizontalPadding}>
+                <OtherUserStats
+                  ownedGames={targetOwnedGames}
+                  friendship={friendship}
+                />
+              </Box>
+
+              {/* 4 Comparison charts in order */}
+              <Box className={horizontalPadding}>
+                <VStack space="lg" className="w-full">
+                  {/* 1. Community Playtime with friend scope */}
+                  <CommunityPlaytimeHistogramChart
+                    scope="user"
+                    targetUserId={user.id}
+                    targetUserName={username}
+                    chartTitle={`${username}'s Playtime`}
+                  />
+
+                  {/* 2. Top Community Games with friend scope */}
+                  <CommunityTopGamesHistogramChart
+                    scope="user"
+                    targetUserId={user.id}
+                    targetUserName={username}
+                    chartTitle={`${username}'s Top Games`}
+                    ownedGames={currentUserOwnedGames}
+                  />
+
+                  {/* 3. Library Status Breakdown with friend scope */}
+                  <CommunityGameStatusChart
+                    scope="user"
+                    targetUserId={user.id}
+                    targetUserName={username}
+                    chartTitle="Library Status Breakdown"
+                  />
+
+                  {/* 4. Community Radar with friend scope and selector hidden */}
+                  <CommunityGenreRadarChart
+                    scope="user"
+                    targetUserId={user.id}
+                    targetUserName={username}
+                    chartTitle={`${username}'s Radar`}
+                    hideScopeSelector
+                    ownedGames={currentUserOwnedGames}
+                  />
+                </VStack>
+              </Box>
+            </VStack>
+          </Box>
+        </ScrollView>
+      </Box>
+    );
+  }
 
   return (
     <Box className="relative flex-1 bg-background-0" testID="other-user-profile-view">

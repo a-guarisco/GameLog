@@ -27,9 +27,15 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop }: Scrol
   const paddingTop = contentPaddingTop ?? (hasBanner ? bannerHeight : insetsTop + 16);
   const leftPadding = isLandscape ? insets.left + 74 : 0;
 
+  const isLandscapeBanner = isLandscape && hasBanner;
+
   return (
     <Box className="flex-1 relative" style={{ paddingLeft: leftPadding }}>
-      <BlurTargetView ref={scrollBlurTargetRef} className="absolute inset-0 z-40">
+      <BlurTargetView
+        ref={scrollBlurTargetRef}
+        className="absolute inset-0 z-40"
+        pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
+      >
         <Animated.ScrollView
           contentContainerStyle={{
             paddingTop,
@@ -38,8 +44,13 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop }: Scrol
           }}
           scrollEventThrottle={16}
           onScroll={onScroll}
+          pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
         >
-          {children}
+          {isLandscapeBanner ? (
+            <Box pointerEvents="auto">{children}</Box>
+          ) : (
+            children
+          )}
         </Animated.ScrollView>
       </BlurTargetView>
       <TopNotchBlurOverlay
