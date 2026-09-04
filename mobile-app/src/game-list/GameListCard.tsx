@@ -108,6 +108,9 @@ export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: Game
       {/* Expand Toggle */}
       <Pressable
         onPress={toggleExpand}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: isExpanded }}
+        testID={`game-list-card-expand-${gameItem.appid}`}
         className="py-1.5 items-center justify-center bg-background-50 active:bg-background-100"
       >
         <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={HEX_COLORS.muted.icon.hex} />

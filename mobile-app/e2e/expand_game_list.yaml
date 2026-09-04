@@ -1,0 +1,31 @@
+appId: com.anonymous.mobileapp
+onFlowComplete:
+  - stopApp
+---
+- launchApp
+- tapOn:
+    text: '.*8081.*'
+    optional: true
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+- waitForAnimationToEnd:
+    timeout: 15000
+- assertVisible: 'Counter-Strike 2 header'
+- assertVisible:
+    point: 6%,28%
+- assertVisible:
+    point: 4%,28%
+- tapOn:
+    id: 'game-list-card-expand-730'
+- assertVisible: 'LAST PLAYED'
+- assertVisible: 'STREAK'
+- assertVisible: 'MAX / DAY'
+- assertVisible: 'GENRES'
+- assertVisible: 'STATUS'
+- assertVisible: 'PLATFORM SPLIT'

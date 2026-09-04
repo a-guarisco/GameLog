@@ -1,0 +1,11 @@
+appId: com.anonymous.mobileapp
+---
+- waitForAnimationToEnd:
+    timeout: 15000
+- tapOn: "Email"
+- inputText: "${EMAIL}"
+- tapOn: "Password"
+- inputText: "${PASSWORD}"
+- tapOn: 
+    text: "Sign In with Email"
+    retryTapIfNoChange: true
