@@ -1,0 +1,51 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: common/logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Sign In'
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: common/login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 100000
+
+- tapOn:
+    id: 'SocialTab'
+
+- extendedWaitUntil:
+    visible: 'test-02'
+    timeout: 30000
+
+- assertVisible:
+    id: 'user-card-22222222-2222-2222-2222-222222222222'
+
+- tapOn:
+    id: 'user-card-pressable-22222222-2222-2222-2222-222222222222'
+
+- extendedWaitUntil:
+    visible:
+      id: 'other-user-profile-view'
+    timeout: 30000
+
+- assertVisible: 'test-02'
+- assertVisible: 'Friend'
+
+- tapOn:
+    id: 'other-user-profile-back-btn'
+
+- extendedWaitUntil:
+    visible:
+      id: 'social-recommender-card'
+    timeout: 30000
