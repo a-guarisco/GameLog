@@ -15,7 +15,7 @@ from datetime import UTC, date, datetime, timedelta
 from uuid import UUID, uuid4
 
 from sqlalchemy import delete
-from sqlmodel import Session
+from sqlmodel import Session, select
 from rich.progress import track
 
 from src.core.database import engine
@@ -42,8 +42,9 @@ DEMO_USER_2_ID = UUID("22222222-2222-2222-2222-222222222222")
 DEMO_USER_3_ID = UUID("33333333-3333-3333-3333-333333333333")
 DEMO_USER_4_ID = UUID("44444444-4444-4444-4444-444444444444")
 DEMO_USER_5_ID = UUID("55555555-5555-5555-5555-555555555555")
-SLAIT_GRAPH_USER_ID = UUID("b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0")
-NEW_DEMO_USER_ID = UUID("c0c0c0c0-c0c0-c0c0-c0c0-c0c0c0c0c0c0")
+DEMO_USER_6_ID = UUID("66666666-6666-6666-6666-666666666666")
+DEMO_USER_7_ID = UUID("77777777-7777-7777-7777-777777777777")
+DEMO_USER_8_ID = UUID("88888888-8888-8888-8888-888888888888")
 
 GENRES_DATA = [
     {"id": "1", "description": "Action"},
@@ -177,85 +178,103 @@ def load_crawled_users() -> list[dict]:
         return []
 
 def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
-    users = [
-        User(
-            id=DEMO_USER_1_ID,
-            firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",
-            username="test-01",
-            steam_id="76561198077919169",
-            steam_api_key="4C67D2313547027F4ECB151CD10E76EC",
-            region="IT",
-        ),
-        User(
-            id=DEMO_USER_2_ID,
-            firebase_uid="tcYaHPGYDkVBlnNrcI7jNf2z4MS2",
-            username="test-02",
-            steam_id="76561198000000002",
-            steam_api_key="",
-            region="IT",
-        ),
-        User(
-            id=DEMO_USER_3_ID,
-            firebase_uid="GRbqhGIYlzb1GHEaBINeJq1ZXld2",
-            username="test-03",
-            steam_id="76561198000000003",
-            steam_api_key="",
-            region="DE",
-        ),
-        User(
-            id=DEMO_USER_4_ID,
-            firebase_uid="wcMFGsVqaYYNHSAeUXgGiK14WPk2",
-            username="test-04",
-            steam_id="76561198000000004",
-            steam_api_key="",
-            region="FR",
-        ),
-        User(
-            id=DEMO_USER_5_ID,
-            firebase_uid="a7swvzI0APgq57SMa8B7PsHevG02",
-            username="test-05",
-            steam_id="76561198000000005",
-            steam_api_key="",
-            region="GB",
-        ),
-        User(
-            id=SLAIT_GRAPH_USER_ID,
-            firebase_uid="slaitgraph1234567890",
-            username="slait-graph",
-            steam_id=os.getenv("SLAIT_GRAPH_STEAM_ID", "dummy_slait_graph_id"),
-            steam_api_key=os.getenv("SLAIT_GRAPH_STEAM_API_KEY", "dummy_slait_graph_key"),
-            region="US",
-        ),
-        User(
-            id=NEW_DEMO_USER_ID,
-            firebase_uid="newuser_76561198159652025",
-            username="xrayman",
-            steam_id="76561198159652025",
-            steam_api_key="",
-            region="IT",
-        )
+    users = []
+    
+    # Fetch API Keys from Env
+    default_api_key = os.getenv("DEFAULT_STEAM_API_KEY") or ""
+    if not default_api_key:
+        print("WARNING: DEFAULT_STEAM_API_KEY is not set. API calls to Steam may fail if user-specific keys are also missing.")
+        
+    dede_api_key = os.getenv("DEDEPIVOT_STEAM_API_KEY") or default_api_key
+    xrayman_api_key = os.getenv("XRAYMAN_STEAM_API_KEY") or default_api_key
+    slaitroc_api_key = os.getenv("SLAITROC_STEAM_API_KEY") or default_api_key
+    
+    # We want these specific users with real steam IDs
+    fixed_steam_ids = {
+        DEMO_USER_1_ID: "76561198077919169", # dedepivot
+        DEMO_USER_2_ID: "76561198159652025", # xrayman
+        DEMO_USER_6_ID: "76561198248779666", # slaitroc
+    }
+    
+    # Create the 3 main users
+    users.append(User(
+        id=DEMO_USER_1_ID,
+        firebase_uid="dede1234567890abcdefghijklmn",
+        username="dedepivot",
+        steam_id=fixed_steam_ids[DEMO_USER_1_ID],
+        steam_api_key=dede_api_key,
+        region="IT",
+    ))
+    users.append(User(
+        id=DEMO_USER_2_ID,
+        firebase_uid="xrayman1234567890abcdefghijk",
+        username="xrayman",
+        steam_id=fixed_steam_ids[DEMO_USER_2_ID],
+        steam_api_key=xrayman_api_key,
+        region="IT",
+    ))
+    users.append(User(
+        id=DEMO_USER_6_ID,
+        firebase_uid="slaitroc1234567890abcdefghij",
+        username="slaitroc",
+        steam_id=fixed_steam_ids[DEMO_USER_6_ID],
+        steam_api_key=slaitroc_api_key,
+        region="IT",
+    ))
+
+    exclude_ids = set(fixed_steam_ids.values())
+    
+    # We want 5 specific test users mapped to the next 5 crawled profiles
+    test_uids = [
+        ("test-01", "test011234567890abcdefghijkl", DEMO_USER_3_ID),
+        ("test-02", "test021234567890abcdefghijkl", DEMO_USER_4_ID),
+        ("test-03", "test031234567890abcdefghijkl", DEMO_USER_5_ID),
+        ("test-04", "test041234567890abcdefghijkl", DEMO_USER_7_ID),
+        ("test-05", "test051234567890abcdefghijkl", DEMO_USER_8_ID),
     ]
     
-    # Exclude IDs we already hardcoded to prevent unique constraint failures
-    exclude_ids = {"76561198077919169", "76561198159652025", "76561198000000002", "76561198000000003", "76561198000000004", "76561198000000005"}
+    test_idx = 0
+    crawled_idx = 0
     
-    # Add crawled users (up to mock_users)
-    for c_user in crawled_users[:mock_users]:
+    while test_idx < 5 and crawled_idx < len(crawled_users):
+        c_user = crawled_users[crawled_idx]
         s_id = c_user["steam_id"]
-        if s_id in exclude_ids:
-            continue
-        exclude_ids.add(s_id)
-        
-        users.append(
-            User(
-                id=uuid4(),
-                firebase_uid=f"mock_{s_id}",
-                username=c_user["personaname"][:30], # Limit length
-                steam_id=s_id,
-                steam_api_key="",
-                region=c_user["region"]
+        if s_id not in exclude_ids:
+            exclude_ids.add(s_id)
+            t_name, t_fbid, t_uuid = test_uids[test_idx]
+            users.append(
+                User(
+                    id=t_uuid,
+                    firebase_uid=t_fbid,
+                    username=f"{t_name}_{c_user['personaname'][:15]}",
+                    steam_id=s_id,
+                    steam_api_key="",
+                    region=c_user["region"]
+                )
             )
-        )
+            test_idx += 1
+        crawled_idx += 1
+
+    # Now add the rest of the mock users up to `mock_users`
+    added_mock = len(users) # count how many we have so far
+    while added_mock < mock_users and crawled_idx < len(crawled_users):
+        c_user = crawled_users[crawled_idx]
+        s_id = c_user["steam_id"]
+        if s_id not in exclude_ids:
+            exclude_ids.add(s_id)
+            users.append(
+                User(
+                    id=uuid4(),
+                    firebase_uid=f"mock_{s_id}",
+                    username=c_user["personaname"][:30],
+                    steam_id=s_id,
+                    steam_api_key="",
+                    region=c_user["region"]
+                )
+            )
+            added_mock += 1
+        crawled_idx += 1
+
     return users
 
 
@@ -439,49 +458,35 @@ def seed_database(mock_users: int = 50) -> None:
 
         rolling_times = []
         
-        # Hardcoded specific logic for SLAIT_GRAPH
-        slait_games_targets = [
-            ("322330", 629),
-            ("3875050", 115),
-            ("431960", 50),
-            ("304930", 22),
-            ("286690", 0),
-            ("2815070", 0)
-        ]
-        # Make sure these specific games are in the Game table if not already
-        for app_id, _ in slait_games_targets:
-            game_id = UUID(int=int(app_id)*1000)
-            if not session.get(Game, game_id):
-                session.add(Game(id=game_id, steam_app_id=app_id))
-                
-        rolling_times.extend(generate_user_playtime(SLAIT_GRAPH_USER_ID, slait_games_targets, 730))
-
-        # Test-01 Specific logic
-        test01_targets = [("730", 25000), ("1174180", 5500), ("271590", 12000), ("1245620", 4000), ("570", 800)]
-        rolling_times.extend(generate_user_playtime(DEMO_USER_1_ID, test01_targets, 730))
-
-        # New Demo User Specific logic
-        new_demo_targets = [("730", 15000), ("570", 5000), ("431960", 200)]
-        rolling_times.extend(generate_user_playtime(NEW_DEMO_USER_ID, new_demo_targets, 730))
-
-        # Mock targets for all other users
-        top_app_ids = [tg["steam_app_id"] for tg in TOP_GAMES_DATA]
+        # Build a lookup for owned games
+        owned_games_map = {cu["steam_id"]: cu.get("owned_games", []) for cu in crawled_users_data}
         
         for user in track(users, description="Generating mock playtimes..."):
-            if user.id in [SLAIT_GRAPH_USER_ID, DEMO_USER_1_ID, NEW_DEMO_USER_ID]:
-                continue
-            
-            # Pick 3 to 8 random games for this user
-            num_games = random.randint(3, 8)
-            user_games = random.sample(top_app_ids, num_games)
-            
             targets = []
-            for app_id in user_games:
-                # Randomize playtime, skewed towards lower playtimes
-                playtime = int(random.expovariate(1/5000)) 
-                targets.append((app_id, playtime))
-                
-            rolling_times.extend(generate_user_playtime(user.id, targets, 730))
+            
+            # Get real owned games if available
+            real_games = owned_games_map.get(user.steam_id, [])
+            
+            if real_games:
+                for g in real_games:
+                    app_id = str(g["appid"])
+                    playtime = g["playtime_forever"]
+                    targets.append((app_id, playtime))
+                    
+                    # Ensure game exists in DB
+                    game_id = UUID(int=int(app_id)*1000)
+                    if not session.get(Game, game_id):
+                        session.add(Game(id=game_id, steam_app_id=app_id))
+            else:
+                # Fallback if no real games (shouldn't happen with the new json, but just in case)
+                top_app_ids = [tg["steam_app_id"] for tg in TOP_GAMES_DATA]
+                num_games = random.randint(3, 8)
+                user_games = random.sample(top_app_ids, num_games)
+                for app_id in user_games:
+                    playtime = int(random.expovariate(1/5000)) 
+                    targets.append((app_id, playtime))
+            
+            rolling_times.extend(generate_user_playtime(user.id, targets, 365))
 
         for rt in track(rolling_times, description="Inserting RollingTimes into DB..."):
             session.add(rt)
@@ -491,26 +496,38 @@ def seed_database(mock_users: int = 50) -> None:
         for s in track(shelvings, description="Inserting Shelvings into DB..."):
             session.add(s)
         # Commit all the massive data first to avoid autoflush hanging later
+        print("💾 Committing massive data to database... (this may take up to a minute, please wait)")
         session.commit()
 
         # Generate some random friendships among users
-        # 1. Hardcoded friendships
-        session.add(Friendship(requester_id=DEMO_USER_1_ID, addressee_id=DEMO_USER_2_ID, status=FriendshipStatus.ACCEPTED))
-        session.add(Friendship(requester_id=DEMO_USER_4_ID, addressee_id=DEMO_USER_1_ID, status=FriendshipStatus.PENDING))
-        session.add(Friendship(requester_id=DEMO_USER_1_ID, addressee_id=DEMO_USER_5_ID, status=FriendshipStatus.BLOCKED))
-        session.add(Friendship(requester_id=DEMO_USER_1_ID, addressee_id=NEW_DEMO_USER_ID, status=FriendshipStatus.ACCEPTED))
-
-        # 2. Random friendships for the mock users (small world)
-        mock_user_ids = [u.id for u in users if u.id not in [DEMO_USER_1_ID, DEMO_USER_2_ID, DEMO_USER_3_ID, DEMO_USER_4_ID, DEMO_USER_5_ID, SLAIT_GRAPH_USER_ID, NEW_DEMO_USER_ID]]
-        for user_id in mock_user_ids:
-            # Each mock user has 1 to 5 friends
-            friends_count = random.randint(1, 5)
-            friends = random.sample(mock_user_ids, min(friends_count, len(mock_user_ids)))
-            for friend_id in friends:
-                if friend_id != user_id:
-                    # Avoid duplicates
-                    if not session.query(Friendship).filter_by(requester_id=user_id, addressee_id=friend_id).first() and not session.query(Friendship).filter_by(requester_id=friend_id, addressee_id=user_id).first():
-                        session.add(Friendship(requester_id=user_id, addressee_id=friend_id, status=random.choice([FriendshipStatus.ACCEPTED, FriendshipStatus.PENDING])))
+        # For each user, generate ~10 friends, 5 pending, 2 blocked (if possible)
+        all_user_ids = [u.id for u in users]
+        
+        for user in track(users, description="Generating friendships..."):
+            possible_friends = [uid for uid in all_user_ids if uid != user.id]
+            
+            if len(possible_friends) >= 17: # Need at least 17 to do 10 + 5 + 2
+                chosen = random.sample(possible_friends, 17)
+                accepted = chosen[:10]
+                pending = chosen[10:15]
+                blocked = chosen[15:]
+                
+                for f_id in accepted:
+                    if not session.exec(select(Friendship).where(Friendship.requester_id == user.id, Friendship.addressee_id == f_id)).first() and not session.exec(select(Friendship).where(Friendship.requester_id == f_id, Friendship.addressee_id == user.id)).first():
+                        session.add(Friendship(requester_id=user.id, addressee_id=f_id, status=FriendshipStatus.ACCEPTED))
+                for f_id in pending:
+                    if not session.exec(select(Friendship).where(Friendship.requester_id == user.id, Friendship.addressee_id == f_id)).first() and not session.exec(select(Friendship).where(Friendship.requester_id == f_id, Friendship.addressee_id == user.id)).first():
+                        session.add(Friendship(requester_id=user.id, addressee_id=f_id, status=FriendshipStatus.PENDING))
+                for f_id in blocked:
+                    if not session.exec(select(Friendship).where(Friendship.requester_id == user.id, Friendship.addressee_id == f_id)).first() and not session.exec(select(Friendship).where(Friendship.requester_id == f_id, Friendship.addressee_id == user.id)).first():
+                        session.add(Friendship(requester_id=user.id, addressee_id=f_id, status=FriendshipStatus.BLOCKED))
+            else:
+                # Fallback for small mock_users count
+                num_to_pick = min(len(possible_friends), 5)
+                if num_to_pick > 0:
+                    for f_id in random.sample(possible_friends, num_to_pick):
+                        if not session.exec(select(Friendship).where(Friendship.requester_id == user.id, Friendship.addressee_id == f_id)).first() and not session.exec(select(Friendship).where(Friendship.requester_id == f_id, Friendship.addressee_id == user.id)).first():
+                            session.add(Friendship(requester_id=user.id, addressee_id=f_id, status=random.choice([FriendshipStatus.ACCEPTED, FriendshipStatus.PENDING])))
 
         yesterday_iso = (datetime.now(UTC) - timedelta(days=1)).isoformat()
         session.merge(Config(key="last_update", value=yesterday_iso))
@@ -523,7 +540,8 @@ def main() -> None:
     args = parser.parse_args()
     
     seed_database(mock_users=args.mock_users)
-    print("Demo data inserted successfully.")
+    print("\n✅ Database seeding completed successfully!")
+    print("🚀 You can now log into the application with the demo accounts.\n")
 
 if __name__ == "__main__":
     main()
