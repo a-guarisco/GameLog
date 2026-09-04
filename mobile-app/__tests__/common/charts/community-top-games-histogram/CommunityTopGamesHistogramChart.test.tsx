@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import CommunityTopGamesHistogramChart from '@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
@@ -162,6 +162,9 @@ describe('CommunityTopGamesHistogramChart', () => {
     });
 
     (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockReturnValue(fetchPromise);
+    (ApiManager.getGameBasicInfo as jest.Mock).mockResolvedValue({
+      '1245620': { data: { name: 'Elden Ring' } },
+    });
 
     render(<CommunityTopGamesHistogramChart scope="global" />);
 
@@ -176,9 +179,11 @@ describe('CommunityTopGamesHistogramChart', () => {
     expect(screen.getByTestId('spinner')).toBeTruthy();
 
     // Resolve fetch
-    resolveFetch!([
-      { id: '1245620', user_playtime: 10, community_playtime: 5 },
-    ]);
+    await act(async () => {
+      resolveFetch!([
+        { id: '1245620', user_playtime: 10, community_playtime: 5 },
+      ]);
+    });
 
     await waitFor(() => {
       expect(screen.queryByTestId('community-top-games-date-shimmer')).toBeNull();

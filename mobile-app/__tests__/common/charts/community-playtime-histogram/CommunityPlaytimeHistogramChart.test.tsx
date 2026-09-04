@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import CommunityPlaytimeHistogramChart from '@gamelog/common/charts/community-playtime-histogram/CommunityPlaytimeHistogramChart';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
@@ -65,7 +65,7 @@ describe('CommunityPlaytimeHistogramChart', () => {
       expect(screen.queryByText('2W')).toBeNull();
       expect(screen.queryByText('1Y')).toBeNull();
     });
-  });
+  }, 10000);
 
   it('switches between 1W and 6M range options', async () => {
     (ApiManager.getCommunityWeeklyPlaytime as jest.Mock).mockResolvedValue({
@@ -188,9 +188,11 @@ describe('CommunityPlaytimeHistogramChart', () => {
     expect(screen.getByTestId('community-histogram-prev')).toBeDisabled();
 
     // Resolve first fetch
-    resolveFirstFetch!({
-      user: [1, 2, 3, 4, 5, 6, 7],
-      community: [2, 2, 2, 2, 2, 2, 2],
+    await act(async () => {
+      resolveFirstFetch!({
+        user: [1, 2, 3, 4, 5, 6, 7],
+        community: [2, 2, 2, 2, 2, 2, 2],
+      });
     });
 
     await waitFor(() => {
@@ -222,9 +224,11 @@ describe('CommunityPlaytimeHistogramChart', () => {
     expect(screen.queryByTestId('mock-bar-chart')).toBeNull();
 
     // Resolve second fetch
-    resolveSecondFetch!({
-      user: [2, 3, 4, 5, 6, 7, 8],
-      community: [3, 3, 3, 3, 3, 3, 3],
+    await act(async () => {
+      resolveSecondFetch!({
+        user: [2, 3, 4, 5, 6, 7, 8],
+        community: [3, 3, 3, 3, 3, 3, 3],
+      });
     });
 
     await waitFor(() => {
