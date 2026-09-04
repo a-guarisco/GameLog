@@ -1,0 +1,7 @@
+appId: com.anonymous.mobileapp
+---
+- tapOn:
+    text: "Dev"
+    index: -1
+- tapOn: "Authentication"
+- tapOn: "Sign Out & Clear AsyncStorage"

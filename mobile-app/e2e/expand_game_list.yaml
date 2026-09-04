@@ -1,11 +1,13 @@
 appId: com.anonymous.mobileapp
 onFlowComplete:
+  - runFlow: 
+      file: logout_flow.yaml
   - stopApp
 ---
 - launchApp
-- tapOn:
-    text: '.*8081.*'
-    optional: true
+- extendedWaitUntil:
+    visible: "Sign In"
+    timeout: 100000
 
 - runFlow:
     when:
@@ -14,8 +16,9 @@ onFlowComplete:
     env:
       EMAIL: test-01@test.com
       PASSWORD: 12345678
-- waitForAnimationToEnd:
-    timeout: 15000
+- extendedWaitUntil:
+    visible: "Games"
+    timeout: 100000
 - assertVisible: 'Counter-Strike 2 header'
 - assertVisible:
     point: 6%,28%

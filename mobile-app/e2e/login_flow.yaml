@@ -6,6 +6,6 @@ appId: com.anonymous.mobileapp
 - inputText: "${EMAIL}"
 - tapOn: "Password"
 - inputText: "${PASSWORD}"
-- tapOn: 
+- doubleTapOn: 
     text: "Sign In with Email"
     retryTapIfNoChange: true
