@@ -1,0 +1,69 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Sign In"
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: "Sign In"
+    file: login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: "Games"
+    timeout: 100000
+
+# Navigate to Social Tab
+- tapOn:
+    id: "SocialTab"
+
+- extendedWaitUntil:
+    visible:
+      id: "social-recommender-card"
+    timeout: 30000
+
+# Enter Game Recommender Flow
+- tapOn:
+    id: "social-recommender-card"
+
+- extendedWaitUntil:
+    visible:
+      id: "recommendations-back-btn"
+    timeout: 30000
+
+# Back to Social Home
+- tapOn:
+    id: "recommendations-back-btn"
+
+- extendedWaitUntil:
+    visible:
+      id: "social-tab-search"
+    timeout: 30000
+
+# Switch to Find Users Tab
+- tapOn:
+    id: "social-tab-search"
+
+- extendedWaitUntil:
+    visible:
+      id: "user-search-input"
+    timeout: 10000
+
+# Search for a user
+- tapOn:
+    id: "user-search-input"
+- inputText: "test"
+- waitForAnimationToEnd:
+    timeout: 5000
+
+
+
+
