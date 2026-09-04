@@ -19,6 +19,8 @@ USE_FIREBASE_EMULATOR := $(EMULATOR)
 
 EXPO_PUBLIC_USE_FIREBASE_EMULATOR := $(EMULATOR)
 
+MOCK_USERS ?= 50
+
 export USE_FIREBASE_EMULATOR
 export EXPO_PUBLIC_USE_FIREBASE_EMULATOR
 
@@ -83,11 +85,11 @@ endif
 
 
 dev-init:
-	@$(PYTHON) ./scripts/dev-init.py
+	@$(PYTHON) ./scripts/dev-init.py MOCK_USERS=$(MOCK_USERS)
 
 dev-init-internal: emulator-bg
 	@echo "🔄 [All Processes] Starting backend & resetting database (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
-	@make -C backend db-reset USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	@make -C backend db-reset USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR) MOCK_USERS=$(MOCK_USERS)
 	@echo "🔑 [All Processes] Seeding Firebase test accounts..."
 	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
