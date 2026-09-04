@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   useGetOwnedGames,
   useGetPlayersInfo,
@@ -8,18 +8,19 @@ import {
 } from '@gamelog/api-manager/useApi';
 
 export const useProfileChartsFetch = (userId: string) => {
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames } = useGetOwnedGames(
+  const { ownedGames, isLoadingOwnedGames, errorOwnedGames, refetchOwnedGames } = useGetOwnedGames(
     userId,
     false,
     false
   );
 
-  const { playersInfo, isLoadingPlayersInfo } = useGetPlayersInfo(
+  const { playersInfo, isLoadingPlayersInfo, refetchPlayersInfo } = useGetPlayersInfo(
     useMemo(() => [userId], [userId])
   );
-  const { userStreak, isLoadingUserStreak } = useGetUserStreak();
-  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
-  const { playtimeByUser, isLoadingPlaytimeByUser, errorPlaytimeByUser } = useGetPlaytimeByUser(-1);
+  const { userStreak, isLoadingUserStreak, refetchUserStreak } = useGetUserStreak();
+  const { playtimeReport, isLoadingPlaytimeReport, refetchPlaytimeReport } = useGetPlaytimeReport();
+  const { playtimeByUser, isLoadingPlaytimeByUser, errorPlaytimeByUser, refetchPlaytimeByUser } =
+    useGetPlaytimeByUser(-1);
 
   const isLoading =
     isLoadingOwnedGames ||
@@ -27,6 +28,22 @@ export const useProfileChartsFetch = (userId: string) => {
     isLoadingUserStreak ||
     isLoadingPlaytimeReport ||
     isLoadingPlaytimeByUser;
+
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      refetchOwnedGames(),
+      refetchPlayersInfo(),
+      refetchUserStreak(),
+      refetchPlaytimeReport(),
+      refetchPlaytimeByUser(),
+    ]);
+  }, [
+    refetchOwnedGames,
+    refetchPlayersInfo,
+    refetchUserStreak,
+    refetchPlaytimeReport,
+    refetchPlaytimeByUser,
+  ]);
 
   return {
     data: {
@@ -44,5 +61,6 @@ export const useProfileChartsFetch = (userId: string) => {
     isLoadingStates: {
       userStreak: isLoadingUserStreak, // Some components might need specific loading states (like useStreakText)
     },
+    refetchAll,
   };
 };

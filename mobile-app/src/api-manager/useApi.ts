@@ -52,23 +52,25 @@ export const useGetOwnedGames = (
     [playerID, includeSub, includeFreeGame]
   );
 
-  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
     ownedGames: data,
     isLoadingOwnedGames: isLoading,
     errorOwnedGames: error,
     errorMessageOwnedGames: errorMessage,
+    refetchOwnedGames: refetch,
   };
 };
 
 export const useGetPlayersInfo = (steamIds: string[]) => {
   const fetchFunc = useCallback(() => ApiManager.getPlayersInfo(steamIds), [steamIds]);
 
-  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, refetch } = useAsyncFetch(fetchFunc);
   return {
     playersInfo: data,
     isLoadingPlayersInfo: isLoading,
     errorPlayersInfo: error,
+    refetchPlayersInfo: refetch,
   };
 };
 
@@ -93,11 +95,12 @@ export const useGetGameStreak = (gameID: string) => {
 export const useGetUserStreak = () => {
   const fetchFunc = useCallback(() => ApiManager.getStreakByUser(), []);
 
-  const { data, isLoading, error } = useAsyncFetch<Streak | number>(fetchFunc);
+  const { data, isLoading, error, refetch } = useAsyncFetch<Streak | number>(fetchFunc);
   return {
     userStreak: normalizeStreak(data),
     isLoadingUserStreak: isLoading,
     errorUserStreak: error,
+    refetchUserStreak: refetch,
   };
 };
 
@@ -119,12 +122,13 @@ export const useGetPlaytimeReport = (days: number = RECENT_PLAYTIME_DAYS) => {
     [startDate, endDate]
   );
 
-  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
     playtimeReport: data,
     isLoadingPlaytimeReport: isLoading,
     errorPlaytimeReport: error,
     errorMessagePlaytimeReport: errorMessage,
+    refetchPlaytimeReport: refetch,
   };
 };
 
@@ -140,12 +144,13 @@ export const useGetFullPlaytimeReport = () => {
 export const useGetPlaytimeByUser = (days: number = RECENT_PLAYTIME_DAYS) => {
   const fetchFunc = useCallback(() => ApiManager.getPlaytimeByUser(days), [days]);
 
-  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
     playtimeByUser: data,
     isLoadingPlaytimeByUser: isLoading,
     errorPlaytimeByUser: error,
     errorMessagePlaytimeByUser: errorMessage,
+    refetchPlaytimeByUser: refetch,
   };
 };
 

@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { ScrollView } from 'react-native';
+import { useState, useCallback, useMemo } from 'react';
+import { ScrollView, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -25,12 +25,24 @@ import { useOrientation } from '@gamelog/common/useOrientation';
 const ProfileView = () => {
   const USER_ID = getSteamId();
   const { vspaceHeight } = useProfileSpacing();
-  const { data, isLoading, errors, isLoadingStates } = useProfileChartsFetch(USER_ID);
+  const { data, isLoading, errors, isLoadingStates, refetchAll } =
+    useProfileChartsFetch(USER_ID);
   const { ownedGames, playersInfo, userStreak, playtimeReport, playtimeByUser } = data;
   const player = playersInfo?.response?.players?.[0];
   const streakText = useStreakText(userStreak?.streak, isLoadingStates.userStreak);
   const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetchAll();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchAll]);
 
   const mostPlayedGame = useMemo(() => selectMostPlayedGame(ownedGames), [ownedGames]);
   const platformSplit = useMemo(() => selectPlatformSplit(ownedGames), [ownedGames]);
@@ -68,6 +80,9 @@ const ProfileView = () => {
           className="flex-1"
           contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={true}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
         >
           <Box className="pt-2">
             <ProfileIdentity
@@ -111,7 +126,7 @@ const ProfileView = () => {
     <Box className="relative flex-1">
       <HeaderGameImage appid={mostPlayedGame?.appid} />
 
-      <ScrollablePage>
+      <ScrollablePage refreshing={refreshing} onRefresh={handleRefresh}>
         <VSpace size={vspaceHeight} testID="profile-vspace" />
         <ProfileIdentity
           name={player?.personaname ?? 'Unknown User'}
