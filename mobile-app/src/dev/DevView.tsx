@@ -54,6 +54,7 @@ export const DevView = () => {
           {SECTIONS.map((section) => (
             <Pressable
               key={section.id}
+              testID={`dev-menu-item-${section.id}`}
               onPress={() => navigation.navigate(section.route)}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.8 : 1.0,

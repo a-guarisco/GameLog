@@ -67,7 +67,12 @@ export const DevAuthView = () => {
             }
           />
 
-          <Button isOnCard onPress={handleSignOutAndClearStorage} className="w-full mt-1">
+          <Button
+            isOnCard
+            onPress={handleSignOutAndClearStorage}
+            className="w-full mt-1"
+            testID="signout-clear-storage-btn"
+          >
             <ButtonText>Sign Out & Clear AsyncStorage</ButtonText>
           </Button>
 
