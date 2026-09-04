@@ -3,7 +3,7 @@ import { getDefaultBannerParams } from '@gamelog/utils/bannerUtils';
 import { BlurTargetView } from 'expo-blur';
 import { Box } from './gluestack/box';
 import TopNotchBlurOverlay from './TopNotchBlurOverlay';
-import { Animated, useColorScheme } from 'react-native';
+import { Animated, RefreshControl, useColorScheme } from 'react-native';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,9 +11,11 @@ type ScrollablePageProps = {
   children: React.ReactNode;
   hasBanner?: boolean;
   contentPaddingTop?: number;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 };
 
-const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop }: ScrollablePageProps) => {
+const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop, refreshing, onRefresh }: ScrollablePageProps) => {
   const isDark = useColorScheme() === 'dark';
   const { isLandscape } = useOrientation();
   const insets = useSafeAreaInsets();
@@ -37,6 +39,7 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop }: Scrol
         pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
       >
         <Animated.ScrollView
+          testID="scrollable-page-scroll"
           contentContainerStyle={{
             paddingTop,
             paddingHorizontal: 0,
@@ -45,6 +48,11 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop }: Scrol
           scrollEventThrottle={16}
           onScroll={onScroll}
           pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
+            ) : undefined
+          }
         >
           {isLandscapeBanner ? (
             <Box pointerEvents="auto">{children}</Box>
