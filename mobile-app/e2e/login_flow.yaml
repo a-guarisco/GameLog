@@ -1,4 +1,4 @@
-appId: com.anonymous.mobileapp
+appId: com.gamelog.app
 ---
 - waitForAnimationToEnd:
     timeout: 15000

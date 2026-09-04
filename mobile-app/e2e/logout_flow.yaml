@@ -1,4 +1,4 @@
-appId: com.anonymous.mobileapp
+appId: com.gamelog.app
 ---
 - tapOn:
     text: "Dev"
