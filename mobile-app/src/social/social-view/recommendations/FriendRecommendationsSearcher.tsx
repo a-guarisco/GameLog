@@ -102,7 +102,11 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
                 >
                   <HStack space="md" className="items-center justify-between">
                     <HStack space="md" className="items-center flex-1 pr-2">
-                      <UserAvatar username={item.user.username} isHighlighted={true} />
+                      <UserAvatar
+                        username={item.user.username}
+                        steamId={item.user.steam_id}
+                        isHighlighted={true}
+                      />
                       <VStack className="flex-1">
                         <Text
                           size="sm"

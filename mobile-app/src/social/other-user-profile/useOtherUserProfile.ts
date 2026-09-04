@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import ApiManager from '@gamelog/api-manager/apiManager';
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
@@ -11,6 +11,7 @@ import type {
   GameItem,
 } from '@gamelog/api-manager/dto';
 import { selectMostPlayedGame } from '@gamelog/profile/selectProfile';
+import { cachePlayerAvatars } from '../steamAvatarCache';
 
 export interface UseOtherUserProfileProps {
   user: UserRead;
@@ -63,6 +64,13 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
   } = useAsyncFetch<OwnedGames>(fetchCurrentUserGames);
 
   const player = playersInfo?.response?.players?.[0];
+
+  useEffect(() => {
+    if (playersInfo?.response?.players) {
+      cachePlayerAvatars(playersInfo.response.players);
+    }
+  }, [playersInfo]);
+
   const mostPlayedGame = useMemo<GameItem | null>(
     () => selectMostPlayedGame(targetOwnedGames),
     [targetOwnedGames]

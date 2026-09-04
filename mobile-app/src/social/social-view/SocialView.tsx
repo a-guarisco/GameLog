@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,6 +12,7 @@ import RecommenderSummaryCard from './RecommenderSummaryCard';
 import SocialSectionTabs from './SocialSectionTabs';
 import { useFriendActions } from './useFriendActions';
 import { selectPendingRequests, selectAcceptedFriends } from './friendListSelectors';
+import { useSteamAvatars } from '../useSteamAvatars';
 
 export const SocialView: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -53,19 +54,46 @@ export const SocialView: React.FC = () => {
     return () => sub.remove();
   }, [refetchFriendList, refetchSearch]);
 
+  const pendingRequests = selectPendingRequests(friendList);
+  const acceptedFriends = selectAcceptedFriends(friendList);
+
+  const allSocialSteamIds = useMemo(() => {
+    const ids: string[] = [];
+    if (pendingRequests) {
+      for (const item of pendingRequests) {
+        if (item.user?.steam_id) ids.push(item.user.steam_id);
+      }
+    }
+    if (acceptedFriends) {
+      for (const item of acceptedFriends) {
+        if (item.user?.steam_id) ids.push(item.user.steam_id);
+      }
+    }
+    if (searchResults) {
+      for (const item of searchResults) {
+        if (item.user?.steam_id) ids.push(item.user.steam_id);
+      }
+    }
+    return ids;
+  }, [pendingRequests, acceptedFriends, searchResults]);
+
+  const { avatarMap, refetchAvatars } = useSteamAvatars(allSocialSteamIds);
+
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetchUserMe(), refetchFriendList(), refetchSearch()]);
+      await Promise.all([
+        refetchUserMe(),
+        refetchFriendList(),
+        refetchSearch(),
+        refetchAvatars(),
+      ]);
     } finally {
       setRefreshing(false);
     }
-  }, [refetchUserMe, refetchFriendList, refetchSearch]);
-
-  const pendingRequests = selectPendingRequests(friendList);
-  const acceptedFriends = selectAcceptedFriends(friendList);
+  }, [refetchUserMe, refetchFriendList, refetchSearch, refetchAvatars]);
 
   const handleOpenRecommendations = (friendItem?: UserSearchResult) => {
     navigation.navigate('FriendRecommendations', {
@@ -107,6 +135,7 @@ export const SocialView: React.FC = () => {
               isLoadingSearch={isLoadingSearch}
               errorSearch={!!errorSearch}
               errorMessageSearch={errorMessageSearch}
+              avatarMap={avatarMap}
               isActionLoading={isActionLoading}
               actionFeedback={actionFeedback}
               handlers={{

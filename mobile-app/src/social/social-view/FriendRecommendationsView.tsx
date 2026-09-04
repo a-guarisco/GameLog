@@ -54,6 +54,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
         {!isSelectingFriend && activeFriend && (
           <ActiveFriendBanner
             friendName={friendName}
+            steamId={activeFriend?.user?.steam_id}
             onChangeFriend={handleStartSelectingFriend}
           />
         )}
