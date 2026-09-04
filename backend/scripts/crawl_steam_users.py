@@ -2,32 +2,43 @@ import requests
 import json
 import time
 import os
+import argparse
 from rich.progress import Progress
 
 STEAM_API_KEY = "98127524D246054C2D096B9DC054AAC5"
 START_IDS = ["76561198077919169", "76561198159652025", "76561198248779666"]
 TARGET_COUNT = 200
 
+def _make_request(url, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 429:
+                wait_time = 0.5 * (attempt + 1)
+                print(f"[429 Too Many Requests] Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as e:
+            if attempt == max_retries - 1:
+                print(f"Request failed after {max_retries} attempts: {e}")
+            else:
+                time.sleep(2)
+    return None
+
 def get_friends(steam_id):
     url = f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={STEAM_API_KEY}&steamid={steam_id}&relationship=friend"
-    try:
-        resp = requests.get(url, timeout=5)
-        data = resp.json()
-        if "friendslist" in data and "friends" in data["friendslist"]:
-            return [f["steamid"] for f in data["friendslist"]["friends"]]
-    except Exception as e:
-        print(f"Error fetching friends for {steam_id}: {e}")
+    data = _make_request(url)
+    if data and "friendslist" in data and "friends" in data["friendslist"]:
+        return [f["steamid"] for f in data["friendslist"]["friends"]]
     return []
 
 def get_owned_games(steam_id):
     url = f"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={STEAM_API_KEY}&steamid={steam_id}&format=json&include_free_sub=true&include_played_free_games=true"
-    try:
-        resp = requests.get(url, timeout=5)
-        data = resp.json()
-        if "response" in data and "games" in data["response"]:
-            return [{"appid": g["appid"], "playtime_forever": g.get("playtime_forever", 0)} for g in data["response"]["games"]]
-    except Exception as e:
-        print(f"Error fetching owned games for {steam_id}: {e}")
+    data = _make_request(url)
+    if data and "response" in data and "games" in data["response"]:
+        return [{"appid": g["appid"], "playtime_forever": g.get("playtime_forever", 0)} for g in data["response"]["games"]]
     return []
 
 def get_player_summaries(steam_ids):
@@ -37,13 +48,9 @@ def get_player_summaries(steam_ids):
         chunk = steam_ids[i:i+100]
         ids_str = ",".join(chunk)
         url = f"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={STEAM_API_KEY}&steamids={ids_str}"
-        try:
-            resp = requests.get(url, timeout=5)
-            data = resp.json()
-            if "response" in data and "players" in data["response"]:
-                results.extend(data["response"]["players"])
-        except Exception as e:
-            print(f"Error fetching summaries: {e}")
+        data = _make_request(url)
+        if data and "response" in data and "players" in data["response"]:
+            results.extend(data["response"]["players"])
     return results
 
 def crawl():
@@ -104,4 +111,11 @@ def crawl():
         json.dump(collected_users[:TARGET_COUNT], f, indent=4)
         
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Crawl Steam users for seed data.")
+    parser.add_argument("--mock-users", type=int, default=50, help="Number of users to crawl (overrides default TARGET_COUNT).")
+    args = parser.parse_args()
+    
+    if args.mock_users:
+        TARGET_COUNT = args.mock_users
+        
     crawl()

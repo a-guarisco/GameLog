@@ -148,7 +148,7 @@ seed:
 	$(COMPOSE) run --rm gamelog uv run python -m src.core.seed $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
 
 crawl-steam:
-	@cd gamelog && uv run python ../scripts/crawl_steam_users.py
+	@cd gamelog && uv run python ../scripts/crawl_steam_users.py $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
 
 seed-firebase:
 	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
