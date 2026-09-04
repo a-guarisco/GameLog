@@ -1,4 +1,5 @@
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
+import { FlatList } from 'react-native';
 import GameListView from '@gamelog/game-list/GameListView';
 import { useGameList } from '@gamelog/game-list/useGameList';
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
@@ -117,5 +118,25 @@ describe('GameListView Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('Game', {
       gameItem: { appid: 1, name: 'Portal', playtime_forever: 10 },
     });
+  });
+
+  it('triggers pull-to-refresh on FlatList', async () => {
+    const mockRefetchAll = jest.fn().mockResolvedValue(undefined);
+    mockUseGameList.mockReturnValue({
+      isLoading: false,
+      processedGames: [{ appid: 1, name: 'Portal', playtime_forever: 10 }],
+      allAvailableGenres: [],
+      dateRangeFilter: { from: undefined, to: undefined },
+      refetchAll: mockRefetchAll,
+    });
+
+    const { UNSAFE_getByType } = render(<GameListView route={{}} />);
+    const flatList = UNSAFE_getByType(FlatList);
+
+    await act(async () => {
+      flatList.props.onRefresh();
+    });
+
+    expect(mockRefetchAll).toHaveBeenCalledTimes(1);
   });
 });

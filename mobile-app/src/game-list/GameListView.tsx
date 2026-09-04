@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -38,7 +39,19 @@ const GameListView = () => {
     dateRangeFilter,
     setDateRangeFilter,
     allAvailableGenres,
+    refetchAll,
   } = useGameList(playerID);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetchAll();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchAll]);
 
   return (
     <Box className="flex-1" style={{ paddingLeft: leftPadding }}>
@@ -83,6 +96,8 @@ const GameListView = () => {
           numColumns={isLandscape ? 3 : 2}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 20 }}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
         />
       )}
     </Box>

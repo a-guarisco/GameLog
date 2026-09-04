@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   useGetOwnedGames,
   useGetFullPlaytimeReport,
@@ -24,18 +24,30 @@ export type DateRange = {
 };
 
 export const useGameList = (playerID: string) => {
-  const { ownedGames, isLoadingOwnedGames, errorOwnedGames, errorMessageOwnedGames } =
-    useGetOwnedGames(playerID, true, true);
+  const {
+    ownedGames,
+    isLoadingOwnedGames,
+    errorOwnedGames,
+    errorMessageOwnedGames,
+    refetchOwnedGames,
+  } = useGetOwnedGames(playerID, true, true);
 
-  const { playtimeReport, isLoadingPlaytimeReport } = useGetFullPlaytimeReport();
-  const { userGameStatuses, isLoadingUserGameStatuses } = useGetUserGameStatuses();
+  const { playtimeReport, isLoadingPlaytimeReport, refetchPlaytimeReport } =
+    useGetFullPlaytimeReport();
+  const { userGameStatuses, isLoadingUserGameStatuses, refetchUserGameStatuses } =
+    useGetUserGameStatuses();
 
   const appIds = useMemo(() => {
     if (!ownedGames?.response?.games) return [];
     return ownedGames.response.games.map((g) => String(g.appid));
   }, [ownedGames]);
 
-  const { libraryGenres, isLoadingLibraryGenres, errorLibraryGenres } = useGetGenresBatch(appIds);
+  const {
+    libraryGenres,
+    isLoadingLibraryGenres,
+    errorLibraryGenres,
+    refetchLibraryGenres,
+  } = useGetGenresBatch(appIds);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('playtime');
@@ -156,6 +168,15 @@ export const useGameList = (playerID: string) => {
     return Array.from(set).sort();
   }, [unifiedGames]);
 
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      refetchOwnedGames?.(),
+      refetchPlaytimeReport?.(),
+      refetchUserGameStatuses?.(),
+      refetchLibraryGenres?.(),
+    ]);
+  }, [refetchOwnedGames, refetchPlaytimeReport, refetchUserGameStatuses, refetchLibraryGenres]);
+
   return {
     processedGames,
     isLoading:
@@ -186,5 +207,6 @@ export const useGameList = (playerID: string) => {
     setDateRangeFilter,
 
     allAvailableGenres,
+    refetchAll,
   };
 };

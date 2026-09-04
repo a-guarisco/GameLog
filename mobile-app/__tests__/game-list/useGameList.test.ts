@@ -28,11 +28,28 @@ const mockGames = {
   },
 };
 
+const mockRefetchOwnedGames = jest.fn().mockResolvedValue(undefined);
+const mockRefetchPlaytimeReport = jest.fn().mockResolvedValue(undefined);
+const mockRefetchLibraryGenres = jest.fn().mockResolvedValue(undefined);
+const mockRefetchUserGameStatuses = jest.fn().mockResolvedValue(undefined);
+
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseGetFullPlaytimeReport.mockReturnValue({ playtimeReport: null, isLoadingPlaytimeReport: false });
-  mockUseGetGenresBatch.mockReturnValue({ libraryGenres: new Map(), isLoadingLibraryGenres: false });
-  mockUseGetUserGameStatuses.mockReturnValue({ userGameStatuses: {}, isLoadingUserGameStatuses: false });
+  mockUseGetFullPlaytimeReport.mockReturnValue({
+    playtimeReport: null,
+    isLoadingPlaytimeReport: false,
+    refetchPlaytimeReport: mockRefetchPlaytimeReport,
+  });
+  mockUseGetGenresBatch.mockReturnValue({
+    libraryGenres: new Map(),
+    isLoadingLibraryGenres: false,
+    refetchLibraryGenres: mockRefetchLibraryGenres,
+  });
+  mockUseGetUserGameStatuses.mockReturnValue({
+    userGameStatuses: {},
+    isLoadingUserGameStatuses: false,
+    refetchUserGameStatuses: mockRefetchUserGameStatuses,
+  });
 });
 
 
@@ -213,6 +230,40 @@ describe('useGameList hook', () => {
       result.current.setStatusFilter('All');
     });
     expect(result.current.processedGames).toHaveLength(2);
+  });
+
+  it('calls all refetch methods when refetchAll is triggered', async () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: mockGames,
+      isLoadingOwnedGames: false,
+      refetchOwnedGames: mockRefetchOwnedGames,
+    });
+    mockUseGetFullPlaytimeReport.mockReturnValue({
+      playtimeReport: null,
+      isLoadingPlaytimeReport: false,
+      refetchPlaytimeReport: mockRefetchPlaytimeReport,
+    });
+    mockUseGetGenresBatch.mockReturnValue({
+      libraryGenres: new Map(),
+      isLoadingLibraryGenres: false,
+      refetchLibraryGenres: mockRefetchLibraryGenres,
+    });
+    mockUseGetUserGameStatuses.mockReturnValue({
+      userGameStatuses: {},
+      isLoadingUserGameStatuses: false,
+      refetchUserGameStatuses: mockRefetchUserGameStatuses,
+    });
+
+    const { result } = renderHook(() => useGameList('123'));
+
+    await act(async () => {
+      await result.current.refetchAll();
+    });
+
+    expect(mockRefetchOwnedGames).toHaveBeenCalledTimes(1);
+    expect(mockRefetchPlaytimeReport).toHaveBeenCalledTimes(1);
+    expect(mockRefetchLibraryGenres).toHaveBeenCalledTimes(1);
+    expect(mockRefetchUserGameStatuses).toHaveBeenCalledTimes(1);
   });
 });
 

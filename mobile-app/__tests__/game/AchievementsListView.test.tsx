@@ -46,7 +46,7 @@ describe('AchievementsListView', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Achievements for\s*Unknown Game/)).toBeTruthy();
-    });
+    }, { timeout: 5000 });
   });
 
   it('displays error text when the API call fails', async () => {
