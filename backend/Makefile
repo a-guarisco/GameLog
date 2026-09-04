@@ -1,5 +1,6 @@
 include .env
 export
+export UV_LINK_MODE=copy
 
 COMPOSE ?= docker compose
 SERVICE ?=
@@ -55,7 +56,8 @@ help:
 	@echo "  make migrate             - Apply pending Alembic migrations to DB"
 	@echo "  make revision m=\"...\"    - Autogenerate an Alembic migration script"
 	@echo "  make downgrade           - Roll back the last Alembic migration"
-	@echo "  make seed                - Load demo data into PostgreSQL database"
+	@echo "  make seed                - Load demo data into PostgreSQL database (auto-runs crawler if data is missing)"
+	@echo "  make crawl-steam         - Run the Steam crawler to generate seed_data_users.json"
 	@echo "  make seed-firebase       - Seed/authenticate Firebase Auth test users & display Bearer tokens"
 	@echo "                             (Supports ARGS=\"--cloud\", ARGS=\"--emulator\", or ARGS=\"email@test.com\")"
 	@echo ""
@@ -139,7 +141,14 @@ downgrade:
 	$(COMPOSE) run --rm gamelog uv run alembic downgrade -1
 
 seed:
+	@if [ ! -f gamelog/src/core/seed_data_users.json ]; then \
+		echo "⚠️ Missing seed_data_users.json. Running crawl-steam first..."; \
+		$(MAKE) crawl-steam; \
+	fi
 	$(COMPOSE) run --rm gamelog uv run python -m src.core.seed $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
+
+crawl-steam:
+	@cd gamelog && uv run python ../scripts/crawl_steam_users.py
 
 seed-firebase:
 	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
