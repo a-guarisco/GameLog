@@ -84,7 +84,7 @@ const ReportRetrievalCard = ({
       style={style}
       headerRight={
         (!!startDate || !!endDate || hasReport) ? (
-          <Pressable onPress={handleClearDates} hitSlop={12}>
+          <Pressable onPress={handleClearDates} hitSlop={12} testID="report-reset-btn">
             <Text className="text-sm font-bold text-primary-500">Reset</Text>
           </Pressable>
         ) : null
@@ -96,7 +96,7 @@ const ReportRetrievalCard = ({
             <Text size="xs" className="font-medium text-typography-400">
               From
             </Text>
-            <Pressable onPress={() => setShowStart(true)} hitSlop={12}>
+            <Pressable onPress={() => setShowStart(true)} hitSlop={12} testID="report-start-date-btn">
               <DateSelectorText>{startDate ? formatDate(startDate) : 'Select Date'}</DateSelectorText>
             </Pressable>
           </VStack>
@@ -105,7 +105,7 @@ const ReportRetrievalCard = ({
             <Text size="xs" className="font-medium text-typography-400">
               To
             </Text>
-            <Pressable onPress={() => setShowEnd(true)} hitSlop={12}>
+            <Pressable onPress={() => setShowEnd(true)} hitSlop={12} testID="report-end-date-btn">
               <DateSelectorText>{endDate ? formatDate(endDate) : 'Select Date'}</DateSelectorText>
             </Pressable>
           </VStack>
@@ -116,6 +116,7 @@ const ReportRetrievalCard = ({
           isDisabled={loading}
           isOnCard
           className="bg-background-0 self-center mt-2"
+          testID="generate-report-btn"
         >
           <ButtonText>Generate Report</ButtonText>
         </Button>

@@ -1,0 +1,62 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: common/logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Sign In'
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: common/login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 100000
+
+- tapOn:
+    id: 'ProfileTab'
+
+- extendedWaitUntil:
+    visible:
+      id: 'profile-tab-overview'
+    timeout: 30000
+
+- extendedWaitUntil:
+    visible:
+      id: 'report-retrieval-card'
+    timeout: 10000
+
+- assertVisible: 'Report Retrieval'
+- assertVisible:
+    id: 'generate-report-btn'
+
+- tapOn:
+    id: 'generate-report-btn'
+
+- scroll
+
+- extendedWaitUntil:
+    visible:
+      id: 'report-results-card'
+    timeout: 30000
+
+- assertVisible: 'PLAYTIME'
+- assertVisible:
+    id: 'report-reset-btn'
+
+- tapOn:
+    id: 'report-reset-btn'
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- assertVisible:
+    id: 'generate-report-btn'
