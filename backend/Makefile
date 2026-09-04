@@ -111,6 +111,7 @@ rebuild-backend-no-cache: rebuild-gamelog-no-cache
 setup: up migrate seed
 
 db-reset: db-clean migrate seed
+	$(COMPOSE) up -d
 
 db-fresh-baseline:
 	@$(PYTHON) -c "import sys; ans = input('⚠️  WARNING: This command will delete ALL migrations in alembic/versions/ and reset the DB! Continue? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operation cancelled." && exit 1)
@@ -126,19 +127,19 @@ db-fresh-baseline:
 # ==============================================================================
 
 migrate:
-	$(COMPOSE) exec gamelog uv run alembic upgrade head
+	$(COMPOSE) run --rm gamelog uv run alembic upgrade head
 
 revision:
 ifndef m
 	$(error ❌ Error: Please provide migration message. Usage: make revision m="Create users table")
 endif
-	$(COMPOSE) exec gamelog uv run alembic revision --autogenerate -m "$(m)"
+	$(COMPOSE) run --rm gamelog uv run alembic revision --autogenerate -m "$(m)"
 
 downgrade:
-	$(COMPOSE) exec gamelog uv run alembic downgrade -1
+	$(COMPOSE) run --rm gamelog uv run alembic downgrade -1
 
 seed:
-	$(COMPOSE) exec gamelog uv run python -m src.core.seed
+	$(COMPOSE) run --rm gamelog uv run python -m src.core.seed $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
 
 seed-firebase:
 	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
@@ -167,7 +168,7 @@ db-shell:
 
 db-clean:
 	$(COMPOSE) down -v
-	$(COMPOSE) up -d
+	$(COMPOSE) up -d db
 	@$(PYTHON) -c "import time; time.sleep(3)"
 	@echo "✅ Database cleaned and recreated"
 
