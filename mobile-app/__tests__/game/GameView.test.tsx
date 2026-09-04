@@ -7,6 +7,7 @@ import * as OrientationHook from '@gamelog/common/useOrientation';
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
+const mockSetParams = jest.fn();
 
 // Only the playtime report is stubbed: every other hook is left to run against the
 // mocked fetch layer, as the rest of this suite already relies on.
@@ -37,6 +38,7 @@ jest.mock('@react-navigation/native', () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
     setOptions: jest.fn(),
+    setParams: mockSetParams,
   }),
   useRoute: jest.fn(() => ({
     params: {
@@ -241,5 +243,32 @@ describe('GameView', () => {
       expect(screen.getByText('Total')).toBeTruthy();
       expect(screen.getByText('2 weeks')).toBeTruthy();
     });
+
+    it('immediately opens inline achievements detail when showAchievements route param is true and clears the param', () => {
+      const useRouteMock = jest.requireMock('@react-navigation/native').useRoute;
+      useRouteMock.mockReturnValueOnce({
+        params: {
+          gameItem: {
+            appid: '123',
+            name: 'Test Game',
+            playtime_forever: 100,
+            img_icon_url: 'http://example.com/icon.png',
+            has_community_visible_stats: true,
+            playtime_windows_forever: 50,
+            playtime_mac_forever: 30,
+            playtime_linux_forever: 20,
+            playtime_deck_forever: 0,
+            rtime_last_played: 1620000000,
+          },
+          showAchievements: true,
+        },
+      });
+
+      render(<GameView />);
+
+      expect(screen.getByTestId('back-to-tabs')).toBeTruthy();
+      expect(mockSetParams).toHaveBeenCalledWith({ showAchievements: undefined });
+    });
   });
 });
+

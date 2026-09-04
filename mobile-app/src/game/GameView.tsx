@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -26,9 +26,20 @@ const GameView = () => {
   const navigation = useNavigation<any>();
   const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
-  const [showInlineAchievements, setShowInlineAchievements] = useState(false);
+  const [showInlineAchievements, setShowInlineAchievements] = useState(
+    Boolean(route.params?.showAchievements)
+  );
   const { gameItem } = route.params;
   const playerID = getSteamId();
+
+  useEffect(() => {
+    if (route.params?.showAchievements) {
+      setShowInlineAchievements(true);
+      if (typeof navigation.setParams === 'function') {
+        navigation.setParams({ showAchievements: undefined });
+      }
+    }
+  }, [route.params?.showAchievements, navigation]);
 
   const {
     streakText,

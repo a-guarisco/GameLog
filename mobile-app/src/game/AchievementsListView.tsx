@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import AchievementItem from '@gamelog/game/AchievementItem';
@@ -13,6 +13,7 @@ import useAchievementsData from './useAchievementsData';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import BackButton from '@gamelog/common/BackButton';
 import AchievementsProgressBar from './AchievementsProgressBar';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 type AchievementsListViewProps = {
   globalAchievements: GlobalAchievement;
@@ -23,7 +24,8 @@ type AchievementsListViewProps = {
 
 const AchievementsListView = ({ route }: any) => {
   const navigation = useNavigation<any>();
-  const { globalAchievements, gameID, playerID } = route.params as AchievementsListViewProps;
+  const { isLandscape } = useOrientation();
+  const { globalAchievements, gameID, playerID, gameItem } = route.params as AchievementsListViewProps;
   const { gameStreak, isLoadingGameStreak, refetchGameStreak } = useGetGameStreak(gameID);
   const secondaryText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
 
@@ -48,6 +50,29 @@ const AchievementsListView = ({ route }: any) => {
       setRefreshing(false);
     }
   }, [refetchGameStreak, refetchAchievements]);
+
+  useEffect(() => {
+    if (isLandscape) {
+      const resolvedGameItem = gameItem ?? { appid: gameID, name: gameName };
+      if (typeof navigation.canGoBack === 'function' && !navigation.canGoBack()) {
+        if (typeof navigation.replace === 'function') {
+          navigation.replace('Game', {
+            gameItem: resolvedGameItem,
+            showAchievements: true,
+          });
+          return;
+        }
+      }
+      navigation.navigate('Game', {
+        gameItem: resolvedGameItem,
+        showAchievements: true,
+      });
+    }
+  }, [isLandscape, navigation, gameItem, gameID, gameName]);
+
+  if (isLandscape) {
+    return null;
+  }
 
   const content = isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
