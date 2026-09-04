@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
+import { ScrollView } from 'react-native';
+import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -130,7 +131,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
           contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={true}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+            <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
           <Box className="pt-2">

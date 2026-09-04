@@ -3,7 +3,8 @@ import { getDefaultBannerParams } from '@gamelog/utils/bannerUtils';
 import { BlurTargetView } from 'expo-blur';
 import { Box } from './gluestack/box';
 import TopNotchBlurOverlay from './TopNotchBlurOverlay';
-import { Animated, RefreshControl, useColorScheme } from 'react-native';
+import { Animated, useColorScheme } from 'react-native';
+import GLRefreshControl from './GLRefreshControl';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -50,7 +51,7 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop, refresh
           pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
           refreshControl={
             onRefresh ? (
-              <RefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
+              <GLRefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
             ) : undefined
           }
         >

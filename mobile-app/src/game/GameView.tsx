@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
+import { ScrollView } from 'react-native';
+import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOrientation } from '@gamelog/common/useOrientation';
@@ -172,7 +173,7 @@ const GameView = () => {
         nestedScrollEnabled={true}
         testID="game-view-landscape-scroll"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
         {/* Left Column (~40% width - Master Overview) */}

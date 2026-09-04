@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import { ScrollView, RefreshControl } from 'react-native';
+import { ScrollView } from 'react-native';
+import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -81,7 +82,7 @@ const ProfileView = () => {
           contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={true}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+            <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
           <Box className="pt-2">
