@@ -186,4 +186,24 @@ describe('useOtherUserProfile', () => {
 
     expect(result.current.friendship).toBeNull();
   });
+
+  it('refetches all data when refetchAll is called', async () => {
+    const { result } = renderHook(() =>
+      useOtherUserProfile({ user: mockUser })
+    );
+
+    await waitFor(() => {
+      expect(result.current.player?.personaname).toBe('PlayerTwo');
+    });
+
+    const initialPlayerCalls = (ApiManager.getPlayersInfo as jest.Mock).mock.calls.length;
+    const initialGamesCalls = (ApiManager.getOwnedGames as jest.Mock).mock.calls.length;
+
+    await act(async () => {
+      await result.current.refetchAll();
+    });
+
+    expect((ApiManager.getPlayersInfo as jest.Mock).mock.calls.length).toBeGreaterThan(initialPlayerCalls);
+    expect((ApiManager.getOwnedGames as jest.Mock).mock.calls.length).toBeGreaterThan(initialGamesCalls);
+  });
 });

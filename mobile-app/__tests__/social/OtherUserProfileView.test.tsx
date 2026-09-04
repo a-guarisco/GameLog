@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import OtherUserProfileView from '@gamelog/social/other-user-profile/OtherUserProfileView';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
@@ -134,5 +134,23 @@ describe('OtherUserProfileView', () => {
 
     fireEvent.press(screen.getByTestId('other-user-profile-back-btn'));
     expect(mockGoBack).toHaveBeenCalled();
+  });
+
+  it('calls refetch functions on pull-to-refresh', async () => {
+    render(<OtherUserProfileView user={mockUser} friendship={mockFriendship} />);
+
+    expect(await screen.findByText('GamerGuy Persona')).toBeTruthy();
+
+    const initialGetPlayersInfoCalls = mockApiManager.getPlayersInfo.mock.calls.length;
+    const initialGetOwnedGamesCalls = mockApiManager.getOwnedGames.mock.calls.length;
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect(mockApiManager.getPlayersInfo.mock.calls.length).toBeGreaterThan(initialGetPlayersInfoCalls);
+    expect(mockApiManager.getOwnedGames.mock.calls.length).toBeGreaterThan(initialGetOwnedGamesCalls);
   });
 });
