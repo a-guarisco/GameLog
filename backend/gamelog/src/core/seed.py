@@ -3,30 +3,20 @@ Database Seeding Script for GameLog Backend.
 
 This module populates the PostgreSQL database with initial demo data (users, games,
 shelvings, and rolling playtime statistics) aligned with the Firebase Authentication service.
-
-IMPORTANT RELATIONAL NOTES:
----------------------------
-1. `firebase_uid`:
-    - The primary test user `test-01` uses `firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2"`.
-    - DO NOT MODIFY the `firebase_uid` of `DEMO_USER_1_ID` without updating:
-      * `backend/scripts/seed_firebase_users.py` (which seeds the local emulator)
-      * Mobile app test credentials (`mobile-app/.env.example`)
-      * Production/Staging Firebase Console accounts
-
-2. `steam_id` & Playtime Records:
-   - `DEMO_USER_1_ID` uses a valid Steam ID (`76561198077919169`) for testing real Steam API sync.
-   - Playtime records (`_rolling_times`) generate a 14-day history for `test-01` across
-     CS2 (730) and Red Dead Redemption 2 (1174180) to power frontend analytics endpoints.
 """
 
 from __future__ import annotations
 
-from datetime import date
-from uuid import UUID, uuid4
+import argparse
+import json
 import os
+import random
+from datetime import UTC, date, datetime, timedelta
+from uuid import UUID, uuid4
 
 from sqlalchemy import delete
 from sqlmodel import Session
+from rich.progress import track
 
 from src.core.database import engine
 from src.models import (
@@ -53,21 +43,7 @@ DEMO_USER_3_ID = UUID("33333333-3333-3333-3333-333333333333")
 DEMO_USER_4_ID = UUID("44444444-4444-4444-4444-444444444444")
 DEMO_USER_5_ID = UUID("55555555-5555-5555-5555-555555555555")
 SLAIT_GRAPH_USER_ID = UUID("b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0")
-
-DEMO_GAME_CS2_ID = UUID("66666666-6666-6666-6666-666666666666")
-DEMO_GAME_DOTA_ID = UUID("77777777-7777-7777-7777-777777777777")
-DEMO_GAME_RDR2_ID = UUID("88888888-8888-8888-8888-888888888888")
-DEMO_GAME_GTAV_ID = UUID("99999999-9999-9999-9999-999999999999")
-DEMO_GAME_ELDEN_RING_ID = UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-
-# SLAIT-GRAPH User Games
-GAME_DONT_STARVE_ID = UUID("b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1")
-GAME_MOTOGP_ID = UUID("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2")
-GAME_WALLPAPER_ENGINE_ID = UUID("b3b3b3b3-b3b3-b3b3-b3b3-b3b3b3b3b3b3")
-GAME_UNTURNED_ID = UUID("b4b4b4b4-b4b4-b4b4-b4b4-b4b4b4b4b4b4")
-GAME_METRO_ID = UUID("b5b5b5b5-b5b5-b5b5-b5b5-b5b5b5b5b5b5")
-GAME_RIDE6_ID = UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-
+NEW_DEMO_USER_ID = UUID("c0c0c0c0-c0c0-c0c0-c0c0-c0c0c0c0c0c0")
 
 GENRES_DATA = [
     {"id": "1", "description": "Action"},
@@ -91,9 +67,7 @@ GENRES_DATA = [
     {"id": "52", "description": "Audio Production"},
 ]
 
-from typing import Any
-
-TOP_GAMES_DATA: list[dict[str, Any]] = [
+TOP_GAMES_DATA = [
     {"steam_app_id": "730", "rank": 1, "genres": ["1", "37"]},
     {"steam_app_id": "578080", "rank": 2, "genres": ["1", "37", "25", "29"]},
     {"steam_app_id": "570", "rank": 3, "genres": ["1", "2", "37"]},
@@ -195,18 +169,18 @@ TOP_GAMES_DATA: list[dict[str, Any]] = [
 ]
 
 
-def _users() -> list[User]:
-    """
-    Returns the initial list of test users.
+def load_crawled_users() -> list[dict]:
+    try:
+        with open("src/core/seed_data_users.json", "r") as f:
+            return json.load(f)
+    except Exception:
+        return []
 
-    WARNING: `firebase_uid` values MUST be kept in sync with:
-    1. Firebase Auth Emulator script (`backend/scripts/seed_firebase_users.py`)
-    2. Firebase Console Cloud accounts for production E2E tests.
-    """
-    return [
+def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
+    users = [
         User(
             id=DEMO_USER_1_ID,
-            firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",  # Matches test-01@test.com
+            firebase_uid="YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",
             username="test-01",
             steam_id="76561198077919169",
             steam_api_key="4C67D2313547027F4ECB151CD10E76EC",
@@ -214,7 +188,7 @@ def _users() -> list[User]:
         ),
         User(
             id=DEMO_USER_2_ID,
-            firebase_uid="tcYaHPGYDkVBlnNrcI7jNf2z4MS2",  # Matches test-02@test.com
+            firebase_uid="tcYaHPGYDkVBlnNrcI7jNf2z4MS2",
             username="test-02",
             steam_id="76561198000000002",
             steam_api_key="",
@@ -222,7 +196,7 @@ def _users() -> list[User]:
         ),
         User(
             id=DEMO_USER_3_ID,
-            firebase_uid="GRbqhGIYlzb1GHEaBINeJq1ZXld2",  # Matches test-03@test.com
+            firebase_uid="GRbqhGIYlzb1GHEaBINeJq1ZXld2",
             username="test-03",
             steam_id="76561198000000003",
             steam_api_key="",
@@ -230,7 +204,7 @@ def _users() -> list[User]:
         ),
         User(
             id=DEMO_USER_4_ID,
-            firebase_uid="wcMFGsVqaYYNHSAeUXgGiK14WPk2",  # Matches test-04@test.com
+            firebase_uid="wcMFGsVqaYYNHSAeUXgGiK14WPk2",
             username="test-04",
             steam_id="76561198000000004",
             steam_api_key="",
@@ -238,7 +212,7 @@ def _users() -> list[User]:
         ),
         User(
             id=DEMO_USER_5_ID,
-            firebase_uid="a7swvzI0APgq57SMa8B7PsHevG02",  # Matches test-05@test.com
+            firebase_uid="a7swvzI0APgq57SMa8B7PsHevG02",
             username="test-05",
             steam_id="76561198000000005",
             steam_api_key="",
@@ -252,229 +226,55 @@ def _users() -> list[User]:
             steam_api_key=os.getenv("SLAIT_GRAPH_STEAM_API_KEY", "dummy_slait_graph_key"),
             region="US",
         ),
+        User(
+            id=NEW_DEMO_USER_ID,
+            firebase_uid="newuser_76561198159652025",
+            username="xrayman",
+            steam_id="76561198159652025",
+            steam_api_key="",
+            region="IT",
+        )
     ]
+    
+    # Exclude IDs we already hardcoded to prevent unique constraint failures
+    exclude_ids = {"76561198077919169", "76561198159652025", "76561198000000002", "76561198000000003", "76561198000000004", "76561198000000005"}
+    
+    # Add crawled users (up to mock_users)
+    for c_user in crawled_users[:mock_users]:
+        s_id = c_user["steam_id"]
+        if s_id in exclude_ids:
+            continue
+        exclude_ids.add(s_id)
+        
+        users.append(
+            User(
+                id=uuid4(),
+                firebase_uid=f"mock_{s_id}",
+                username=c_user["personaname"][:30], # Limit length
+                steam_id=s_id,
+                steam_api_key="",
+                region=c_user["region"]
+            )
+        )
+    return users
 
 
-def _games() -> list[Game]:
-    """Returns initial demo games indexed by Steam App ID."""
-    return [
-        Game(
-            id=DEMO_GAME_CS2_ID,
-            steam_app_id="730",  # Counter-Strike 2
-        ),
-        Game(
-            id=DEMO_GAME_DOTA_ID,
-            steam_app_id="570",  # Dota 2
-        ),
-        Game(
-            id=DEMO_GAME_RDR2_ID,
-            steam_app_id="1174180",  # Red Dead Redemption 2
-        ),
-        Game(
-            id=DEMO_GAME_GTAV_ID,
-            steam_app_id="271590",  # Grand Theft Auto V
-        ),
-        Game(
-            id=DEMO_GAME_ELDEN_RING_ID,
-            steam_app_id="1245620",  # Elden Ring
-        ),
-        Game(id=GAME_DONT_STARVE_ID, steam_app_id="322330"),
-        Game(id=GAME_MOTOGP_ID, steam_app_id="3875050"),
-        Game(id=GAME_WALLPAPER_ENGINE_ID, steam_app_id="431960"),
-        Game(id=GAME_UNTURNED_ID, steam_app_id="304930"),
-        Game(id=GAME_METRO_ID, steam_app_id="286690"),
-        Game(id=GAME_RIDE6_ID, steam_app_id="2815070"),
-    ]
-
-
-def _shelvings() -> list[Shelving]:
-    """Returns sample game status assignments (Shelvings) per user."""
-    return [
-        Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_RDR2_ID, status=GameStatus.TO_BE_PLAYED),
-        Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_GTAV_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=DEMO_USER_1_ID, game_id=DEMO_GAME_ELDEN_RING_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=DEMO_USER_2_ID, game_id=DEMO_GAME_DOTA_ID, status=GameStatus.SHELVED),
-        Shelving(owner_id=DEMO_USER_3_ID, game_id=DEMO_GAME_CS2_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=DEMO_USER_4_ID, game_id=DEMO_GAME_RDR2_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_DONT_STARVE_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_MOTOGP_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_WALLPAPER_ENGINE_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_UNTURNED_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_METRO_ID, status=GameStatus.PLAYING),
-        Shelving(owner_id=SLAIT_GRAPH_USER_ID, game_id=GAME_RIDE6_ID, status=GameStatus.PLAYING),
-    ]
-
-
-def _rolling_times() -> list[SteamRollingTime]:
+def generate_user_playtime(user_id: UUID, games_targets: list[tuple[str, int]], history_days: int = 365) -> list[SteamRollingTime]:
     """
-    Generates 14 days of historical daily playtime snapshots.
-
-    Used to test endpoints:
-    - GET /games/_playtime_by_user
-    - GET /games/_playtime_by_game
+    Generates realistic historical playtime curves for a user's games.
+    Uses realistic gaps (sparsity) and random distributions.
+    Low total playtime implies adopting GameLog recently and generating playtime sporadically from 0 baseline.
     """
-    from datetime import timedelta
-
-    today = date.today()
     records = []
-
-    # Seed CS2 (730) rolling playtime for test-01 (DEMO_USER_1_ID)
-    cs2_playtime = 1000
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [30, 45, 0, 60, 20, 0, 90, 15, 40, 0, 50, 75, 10, 80, 45][14 - day_offset]
-            cs2_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_1_ID,
-                steam_app_id="730",
-                last_day_playtime=cs2_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # Seed RDR2 (1174180) rolling playtime for test-01 (DEMO_USER_1_ID)
-    rdr2_playtime = 500
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [0, 60, 90, 0, 15, 30, 45, 0, 0, 120, 10, 0, 35, 50, 60][14 - day_offset]
-            rdr2_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_1_ID,
-                steam_app_id="1174180",
-                last_day_playtime=rdr2_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # Seed GTA V (271590) rolling playtime for test-01 (DEMO_USER_1_ID)
-    gtav_playtime = 1500
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [20, 30, 40, 50, 0, 60, 70, 80, 0, 45, 60, 30, 90, 100, 90][14 - day_offset]
-            gtav_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_1_ID,
-                steam_app_id="271590",
-                last_day_playtime=gtav_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # Seed Elden Ring (1245620) rolling playtime for test-01 (DEMO_USER_1_ID)
-    elden_playtime = 800
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [45, 60, 0, 30, 90, 120, 0, 40, 50, 60, 80, 100, 110, 90, 120][14 - day_offset]
-            elden_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_1_ID,
-                steam_app_id="1245620",
-                last_day_playtime=elden_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # Seed Dota 2 (570) rolling playtime for test-02 (DEMO_USER_2_ID)
-    dota_playtime = 2000
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [100, 120, 0, 80, 90, 150, 0, 60, 40, 110, 0, 85, 95, 120, 60][14 - day_offset]
-            dota_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_2_ID,
-                steam_app_id="570",
-                last_day_playtime=dota_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # Seed Dota 2 (570) rolling playtime for test-01 (DEMO_USER_1_ID)
-    test01_dota_playtime = 700
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [10, 15, 0, 20, 5, 0, 30, 0, 10, 0, 20, 25, 0, 10, 25][14 - day_offset]
-            test01_dota_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_1_ID,
-                steam_app_id="570",
-                last_day_playtime=test01_dota_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # Seed CS2 (730) rolling playtime for test-02 (DEMO_USER_2_ID)
-    test02_cs2_playtime = 1100
-    for day_offset in range(14, -1, -1):
-        record_date = today - timedelta(days=day_offset)
-        is_baseline = day_offset == 14
-        if not is_baseline:
-            playtime_increment = [15, 20, 0, 30, 10, 0, 45, 5, 20, 0, 25, 35, 5, 40, 20][14 - day_offset]
-            test02_cs2_playtime += playtime_increment
-
-        records.append(
-            SteamRollingTime(
-                id=uuid4(),
-                user_id=DEMO_USER_2_ID,
-                steam_app_id="730",
-                last_day_playtime=test02_cs2_playtime,
-                created_at=record_date,
-            )
-        )
-
-    # SLAIT-GRAPH User Playtime Seeding
-    # Real steam playtimes on Day 0: Don't Starve (629), MotoGP (115), Wallpaper Engine (50), Unturned (22), Metro (0), RIDE 6 (0)
-    import random
-    
-    HISTORY_DAYS = 180
-    
-    games_targets = [
-        ("322330", 629),
-        ("3875050", 115),
-        ("431960", 50),
-        ("304930", 22),
-        ("286690", 0),
-        ("2815070", 0)
-    ]
-    
+    today = date.today()
     for app_id, final_target in games_targets:
         if final_target == 0:
             current_playtime = 0
-            for day_offset in range(HISTORY_DAYS, -1, -1):
+            for day_offset in range(history_days, -1, -1):
                 records.append(
                     SteamRollingTime(
                         id=uuid4(),
-                        user_id=SLAIT_GRAPH_USER_ID,
+                        user_id=user_id,
                         steam_app_id=app_id,
                         last_day_playtime=current_playtime,
                         created_at=today - timedelta(days=day_offset),
@@ -482,68 +282,114 @@ def _rolling_times() -> list[SteamRollingTime]:
                 )
             continue
 
-        # Use 50% of the playtime as the "baseline" (the playtime they had before joining GameLog)
-        baseline = final_target // 2
-        remaining = final_target - baseline
-        
-        increments = [0] * (HISTORY_DAYS + 1)
-        
-        # Distribute the remaining playtime on a random subset of "active days" for realistic clustering
-        active_days_count = random.randint(15, min(90, HISTORY_DAYS)) 
-        active_days = set(random.sample(range(0, HISTORY_DAYS), active_days_count))
-        
-        for _ in range(remaining):
-            day_idx = random.choice(list(active_days))
-            increments[day_idx] += 1
+        # If total playtime is very low (< 30 hours / 1800 mins), assume they didn't have a baseline before GameLog.
+        # So we distribute 100% of the playtime over time. Otherwise, we assume 50% baseline.
+        if final_target < 1800:
+            baseline = 0
+        else:
+            baseline = final_target // 2
             
-        current_playtime = baseline
+        remaining = final_target - baseline
+        increments = [0] * (history_days + 1)
         
-        for day_offset in range(HISTORY_DAYS, -1, -1):
-            record_date = today - timedelta(days=day_offset)
-            if day_offset != HISTORY_DAYS:
+        if remaining > 0:
+            # We don't pre-pick active days. We just keep adding "gaming sessions" 
+            # (e.g. 30 mins to 5 hours) to random days until the remaining time is depleted.
+            while remaining > 0:
+                day_idx = random.randint(0, history_days - 1)
+                
+                # A realistic gaming session is between 30 minutes and 4 hours (240 mins)
+                # Or whatever is left if it's smaller.
+                session_len = random.randint(30, 240)
+                if session_len > remaining:
+                    session_len = remaining
+                    
+                increments[day_idx] += session_len
+                remaining -= session_len
+                
+        current_playtime = baseline
+        for day_offset in range(history_days, -1, -1):
+            if day_offset != history_days:
                 current_playtime += increments[day_offset]
                 
             records.append(
                 SteamRollingTime(
                     id=uuid4(),
-                    user_id=SLAIT_GRAPH_USER_ID,
+                    user_id=user_id,
                     steam_app_id=app_id,
                     last_day_playtime=current_playtime,
-                    created_at=record_date,
+                    created_at=today - timedelta(days=day_offset),
                 )
             )
-
+            
     return records
 
 
-def _friendships() -> list[Friendship]:
-    """Returns sample friendships for manual testing."""
-    return [
-        # test-01 and test-02 are accepted friends
-        Friendship(
-            requester_id=DEMO_USER_1_ID,
-            addressee_id=DEMO_USER_2_ID,
-            status=FriendshipStatus.ACCEPTED,
-        ),
-        # test-04 requested test-01 (pending incoming request to test-01)
-        Friendship(
-            requester_id=DEMO_USER_4_ID,
-            addressee_id=DEMO_USER_1_ID,
-            status=FriendshipStatus.PENDING,
-        ),
-        # test-01 blocked test-05 (blocked relationship)
-        Friendship(
-            requester_id=DEMO_USER_1_ID,
-            addressee_id=DEMO_USER_5_ID,
-            status=FriendshipStatus.BLOCKED,
-        ),
-    ]
+def generate_shelvings(rolling_times: list[SteamRollingTime], users: list[User]) -> list[Shelving]:
+    """
+    Infers GameStatus (Shelving) from the generated playtime.
+    """
+    shelvings = []
+    
+    # Aggregate data by (user_id, app_id)
+    # We need to know:
+    # 1. Total Playtime
+    # 2. Playtime in the last 14 days
+    
+    stats = {}
+    today = date.today()
+    for rt in rolling_times:
+        key = (rt.user_id, rt.steam_app_id)
+        if key not in stats:
+            stats[key] = {"total": 0, "recent": 0}
+            
+        # The rolling time records represent the cumulative playtime up to that day.
+        # We can just look at the delta between today and 14 days ago.
+        # But iterating all records is fine, we just update total to the latest day's playtime.
+        days_ago = (today - rt.created_at).days
+        stats[key]["total"] = max(stats[key]["total"], rt.last_day_playtime)
+        
+        if days_ago == 14:
+            stats[key]["14_days_ago"] = rt.last_day_playtime
+            
+    # Resolve Games map
+    # Some games in top games don't have UUIDs generated manually.
+    # But Shelving requires `game_id` as UUID. We will map steam_app_id to game_id.
+    app_id_to_game_id = {}
+    
+    for (user_id, app_id), data in stats.items():
+        total = data["total"]
+        playtime_14_days_ago = data.get("14_days_ago", 0)
+        recent_playtime = total - playtime_14_days_ago
+        
+        status = GameStatus.TO_BE_PLAYED
+        if total == 0:
+            status = GameStatus.TO_BE_PLAYED
+        elif recent_playtime > 0:
+            status = GameStatus.PLAYING
+        else:
+            # Played in the past but not recently
+            if total > 600: # > 10 hours
+                status = random.choice([GameStatus.PLATINATO, GameStatus.SHELVED])
+            else:
+                status = GameStatus.SHELVED
+                
+        # Resolve a deterministic UUID for the game based on steam_app_id
+        game_id = UUID(int=int(app_id)*1000)
+        
+        shelvings.append(
+            Shelving(
+                owner_id=user_id,
+                game_id=game_id,
+                status=status
+            )
+        )
+        
+    return shelvings
 
-
-def seed_database() -> None:
+def seed_database(mock_users: int = 50) -> None:
     """Reset demo data and insert a consistent sample dataset using SQLModel models."""
     with Session(engine) as session:
-        # Wipe existing tables in safe order (dependency first) to avoid ForeignKeyViolation
         session.exec(delete(SteamRollingTime))
         session.exec(delete(Shelving))
         session.exec(delete(Friendship))
@@ -558,7 +404,6 @@ def seed_database() -> None:
         session.exec(delete(Config))
         session.flush()
 
-        # Seed realistic genres
         genre_instances = {}
         for gd in GENRES_DATA:
             g = Genre(id=gd["id"], description=gd["description"])
@@ -566,39 +411,7 @@ def seed_database() -> None:
             genre_instances[gd["id"]] = g
         session.flush()
 
-        # Seed users
-        for user in _users():
-            session.add(user)
-
-        # Seed the 5 demo games using fixed IDs and assigning resolved genres
-        game_cs2 = Game(id=DEMO_GAME_CS2_ID, steam_app_id="730", genres=[genre_instances["1"], genre_instances["37"]])
-        game_dota = Game(id=DEMO_GAME_DOTA_ID, steam_app_id="570", genres=[genre_instances["1"], genre_instances["37"], genre_instances["2"]])
-        game_rdr2 = Game(id=DEMO_GAME_RDR2_ID, steam_app_id="1174180", genres=[genre_instances["1"], genre_instances["25"]])
-        game_gtav = Game(id=DEMO_GAME_GTAV_ID, steam_app_id="271590", genres=[genre_instances["1"], genre_instances["25"]])
-        game_elden_ring = Game(id=DEMO_GAME_ELDEN_RING_ID, steam_app_id="1245620", genres=[genre_instances["1"], genre_instances["3"]])
-
-        session.add(game_cs2)
-        session.add(game_dota)
-        session.add(game_rdr2)
-        session.add(game_gtav)
-        session.add(game_elden_ring)
-
-        # SLAIT-GRAPH User Games
-        game_dont_starve = Game(id=GAME_DONT_STARVE_ID, steam_app_id="322330", genres=[genre_instances["23"], genre_instances["25"]])
-        game_motogp = Game(id=GAME_MOTOGP_ID, steam_app_id="3875050", genres=[genre_instances["9"], genre_instances["18"]])
-        game_wallpaper = Game(id=GAME_WALLPAPER_ENGINE_ID, steam_app_id="431960", genres=[genre_instances["57"]])
-        game_unturned = Game(id=GAME_UNTURNED_ID, steam_app_id="304930", genres=[genre_instances["1"], genre_instances["37"]])
-        game_metro = Game(id=GAME_METRO_ID, steam_app_id="286690", genres=[genre_instances["1"]])
-        game_ride6 = Game(id=GAME_RIDE6_ID, steam_app_id="2815070", genres=[genre_instances["9"]])
-
-        session.add(game_dont_starve)
-        session.add(game_motogp)
-        session.add(game_wallpaper)
-        session.add(game_unturned)
-        session.add(game_metro)
-        session.add(game_ride6)
-
-        # Seed realistic Top Games
+        # Seed realistic Top Games (used for both TopGame and standard Games)
         for tg in TOP_GAMES_DATA:
             tg_genres: list[str] = tg["genres"]
             top_game = TopGame(
@@ -607,27 +420,110 @@ def seed_database() -> None:
                 genres=[genre_instances[gid] for gid in tg_genres if gid in genre_instances],
             )
             session.add(top_game)
+            
+            # Add to Game table to support Shelvings
+            game_id = UUID(int=int(tg["steam_app_id"])*1000)
+            game = Game(
+                id=game_id,
+                steam_app_id=tg["steam_app_id"],
+                genres=[genre_instances[gid] for gid in tg_genres if gid in genre_instances],
+            )
+            session.add(game)
+        session.flush()
 
-        # Seed demo user interaction data
-        for shelving in _shelvings():
-            session.add(shelving)
-        for rolling_time in _rolling_times():
-            session.add(rolling_time)
-        for friendship in _friendships():
-            session.add(friendship)
+        crawled_users_data = load_crawled_users()
+        users = _users(crawled_users_data, mock_users)
+        for user in users:
+            session.add(user)
+        session.flush()
 
-        from datetime import UTC, datetime, timedelta
+        rolling_times = []
+        
+        # Hardcoded specific logic for SLAIT_GRAPH
+        slait_games_targets = [
+            ("322330", 629),
+            ("3875050", 115),
+            ("431960", 50),
+            ("304930", 22),
+            ("286690", 0),
+            ("2815070", 0)
+        ]
+        # Make sure these specific games are in the Game table if not already
+        for app_id, _ in slait_games_targets:
+            game_id = UUID(int=int(app_id)*1000)
+            if not session.get(Game, game_id):
+                session.add(Game(id=game_id, steam_app_id=app_id))
+                
+        rolling_times.extend(generate_user_playtime(SLAIT_GRAPH_USER_ID, slait_games_targets, 730))
+
+        # Test-01 Specific logic
+        test01_targets = [("730", 25000), ("1174180", 5500), ("271590", 12000), ("1245620", 4000), ("570", 800)]
+        rolling_times.extend(generate_user_playtime(DEMO_USER_1_ID, test01_targets, 730))
+
+        # New Demo User Specific logic
+        new_demo_targets = [("730", 15000), ("570", 5000), ("431960", 200)]
+        rolling_times.extend(generate_user_playtime(NEW_DEMO_USER_ID, new_demo_targets, 730))
+
+        # Mock targets for all other users
+        top_app_ids = [tg["steam_app_id"] for tg in TOP_GAMES_DATA]
+        
+        for user in track(users, description="Generating mock playtimes..."):
+            if user.id in [SLAIT_GRAPH_USER_ID, DEMO_USER_1_ID, NEW_DEMO_USER_ID]:
+                continue
+            
+            # Pick 3 to 8 random games for this user
+            num_games = random.randint(3, 8)
+            user_games = random.sample(top_app_ids, num_games)
+            
+            targets = []
+            for app_id in user_games:
+                # Randomize playtime, skewed towards lower playtimes
+                playtime = int(random.expovariate(1/5000)) 
+                targets.append((app_id, playtime))
+                
+            rolling_times.extend(generate_user_playtime(user.id, targets, 730))
+
+        for rt in track(rolling_times, description="Inserting RollingTimes into DB..."):
+            session.add(rt)
+            
+        # Dynamically generate shelvings based on the 730-day playtime history
+        shelvings = generate_shelvings(rolling_times, users)
+        for s in track(shelvings, description="Inserting Shelvings into DB..."):
+            session.add(s)
+        # Commit all the massive data first to avoid autoflush hanging later
+        session.commit()
+
+        # Generate some random friendships among users
+        # 1. Hardcoded friendships
+        session.add(Friendship(requester_id=DEMO_USER_1_ID, addressee_id=DEMO_USER_2_ID, status=FriendshipStatus.ACCEPTED))
+        session.add(Friendship(requester_id=DEMO_USER_4_ID, addressee_id=DEMO_USER_1_ID, status=FriendshipStatus.PENDING))
+        session.add(Friendship(requester_id=DEMO_USER_1_ID, addressee_id=DEMO_USER_5_ID, status=FriendshipStatus.BLOCKED))
+        session.add(Friendship(requester_id=DEMO_USER_1_ID, addressee_id=NEW_DEMO_USER_ID, status=FriendshipStatus.ACCEPTED))
+
+        # 2. Random friendships for the mock users (small world)
+        mock_user_ids = [u.id for u in users if u.id not in [DEMO_USER_1_ID, DEMO_USER_2_ID, DEMO_USER_3_ID, DEMO_USER_4_ID, DEMO_USER_5_ID, SLAIT_GRAPH_USER_ID, NEW_DEMO_USER_ID]]
+        for user_id in mock_user_ids:
+            # Each mock user has 1 to 5 friends
+            friends_count = random.randint(1, 5)
+            friends = random.sample(mock_user_ids, min(friends_count, len(mock_user_ids)))
+            for friend_id in friends:
+                if friend_id != user_id:
+                    # Avoid duplicates
+                    if not session.query(Friendship).filter_by(requester_id=user_id, addressee_id=friend_id).first() and not session.query(Friendship).filter_by(requester_id=friend_id, addressee_id=user_id).first():
+                        session.add(Friendship(requester_id=user_id, addressee_id=friend_id, status=random.choice([FriendshipStatus.ACCEPTED, FriendshipStatus.PENDING])))
 
         yesterday_iso = (datetime.now(UTC) - timedelta(days=1)).isoformat()
-        session.add(Config(key="last_update", value=yesterday_iso))
+        session.merge(Config(key="last_update", value=yesterday_iso))
 
         session.commit()
 
-
 def main() -> None:
-    seed_database()
+    parser = argparse.ArgumentParser(description="Seed the GameLog database.")
+    parser.add_argument("--mock-users", type=int, default=50, help="Number of random crawled users to inject")
+    args = parser.parse_args()
+    
+    seed_database(mock_users=args.mock_users)
     print("Demo data inserted successfully.")
-
 
 if __name__ == "__main__":
     main()
