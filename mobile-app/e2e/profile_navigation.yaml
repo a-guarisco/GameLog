@@ -1,58 +1,58 @@
 appId: com.gamelog.app
 onFlowComplete:
   - runFlow:
-      file: logout_flow.yaml
+      file: common/logout_flow.yaml
   - stopApp
 ---
 - launchApp
 - extendedWaitUntil:
-    visible: "Sign In"
+    visible: 'Sign In'
     timeout: 100000
 
 - runFlow:
     when:
-      visible: "Sign In"
-    file: login_flow.yaml
+      visible: 'Sign In'
+    file: common/login_flow.yaml
     env:
       EMAIL: test-01@test.com
       PASSWORD: 12345678
 
 - extendedWaitUntil:
-    visible: "Games"
+    visible: 'Games'
     timeout: 100000
 
 - tapOn:
-    id: "ProfileTab"
+    id: 'ProfileTab'
 
 - extendedWaitUntil:
     visible:
-      id: "profile-tab-overview"
+      id: 'profile-tab-overview'
     timeout: 30000
 
 - tapOn:
-    id: "profile-tab-time"
+    id: 'profile-tab-time'
 - waitForAnimationToEnd:
     timeout: 5000
 - assertVisible:
-    id: "playtime-blocks-chart"
+    id: 'playtime-blocks-chart'
 
 - tapOn:
-    id: "profile-tab-genres"
+    id: 'profile-tab-genres'
 - waitForAnimationToEnd:
     timeout: 5000
 - assertVisible:
     point: 3%,39%
 
 - tapOn:
-    id: "profile-tab-community"
+    id: 'profile-tab-community'
 - waitForAnimationToEnd:
     timeout: 5000
 - assertVisible:
-    id: "profile-community-tab"
+    id: 'profile-community-tab'
 
 - tapOn:
-    id: "profile-tab-overview"
+    id: 'profile-tab-overview'
 - waitForAnimationToEnd:
     timeout: 5000
 - assertVisible:
-    id: "profile-playtime-trend"
+    id: 'profile-playtime-trend'

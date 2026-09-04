@@ -1,7 +1,7 @@
 appId: com.gamelog.app
 onFlowComplete:
   - runFlow:
-      file: logout_flow.yaml
+      file: common/logout_flow.yaml
   - stopApp
 ---
 - launchApp
@@ -12,7 +12,7 @@ onFlowComplete:
 - runFlow:
     when:
       visible: 'Sign In'
-    file: login_flow.yaml
+    file: common/login_flow.yaml
     env:
       EMAIL: test-01@test.com
       PASSWORD: 12345678
@@ -48,7 +48,7 @@ onFlowComplete:
 - waitForAnimationToEnd:
     timeout: 5000
 
-- scrollUntilVisible: 
+- scrollUntilVisible:
     element: 'See all guides on Steam'
     direction: DOWN
 - swipe:
