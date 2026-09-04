@@ -1,7 +1,8 @@
 appId: com.gamelog.app
 ---
 - tapOn:
-    text: "Dev"
-    index: -1
-- tapOn: "Authentication"
-- tapOn: "Sign Out & Clear AsyncStorage"
+    id: "DevTab"
+- tapOn:
+    id: "dev-menu-item-auth"
+- tapOn:
+    id: "signout-clear-storage-btn"
