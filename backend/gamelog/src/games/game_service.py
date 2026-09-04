@@ -68,7 +68,7 @@ def get_game_status(session: Session, user_id: str, steam_app_id: str) -> GameSt
     user = user_service.get_user_by_firebase_uid(session, user_id)
     game = _get_cached_game(session, steam_app_id)
     if not game:
-        raise HTTPException(status_code=404, detail="Game not found in cache.")
+        game = _cache_game(session, steam_app_id)
     shelve = _get_game_player_shelve(session, game.id, user.id)
     if not shelve:
         raise HTTPException(status_code=404, detail="Game not found in user's shelf.")
@@ -182,16 +182,16 @@ def update_game_status(session: Session, user_id: str, steam_app_id: str, status
     game = _get_cached_game(session, steam_app_id)
 
     if not game:
-        raise HTTPException(status_code=404, detail="Game not found in cache.")
+        game = _cache_game(session, steam_app_id)
 
     shelving = _get_game_player_shelve(session, game.id, user.id)
 
     if not shelving:
-        raise HTTPException(status_code=404, detail="Game not found in user's shelving.")
-
-    shelving.status = status
-    session.add(shelving)
-    session.commit()
+        _shelve_game(session, game.id, user.id, status)
+    else:
+        shelving.status = status
+        session.add(shelving)
+        session.commit()
 
 
 def _get_cached_game(session: Session, steam_app_id: str) -> Game | None:
