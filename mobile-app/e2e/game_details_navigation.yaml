@@ -1,0 +1,83 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Sign In'
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 100000
+
+- tapOn:
+    id: 'game-list-card-press-730'
+
+- extendedWaitUntil:
+    visible:
+      id: 'achievements-summary'
+    timeout: 30000
+
+- assertVisible:
+    id: 'game-tab-achievements'
+
+- tapOn:
+    id: 'game-tab-news'
+- waitForAnimationToEnd:
+    timeout: 5000
+- swipe:
+    direction: UP
+- assertVisible:
+    id: 'see-all-news-button'
+- swipe:
+    direction: DOWN
+
+- tapOn:
+    id: 'game-tab-guides'
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- scrollUntilVisible: 
+    element: 'See all guides on Steam'
+    direction: DOWN
+- swipe:
+    direction: DOWN
+
+- tapOn:
+    id: 'game-tab-achievements'
+- assertVisible:
+    id: 'achievements-summary'
+
+- tapOn:
+    id: 'achievements-summary'
+
+- extendedWaitUntil:
+    visible:
+      id: 'achievements-back'
+    timeout: 30000
+
+- tapOn:
+    id: 'achievements-back'
+
+- extendedWaitUntil:
+    visible:
+      id: 'game-back'
+    timeout: 30000
+
+- tapOn:
+    id: 'game-back'
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 30000

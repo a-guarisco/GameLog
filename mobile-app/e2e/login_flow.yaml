@@ -3,11 +3,11 @@ appId: com.gamelog.app
 - waitForAnimationToEnd:
     timeout: 15000
 - tapOn:
-    id: "signin-email-input"
-- inputText: "${EMAIL}"
+    id: 'signin-email-input'
+- inputText: '${EMAIL}'
 - tapOn:
-    id: "signin-password-input"
-- inputText: "${PASSWORD}"
-- tapOn:
-    id: "signin-submit-button"
+    id: 'signin-password-input'
+- inputText: '${PASSWORD}'
+- doubleTapOn:
+    id: 'signin-submit-button'
     retryTapIfNoChange: true
