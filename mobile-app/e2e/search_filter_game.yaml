@@ -1,0 +1,47 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Sign In"
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: "Sign In"
+    file: login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: "Games"
+    timeout: 100000
+
+# Search for Counter-Strike
+- tapOn:
+    id: "game-list-search-input"
+- inputText: "Counter-Strike"
+
+- extendedWaitUntil:
+    visible:
+      id: "game-list-card-press-730"
+    timeout: 10000
+
+# Search for non-existent game to check empty/no-results state
+- eraseText: 20
+- inputText: "NonExistentGameXYZ123"
+
+- extendedWaitUntil:
+    visible: 'No results found for "NonExistentGameXYZ123".'
+    timeout: 10000
+
+# Clear search input to restore full list
+- eraseText: 30
+- extendedWaitUntil:
+    visible:
+      id: "game-list-card-press-730"
+    timeout: 10000

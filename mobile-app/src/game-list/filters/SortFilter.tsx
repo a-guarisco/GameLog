@@ -75,6 +75,7 @@ export const SortFilter = ({ sortBy, onSortChange }: SortFilterProps) => {
         activeBorderClass={activeColors.border}
         activeTextClass={activeColors.text}
         activeIconColor={activeColors.hex}
+        testID="filter-chip-sort"
       />
 
       <FilterModalWrapper isVisible={isOpen} onClose={() => setIsOpen(false)} title="Sort By">
@@ -82,6 +83,7 @@ export const SortFilter = ({ sortBy, onSortChange }: SortFilterProps) => {
           {SORT_OPTIONS.map((opt) => (
             <Pressable
               key={opt.value}
+              testID={`filter-sort-option-${opt.value}`}
               onPress={() => {
                 onSortChange(opt.value);
                 setIsOpen(false);

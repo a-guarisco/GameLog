@@ -39,6 +39,7 @@ export const PlatformFilter = ({ platformFilter, setPlatformFilter }: PlatformFi
           {PLATFORM_OPTIONS.map((plat) => (
             <Pressable
               key={plat}
+              testID={`filter-platform-option-${plat}`}
               onPress={() => {
                 setPlatformFilter(plat);
                 setIsOpen(false);

@@ -1,0 +1,116 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow: 
+      file: logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Sign In"
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+- extendedWaitUntil:
+    visible: "Games"
+    timeout: 100000
+
+# 1. Filter by Genre (e.g. Action)
+- tapOn:
+    id: "filter-chip-genre"
+- extendedWaitUntil:
+    visible: "Filter by Genre"
+    timeout: 10000
+- tapOn: "Action"
+- extendedWaitUntil:
+    visible: "Genre: Action"
+    timeout: 10000
+
+# Reset Genre Filter
+- tapOn:
+    id: "filter-chip-genre"
+- extendedWaitUntil:
+    visible: "Filter by Genre"
+    timeout: 10000
+- tapOn:
+    id: "filter-genre-option-All"
+- extendedWaitUntil:
+    visible: "Genre: All"
+    timeout: 10000
+
+# 2. Filter by Status (e.g. Playing)
+- tapOn:
+    id: "filter-chip-status"
+- extendedWaitUntil:
+    visible: "Filter by Status"
+    timeout: 10000
+- tapOn:
+    id: "filter-status-option-playing"
+- extendedWaitUntil:
+    visible: "Status: Playing"
+    timeout: 10000
+
+# Reset Status Filter
+- tapOn:
+    id: "filter-chip-status"
+- extendedWaitUntil:
+    visible: "Filter by Status"
+    timeout: 10000
+- tapOn:
+    id: "filter-status-option-All"
+- extendedWaitUntil:
+    visible: "Status: All"
+    timeout: 10000
+
+# 3. Filter by Platform (e.g. Windows)
+- tapOn:
+    id: "filter-chip-platform"
+- extendedWaitUntil:
+    visible: "Filter by Platform"
+    timeout: 10000
+- tapOn:
+    id: "filter-platform-option-Windows"
+- extendedWaitUntil:
+    visible: "Platform: Windows"
+    timeout: 10000
+
+# Reset Platform Filter
+- tapOn:
+    id: "filter-chip-platform"
+- extendedWaitUntil:
+    visible: "Filter by Platform"
+    timeout: 10000
+- tapOn:
+    id: "filter-platform-option-All"
+- extendedWaitUntil:
+    visible: "Platform: All"
+    timeout: 10000
+
+# 4. Sort Filter (e.g. Last Played)
+- tapOn:
+    id: "filter-chip-sort"
+- extendedWaitUntil:
+    visible: "Sort By"
+    timeout: 10000
+- tapOn:
+    id: "filter-sort-option-last_played"
+- extendedWaitUntil:
+    visible: "Sort: Last Played"
+    timeout: 10000
+
+# Reset Sort Filter to Playtime
+- tapOn:
+    id: "filter-chip-sort"
+- extendedWaitUntil:
+    visible: "Sort By"
+    timeout: 10000
+- tapOn:
+    id: "filter-sort-option-playtime"
+- extendedWaitUntil:
+    visible: "Sort: Playtime"
+    timeout: 10000

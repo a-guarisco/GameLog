@@ -40,6 +40,7 @@ export const GenreFilter = ({
         <ScrollView>
           <VStack space="sm">
             <Pressable
+              testID="filter-genre-option-All"
               onPress={() => {
                 setGenreFilter('All');
                 setIsOpen(false);
@@ -50,6 +51,7 @@ export const GenreFilter = ({
             {allAvailableGenres.map((genre) => (
               <Pressable
                 key={genre}
+                testID={`filter-genre-option-${genre}`}
                 onPress={() => {
                   setGenreFilter(genre);
                   setIsOpen(false);

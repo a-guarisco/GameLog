@@ -95,6 +95,7 @@ export const StatusFilter = ({ statusFilter, setStatusFilter }: StatusFilterProp
             {STATUS_OPTIONS.map((option) => (
               <Pressable
                 key={option.key}
+                testID={`filter-status-option-${option.key}`}
                 onPress={() => {
                   setStatusFilter(option.key);
                   setIsOpen(false);
