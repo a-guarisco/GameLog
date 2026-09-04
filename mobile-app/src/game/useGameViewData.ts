@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import useAchievementsData from '@gamelog/game/useAchievementsData';
 import { GameScreenshot } from '@gamelog/game/GameScreenshotsStrip';
 import {
@@ -22,11 +23,11 @@ export const toGameScreenshots = (files: PublishedFileDetails[]): GameScreenshot
   }));
 
 export const useGameViewData = (gameItem: any, playerID: string) => {
-  const { gameStreak, isLoadingGameStreak } = useGetGameStreak(gameItem.appid);
+  const { gameStreak, isLoadingGameStreak, refetchGameStreak } = useGetGameStreak(gameItem.appid);
   const streakText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
 
-  const { globalAchievements } = useGetGlobalAchievement(gameItem.appid);
-  const { unlockedCount, totalCount, completionPercent } = useAchievementsData(
+  const { globalAchievements, refetchGlobalAchievements } = useGetGlobalAchievement(gameItem.appid);
+  const { unlockedCount, totalCount, completionPercent, refetchAchievements } = useAchievementsData(
     gameItem.appid,
     playerID,
     globalAchievements
@@ -38,11 +39,12 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
     loadMoreScreenshots,
     isLoadingScreenshots,
     isLoadingMoreScreenshots,
+    refetchScreenshots,
   } = useGetGameScreenshots(gameItem.appid);
 
-  const { currentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
+  const { currentPlayers, refetchCurrentPlayers } = useGetNumberOfCurrentPlayers(gameItem.appid);
   const livePlayers = currentPlayers?.response?.player_count ?? 0;
-  const { playtimeReport, isLoadingPlaytimeReport } = useGetPlaytimeReport();
+  const { playtimeReport, isLoadingPlaytimeReport, refetchPlaytimeReport } = useGetPlaytimeReport();
   const recentMinutes = getReportMinutesForGame(playtimeReport, gameItem.appid);
   const { gameStatus, isLoadingGameStatus, refetchGameStatus } = useGetGameStatus(
     String(gameItem.appid)
@@ -57,6 +59,26 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
     },
     { value: formatShortDateWithYear(gameItem.rtime_last_played), label: 'Last played' },
   ];
+
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      refetchGameStreak?.(),
+      refetchGlobalAchievements?.(),
+      refetchAchievements?.(),
+      refetchScreenshots?.(),
+      refetchCurrentPlayers?.(),
+      refetchPlaytimeReport?.(),
+      refetchGameStatus?.(),
+    ]);
+  }, [
+    refetchGameStreak,
+    refetchGlobalAchievements,
+    refetchAchievements,
+    refetchScreenshots,
+    refetchCurrentPlayers,
+    refetchPlaytimeReport,
+    refetchGameStatus,
+  ]);
 
   return {
     streakText,
@@ -74,6 +96,7 @@ export const useGameViewData = (gameItem: any, playerID: string) => {
     gameStatus,
     isLoadingGameStatus,
     refetchGameStatus,
+    refetchAll,
   };
 };
 

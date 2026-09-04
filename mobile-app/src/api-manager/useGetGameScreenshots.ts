@@ -18,6 +18,7 @@ export interface UseGetGameScreenshotsResult {
   isLoadingMoreScreenshots: boolean;
   errorScreenshots: boolean;
   errorMessageScreenshots: string | null;
+  refetchScreenshots: () => Promise<void>;
 }
 
 export const SCREENSHOTS_PAGE_SIZE = 50;
@@ -103,6 +104,15 @@ export const useGetGameScreenshots = (
     loadPage(cursorRef.current, requestIdRef.current);
   }, [hasMore, loadPage]);
 
+  const refetchScreenshots = useCallback(async () => {
+    requestIdRef.current += 1;
+    isFetchingRef.current = false;
+    cursorRef.current = FIRST_SCREENSHOTS_CURSOR;
+    setHasMore(true);
+    setErrorMessage(null);
+    await loadPage(FIRST_SCREENSHOTS_CURSOR, requestIdRef.current);
+  }, [loadPage]);
+
   return {
     screenshots,
     totalScreenshots: total,
@@ -112,5 +122,6 @@ export const useGetGameScreenshots = (
     isLoadingMoreScreenshots: isLoadingMore,
     errorScreenshots: !!errorMessage,
     errorMessageScreenshots: errorMessage,
+    refetchScreenshots,
   };
 };

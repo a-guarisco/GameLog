@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { useState, useCallback } from 'react';
+import { ScrollView, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOrientation } from '@gamelog/common/useOrientation';
@@ -44,7 +44,21 @@ const GameView = () => {
     stats,
     gameStatus,
     refetchGameStatus,
+    refetchAll,
   } = useGameViewData(gameItem, playerID);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setRefreshKey((k) => k + 1);
+    try {
+      await refetchAll();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchAll]);
 
   const openAchievementsList = () =>
     navigation.navigate('AchievementsList', {
@@ -59,7 +73,7 @@ const GameView = () => {
       <Box className="flex-1 relative">
         <HeaderGameImage appid={gameItem.appid} />
 
-        <ScrollablePage>
+        <ScrollablePage refreshing={refreshing} onRefresh={handleRefresh}>
           <GameIdentity
             className="bg-background-0"
             title={gameItem.name}
@@ -103,6 +117,7 @@ const GameView = () => {
 
               <Box className="px-4">
                 <GameSectionTabs
+                  key={`game-tabs-portrait-${refreshKey}`}
                   appid={gameItem.appid}
                   achievementsSlot={
                     <GlobalAchievementsPreview
@@ -151,7 +166,15 @@ const GameView = () => {
       </Box>
 
       {/* 2-Column Split starting strictly below the banner */}
-      <Box className="flex-1 flex-row">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flex: 1, flexDirection: 'row' }}
+        nestedScrollEnabled={true}
+        testID="game-view-landscape-scroll"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         {/* Left Column (~40% width - Master Overview) */}
         <Box
           className="h-full border-r border-outline-100 bg-background-0"
@@ -161,6 +184,7 @@ const GameView = () => {
             className="flex-1"
             contentContainerStyle={{ paddingBottom: 24 }}
             showsVerticalScrollIndicator={true}
+            nestedScrollEnabled={true}
           >
             <GameIdentity
               className="bg-background-0"
@@ -198,6 +222,7 @@ const GameView = () => {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 24 }}
               showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
             >
               <InlineAchievementsDetail
                 gameID={gameItem.appid}
@@ -208,6 +233,7 @@ const GameView = () => {
             </ScrollView>
           ) : (
             <GameSectionTabs
+              key={`game-tabs-landscape-${refreshKey}`}
               appid={gameItem.appid}
               stickyHeader
               screenshotsSlot={
@@ -229,7 +255,7 @@ const GameView = () => {
             />
           )}
         </Box>
-      </Box>
+      </ScrollView>
     </Box>
   );
 };

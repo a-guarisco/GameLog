@@ -8,8 +8,12 @@ const useAchievementsData = (
   playerID: string,
   globalAchievements: GlobalAchievement | null | undefined
 ) => {
-  const { personalAchievements, isLoadingPlayerAchievement, errorPlayerAchievement } =
-    useGetPlayerAchievementsPerApp(gameID, playerID);
+  const {
+    personalAchievements,
+    isLoadingPlayerAchievement,
+    errorPlayerAchievement,
+    refetchPlayerAchievements,
+  } = useGetPlayerAchievementsPerApp(gameID, playerID);
 
   const mergedAchievements = useMemo(
     () =>
@@ -33,6 +37,7 @@ const useAchievementsData = (
     gameName,
     isLoading: isLoadingPlayerAchievement,
     error: errorPlayerAchievement,
+    refetchAchievements: refetchPlayerAchievements,
   };
 };
 

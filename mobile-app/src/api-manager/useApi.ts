@@ -12,22 +12,24 @@ export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string)
     [gameID, playerID]
   );
 
-  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, refetch } = useAsyncFetch(fetchFunc);
   return {
     personalAchievements: data,
     isLoadingPlayerAchievement: isLoading,
     errorPlayerAchievement: error,
+    refetchPlayerAchievements: refetch,
   };
 };
 
 export const useGetGlobalAchievement = (gameID: string) => {
   const fetchFunc = useCallback(() => ApiManager.getGlobalAchievement(gameID), [gameID]);
 
-  const { data, isLoading, error } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, refetch } = useAsyncFetch(fetchFunc);
   return {
     globalAchievements: data,
     isLoadingGlobalAchievements: isLoading,
     errorGlobalAchievements: error,
+    refetchGlobalAchievements: refetch,
   };
 };
 
@@ -84,11 +86,12 @@ const normalizeStreak = (data: StreakResponse): Streak | null => {
 export const useGetGameStreak = (gameID: string) => {
   const fetchFunc = useCallback(() => ApiManager.getStreakByGame(gameID), [gameID]);
 
-  const { data, isLoading, error } = useAsyncFetch<Streak | number>(fetchFunc);
+  const { data, isLoading, error, refetch } = useAsyncFetch<Streak | number>(fetchFunc);
   return {
     gameStreak: normalizeStreak(data),
     isLoadingGameStreak: isLoading,
     errorGameStreak: error,
+    refetchGameStreak: refetch,
   };
 };
 
@@ -330,24 +333,26 @@ export const useGetGameNews = (appId: string, count: number = GAME_FEED_COUNT) =
     [appId, count]
   );
 
-  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
     gameNews: data,
     isLoadingGameNews: isLoading,
     errorGameNews: error,
     errorMessageGameNews: errorMessage,
+    refetchGameNews: refetch,
   };
 };
 
 export const useGetGameGuides = (appId: string, count: number = GAME_FEED_COUNT) => {
   const fetchFunc = useCallback(() => ApiManager.getGameGuides(appId, '*', count), [appId, count]);
 
-  const { data, isLoading, error, errorMessage } = useAsyncFetch(fetchFunc);
+  const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
     gameGuides: data,
     isLoadingGameGuides: isLoading,
     errorGameGuides: error,
     errorMessageGameGuides: errorMessage,
+    refetchGameGuides: refetch,
   };
 };
 

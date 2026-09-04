@@ -1,20 +1,37 @@
-import { renderHook } from '@testing-library/react-native';
+import { renderHook, act } from '@testing-library/react-native';
 import { useGameViewData, toGameScreenshots } from '@gamelog/game/useGameViewData';
 import { useGetPlaytimeReport } from '@gamelog/api-manager/useApi';
 import type { PublishedFileDetails } from '@gamelog/api-manager/dto';
 
+const mockRefetchGameStreak = jest.fn().mockResolvedValue(undefined);
+const mockRefetchGlobalAchievements = jest.fn().mockResolvedValue(undefined);
+const mockRefetchScreenshots = jest.fn().mockResolvedValue(undefined);
+const mockRefetchCurrentPlayers = jest.fn().mockResolvedValue(undefined);
+const mockRefetchPlaytimeReport = jest.fn().mockResolvedValue(undefined);
+const mockRefetchGameStatus = jest.fn().mockResolvedValue(undefined);
+const mockRefetchAchievements = jest.fn().mockResolvedValue(undefined);
+
 jest.mock('@gamelog/api-manager/useApi', () => ({
-  useGetGameStreak: jest.fn(() => ({ gameStreak: { streak: 5 }, isLoadingGameStreak: false })),
-  useGetGlobalAchievement: jest.fn(() => ({ globalAchievements: [] })),
+  useGetGameStreak: jest.fn(() => ({
+    gameStreak: { streak: 5 },
+    isLoadingGameStreak: false,
+    refetchGameStreak: mockRefetchGameStreak,
+  })),
+  useGetGlobalAchievement: jest.fn(() => ({
+    globalAchievements: [],
+    refetchGlobalAchievements: mockRefetchGlobalAchievements,
+  })),
   useGetGameScreenshots: jest.fn(() => ({
     screenshots: [],
     totalScreenshots: 0,
     loadMoreScreenshots: jest.fn(),
     isLoadingScreenshots: false,
     isLoadingMoreScreenshots: false,
+    refetchScreenshots: mockRefetchScreenshots,
   })),
   useGetNumberOfCurrentPlayers: jest.fn(() => ({
     currentPlayers: { response: { player_count: 1234 } },
+    refetchCurrentPlayers: mockRefetchCurrentPlayers,
   })),
   useGetPlaytimeReport: jest.fn(() => ({
     playtimeReport: {
@@ -22,11 +39,12 @@ jest.mock('@gamelog/api-manager/useApi', () => ({
       game_reports: [{ app_id: '413150', today_play_time: 180, streak: 2 }],
     },
     isLoadingPlaytimeReport: false,
+    refetchPlaytimeReport: mockRefetchPlaytimeReport,
   })),
   useGetGameStatus: jest.fn(() => ({
     gameStatus: 'playing',
     isLoadingGameStatus: false,
-    refetchGameStatus: jest.fn(),
+    refetchGameStatus: mockRefetchGameStatus,
   })),
 }));
 
@@ -35,6 +53,7 @@ jest.mock('@gamelog/game/useAchievementsData', () =>
     unlockedCount: 10,
     totalCount: 20,
     completionPercent: 50,
+    refetchAchievements: mockRefetchAchievements,
   }))
 );
 
@@ -104,5 +123,21 @@ describe('useGameViewData', () => {
     const { result } = renderHook(() => useGameViewData({ ...gameItem, appid: '730' }, 'player-1'));
 
     expect(result.current.stats[1].value).toBe('0h');
+  });
+
+  it('calls all refetch methods when refetchAll is triggered', async () => {
+    const { result } = renderHook(() => useGameViewData(gameItem, 'player-1'));
+
+    await act(async () => {
+      await result.current.refetchAll();
+    });
+
+    expect(mockRefetchGameStreak).toHaveBeenCalledTimes(1);
+    expect(mockRefetchGlobalAchievements).toHaveBeenCalledTimes(1);
+    expect(mockRefetchAchievements).toHaveBeenCalledTimes(1);
+    expect(mockRefetchScreenshots).toHaveBeenCalledTimes(1);
+    expect(mockRefetchCurrentPlayers).toHaveBeenCalledTimes(1);
+    expect(mockRefetchPlaytimeReport).toHaveBeenCalledTimes(1);
+    expect(mockRefetchGameStatus).toHaveBeenCalledTimes(1);
   });
 });
