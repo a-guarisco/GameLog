@@ -14,7 +14,11 @@ def get_community_daily_totals(db: Session, target_user_ids: list[uuid.UUID], st
         WITH daily_deltas AS (
             SELECT 
                 created_at,
-                GREATEST(0, COALESCE(last_day_playtime - LAG(last_day_playtime) OVER (PARTITION BY user_id, steam_app_id ORDER BY created_at), 0)) AS delta_playtime
+                CASE 
+                    WHEN COALESCE(last_day_playtime - LAG(last_day_playtime) OVER (PARTITION BY user_id, steam_app_id ORDER BY created_at), 0) > 0 
+                    THEN COALESCE(last_day_playtime - LAG(last_day_playtime) OVER (PARTITION BY user_id, steam_app_id ORDER BY created_at), 0)
+                    ELSE 0 
+                END AS delta_playtime
             FROM steamrollingtime
             WHERE user_id IN :target_ids
               AND created_at >= :query_start
@@ -29,13 +33,21 @@ def get_community_daily_totals(db: Session, target_user_ids: list[uuid.UUID], st
     """).bindparams(bindparam("target_ids", expanding=True))
     
     results = db.execute(sql, {
-        "target_ids": [str(uid) for uid in target_user_ids],
+        "target_ids": [uid.hex for uid in target_user_ids],
         "query_start": query_start,
         "start_date": start_date,
         "end_date": end_date
     }).fetchall()
     
-    return {row[0]: int(row[1] or 0) for row in results}
+    parsed_results = {}
+    for row in results:
+        d = row[0]
+        if isinstance(d, str):
+            from datetime import datetime
+            d = datetime.strptime(d, "%Y-%m-%d").date()
+        parsed_results[d] = int(row[1] or 0)
+        
+    return parsed_results
 
 def get_community_game_totals_and_players(db: Session, target_user_ids: list[uuid.UUID], start_date: date, end_date: date) -> tuple[dict[str, int], dict[str, int]]:
     if not target_user_ids:
@@ -49,7 +61,11 @@ def get_community_game_totals_and_players(db: Session, target_user_ids: list[uui
                 user_id,
                 steam_app_id,
                 created_at,
-                GREATEST(0, COALESCE(last_day_playtime - LAG(last_day_playtime) OVER (PARTITION BY user_id, steam_app_id ORDER BY created_at), 0)) AS delta_playtime
+                CASE 
+                    WHEN COALESCE(last_day_playtime - LAG(last_day_playtime) OVER (PARTITION BY user_id, steam_app_id ORDER BY created_at), 0) > 0 
+                    THEN COALESCE(last_day_playtime - LAG(last_day_playtime) OVER (PARTITION BY user_id, steam_app_id ORDER BY created_at), 0)
+                    ELSE 0 
+                END AS delta_playtime
             FROM steamrollingtime
             WHERE user_id IN :target_ids
               AND created_at >= :query_start
@@ -74,7 +90,7 @@ def get_community_game_totals_and_players(db: Session, target_user_ids: list[uui
     """).bindparams(bindparam("target_ids", expanding=True))
     
     results = db.execute(sql, {
-        "target_ids": [str(uid) for uid in target_user_ids],
+        "target_ids": [uid.hex for uid in target_user_ids],
         "query_start": query_start,
         "start_date": start_date,
         "end_date": end_date
