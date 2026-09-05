@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import FriendRecommendationsView from '@gamelog/social/social-view/FriendRecommendationsView';
 import {
@@ -12,6 +12,8 @@ jest.mock('@gamelog/api-manager/apiManager');
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
+const mockRefetchFriendList = jest.fn().mockResolvedValue(undefined);
+const mockRefetchRecommendations = jest.fn().mockResolvedValue(undefined);
 jest.mock('@react-navigation/native', () => {
   const actualNav = jest.requireActual('@react-navigation/native');
   return {
@@ -66,6 +68,7 @@ describe('FriendRecommendationsView', () => {
     mockUseGetFriendList.mockReturnValue({
       friendList: [mockFriendAlice, mockFriendBob],
       isLoadingFriendList: false,
+      refetchFriendList: mockRefetchFriendList,
     });
 
     mockUseGetFriendRecommendations.mockReturnValue({
@@ -73,6 +76,7 @@ describe('FriendRecommendationsView', () => {
       isLoadingRecommendations: false,
       errorRecommendations: null,
       errorMessageRecommendations: null,
+      refetchRecommendations: mockRefetchRecommendations,
     });
 
     mockApiManager.getGameBasicInfo.mockImplementation((appId: string) => {
@@ -262,6 +266,32 @@ describe('FriendRecommendationsView', () => {
 
     fireEvent.press(screen.getByTestId('recommendations-back-btn'));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('triggers pull-to-refresh and refetches recommendations and friends when active friend is set', async () => {
+    render(<FriendRecommendationsView friendItem={mockFriendAlice} />);
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect(mockRefetchRecommendations).toHaveBeenCalledTimes(1);
+    expect(mockRefetchFriendList).toHaveBeenCalledTimes(1);
+  });
+
+  it('triggers pull-to-refresh and refetches friend list only when in friend selection mode', async () => {
+    render(<FriendRecommendationsView />);
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect(mockRefetchFriendList).toHaveBeenCalledTimes(1);
+    expect(mockRefetchRecommendations).not.toHaveBeenCalled();
   });
 });
 

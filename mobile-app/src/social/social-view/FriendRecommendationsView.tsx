@@ -36,6 +36,8 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
     errorRecommendations,
     errorMessageRecommendations,
     gameNames,
+    refreshing,
+    handleRefresh,
     handleSelectFriend,
     handleStartSelectingFriend,
     handleCommonGamePress,
@@ -45,7 +47,7 @@ export const FriendRecommendationsView: React.FC<FriendRecommendationsViewProps>
 
   return (
     <Box className="flex-1 relative bg-background-0">
-      <ScrollablePage hasBanner={false}>
+      <ScrollablePage hasBanner={false} refreshing={refreshing} onRefresh={handleRefresh}>
         <FriendRecommendationsHeader
           isSelectingFriend={isSelectingFriend}
           activeFriendName={activeFriend?.user?.username}

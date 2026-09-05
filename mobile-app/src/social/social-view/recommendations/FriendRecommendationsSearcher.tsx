@@ -8,7 +8,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
-import SectionCard from '@gamelog/common/SectionCard';
+import { CardTitleText } from '@gamelog/common/typography/CardTypography';
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { UserAvatar } from '../../user-card/UserAvatar';
 
@@ -33,7 +33,7 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
   errorMessage,
   onSelectFriend,
 }) => {
-  if (isLoading) {
+  if (isLoading && totalFriendsCount === 0) {
     return (
       <Box className="px-4">
         <LoadingBox message="Loading friends..." className="py-10" />
@@ -74,22 +74,22 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
         />
       </Box>
 
-      <SectionCard
-        label={
-          searchQuery
+      <VStack space="sm">
+        <CardTitleText>
+          {searchQuery
             ? `Matching Friends (${filteredFriends.length})`
-            : `Select a Friend (${totalFriendsCount})`
-        }
-      >
+            : `Select a Friend (${totalFriendsCount})`}
+        </CardTitleText>
+
         {filteredFriends.length === 0 ? (
-          <Box className="py-3">
+          <Box className="py-2">
             <InfoBox
               message={`No friends found matching "${searchQuery}".`}
               className="py-4"
             />
           </Box>
         ) : (
-          <VStack space="sm" className="pt-1">
+          <VStack space="sm">
             {filteredFriends.map((item) => (
               <Pressable
                 key={item.user.id}
@@ -136,7 +136,7 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
             ))}
           </VStack>
         )}
-      </SectionCard>
+      </VStack>
     </VStack>
   );
 };

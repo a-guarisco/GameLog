@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Linking } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,9 +24,15 @@ export const useFriendRecommendationsView = ({
   const [activeFriend, setActiveFriend] = useState<UserSearchResult | undefined>(initialFriend);
   const [isSelectingFriend, setIsSelectingFriend] = useState<boolean>(!initialFriend);
   const [searchFriendQuery, setSearchFriendQuery] = useState<string>('');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  const { friendList, isLoadingFriendList, errorFriendList, errorMessageFriendList } =
-    useGetFriendList();
+  const {
+    friendList,
+    isLoadingFriendList,
+    errorFriendList,
+    errorMessageFriendList,
+    refetchFriendList,
+  } = useGetFriendList();
   const acceptedFriends = selectAcceptedFriends(friendList);
 
   const filteredFriends = useMemo(() => {
@@ -44,6 +50,7 @@ export const useFriendRecommendationsView = ({
     isLoadingRecommendations,
     errorRecommendations,
     errorMessageRecommendations,
+    refetchRecommendations,
   } = useGetFriendRecommendations(friendId);
 
   const gameNames = useRecommendationsGameNames(recommendations);
@@ -89,6 +96,19 @@ export const useFriendRecommendationsView = ({
     }
   };
 
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      if (isSelectingFriend || !activeFriend) {
+        await refetchFriendList();
+      } else {
+        await Promise.all([refetchRecommendations(), refetchFriendList()]);
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  }, [isSelectingFriend, activeFriend, refetchRecommendations, refetchFriendList]);
+
   return {
     activeFriend,
     friendName,
@@ -100,11 +120,15 @@ export const useFriendRecommendationsView = ({
     isLoadingFriendList,
     errorFriendList,
     errorMessageFriendList,
+    refetchFriendList,
     recommendations,
     isLoadingRecommendations,
     errorRecommendations,
     errorMessageRecommendations,
+    refetchRecommendations,
     gameNames,
+    refreshing,
+    handleRefresh,
     handleSelectFriend,
     handleStartSelectingFriend,
     handleCommonGamePress,

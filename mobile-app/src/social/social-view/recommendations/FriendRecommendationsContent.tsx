@@ -28,7 +28,7 @@ export const FriendRecommendationsContent: React.FC<FriendRecommendationsContent
   onCommonGamePress,
   onTopGamePress,
 }) => {
-  if (isLoading) {
+  if (isLoading && !recommendations) {
     return (
       <Box className="px-4">
         <LoadingBox message={`Analyzing games for ${friendName}...`} className="py-10" />
