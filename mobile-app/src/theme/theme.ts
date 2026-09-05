@@ -472,7 +472,8 @@ export const brand = {
     lastPlayed: tailwindColors.violet,
     genre: tailwindColors.fuchsia,
     maxPerDay: tailwindColors.orange,
-    streak: tailwindColors.lime,
+    dayStreak: tailwindColors.red,
+    gameStreak: tailwindColors.lime,
     topPlatform: tailwindColors.emerald,
   },
   gameStatus: {

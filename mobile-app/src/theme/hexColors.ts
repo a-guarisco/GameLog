@@ -18,7 +18,11 @@ export const HEX_COLORS = {
     hex: parseRGB(tailwindColors.orange[600]),
     gradientHex: parseRGB(tailwindColors.orange[400]),
   },
-  streak: {
+  dayStreak: {
+    hex: parseRGB(tailwindColors.red[600]),
+    gradientHex: parseRGB(tailwindColors.red[400]),
+  },
+  gameStreak: {
     hex: parseRGB(tailwindColors.lime[600]),
     gradientHex: parseRGB(tailwindColors.lime[400]),
   },
