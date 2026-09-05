@@ -1,6 +1,5 @@
-import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { useState, useRef, useEffect } from 'react';
-import { Pressable, Image, Animated, Easing } from 'react-native';
+import { Pressable, Animated, Easing } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
@@ -12,7 +11,7 @@ import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmented
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import { ChartDateRangeText } from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
-import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
+import GameCapsuleImage from '@gamelog/common/GameCapsuleImage';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { ShimmerBox } from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksHeader';
 import { useCommunityTopGames } from './useCommunityTopGames';
@@ -298,15 +297,8 @@ const CommunityTopGamesHistogramChart = ({
                       testID={`top-game-item-${item.id}`}
                     >
                       {/* Left: Capsule Image with height matching title + 2 bars */}
-                      <Image
-                        source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
-                        style={{
-                          width: 88,
-                          height: 52,
-                          borderRadius: 6,
-                          backgroundColor: HEX_COLORS.muted.divider.hex,
-                        }}
-                        resizeMode="cover"
+                      <GameCapsuleImage
+                        appId={item.id}
                         testID={`game-capsule-${item.id}`}
                       />
 
@@ -342,15 +334,8 @@ const CommunityTopGamesHistogramChart = ({
                     testID={`top-game-item-${item.id}`}
                   >
                     {/* Left: Capsule Image with height matching title + 2 bars */}
-                    <Image
-                      source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
-                      style={{
-                        width: 88,
-                        height: 52,
-                        borderRadius: 6,
-                        backgroundColor: HEX_COLORS.muted.divider.hex,
-                      }}
-                      resizeMode="cover"
+                    <GameCapsuleImage
+                      appId={item.id}
                       testID={`game-capsule-${item.id}`}
                     />
 

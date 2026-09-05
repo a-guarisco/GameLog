@@ -1,5 +1,4 @@
-import { HEX_COLORS } from '@gamelog/theme/hexColors';
-import { ScrollView, Pressable, Image } from 'react-native';
+import { ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -7,7 +6,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
-import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
+import GameCapsuleImage from '@gamelog/common/GameCapsuleImage';
 import ChartWrapperCard from '../ChartWrapperCard';
 
 import { useTotalHoursChart } from './useTotalHoursChart';
@@ -68,15 +67,7 @@ const TotalHoursChart = ({ ownedGames, targetHeight }: TotalHoursChartProps) => 
                     }}
                   >
                     <HStack space="md" className="items-center">
-                      {/* Game Image / Icon fallback */}
-                      <Image
-                        source={{
-                          uri: steamAssetUrls.getGameCapsuleImage(gameItem.appid),
-                        }}
-                        style={{ width: 88, height: 52, borderRadius: 6, backgroundColor: HEX_COLORS.muted.divider.hex }}
-                        resizeMode="cover"
-                        testID={gameItem.appid ? `game-capsule-${gameItem.appid}` : undefined}
-                      />
+                      <GameCapsuleImage appId={gameItem.appid} />
 
                       {/* Bar and Label */}
                       <VStack className="flex-1" space="xs">
