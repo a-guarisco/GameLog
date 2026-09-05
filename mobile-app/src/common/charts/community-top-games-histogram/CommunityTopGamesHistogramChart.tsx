@@ -301,8 +301,8 @@ const CommunityTopGamesHistogramChart = ({
                       <Image
                         source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
                         style={{
-                          width: 105,
-                          height: 62,
+                          width: 88,
+                          height: 52,
                           borderRadius: 6,
                           backgroundColor: HEX_COLORS.muted.divider.hex,
                         }}
@@ -345,8 +345,8 @@ const CommunityTopGamesHistogramChart = ({
                     <Image
                       source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
                       style={{
-                        width: 115,
-                        height: 68,
+                        width: 88,
+                        height: 52,
                         borderRadius: 6,
                         backgroundColor: HEX_COLORS.muted.divider.hex,
                       }}

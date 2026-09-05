@@ -7,6 +7,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
+import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
 import ChartWrapperCard from '../ChartWrapperCard';
 
 import { useTotalHoursChart } from './useTotalHoursChart';
@@ -70,10 +71,11 @@ const TotalHoursChart = ({ ownedGames, targetHeight }: TotalHoursChartProps) => 
                       {/* Game Image / Icon fallback */}
                       <Image
                         source={{
-                          uri: `https://steamcdn-a.akamaihd.net/steam/apps/${gameItem.appid}/capsule_184x69.jpg`,
+                          uri: steamAssetUrls.getGameCapsuleImage(gameItem.appid),
                         }}
-                        style={{ width: 46, height: 21, borderRadius: 4, backgroundColor: HEX_COLORS.muted.divider.hex }}
+                        style={{ width: 88, height: 52, borderRadius: 6, backgroundColor: HEX_COLORS.muted.divider.hex }}
                         resizeMode="cover"
+                        testID={gameItem.appid ? `game-capsule-${gameItem.appid}` : undefined}
                       />
 
                       {/* Bar and Label */}
