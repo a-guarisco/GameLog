@@ -11,6 +11,7 @@ interface SectionCardProps {
   headerRight?: ReactNode;
   children: ReactNode;
   className?: string;
+  style?: any;
   testID?: string;
 }
 
@@ -19,27 +20,31 @@ const SectionCard = ({
   headerRight,
   children,
   className = '',
+  style,
   testID,
-}: SectionCardProps) => (
-  <Card variant="elevated" className={`p-3 overflow-visible ${className}`} testID={testID}>
-    <VStack
-      space="sm"
-      className={`w-full ${className.includes('h-full') ? 'h-full flex-1 justify-between' : ''}`}
-    >
-      {(!!label || !!headerRight) && (
-        <HStack className="w-full justify-between items-center">
-          {!!label && (
-            <Box className={headerRight ? 'flex-1 mr-2' : 'w-full'}>
-              <CardTitleText numberOfLines={2}>{label}</CardTitleText>
-            </Box>
-          )}
-          {!!headerRight && headerRight}
-        </HStack>
-      )}
-      {children}
-    </VStack>
-  </Card>
-);
+}: SectionCardProps) => {
+  const isFill = className.includes('h-full') || className.includes('flex-1');
+  return (
+    <Card variant="elevated" className={`p-3 overflow-visible ${className}`} style={style} testID={testID}>
+      <VStack
+        space="sm"
+        className={`w-full ${isFill ? 'h-full flex-1 justify-between' : ''}`}
+      >
+        {(!!label || !!headerRight) && (
+          <HStack className="w-full justify-between items-center">
+            {!!label && (
+              <Box className={headerRight ? 'flex-1 mr-2' : 'w-full'}>
+                <CardTitleText numberOfLines={2}>{label}</CardTitleText>
+              </Box>
+            )}
+            {!!headerRight && headerRight}
+          </HStack>
+        )}
+        {children}
+      </VStack>
+    </Card>
+  );
+};
 
 export default SectionCard;
 

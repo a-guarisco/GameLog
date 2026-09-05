@@ -88,6 +88,8 @@ const ReportRetrievalCard = ({
     return 'Custom range selected.';
   };
 
+  const isFill = className.includes('flex-1') || className.includes('h-full');
+
   return (
     <SectionCard
       testID="report-retrieval-card"
@@ -102,7 +104,7 @@ const ReportRetrievalCard = ({
         ) : null
       }
     >
-      <VStack space="md" className="flex-1 justify-center">
+      <VStack space="md" className={`w-full ${isFill ? 'flex-1 justify-center' : ''}`}>
         <HStack space="md" className="justify-center pt-2">
           <VStack space="xs" className="items-center flex-1">
             <Text size="xs" className="font-medium text-typography-400">
