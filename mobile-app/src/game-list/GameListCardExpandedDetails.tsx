@@ -28,7 +28,7 @@ export const GameListCardExpandedDetails = ({
       
       {/* LAST PLAYED */}
       <HStack space="sm" className="items-center">
-        <Ionicons name="calendar-clear-outline" size={16} color={HEX_COLORS.lastPlayed.hex} />
+        <Ionicons name="calendar-clear" size={16} color={HEX_COLORS.lastPlayed.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Last Played
         </Text>
@@ -69,7 +69,7 @@ export const GameListCardExpandedDetails = ({
 
       {/* GENRES */}
       <HStack space="sm" className="items-center">
-        <Ionicons name="game-controller-outline" size={16} color={HEX_COLORS.genre.hex} />
+        <Ionicons name="game-controller" size={16} color={HEX_COLORS.genre.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Genres
         </Text>
@@ -82,7 +82,7 @@ export const GameListCardExpandedDetails = ({
 
       {/* STATUS */}
       <HStack space="sm" className="items-center">
-        <Ionicons name="bookmark-outline" size={16} color={gameItem.gameStatus ? HEX_COLORS.gameStatus[gameItem.gameStatus].hex : HEX_COLORS.muted.icon.hex} />
+        <Ionicons name="bookmark" size={16} color={gameItem.gameStatus ? HEX_COLORS.gameStatus[gameItem.gameStatus].hex : HEX_COLORS.muted.icon.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Status
         </Text>
@@ -96,7 +96,7 @@ export const GameListCardExpandedDetails = ({
       {/* PLATFORMS */}
       <HStack space="sm" className="items-center mb-1">
 
-        <Ionicons name="hardware-chip-outline" size={16} color={HEX_COLORS.topPlatform.hex} />
+        <Ionicons name="hardware-chip" size={16} color={HEX_COLORS.topPlatform.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Platform Split
         </Text>

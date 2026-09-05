@@ -64,7 +64,7 @@ export const GameListCardBadges = ({
     {
       id: 'playtime',
       text: formatMinutesToHoursShort(gameItem.playtime_forever),
-      icon: 'time-outline',
+      icon: 'time',
       metric: { hex: HEX_COLORS.playtime.hex, bgClass: 'bg-semantic-playtime-100 dark:bg-semantic-playtime-900/40', textClass: 'text-semantic-playtime-600', borderClass: 'border-semantic-playtime-600' },
       show: true,
       hideText: false,
@@ -88,7 +88,7 @@ export const GameListCardBadges = ({
     {
       id: 'last_played',
       text: lastPlayedText,
-      icon: 'calendar-clear-outline',
+      icon: 'calendar-clear',
       metric: { hex: HEX_COLORS.lastPlayed.hex, bgClass: 'bg-semantic-lastPlayed-100 dark:bg-semantic-lastPlayed-900/40', textClass: 'text-semantic-lastPlayed-600', borderClass: 'border-semantic-lastPlayed-600' },
       show: gameItem.rtime_last_played > 0,
       hideText: false,
@@ -96,7 +96,7 @@ export const GameListCardBadges = ({
     {
       id: 'game_status',
       text: formatGameStatus(gameItem.gameStatus),
-      icon: 'bookmark-outline',
+      icon: 'bookmark',
       metric: (() => {
         const gs = gameItem.gameStatus;
         if (gs === 'playing') {
