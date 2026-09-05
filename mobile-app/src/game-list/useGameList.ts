@@ -37,10 +37,15 @@ export const useGameList = (playerID: string) => {
   const { userGameStatuses, isLoadingUserGameStatuses, refetchUserGameStatuses } =
     useGetUserGameStatuses();
 
-  const appIds = useMemo(() => {
-    if (!ownedGames?.response?.games) return [];
-    return ownedGames.response.games.map((g) => String(g.appid));
+  const appIdsKey = useMemo(() => {
+    if (!ownedGames?.response?.games) return '';
+    return ownedGames.response.games.map((g) => g.appid).join(',');
   }, [ownedGames]);
+
+  const appIds = useMemo(() => {
+    if (!appIdsKey) return [];
+    return appIdsKey.split(',');
+  }, [appIdsKey]);
 
   const {
     libraryGenres,

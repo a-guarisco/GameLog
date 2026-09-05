@@ -265,6 +265,25 @@ describe('useGameList hook', () => {
     expect(mockRefetchLibraryGenres).toHaveBeenCalledTimes(1);
     expect(mockRefetchUserGameStatuses).toHaveBeenCalledTimes(1);
   });
+
+  it('keeps stable appIds passed to useGetGenresBatch when ownedGames reference changes but games are identical', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: { response: { games: [{ appid: 1, name: 'Game 1' }] } },
+      isLoadingOwnedGames: false,
+    });
+
+    const { rerender } = renderHook(() => useGameList('123'));
+    const firstCallAppIds = mockUseGetGenresBatch.mock.calls[0][0];
+
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: { response: { games: [{ appid: 1, name: 'Game 1' }] } },
+      isLoadingOwnedGames: false,
+    });
+    rerender();
+
+    const secondCallAppIds = mockUseGetGenresBatch.mock.calls[1][0];
+    expect(firstCallAppIds).toBe(secondCallAppIds);
+  });
 });
 
 
