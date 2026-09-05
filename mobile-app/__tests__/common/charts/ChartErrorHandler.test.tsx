@@ -6,6 +6,10 @@ jest.mock('@gamelog/common/gluestack/box', () => ({
   Box: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
 
+jest.mock('@gamelog/common/gluestack/vstack', () => ({
+  VStack: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+}));
+
 jest.mock('@gamelog/common/gluestack/text', () => {
   const { Text: RNText } = jest.requireActual<typeof import('react-native')>('react-native');
   return {

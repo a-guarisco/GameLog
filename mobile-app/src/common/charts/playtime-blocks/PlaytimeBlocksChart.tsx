@@ -14,6 +14,7 @@ import { formatMinutesToHours, formatMinutesToHoursShort, toIsoDate } from '@gam
 import { usePlaytimeBlocksData } from './usePlaytimeBlocksData';
 import { useChartScrollShimmer } from './useChartScrollShimmer';
 import { PlaytimeBlocksHeader, ShimmerBox } from './PlaytimeBlocksHeader';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 
 import type { PlaytimeByUser } from '@gamelog/api-manager/dto';
 
@@ -32,9 +33,10 @@ const LANDSCAPE_RANGE_OPTIONS = [
 
 interface PlaytimeBlocksChartProps {
   playtimeByUser?: PlaytimeByUser | null;
+  hasError?: boolean;
 }
 
-const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
+const PlaytimeBlocksChart = ({ playtimeByUser, hasError = false }: PlaytimeBlocksChartProps) => {
   const { isLandscape } = useOrientation();
   const hasManualSelection = useRef(false);
 
@@ -132,11 +134,15 @@ const PlaytimeBlocksChart = ({ playtimeByUser }: PlaytimeBlocksChartProps) => {
         </Box>
       }
       isLoading={false}
-      error={false}
+      error={hasError}
       testID="playtime-blocks-chart"
       ErrorBehaviour={() => (
-        <Box className="py-8 items-center justify-center w-full">
-          <Text className="text-typography-400">Could not load playtime history</Text>
+        <Box className="py-6 items-center justify-center w-full">
+          <ErrorBox
+            errorMessage="Could not load playtime history"
+            variant="icon-top"
+            className="w-full"
+          />
         </Box>
       )}
     >

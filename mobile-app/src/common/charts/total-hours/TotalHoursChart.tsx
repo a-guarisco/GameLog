@@ -34,7 +34,7 @@ const TotalHoursChart = ({ ownedGames, targetHeight }: TotalHoursChartProps) => 
         if (barData.length === 0) {
           return (
             <Box className="flex-1 items-center justify-center w-full py-8">
-              <Text className="text-typography-400">No games found</Text>
+              <Text className="text-typography-400 font-medium text-center">No games found</Text>
             </Box>
           );
         }

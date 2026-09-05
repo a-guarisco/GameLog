@@ -70,10 +70,20 @@ describe('PlaytimeTrendChart', () => {
     expect(screen.getByTestId('mock-line-chart')).toBeTruthy();
   });
 
-  it('handles empty playtime data', () => {
+  it('handles empty playtime data while keeping range controls intact', () => {
     render(<PlaytimeTrendChart playtimeByUser={[]} />);
 
     expect(screen.getByText(/No playtime in this window/)).toBeTruthy();
+    expect(screen.getByText('AVG')).toBeTruthy();
+    expect(screen.getByText('TOT')).toBeTruthy();
+    expect(screen.getByText('14D')).toBeTruthy();
+    expect(screen.getByText('30D')).toBeTruthy();
+  });
+
+  it('renders error state when hasError is true', () => {
+    render(<PlaytimeTrendChart playtimeByUser={mockPlaytimeByUser} hasError={true} />);
+
+    expect(screen.getByText('Could not load playtime history')).toBeTruthy();
   });
 
   it('switches between AVG and TOT trend modes', () => {

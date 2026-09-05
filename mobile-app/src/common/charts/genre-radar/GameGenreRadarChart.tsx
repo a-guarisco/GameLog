@@ -38,7 +38,7 @@ const GameGenreRadarChart = ({ ownedGames, targetHeight, style }: GameGenreRadar
         if (values.length === 0) {
           return (
             <Box className="py-8 items-center justify-center w-full">
-              <Text className="text-typography-400">No genres found</Text>
+              <Text className="text-typography-400 font-medium text-center">No genres found</Text>
             </Box>
           );
         }

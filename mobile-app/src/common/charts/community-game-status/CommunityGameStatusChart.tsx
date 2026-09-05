@@ -6,7 +6,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import { WarningBox } from '@gamelog/common/feedbacks';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 import ProgressTrack from '@gamelog/common/ProgressTrack';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { parseRGB } from '../chartsHelpers';
@@ -206,8 +206,9 @@ const CommunityGameStatusChart = ({
 
   const renderError = () => (
     <Box className="py-6 items-center justify-center w-full">
-      <WarningBox
-        message={errorMessage || 'Unable to load library status breakdown.'}
+      <ErrorBox
+        errorMessage={errorMessage || 'Unable to load library status breakdown.'}
+        variant="icon-top"
         className="w-full"
       />
     </Box>
@@ -236,7 +237,9 @@ const CommunityGameStatusChart = ({
         if (!hasData) {
           return (
             <Box className="py-8 items-center justify-center w-full">
-              <Text className="text-typography-400">No game status data found</Text>
+              <Text className="text-typography-400 font-medium text-center">
+                No game status data found
+              </Text>
             </Box>
           );
         }

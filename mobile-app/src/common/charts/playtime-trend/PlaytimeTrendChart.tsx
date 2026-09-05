@@ -15,6 +15,7 @@ import { GLSegmentedControl } from '@gamelog/common/GLSegmentedControl';
 import { PointerLabelUpdater } from '@gamelog/common/charts/PointerLabelUpdater';
 import { PlaytimeTrendAvgHeader } from './PlaytimeTrendAvgHeader';
 import { PlaytimeTrendTotHeader } from './PlaytimeTrendTotHeader';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 
 import { usePlaytimeTrendChart } from './usePlaytimeTrendChart';
 
@@ -32,9 +33,10 @@ const RANGE_OPTIONS = [
 
 interface PlaytimeTrendChartProps {
   playtimeByUser?: PlaytimeByUser | null;
+  hasError?: boolean;
 }
 
-const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
+const PlaytimeTrendChart = ({ playtimeByUser, hasError = false }: PlaytimeTrendChartProps) => {
   const { isLandscape } = useOrientation();
   const hasUserSelectedRange = useRef(false);
 
@@ -121,23 +123,19 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
         </Box>
       }
       isLoading={false}
-      error={false}
+      error={hasError}
       testID="profile-playtime-trend"
       ErrorBehaviour={() => (
-        <Box className="py-8 items-center justify-center w-full">
-          <Text className="text-typography-400">Could not load playtime history</Text>
+        <Box className="py-6 items-center justify-center w-full">
+          <ErrorBox
+            errorMessage="Could not load playtime history"
+            variant="icon-top"
+            className="w-full"
+          />
         </Box>
       )}
     >
       {({ cardWidth, theme }) => {
-        if (!trend.hasPlaytime) {
-          return (
-            <Box className="py-8 items-center justify-center w-full">
-              <Text className="text-typography-400">No playtime in this window</Text>
-            </Box>
-          );
-        }
-
         const primaryColor = parseRGB(theme['--color-primary-400']);
         return (
           <VStack space="sm" className="w-full">
@@ -167,47 +165,56 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
                   alignItems: 'center',
                   marginLeft: -10,
                   height: chartContainerHeight,
+                  justifyContent: 'center',
                 }}
               >
-                <LineChart
-                  parentWidth={cardWidth || (isLandscape ? 750 : 370)}
-                  adjustToWidth
-                  disableScroll
-                  initialSpacing={0}
-                  endSpacing={0}
-                  data={trendLineData}
-                  height={chartHeight}
-                  yAxisOffset={Math.max(
-                    0,
-                    chartBounds.min - (chartBounds.max - chartBounds.min) * 0.1
-                  )}
-                  maxValue={(chartBounds.max - chartBounds.min) * 1.2 || 10}
-                  isAnimated
-                  animationDuration={600}
-                  color={primaryColor}
-                  thickness={isLandscape ? 4 : 3}
-                  hideDataPoints
-                  yAxisThickness={0}
-                  xAxisThickness={0}
-                  hideRules
-                  hideYAxisText
-                  pointerConfig={{
-                    pointerStripHeight: chartHeight,
-                    pointerStripColor: primaryColor,
-                    pointerStripWidth: 2,
-                    pointerColor: primaryColor,
-                    radius: 5,
-                    pointerLabelWidth: 0,
-                    pointerLabelHeight: 0,
-                    activatePointersOnLongPress: true,
-                    autoAdjustPointerLabelPosition: false,
-                    pointerLabelComponent: (items: any) => {
-                      const item = items[0];
-                      if (!item) return <View />;
-                      return <PointerLabelUpdater item={item} onUpdate={setActivePoint} />;
-                    },
-                  }}
-                />
+                {!trend.hasPlaytime ? (
+                  <Box className="items-center justify-center py-8">
+                    <Text className="text-typography-400 font-medium text-center">
+                      No playtime in this window
+                    </Text>
+                  </Box>
+                ) : (
+                  <LineChart
+                    parentWidth={cardWidth || (isLandscape ? 750 : 370)}
+                    adjustToWidth
+                    disableScroll
+                    initialSpacing={0}
+                    endSpacing={0}
+                    data={trendLineData}
+                    height={chartHeight}
+                    yAxisOffset={Math.max(
+                      0,
+                      chartBounds.min - (chartBounds.max - chartBounds.min) * 0.1
+                    )}
+                    maxValue={(chartBounds.max - chartBounds.min) * 1.2 || 10}
+                    isAnimated
+                    animationDuration={600}
+                    color={primaryColor}
+                    thickness={isLandscape ? 4 : 3}
+                    hideDataPoints
+                    yAxisThickness={0}
+                    xAxisThickness={0}
+                    hideRules
+                    hideYAxisText
+                    pointerConfig={{
+                      pointerStripHeight: chartHeight,
+                      pointerStripColor: primaryColor,
+                      pointerStripWidth: 2,
+                      pointerColor: primaryColor,
+                      radius: 5,
+                      pointerLabelWidth: 0,
+                      pointerLabelHeight: 0,
+                      activatePointersOnLongPress: true,
+                      autoAdjustPointerLabelPosition: false,
+                      pointerLabelComponent: (items: any) => {
+                        const item = items[0];
+                        if (!item) return <View />;
+                        return <PointerLabelUpdater item={item} onUpdate={setActivePoint} />;
+                      },
+                    }}
+                  />
+                )}
               </Box>
 
               <HStack space="xs" className="w-full flex-wrap justify-between mt-1 mb-1">
