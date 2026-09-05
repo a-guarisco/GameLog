@@ -217,7 +217,7 @@ describe('Tablet Portrait Layout and navConstants', () => {
   });
 
   describe('GameListView', () => {
-    it('applies zero left padding while keeping 2 columns in tablet portrait mode', () => {
+    it('applies zero left padding while keeping 3 columns in tablet portrait mode', () => {
       jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
         isLandscape: false,
         isTablet: true,
@@ -240,7 +240,7 @@ describe('Tablet Portrait Layout and navConstants', () => {
       const flatList = rootBox.props.children.find(
         (child: any) => child?.type?.name === 'FlatList' || child?.props?.numColumns !== undefined
       );
-      expect(flatList.props.numColumns).toBe(2);
+      expect(flatList.props.numColumns).toBe(3);
     });
   });
 });
