@@ -26,6 +26,7 @@ export const FilterChip = ({
   activeBorderClass = 'border-primary-500',
   activeTextClass = 'text-typography-0',
   activeIconColor = HEX_COLORS.overlay.icon.hex,
+  testID,
 }: FilterChipProps) => (
   <Pressable onPress={onPress} testID={testID}>
     <HStack
