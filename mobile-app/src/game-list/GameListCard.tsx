@@ -12,6 +12,8 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import { GameListCardBadges } from './GameListCardBadges';
 import { GameListCardExpandedDetails } from './GameListCardExpandedDetails';
 import { useOrientation } from '@gamelog/common/useOrientation';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 interface GameListCardProps {
   gameItem: GameListItemData;
@@ -108,7 +110,7 @@ export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: Game
         onPress={toggleExpand}
         className="py-1.5 items-center justify-center bg-background-50 active:bg-background-100"
       >
-        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color="#737373" />
+        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={HEX_COLORS.muted.icon.hex} />
       </Pressable>
 
       {/* Expanded Details */}

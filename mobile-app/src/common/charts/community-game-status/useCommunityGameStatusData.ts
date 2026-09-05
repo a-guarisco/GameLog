@@ -24,13 +24,13 @@ export interface StatusComparisonItem {
 
 export const STATUS_ORDER: GameStatus[] = ['playing', 'to_be_played', 'shelved', 'platinato'];
 
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
 export const STATUS_COLORS: Record<GameStatus, string> = {
-  playing: METRICS.gameStatus.playing.hex,
-  to_be_played: METRICS.gameStatus.to_be_played.hex,
-  shelved: METRICS.gameStatus.shelved.hex,
-  platinato: METRICS.gameStatus.platinato.hex,
+  playing: HEX_COLORS.gameStatus.playing.hex,
+  to_be_played: HEX_COLORS.gameStatus.to_be_played.hex,
+  shelved: HEX_COLORS.gameStatus.shelved.hex,
+  platinato: HEX_COLORS.gameStatus.platinato.hex,
 };
 
 export const formatCommunityGameCount = (count?: number | null): string => {
@@ -47,7 +47,7 @@ export interface UseCommunityGameStatusDataParams {
 
 export const useCommunityGameStatusData = ({
   data,
-  emptyColor = parseRGB(tailwindColors.slate[700]),
+  emptyColor = "transparent",
 }: UseCommunityGameStatusDataParams) => {
   const comparisonItems = useMemo<StatusComparisonItem[]>(() => {
     if (!data) return [];

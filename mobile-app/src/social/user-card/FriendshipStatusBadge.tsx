@@ -3,9 +3,9 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { BadgeTone, FriendshipBadgeConfig } from './friendshipStatus';
 
 const TONE_CLASSES: Record<BadgeTone, { bg: string; text: string }> = {
-  success: { bg: 'bg-success-500/15', text: 'text-success-700' },
-  warning: { bg: 'bg-warning-500/15', text: 'text-warning-700' },
-  error: { bg: 'bg-error-500/15', text: 'text-error-700' },
+  success: { bg: 'bg-primary-500/15', text: 'text-primary-700 dark:text-primary-300' },
+  warning: { bg: 'bg-background-50 border border-outline-100', text: 'text-typography-600' },
+  error: { bg: 'bg-error-500/15', text: 'text-error-700 dark:text-error-400' },
 };
 
 interface FriendshipStatusBadgeProps {

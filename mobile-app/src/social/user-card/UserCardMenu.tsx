@@ -14,6 +14,8 @@ import { Text } from '@gamelog/common/gluestack/text';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 export interface UserCardMenuItem {
   label: string;
@@ -137,7 +139,7 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
           hitSlop={8}
           className="w-8 h-8 rounded-lg items-center justify-center border border-outline-100 bg-background-100 active:opacity-70"
         >
-          <Ionicons name="ellipsis-horizontal" size={16} color="#a3a3a3" />
+          <Ionicons name="ellipsis-horizontal" size={16} color={HEX_COLORS.muted.icon.hex} />
         </Pressable>
       </View>
 
@@ -167,7 +169,7 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
               <VStack space="xs">
                 {items.map((item, index) => {
                   const iconColor = item.isDestructive
-                    ? '#f87171'
+                    ? HEX_COLORS.feedback.error.hex
                     : toHex(brand.primary['400']);
 
                   return (

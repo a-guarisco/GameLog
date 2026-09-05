@@ -8,6 +8,8 @@ import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 import { UserCardMenu, UserCardMenuItem } from './UserCardMenu';
 import { ActionConfirmModal } from '@gamelog/common/ActionConfirmModal';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 interface AddFriendActionProps {
   userId: string;
@@ -301,7 +303,7 @@ export const IncomingRequestActions: React.FC<IncomingRequestActionsProps> = ({
           hitSlop={6}
           className="flex-row items-center justify-center gap-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 active:opacity-70"
         >
-          <Ionicons name="close" size={13} color="#9ca3af" />
+          <Ionicons name="close" size={13} color={HEX_COLORS.muted.icon.hex} />
           <Text size="xs" className="font-semibold text-typography-300">
             Refuse
           </Text>

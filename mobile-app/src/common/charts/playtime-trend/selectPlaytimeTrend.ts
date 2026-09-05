@@ -2,7 +2,7 @@ import type { PlaytimeByUser, GamePlaytime } from '@gamelog/api-manager/dto';
 import { formatMinutesToHours, toIsoDate } from '@gamelog/utils/formatUtils';
 import { tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
-import { CHART_PALETTE } from '@gamelog/theme/metrics';
+import { CHART_PALETTE, HEX_COLORS } from '@gamelog/theme/hexColors';
 
 const WEEKDAY_INITIALS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const WEEKDAY_NAMES = [
@@ -57,7 +57,7 @@ const STACK_PALETTE = [
   CHART_PALETTE[4],
   CHART_PALETTE[5],
 ];
-const STACK_OTHER_COLOR = parseRGB(tailwindColors.zinc[600]);
+const STACK_OTHER_COLOR = HEX_COLORS.chart.other.hex;
 
 const buildWindow = (days: number, endDate: Date): Date[] =>
   Array.from({ length: Math.max(0, days) }, (_, index) => {

@@ -6,7 +6,7 @@ import { FilterChip } from './FilterChip';
 import { FilterModalWrapper } from './FilterModalWrapper';
 import { SortBy } from '../useGameList';
 
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
 const SORT_OPTIONS: { label: string; value: SortBy }[] = [
   { label: 'Playtime', value: 'playtime' },
@@ -19,38 +19,38 @@ const getSortColorClasses = (sort: SortBy) => {
   switch (sort) {
     case 'playtime':
       return {
-        bg: METRICS.playtime.bgClass,
-        border: METRICS.playtime.borderClass,
-        text: METRICS.playtime.textClass,
-        hex: METRICS.playtime.hex,
+        bg: 'bg-semantic-playtime-100 dark:bg-semantic-playtime-900/40',
+        border: 'border-semantic-playtime-600',
+        text: 'text-semantic-playtime-600',
+        hex: HEX_COLORS.playtime.hex,
       };
     case 'last_played':
       return {
-        bg: METRICS.lastPlayed.bgClass,
-        border: METRICS.lastPlayed.borderClass,
-        text: METRICS.lastPlayed.textClass,
-        hex: METRICS.lastPlayed.hex,
+        bg: 'bg-semantic-lastPlayed-100 dark:bg-semantic-lastPlayed-900/40',
+        border: 'border-semantic-lastPlayed-600',
+        text: 'text-semantic-lastPlayed-600',
+        hex: HEX_COLORS.lastPlayed.hex,
       };
     case 'max_per_day':
       return {
-        bg: METRICS.maxPerDay.bgClass,
-        border: METRICS.maxPerDay.borderClass,
-        text: METRICS.maxPerDay.textClass,
-        hex: METRICS.maxPerDay.hex,
+        bg: 'bg-semantic-maxPerDay-100 dark:bg-semantic-maxPerDay-900/40',
+        border: 'border-semantic-maxPerDay-600',
+        text: 'text-semantic-maxPerDay-600',
+        hex: HEX_COLORS.maxPerDay.hex,
       };
     case 'top_platform':
       return {
-        bg: METRICS.topPlatform.bgClass,
-        border: METRICS.topPlatform.borderClass,
-        text: METRICS.topPlatform.textClass,
-        hex: METRICS.topPlatform.hex,
+        bg: 'bg-semantic-topPlatform-100 dark:bg-semantic-topPlatform-900/40',
+        border: 'border-semantic-topPlatform-600',
+        text: 'text-semantic-topPlatform-600',
+        hex: HEX_COLORS.topPlatform.hex,
       };
     default:
       return {
         bg: 'bg-primary-500',
         border: 'border-primary-500',
         text: 'text-typography-0',
-        hex: '#ffffff',
+        hex: HEX_COLORS.overlay.icon.hex,
       };
   }
 };

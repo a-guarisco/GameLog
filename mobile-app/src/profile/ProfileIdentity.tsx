@@ -1,3 +1,5 @@
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -37,13 +39,16 @@ const ProfileIdentity = ({
         </Box>
 
         <HStack space="xs" className="flex-wrap items-center justify-center z-10">
-          <Chip
-            className="bg-primary-500 border-[4px] border-background-0"
+          <Chip 
+            className="border-[4px] border-background-0 bg-semantic-streak-500"
             testID="profile-streak-chip"
           >
-            <Text size="xs" className="font-bold text-white">
-              {streakText}
-            </Text>
+            <HStack space="xs" className="items-center">
+              <Ionicons name="flame" size={12} color={HEX_COLORS.streak.hex} />
+              <Text size="xs" className="font-bold text-white">
+                {streakText}
+              </Text>
+            </HStack>
           </Chip>
 
           {!!memberSinceLabel && (

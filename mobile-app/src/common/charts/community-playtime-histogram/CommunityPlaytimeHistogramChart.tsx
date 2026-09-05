@@ -1,3 +1,4 @@
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { useState, memo, useRef, useEffect } from 'react';
 import { useColorScheme, Pressable } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -94,8 +95,8 @@ const CommunityPlaytimeHistogramChart = ({
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
   const axisColor = parseRGB(theme['--color-typography-200']);
-  const primaryColor = parseRGB(brand.primary['500']);
-  const purpleColor = parseRGB(tailwindColors.purple['500']);
+  const primaryColor = HEX_COLORS.comparison.user.hex;
+  const compareColor = HEX_COLORS.comparison.compare.hex;
 
   const { data, isLoading, error, errorMessage, dateRangeInfo } = useCommunityPlaytime({
     scope,
@@ -119,7 +120,7 @@ const CommunityPlaytimeHistogramChart = ({
     offset,
     axisColor,
     primaryColor,
-    purpleColor,
+    compareColor,
     theme,
     barWidth,
   });
@@ -211,7 +212,7 @@ const CommunityPlaytimeHistogramChart = ({
               {/* Header with dual playtime numbers on left and date navigation on right */}
               <VStack className="w-full px-0 mb-3" space="xs">
                 <HStack className="w-full justify-between items-center flex-wrap">
-                  {/* Left: Summary totals in blue and purple with separator */}
+                  {/* Left: Summary totals in blue and compareColor with separator */}
                   <HStack space="xs" className="items-baseline">
                     <ChartSummaryText className="text-primary-500">
                       {userTotalLabel}
@@ -220,7 +221,7 @@ const CommunityPlaytimeHistogramChart = ({
                       {' '}
                       ·{' '}
                     </Text>
-                    <ChartSummaryText className="text-purple-500">
+                    <ChartSummaryText className="text-comparison-compare-500">
                       {communityTotalLabel}
                     </ChartSummaryText>
                   </HStack>
@@ -360,7 +361,7 @@ const CommunityPlaytimeHistogramChart = ({
                 <HStack space="xs" className="items-center">
                   <Box
                     className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: `rgb(${brand.primary['500']})` }}
+                    className="bg-comparison-user-500"
                   />
                   <Text size="xs" className="font-bold text-primary-500">
                     You
@@ -369,9 +370,9 @@ const CommunityPlaytimeHistogramChart = ({
                 <HStack space="xs" className="items-center">
                   <Box
                     className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
+                    className="bg-comparison-compare-500"
                   />
-                  <Text size="xs" className="font-bold text-purple-500">
+                  <Text size="xs" className="font-bold text-comparison-compare-500">
                     {othersLabel}
                   </Text>
                 </HStack>

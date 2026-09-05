@@ -1,3 +1,4 @@
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { Pressable } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { HStack } from '@gamelog/common/gluestack/hstack';
@@ -44,7 +45,7 @@ const InlineAchievementsDetail = ({
           className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background-100 border border-outline-100"
           hitSlop={8}
         >
-          <Ionicons name="arrow-back" size={16} color="#FFFFFF" />
+          <Ionicons name="arrow-back" size={16} color={HEX_COLORS.overlay.icon.hex} />
           <Text size="sm" className="font-semibold text-typography-0">
             Back to Tabs
           </Text>

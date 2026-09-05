@@ -1,3 +1,6 @@
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -32,9 +35,12 @@ const GameIdentity = ({
             {chips}
             {secondaryText && (
               <Box className="bg-background-200 border border-outline-100 rounded-full px-3 py-1 mt-1">
-                <Text size="xs" className="font-bold text-typography-100">
-                  {secondaryText}
-                </Text>
+                <HStack space="xs" className="items-center">
+                  <Ionicons name="flame" size={12} color={HEX_COLORS.streak.hex} />
+                  <Text size="xs" className="font-bold text-typography-100">
+                    {secondaryText}
+                  </Text>
+                </HStack>
               </Box>
             )}
           </Box>

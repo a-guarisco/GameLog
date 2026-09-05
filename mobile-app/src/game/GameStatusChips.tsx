@@ -1,3 +1,5 @@
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -35,9 +37,12 @@ const GameStatusChips = ({
     </Chip>
 
     <Chip className="bg-background-200">
-      <Text size="xs" className="font-bold text-typography-100">
-        {streakText}
-      </Text>
+      <HStack space="xs" className="items-center">
+        <Ionicons name="flame" size={12} color={HEX_COLORS.streak.hex} />
+        <Text size="xs" className="font-bold text-typography-100">
+          {streakText}
+        </Text>
+      </HStack>
     </Chip>
 
     {appId && (
