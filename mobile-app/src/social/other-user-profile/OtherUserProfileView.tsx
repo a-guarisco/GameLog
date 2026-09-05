@@ -15,7 +15,7 @@ import CommunityPlaytimeHistogramChart from '@gamelog/common/charts/community-pl
 import CommunityTopGamesHistogramChart from '@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart';
 import CommunityGameStatusChart from '@gamelog/common/charts/community-game-status/CommunityGameStatusChart';
 import CommunityGenreRadarChart from '@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart';
-import OtherUserIdentity from './OtherUserIdentity';
+import OtherUserIdentity, { hasOtherUserActionButtons } from './OtherUserIdentity';
 import OtherUserStats from './OtherUserStats';
 import { useOtherUserProfile } from './useOtherUserProfile';
 import type { UserRead, FriendshipInfo, UserSearchResult } from '@gamelog/api-manager/dto';
@@ -98,6 +98,11 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
   const username = user.username;
   const isFriend = friendship?.friendship_status === 'accepted';
+  const hasActionButtons = hasOtherUserActionButtons(friendship, {
+    onAcceptFriend: handleAcceptFriend,
+    onRefuseFriend: handleRefuseFriend,
+  });
+  const statsPaddingTop = hasActionButtons ? 'pt-20' : 'pt-6';
 
   if (isLandscape) {
     const leftRailOffset = insets.left + 74;
@@ -161,7 +166,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
           />
 
           <Box className="bg-background-0 pb-10">
-            <VStack space="xl" className="pt-6">
+            <VStack space="xl" className={statsPaddingTop}>
               <Box className={horizontalPadding}>
                 <OtherUserStats
                   ownedGames={targetOwnedGames}
@@ -242,7 +247,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
         />
 
         <Box className="bg-background-0 pb-10">
-          <VStack space="xl" className="pt-6">
+          <VStack space="xl" className={statsPaddingTop}>
             <Box className={horizontalPadding}>
               <OtherUserStats
                 ownedGames={targetOwnedGames}

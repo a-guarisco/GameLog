@@ -1,24 +1,50 @@
-import { Box } from '@gamelog/common/gluestack/box';
+import React from 'react';
+import Chip, { ChipVariant } from '@gamelog/common/Chip';
 import { Text } from '@gamelog/common/gluestack/text';
-import { BadgeTone, FriendshipBadgeConfig } from './friendshipStatus';
-
-const TONE_CLASSES: Record<BadgeTone, { bg: string; text: string }> = {
-  success: { bg: 'bg-primary-500/15', text: 'text-primary-700 dark:text-primary-300' },
-  warning: { bg: 'bg-background-50 border border-outline-100', text: 'text-typography-600' },
-  error: { bg: 'bg-error-500/15', text: 'text-error-700 dark:text-error-400' },
-};
+import {
+  FriendshipBadgeConfig,
+  getFriendshipStatusStyle,
+} from './friendshipStatus';
 
 interface FriendshipStatusBadgeProps {
-  config: FriendshipBadgeConfig;
+  status?: string | null;
+  config?: FriendshipBadgeConfig;
+  variant?: ChipVariant;
+  className?: string;
+  testID?: string;
 }
 
-export const FriendshipStatusBadge: React.FC<FriendshipStatusBadgeProps> = ({ config }) => {
-  const { bg, text } = TONE_CLASSES[config.tone];
+export const FriendshipStatusBadge: React.FC<FriendshipStatusBadgeProps> = ({
+  status,
+  config,
+  variant = 'pill',
+  className = '',
+  testID,
+}) => {
+  const resolvedStatus =
+    status !== undefined
+      ? status
+      : config
+        ? config.tone === 'success'
+          ? 'accepted'
+          : config.tone === 'error'
+            ? 'blocked'
+            : 'pending_outgoing'
+        : undefined;
+  const style = getFriendshipStatusStyle(resolvedStatus);
+  const label = config?.label ?? style.label;
+
   return (
-    <Box className={`${bg} px-2 py-0.5 rounded-md`}>
-      <Text size="xs" className={`font-bold uppercase ${text}`}>
-        {config.label}
+    <Chip
+      variant={variant}
+      className={`${style.bgClass} ${style.borderClass} border-[1px] ${className}`}
+      testID={testID}
+    >
+      <Text size="xs" className={`font-bold ${style.textClass}`}>
+        {label}
       </Text>
-    </Box>
+    </Chip>
   );
 };
+
+export default FriendshipStatusBadge;

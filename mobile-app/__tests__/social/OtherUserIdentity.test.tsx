@@ -67,6 +67,75 @@ describe('OtherUserIdentity', () => {
     expect(screen.getByText('Blocked')).toBeTruthy();
   });
 
+  it('renders three-dots menu button as the last element in row 1 across all statuses', () => {
+    const onBlockFriend = jest.fn();
+    render(
+      <OtherUserIdentity
+        user={mockUser}
+        player={mockPlayer}
+        friendship={{ friendship_id: 'f1', friendship_status: 'accepted' }}
+        onBlockFriend={onBlockFriend}
+      />
+    );
+
+    expect(screen.getByTestId(`user-card-menu-btn-${mockUser.id}`)).toBeTruthy();
+  });
+
+  it('renders Accept and Refuse buttons only when pending_incoming with friendshipId and handlers', () => {
+    const onAcceptFriend = jest.fn();
+    const onRefuseFriend = jest.fn();
+
+    render(
+      <OtherUserIdentity
+        user={mockUser}
+        player={mockPlayer}
+        friendship={{ friendship_id: 'f1', friendship_status: 'pending_incoming' }}
+        onAcceptFriend={onAcceptFriend}
+        onRefuseFriend={onRefuseFriend}
+      />
+    );
+
+    expect(screen.getByTestId(`accept-btn-${mockUser.id}`)).toBeTruthy();
+    expect(screen.getByTestId(`refuse-btn-${mockUser.id}`)).toBeTruthy();
+    expect(screen.getByText('Accept')).toBeTruthy();
+    expect(screen.getByText('Refuse')).toBeTruthy();
+  });
+
+  it('does not render Accept or Refuse buttons when status is accepted', () => {
+    const onAcceptFriend = jest.fn();
+    const onRefuseFriend = jest.fn();
+
+    render(
+      <OtherUserIdentity
+        user={mockUser}
+        player={mockPlayer}
+        friendship={{ friendship_id: 'f1', friendship_status: 'accepted' }}
+        onAcceptFriend={onAcceptFriend}
+        onRefuseFriend={onRefuseFriend}
+      />
+    );
+
+    expect(screen.queryByTestId(`accept-btn-${mockUser.id}`)).toBeNull();
+    expect(screen.queryByTestId(`refuse-btn-${mockUser.id}`)).toBeNull();
+  });
+
+  it('does not render Accept or Refuse buttons when status is pending_outgoing', () => {
+    const onAcceptFriend = jest.fn();
+    const onRefuseFriend = jest.fn();
+
+    render(
+      <OtherUserIdentity
+        user={mockUser}
+        player={mockPlayer}
+        friendship={{ friendship_id: 'f1', friendship_status: 'pending_outgoing' }}
+        onAcceptFriend={onAcceptFriend}
+        onRefuseFriend={onRefuseFriend}
+      />
+    );
+    expect(screen.queryByTestId(`accept-btn-${mockUser.id}`)).toBeNull();
+    expect(screen.queryByTestId(`refuse-btn-${mockUser.id}`)).toBeNull();
+  });
+
   it('renders correctly when no friendship exists (Player status)', () => {
     render(
       <OtherUserIdentity
@@ -80,3 +149,5 @@ describe('OtherUserIdentity', () => {
     expect(screen.getByText('Player')).toBeTruthy();
   });
 });
+
+
