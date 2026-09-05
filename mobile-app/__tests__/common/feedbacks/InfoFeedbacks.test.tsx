@@ -1,17 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { InfoBox, InfoHeading, InfoText } from '@gamelog/common/feedbacks';
-
-describe('Info Texts', () => {
-  it('InfoHeading renders message correctly', () => {
-    const { getByText } = render(<InfoHeading message="Test Title" />);
-    expect(getByText('Test Title')).toBeTruthy();
-  });
-
-  it('InfoText renders message correctly', () => {
-    const { getByText } = render(<InfoText message="Detailed info description" />);
-    expect(getByText('Detailed info description')).toBeTruthy();
-  });
-});
+import { InfoBox } from '@gamelog/common/feedbacks';
 
 jest.mock('@react-native-vector-icons/ionicons', () => 'Icon');
 

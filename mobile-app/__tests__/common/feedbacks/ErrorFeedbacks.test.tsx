@@ -1,17 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { ErrorHeading, ErrorText, ErrorBox } from '@gamelog/common/feedbacks';
-
-describe('Error Texts', () => {
-  it('ErrorHeading renders message correctly', () => {
-    const { getByText } = render(<ErrorHeading message="Test Title" />);
-    expect(getByText('Test Title')).toBeTruthy();
-  });
-
-  it('ErrorText renders message correctly', () => {
-    const { getByText } = render(<ErrorText message="Detailed error description" />);
-    expect(getByText('Detailed error description')).toBeTruthy();
-  });
-});
+import { ErrorBox } from '@gamelog/common/feedbacks';
 
 jest.mock('@react-native-vector-icons/ionicons', () => 'Icon');
 

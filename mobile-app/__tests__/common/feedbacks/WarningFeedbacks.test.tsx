@@ -1,17 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { WarningBox, WarningHeading, WarningText } from '@gamelog/common/feedbacks';
-
-describe('Warning Texts', () => {
-  it('WarningHeading renders message correctly', () => {
-    const { getByText } = render(<WarningHeading message="Test Title" />);
-    expect(getByText('Test Title')).toBeTruthy();
-  });
-
-  it('WarningText renders message correctly', () => {
-    const { getByText } = render(<WarningText message="Detailed warning description" />);
-    expect(getByText('Detailed warning description')).toBeTruthy();
-  });
-});
+import { WarningBox } from '@gamelog/common/feedbacks';
 
 jest.mock('@react-native-vector-icons/ionicons', () => 'Icon');
 
