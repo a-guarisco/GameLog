@@ -5,7 +5,6 @@ export interface GameStatusesResponse {
   status: GameStatus;
 }
 
-
 export const GAME_STATUS_LABELS: Record<GameStatus, string> = {
   playing: 'Playing',
   to_be_played: 'To Be Played',

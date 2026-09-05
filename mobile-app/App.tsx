@@ -12,6 +12,7 @@ import useAppInit from '@gamelog/common/useAppInit';
 import { RootTabs, AuthNavigator, OnboardingNavigator, UnverifiedNavigator } from '@gamelog/routes';
 import SplashScreen from '@gamelog/onboarding/SplashScreen';
 import { useAuthSession } from '@gamelog/auth/useAuthSession';
+import { useDeviceNotificationSync } from '@gamelog/notifications';
 
 const MainNavigation = createStaticNavigation(RootTabs);
 const AuthNavigation = createStaticNavigation(AuthNavigator);
@@ -26,10 +27,12 @@ const navigators: Record<string, React.ComponentType<any>> = {
 };
 
 const AppContent = () => {
-  const { authState, refreshBackendUser } = useAuthSession();
+  const { authState, backendUser, refreshBackendUser } = useAuthSession();
   const { colorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const navTheme = useMemo(() => getNavigationTheme(isDarkMode), [isDarkMode]);
+
+  useDeviceNotificationSync(authState === 'authenticated' ? backendUser?.id : undefined);
 
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener('registrationSuccess', () => {

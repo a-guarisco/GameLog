@@ -6,6 +6,7 @@ import {
   setSteamId as globalSetSteamId,
 } from '@gamelog/api-manager/steamApiKey';
 import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
+import { requestAndRegisterPushToken } from '../notifications/pushNotificationService';
 
 export function useProfileSetup() {
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,13 @@ export function useProfileSetup() {
         globalSetSteamApiKey(response.steam_api_key);
       }
       globalSetSteamId(steamId);
+
+      try {
+        await requestAndRegisterPushToken(response.id);
+      } catch (pushErr) {
+        console.warn('[useProfileSetup] Notification registration skipped or failed:', pushErr);
+      }
+
       DeviceEventEmitter.emit('registrationSuccess');
     } catch (err: unknown) {
       const errorWithResponse = err as {

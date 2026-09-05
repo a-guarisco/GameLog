@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { DeviceEventEmitter } from 'react-native';
 import { onIdTokenChanged, type User } from 'firebase/auth';
 import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
@@ -56,9 +57,18 @@ export const useAuthSession = () => {
         setBackendUser(null);
         setAuthState('onboarding');
       } else {
-        // Network error or other issues
+        // Network error or backend unreachable
         console.error('Error fetching /users/me', error);
+        setBackendUser(null);
         setAuthState('unauthenticated');
+        try {
+          await getFirebaseAuth().signOut();
+        } catch {
+          // ignore signout errors
+        }
+        DeviceEventEmitter.emit('backendConnectionError', {
+          message: 'Unable to connect to GameLog server. The backend may be offline.',
+        });
       }
     }
   };

@@ -1,8 +1,6 @@
 import ApiManager, { fetchData } from '@gamelog/api-manager/apiManager';
 import EndPoints from '@gamelog/api-manager/apiEndsPoints';
-import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
-import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 
 jest.mock('@gamelog/auth/firebaseClient', () => ({
   getFirebaseAuth: () => mockAuth,
@@ -12,6 +10,7 @@ const mockAuth: any = {};
 
 jest.mock('@gamelog/api-manager/backendResolver', () => ({
   resolveBackendUrl: jest.fn().mockResolvedValue(''),
+  clearCachedBackendUrl: jest.fn(),
 }));
 
 const mockFetch = jest.fn();
@@ -420,9 +419,6 @@ describe('ApiManager', () => {
       expect(result).toEqual(mockResponse);
     });
 
-
-
-
     it('fetches search users with the current Firebase token', async () => {
       const mockResponse = [
         { user: { id: 'u1', username: 'alex', steam_id: '123' }, friendship: {} },
@@ -514,7 +510,6 @@ describe('ApiManager', () => {
     });
   });
 
-
   describe('additional authenticated endpoints', () => {
     beforeEach(() => {
       mockAuth.currentUser = {
@@ -590,16 +585,32 @@ describe('ApiManager', () => {
       const genreRes = await ApiManager.getCommunityGenre('global');
       expect(genreRes).toEqual([{ genre: 'Action', hours: 50 }]);
 
-      const weeklyRes = await ApiManager.getCommunityWeeklyPlaytime('friends', '2026-08-01', '2026-08-07');
+      const weeklyRes = await ApiManager.getCommunityWeeklyPlaytime(
+        'friends',
+        '2026-08-01',
+        '2026-08-07'
+      );
       expect(weeklyRes).toEqual({ buckets: [] });
 
-      const monthlyRes = await ApiManager.getCommunityMonthlyPlaytime('region', '2026-08-01', '2026-08-31');
+      const monthlyRes = await ApiManager.getCommunityMonthlyPlaytime(
+        'region',
+        '2026-08-01',
+        '2026-08-31'
+      );
       expect(monthlyRes).toEqual({ buckets: [] });
 
-      const topWeekly = await ApiManager.getCommunityWeeklyTopGames('global', '2026-08-01', '2026-08-07');
+      const topWeekly = await ApiManager.getCommunityWeeklyTopGames(
+        'global',
+        '2026-08-01',
+        '2026-08-07'
+      );
       expect(topWeekly).toEqual([{ app_id: '440', title: 'TF2', hours: 10 }]);
 
-      const topMonthly = await ApiManager.getCommunityMonthlyTopGames('global', '2026-08-01', '2026-08-31');
+      const topMonthly = await ApiManager.getCommunityMonthlyTopGames(
+        'global',
+        '2026-08-01',
+        '2026-08-31'
+      );
       expect(topMonthly).toEqual([{ app_id: '440', title: 'TF2', hours: 10 }]);
     });
 
@@ -672,4 +683,3 @@ describe('fetchData', () => {
     await expect(fetchData('https://example.dev/error')).rejects.toThrow('Network down');
   });
 });
-
