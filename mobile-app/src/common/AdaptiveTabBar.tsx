@@ -13,12 +13,13 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
+import { isDevMenuEnabled } from './devMenuConfig';
 
 // Tab definitions with label and icons
-export const TAB_CONFIG: Record<
+export const getTabConfig = (): Record<
   string,
   { label: string; defaultIcon: string; focusedIcon: string }
-> = {
+> => ({
   GameListTab: {
     label: 'Games',
     defaultIcon: 'game-controller',
@@ -35,11 +36,18 @@ export const TAB_CONFIG: Record<
     focusedIcon: 'people',
   },
   DevTab: {
-    label: 'Dev',
-    defaultIcon: 'construct',
+    label: isDevMenuEnabled() ? 'Dev' : 'Options',
+    defaultIcon: 'construct-outline',
     focusedIcon: 'construct',
   },
-};
+});
+
+export const TAB_CONFIG: Record<
+  string,
+  { label: string; defaultIcon: string; focusedIcon: string }
+> = new Proxy({} as any, {
+  get: (_, prop: string) => getTabConfig()[prop],
+});
 
 /**
  * Adaptive navigation tab bar:

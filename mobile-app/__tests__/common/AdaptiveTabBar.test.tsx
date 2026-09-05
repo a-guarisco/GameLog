@@ -6,6 +6,9 @@ jest.mock('@react-native-vector-icons/ionicons', () => 'Ionicons');
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: jest.fn(() => ({ top: 0, bottom: 0, left: 0, right: 0 })),
 }));
+jest.mock('@gamelog/common/devMenuConfig', () => ({
+  isDevMenuEnabled: jest.fn(() => true),
+}));
 
 describe('AdaptiveTabBar', () => {
   const mockNavigation: any = {
@@ -87,5 +90,20 @@ describe('AdaptiveTabBar', () => {
       expect.objectContaining({ type: 'tabPress', target: 'SocialTab' })
     );
     expect(mockNavigation.navigate).toHaveBeenCalledWith('SocialTab');
+  });
+
+  it('renders "Options" label when dev menu is disabled', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      width: 390,
+      height: 844,
+    });
+    const devMenuConfig = require('@gamelog/common/devMenuConfig');
+    jest.spyOn(devMenuConfig, 'isDevMenuEnabled').mockReturnValue(false);
+
+    const { getByText, queryByText } = render(<AdaptiveTabBar {...defaultProps} />);
+
+    expect(getByText('Options')).toBeTruthy();
+    expect(queryByText('Dev')).toBeNull();
   });
 });
