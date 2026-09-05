@@ -20,14 +20,14 @@ describe('ProfileIdentity', () => {
     render(<ProfileIdentity {...PROPS} />);
 
     expect(screen.getByTestId('profile-streak-chip').props.className).toContain('bg-semantic-dayStreak-100');
-    expect(screen.getByText('12')).toBeTruthy();
+    expect(screen.getByText('12 Days Streak')).toBeTruthy();
   });
 
   it('renders the streak chip even when streak is 0', () => {
     render(<ProfileIdentity {...PROPS} streak={0} />);
 
     expect(screen.getByTestId('profile-streak-chip')).toBeTruthy();
-    expect(screen.getByText('0')).toBeTruthy();
+    expect(screen.getByText('0 Days Streak')).toBeTruthy();
   });
 
   it('shows the account age chip when Steam reports a creation date', () => {
