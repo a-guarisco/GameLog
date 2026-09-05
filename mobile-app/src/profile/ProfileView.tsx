@@ -89,7 +89,7 @@ const ProfileView = () => {
             <ProfileIdentity
               name={player?.personaname ?? 'Unknown User'}
               avatarUrl={player?.avatarfull}
-              streakText={streakText}
+              streak={userStreak?.streak ?? 0}
               memberSinceLabel={selectMemberSinceLabel(player?.timecreated)}
               mostPlayedName={mostPlayedGame?.name}
             />
@@ -132,7 +132,7 @@ const ProfileView = () => {
         <ProfileIdentity
           name={player?.personaname ?? 'Unknown User'}
           avatarUrl={player?.avatarfull}
-          streakText={streakText}
+          streak={userStreak?.streak ?? 0}
           memberSinceLabel={selectMemberSinceLabel(player?.timecreated)}
           mostPlayedName={mostPlayedGame?.name}
         />
