@@ -40,7 +40,11 @@ const ScrollablePage = ({
   const isScrollableBanner = (isLandscape || isTablet) && hasBanner;
 
   return (
-    <Box className="flex-1 relative" style={{ paddingLeft: leftPadding }}>
+    <Box
+      className="flex-1 relative"
+      style={{ paddingLeft: leftPadding }}
+      pointerEvents={isScrollableBanner ? 'box-none' : 'auto'}
+    >
       <BlurTargetView
         ref={scrollBlurTargetRef}
         className="absolute inset-0 z-40"

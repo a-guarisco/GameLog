@@ -16,6 +16,7 @@ interface OtherUserIdentityProps extends UserCardActionHandlers {
   player?: Player;
   friendship?: FriendshipInfo | null;
   isActionLoading?: boolean;
+  isLandscape?: boolean;
 }
 
 export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
@@ -23,6 +24,7 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
   player,
   friendship,
   isActionLoading,
+  isLandscape = false,
   ...handlers
 }) => {
   const status = friendship?.friendship_status;
@@ -59,37 +61,36 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
     friendship: friendship ?? {},
   };
 
-  return (
-    <Box className="w-full items-center z-10" style={{ height: 0, overflow: 'visible' }}>
-      <VStack space="xs" className="absolute w-full items-center" style={{ top: -136 }}>
-        <Avatar size="xl" className="border-[4px] border-background-0 bg-background-300 z-10">
-          <AvatarFallbackText>{displayName}</AvatarFallbackText>
-          {!!player?.avatarfull && (
-            <AvatarImage
-              source={{ uri: player.avatarfull }}
-              alt={`${displayName} avatar`}
-              resizeMode="cover"
-            />
-          )}
-        </Avatar>
+  const content = (
+    <>
+      <Avatar size="xl" className="border-[4px] border-background-0 bg-background-300 z-10">
+        <AvatarFallbackText>{displayName}</AvatarFallbackText>
+        {!!player?.avatarfull && (
+          <AvatarImage
+            source={{ uri: player.avatarfull }}
+            alt={`${displayName} avatar`}
+            resizeMode="cover"
+          />
+        )}
+      </Avatar>
 
-        <Box className="bg-background-0 px-4 py-1 rounded-full z-10">
-          <PageTitle size="xl" className="text-center" numberOfLines={1}>
-            {displayName}
-          </PageTitle>
-        </Box>
+      <Box className="bg-background-0 px-4 py-1 rounded-full z-10">
+        <PageTitle size="xl" className="text-center" numberOfLines={1}>
+          {displayName}
+        </PageTitle>
+      </Box>
 
-        <HStack space="xs" className="flex-wrap items-center justify-center z-10">
-          {!!memberSinceLabel && (
-            <Chip
+      <HStack space="xs" className="flex-wrap items-center justify-center z-10">
+        {!!memberSinceLabel && (
+          <Chip
               className="bg-background-50 border border-outline-50 shadow-sm"
-              testID="other-user-member-since-chip"
-            >
-              <Text size="xs" className="font-bold text-typography-100">
-                {memberSinceLabel}
-              </Text>
-            </Chip>
-          )}
+            testID="other-user-member-since-chip"
+          >
+            <Text size="xs" className="font-bold text-typography-100">
+              {memberSinceLabel}
+            </Text>
+          </Chip>
+        )}
 
           <Chip
             className={`${badgeBgClass} border-[4px]`}
@@ -100,12 +101,19 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
             </Text>
           </Chip>
 
-          <UserCardActions
-            item={searchResultItem}
-            handlers={handlers}
-            isActionLoading={isActionLoading}
-          />
-        </HStack>
+        <UserCardActions
+          item={searchResultItem}
+          handlers={handlers}
+          isActionLoading={isActionLoading}
+        />
+      </HStack>
+    </>
+  );
+
+  return (
+    <Box className="w-full items-center z-10" style={{ height: 0, overflow: 'visible' }}>
+      <VStack space="xs" className="absolute w-full items-center" style={{ top: -136 }}>
+        {content}
       </VStack>
     </Box>
   );

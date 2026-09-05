@@ -15,6 +15,7 @@ interface HeaderGameImageProps {
   style?: StyleProp<ViewStyle>;
   height?: number;
   scrollable?: boolean;
+  alignTop?: boolean;
 }
 
 const HeaderGameImage = ({
@@ -25,6 +26,7 @@ const HeaderGameImage = ({
   style,
   height,
   scrollable = false,
+  alignTop = false,
 }: HeaderGameImageProps) => {
   const gameHeaderImage = appid ? steamAssetUrls.getGameHeaderImage(appid) : undefined;
   const { isLandscape, isTablet } = useOrientation();
@@ -49,6 +51,7 @@ const HeaderGameImage = ({
             heightPercentage={heightPercentage}
             height={height}
             scrollable={isScrollable}
+            alignTop={alignTop}
           />
         </Box>
       </Card>
@@ -68,6 +71,7 @@ const HeaderGameImage = ({
           heightPercentage={heightPercentage}
           height={height}
           scrollable={isScrollable}
+          alignTop={alignTop}
         />
       </Box>
     </Card>

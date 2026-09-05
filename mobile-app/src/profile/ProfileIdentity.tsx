@@ -15,36 +15,42 @@ interface ProfileIdentityProps {
   streak: number;
   memberSinceLabel?: string | null;
   mostPlayedName?: string;
+  isLandscape?: boolean;
 }
 
-const ProfileIdentity = ({ name, avatarUrl, streak, memberSinceLabel }: ProfileIdentityProps) => {
-  return (
-    <Box className="w-full items-center z-10" style={{ height: 0, overflow: 'visible' }}>
-      <VStack space="xs" className="absolute w-full items-center" style={{ top: -136 }}>
-        <Avatar size="xl" className="border-[4px] border-background-0 bg-background-300 z-10">
-          <AvatarFallbackText>{name}</AvatarFallbackText>
-          {!!avatarUrl && (
-            <AvatarImage source={{ uri: avatarUrl }} alt={`${name} avatar`} resizeMode="cover" />
-          )}
-        </Avatar>
+const ProfileIdentity = ({
+  name,
+  avatarUrl,
+  streak,
+  memberSinceLabel,
+  isLandscape = false,
+}: ProfileIdentityProps) => {
+  const content = (
+    <>
+      <Avatar size="xl" className="border-[4px] border-background-0 bg-background-300 z-10">
+        <AvatarFallbackText>{name}</AvatarFallbackText>
+        {!!avatarUrl && (
+          <AvatarImage source={{ uri: avatarUrl }} alt={`${name} avatar`} resizeMode="cover" />
+        )}
+      </Avatar>
 
-        <Box className="bg-background-0 px-4 py-1 rounded-full z-10">
-          <PageTitle size="xl" className="text-center" numberOfLines={1}>
-            {name}
-          </PageTitle>
-        </Box>
+      <Box className="bg-background-0 px-4 py-1 rounded-full z-10">
+        <PageTitle size="xl" className="text-center" numberOfLines={1}>
+          {name}
+        </PageTitle>
+      </Box>
 
-        <HStack space="xs" className="flex-wrap items-center justify-center z-10">
-          {!!memberSinceLabel && (
-            <Chip
+      <HStack space="xs" className="flex-wrap items-center justify-center z-10">
+        {!!memberSinceLabel && (
+          <Chip
               className="bg-background-50 border border-outline-50 shadow-sm"
-              testID="profile-member-since-chip"
-            >
-              <Text size="xs" className="font-bold text-typography-100">
-                {memberSinceLabel}
-              </Text>
-            </Chip>
-          )}
+            testID="profile-member-since-chip"
+          >
+            <Text size="xs" className="font-bold text-typography-100">
+              {memberSinceLabel}
+            </Text>
+          </Chip>
+        )}
 
           <MinimalBadge
             iconName="flame"
@@ -55,7 +61,14 @@ const ProfileIdentity = ({ name, avatarUrl, streak, memberSinceLabel }: ProfileI
             bgClass="bg-semantic-dayStreak-100 dark:bg-semantic-dayStreak-900/40"
             testID="profile-streak-chip"
           />
-        </HStack>
+      </HStack>
+    </>
+  );
+
+  return (
+    <Box className="w-full items-center z-10" style={{ height: 0, overflow: 'visible' }}>
+      <VStack space="xs" className="absolute w-full items-center" style={{ top: -136 }}>
+        {content}
       </VStack>
     </Box>
   );

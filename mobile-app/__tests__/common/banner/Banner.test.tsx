@@ -59,5 +59,13 @@ describe('Banner', () => {
       const box = getByTestId('banner-box');
       expect(box.props.onMoveShouldSetResponder).toBeDefined();
     });
+
+    it('renders image properly when alignTop=true', () => {
+      const { getByTestId } = render(
+        <Banner {...defaultProps} imageUrl="https://example.com/banner.jpg" alignTop={true} />
+      );
+      const image = getByTestId('banner-image');
+      expect(image).toBeTruthy();
+    });
   });
 });

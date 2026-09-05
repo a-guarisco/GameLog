@@ -41,9 +41,10 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
   const initialFriendship =
     propFriendship ?? propItem?.friendship ?? routeItem?.friendship ?? route.params?.friendship;
 
-  const { vspaceHeight } = useProfileSpacing();
   const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
+  const bannerHeight = isLandscape ? (isTablet ? 280 : 120) : undefined;
+  const { vspaceHeight } = useProfileSpacing({ bannerHeight });
   const horizontalPadding = isLandscape ? 'px-8' : 'px-4';
 
   const {
@@ -104,7 +105,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
     return (
       <Box
-        className="flex-1 bg-background-0"
+        className="flex-1 bg-background-0 relative"
         style={{
           paddingLeft: leftRailOffset,
           paddingRight: insets.right,
@@ -112,44 +113,52 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
         }}
         testID="other-user-profile-view"
       >
-        <Box className="w-full relative" style={{ height: bannerHeight }}>
+        {/* Banner: absolute at z-0, stays fixed while content scrolls over it */}
+        <Box
+          className="absolute"
+          style={{ top: 0, left: leftRailOffset, right: insets.right, height: bannerHeight, zIndex: 0 }}
+        >
           <HeaderGameImage
             appid={mostPlayedGame?.appid}
             compact={!isTablet}
             contained
             height={bannerHeight}
             scrollable
-          />
-          <BackButton
-            onPress={handleBack}
-            testID="other-user-profile-back-btn"
-            style={{ top: Math.max(insets.top, 8), left: 12 }}
+            alignTop
           />
         </Box>
 
+        {/* BackButton: z-20, always visible above banner and scroll content */}
+        <BackButton
+          onPress={handleBack}
+          testID="other-user-profile-back-btn"
+          style={{ top: Math.max(insets.top, 8), left: 12, zIndex: 20, position: 'absolute' }}
+        />
+
+        {/* ScrollView: z-10, content begins at bannerHeight, slides over the banner on scroll-up */}
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingBottom: 24 }}
+          style={{ zIndex: 10 }}
+          contentContainerStyle={{ paddingTop: bannerHeight, paddingBottom: 24 }}
           showsVerticalScrollIndicator={true}
           refreshControl={
             <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
-          <Box className="pt-2">
-            <OtherUserIdentity
-              user={user}
-              player={player}
-              friendship={friendship}
-              isActionLoading={isActionLoading}
-              onAddFriend={handleAddFriend}
-              onAcceptFriend={handleAcceptFriend}
-              onRefuseFriend={handleRefuseFriend}
-              onBlockFriend={handleBlockFriend}
-              onRemoveFriend={handleRemoveFriend}
-              onRemovePending={handleRemovePending}
-              onUnblockFriend={handleUnblockFriend}
-            />
-          </Box>
+          <VSpace size={vspaceHeight} testID="other-user-vspace" />
+          <OtherUserIdentity
+            user={user}
+            player={player}
+            friendship={friendship}
+            isActionLoading={isActionLoading}
+            onAddFriend={handleAddFriend}
+            onAcceptFriend={handleAcceptFriend}
+            onRefuseFriend={handleRefuseFriend}
+            onBlockFriend={handleBlockFriend}
+            onRemoveFriend={handleRemoveFriend}
+            onRemovePending={handleRemovePending}
+            onUnblockFriend={handleUnblockFriend}
+          />
 
           <Box className="bg-background-0 pb-10">
             <VStack space="xl" className="pt-6">
@@ -162,10 +171,10 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
               {/* 4 Comparison charts in order */}
               <Box className={horizontalPadding}>
-                <VStack space="lg" className="w-full" key={`charts-landscape-${refreshKey}`}>
+                <VStack space="lg" className="w-full" key={`charts-${refreshKey}`}>
                   {/* 1. Community Playtime with friend scope */}
                   <CommunityPlaytimeHistogramChart
-                    key={`playtime-landscape-${refreshKey}`}
+                    key={`playtime-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -174,7 +183,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                   {/* 2. Top Community Games with friend scope */}
                   <CommunityTopGamesHistogramChart
-                    key={`topgames-landscape-${refreshKey}`}
+                    key={`topgames-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -185,7 +194,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                   {/* 3. Library Status Breakdown with friend scope */}
                   <CommunityGameStatusChart
-                    key={`gamestatus-landscape-${refreshKey}`}
+                    key={`gamestatus-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -194,7 +203,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                   {/* 4. Community Radar with friend scope and selector hidden */}
                   <CommunityGenreRadarChart
-                    key={`radar-landscape-${refreshKey}`}
+                    key={`radar-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -243,10 +252,10 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
             {/* 4 Comparison charts in order */}
             <Box className={horizontalPadding}>
-              <VStack space="lg" className="w-full" key={`charts-portrait-${refreshKey}`}>
+              <VStack space="lg" className="w-full" key={`charts-${refreshKey}`}>
                 {/* 1. Community Playtime with friend scope */}
                 <CommunityPlaytimeHistogramChart
-                  key={`playtime-portrait-${refreshKey}`}
+                  key={`playtime-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}
@@ -255,7 +264,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                 {/* 2. Top Community Games with friend scope */}
                 <CommunityTopGamesHistogramChart
-                  key={`topgames-portrait-${refreshKey}`}
+                  key={`topgames-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}
@@ -266,7 +275,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                 {/* 3. Library Status Breakdown with friend scope */}
                 <CommunityGameStatusChart
-                  key={`gamestatus-portrait-${refreshKey}`}
+                  key={`gamestatus-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}
@@ -275,7 +284,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                 {/* 4. Community Radar with friend scope and selector hidden */}
                 <CommunityGenreRadarChart
-                  key={`radar-portrait-${refreshKey}`}
+                  key={`radar-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}

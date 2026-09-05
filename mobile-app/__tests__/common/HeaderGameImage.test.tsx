@@ -4,10 +4,10 @@ import * as OrientationHook from '@gamelog/common/useOrientation';
 
 jest.mock('@gamelog/common/Banner', () => {
   const { View } = jest.requireActual('react-native');
-  const MockBanner = ({ imageUrl, minHeight, heightPercentage, scrollable }: any) => (
+  const MockBanner = ({ imageUrl, minHeight, heightPercentage, scrollable, alignTop }: any) => (
     <View
       testID="banner"
-      accessibilityLabel={`banner-${imageUrl}-${minHeight}-${heightPercentage}-${scrollable ? 'scrollable' : 'static'}`}
+      accessibilityLabel={`banner-${imageUrl}-${minHeight}-${heightPercentage}-${scrollable ? 'scrollable' : 'static'}${alignTop ? '-top' : ''}`}
     />
   );
   MockBanner.displayName = 'MockBanner';
@@ -123,6 +123,12 @@ describe('HeaderGameImage', () => {
     const landscapeRender = render(<HeaderGameImage {...defaultProps} />);
     const landscapeBanner = landscapeRender.getByTestId('banner');
     expect(landscapeBanner.props.accessibilityLabel).toContain('-scrollable');
+  });
+
+  it('passes alignTop=true to Banner component when specified', () => {
+    render(<HeaderGameImage {...defaultProps} alignTop={true} />);
+    const banner = screen.getByTestId('banner');
+    expect(banner.props.accessibilityLabel).toContain('-top');
   });
 });
 
