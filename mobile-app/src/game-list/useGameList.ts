@@ -6,6 +6,10 @@ import {
   useGetUserGameStatuses,
 } from '@gamelog/api-manager/useApi';
 import { GameItem, GameStatus } from '@gamelog/api-manager/dto';
+import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
+import { resolveGameListError, type GameListErrorCode } from './gameListErrorMessages';
+
+export type { GameListErrorCode };
 
 export interface GameListItemData extends GameItem {
   genres: string[];
@@ -47,12 +51,8 @@ export const useGameList = (playerID: string) => {
     return appIdsKey.split(',');
   }, [appIdsKey]);
 
-  const {
-    libraryGenres,
-    isLoadingLibraryGenres,
-    errorLibraryGenres,
-    refetchLibraryGenres,
-  } = useGetGenresBatch(appIds);
+  const { libraryGenres, isLoadingLibraryGenres, errorLibraryGenres, refetchLibraryGenres } =
+    useGetGenresBatch(appIds);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('playtime');
@@ -88,7 +88,6 @@ export const useGameList = (playerID: string) => {
       };
     });
   }, [ownedGames, playtimeReport, libraryGenres, userGameStatuses]);
-
 
   const processedGames = useMemo(() => {
     let result = [...unifiedGames];
@@ -159,7 +158,15 @@ export const useGameList = (playerID: string) => {
     });
 
     return result;
-  }, [unifiedGames, searchQuery, genreFilter, statusFilter, platformFilter, dateRangeFilter, sortBy]);
+  }, [
+    unifiedGames,
+    searchQuery,
+    genreFilter,
+    statusFilter,
+    platformFilter,
+    dateRangeFilter,
+    sortBy,
+  ]);
 
   const handleSortChange = (newSort: SortBy) => {
     setIsProcessing(true);
@@ -182,6 +189,15 @@ export const useGameList = (playerID: string) => {
     ]);
   }, [refetchOwnedGames, refetchPlaytimeReport, refetchUserGameStatuses, refetchLibraryGenres]);
 
+  const hasSteamApiKey = Boolean(getSteamApiKey());
+
+  const { errorCode, errorMessage } = useMemo(() => {
+    if (!errorOwnedGames) {
+      return { errorCode: null, errorMessage: null };
+    }
+    return resolveGameListError(errorMessageOwnedGames, hasSteamApiKey);
+  }, [errorOwnedGames, errorMessageOwnedGames, hasSteamApiKey]);
+
   return {
     processedGames,
     isLoading:
@@ -193,7 +209,8 @@ export const useGameList = (playerID: string) => {
       (appIds.length > 0 && !libraryGenres && !errorLibraryGenres),
 
     error: errorOwnedGames,
-    errorMessage: errorMessageOwnedGames,
+    errorCode,
+    errorMessage: errorMessage || errorMessageOwnedGames,
     isEmpty: !ownedGames?.response?.games?.length,
     noResults: processedGames.length === 0,
 

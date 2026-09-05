@@ -105,7 +105,6 @@ const EndPoints = {
     return `/games/update_game_status`;
   },
 
-
   getAuthOutcome: () => {
     return `/me`;
   },
@@ -120,6 +119,10 @@ const EndPoints = {
 
   getUserMe: () => {
     return `/users/me`;
+  },
+
+  updateSteamApiKey: () => {
+    return `/users/me/steam-api-key`;
   },
 
   searchUsers: (query: string) => {

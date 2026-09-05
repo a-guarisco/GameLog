@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
-import { FlatList } from 'react-native';
+import { FlatList, ScrollView } from 'react-native';
 import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { GameListCard } from './GameListCard';
 import { useGameList } from './useGameList';
@@ -11,8 +11,16 @@ import { GameListControls } from './GameListControls';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getNavRailOffset } from '@gamelog/common/navConstants';
+import { Button, ButtonText } from '@gamelog/common/button';
+import Ionicons from '@react-native-vector-icons/ionicons';
+import type { GameListErrorCode } from './gameListErrorMessages';
 
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
+
+const API_KEY_ERROR_CODES = new Set<GameListErrorCode>([
+  'gamelist/steam-api-key-missing',
+  'gamelist/unauthorized',
+]);
 
 const GameListView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -25,6 +33,7 @@ const GameListView = () => {
     processedGames,
     isLoading,
     error,
+    errorCode,
     errorMessage,
     isEmpty,
     noResults,
@@ -79,9 +88,39 @@ const GameListView = () => {
       {isLoading ? (
         <LoadingBox className="flex-1" message="Loading games..." />
       ) : error ? (
-        <ErrorBox className="flex-1" errorMessage={errorMessage} />
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flex: 1 }}
+          refreshControl={<GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+        >
+          <ErrorBox
+            className="flex-1"
+            title={errorCode ? `Error: ${errorCode}` : undefined}
+            errorMessage={errorMessage}
+          />
+          {errorCode && API_KEY_ERROR_CODES.has(errorCode) && (
+            <Box className="items-center pb-8">
+              <Button
+                variant="outline"
+                action="primary"
+                onPress={() => navigation.navigate('DevTab')}
+                className="flex-row items-center gap-2"
+                testID="gamelist-go-to-settings-btn"
+              >
+                <Ionicons name="settings-outline" size={16} color="#93c5fd" />
+                <ButtonText>Go to Settings</ButtonText>
+              </Button>
+            </Box>
+          )}
+        </ScrollView>
       ) : isEmpty ? (
-        <WarningBox className="flex-1" message="No games found." />
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flex: 1 }}
+          refreshControl={<GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+        >
+          <WarningBox className="flex-1" message="No games found." />
+        </ScrollView>
       ) : noResults ? (
         <InfoBox className="flex-1" message={`No results found for "${searchQuery}".`} />
       ) : (
