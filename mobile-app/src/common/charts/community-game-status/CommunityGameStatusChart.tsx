@@ -10,13 +10,11 @@ import { WarningBox } from '@gamelog/common/feedbacks';
 import ProgressTrack from '@gamelog/common/ProgressTrack';
 import ChartWrapperCard from '../ChartWrapperCard';
 import { parseRGB } from '../chartsHelpers';
-import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useCommunityGameStatus } from './useCommunityGameStatus';
 import { useCommunityGameStatusData } from './useCommunityGameStatusData';
 import type { CommunityScope } from '@gamelog/api-manager/dto';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
-
 
 interface CommunityGameStatusChartProps {
   scope?: CommunityScope;
@@ -126,9 +124,11 @@ const SingleDonut = memo(
 
     return (
       <VStack className="items-center flex-1" space="xs" testID={testID}>
-        <Text size="sm" className="font-bold text-typography-0 text-center mb-1" numberOfLines={1}>
-          {title}
-        </Text>
+        <Box className="min-h-[38px] justify-center items-center w-full px-1 mb-1">
+          <Text size="sm" className="font-bold text-typography-0 text-center" numberOfLines={2}>
+            {title}
+          </Text>
+        </Box>
         <Animated.View
           style={{
             opacity,
@@ -257,20 +257,16 @@ const CommunityGameStatusChart = ({
                 {/* Caption / Legend */}
                 <HStack space="lg" className="items-center justify-center pb-1">
                   <HStack space="xs" className="items-center">
-                    <Box
-                      className="w-2.5 h-2.5 rounded-full"
-                      className="bg-comparison-user-500"
-                    />
+                    <Box className="w-2.5 h-2.5 rounded-full bg-comparison-user-500" />
                     <Text size="xs" className="font-bold text-primary-500">
                       You
                     </Text>
                   </HStack>
-                  <HStack space="xs" className="items-center">
+                  <HStack space="xs" className="items-center max-w-[50%]">
                     <Box
-                      className="w-2.5 h-2.5 rounded-full"
-                      className="bg-comparison-compare-500"
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-comparison-compare-500"
                     />
-                    <Text size="xs" className="font-bold text-comparison-compare-500">
+                    <Text size="xs" className="font-bold text-comparison-compare-500" numberOfLines={2}>
                       {othersLabel}
                     </Text>
                   </HStack>
@@ -311,7 +307,10 @@ const CommunityGameStatusChart = ({
                           testID={`others-status-progress-${item.status}`}
                         />
                       </Box>
-                      <Text size="xs" className="font-bold w-14 text-right text-comparison-compare-500">
+                      <Text
+                        size="xs"
+                        className="font-bold w-14 text-right text-comparison-compare-500"
+                      >
                         {item.communityPercentage}%
                       </Text>
                     </HStack>

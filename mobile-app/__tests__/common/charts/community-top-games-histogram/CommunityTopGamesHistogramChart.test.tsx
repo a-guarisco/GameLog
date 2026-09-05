@@ -236,4 +236,68 @@ describe('CommunityTopGamesHistogramChart', () => {
       expect(screen.getByText('No top community games found for this period')).toBeTruthy();
     });
   });
+
+  it('displays "User" on the comparison button when targetUserName is longer than 10 characters and isFriend is false/pending/blocked', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
+
+    render(
+      <CommunityTopGamesHistogramChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="DeadSkorpioProGamerMC"
+        isFriend={false}
+      />
+    );
+
+    await waitFor(() => {
+      const button = screen.getByTestId('community-top-games-reference-community');
+      expect(button).toBeTruthy();
+      // Button should display "User" because "DeadSkorpioProGamerMC".length > 10 and not friend
+      expect(screen.getByText('User')).toBeTruthy();
+      // Legend / caption should still have the full username
+      expect(screen.getByText('DeadSkorpioProGamerMC')).toBeTruthy();
+    });
+  });
+
+  it('displays "Friend" on the comparison button when targetUserName is longer than 10 characters and isFriend is true', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
+
+    render(
+      <CommunityTopGamesHistogramChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="DeadSkorpioProGamerMC"
+        isFriend={true}
+      />
+    );
+
+    await waitFor(() => {
+      const button = screen.getByTestId('community-top-games-reference-community');
+      expect(button).toBeTruthy();
+      // Button should display "Friend" because "DeadSkorpioProGamerMC".length > 10 and isFriend is true
+      expect(screen.getByText('Friend')).toBeTruthy();
+      // Legend / caption should still have the full username
+      expect(screen.getByText('DeadSkorpioProGamerMC')).toBeTruthy();
+    });
+  });
+
+  it('displays the actual name on the comparison button when targetUserName is 10 characters or less even if friend', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
+
+    render(
+      <CommunityTopGamesHistogramChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="ShortUser"
+        isFriend={true}
+      />
+    );
+
+    await waitFor(() => {
+      const button = screen.getByTestId('community-top-games-reference-community');
+      expect(button).toBeTruthy();
+      // Button and legend should display "ShortUser"
+      expect(screen.getAllByText('ShortUser').length).toBeGreaterThanOrEqual(1);
+    });
+  });
 });

@@ -46,4 +46,20 @@ describe('SectionCard', () => {
     expect(className).toContain('bg-background-50');
     expect(className).toContain('mt-4');
   });
+
+  it('renders headerRight alongside label with numberOfLines={2}', () => {
+    render(
+      <SectionCard
+        label="DEADSKORPIOPROGAMERMC'S PLAYTIME"
+        headerRight={<Text testID="header-right-action">1W / 6M</Text>}
+      >
+        <Text>Content</Text>
+      </SectionCard>
+    );
+
+    const titleElement = screen.getByText("DEADSKORPIOPROGAMERMC'S PLAYTIME");
+    expect(titleElement).toBeTruthy();
+    expect(titleElement.props.numberOfLines).toBe(2);
+    expect(screen.getByTestId('header-right-action')).toBeTruthy();
+  });
 });

@@ -34,6 +34,7 @@ interface CommunityTopGamesHistogramChartProps {
   targetUserId?: string;
   targetUserName?: string;
   chartTitle?: string;
+  isFriend?: boolean;
 }
 
 const CommunityTopGamesHistogramChart = ({
@@ -42,6 +43,7 @@ const CommunityTopGamesHistogramChart = ({
   targetUserId,
   targetUserName,
   chartTitle,
+  isFriend = false,
 }: CommunityTopGamesHistogramChartProps) => {
   const { isLandscape } = useOrientation();
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
@@ -131,6 +133,8 @@ const CommunityTopGamesHistogramChart = ({
   const displayTitle =
     chartTitle || (targetUserName ? `${targetUserName}'s Top Games` : 'Top Community Games');
   const othersLabel = targetUserName || 'Others';
+  const fallbackLabel = isFriend ? 'Friend' : 'User';
+  const referenceButtonLabel = othersLabel.length > 10 ? fallbackLabel : othersLabel;
   const comparisonScopeText = targetUserName
     ? targetUserName
     : scope === 'global'
@@ -211,7 +215,7 @@ const CommunityTopGamesHistogramChart = ({
                       }
                       numberOfLines={1}
                     >
-                      {othersLabel}
+                      {referenceButtonLabel}
                     </Text>
                   </Pressable>
                 </HStack>

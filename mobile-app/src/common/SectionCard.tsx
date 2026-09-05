@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Card } from '@gamelog/common/gluestack/card';
 import { CardTitleText } from '@gamelog/common/typography/CardTypography';
@@ -27,7 +28,11 @@ const SectionCard = ({
     >
       {(!!label || !!headerRight) && (
         <HStack className="w-full justify-between items-center">
-          {!!label && <CardTitleText>{label}</CardTitleText>}
+          {!!label && (
+            <Box className={headerRight ? 'flex-1 mr-2' : 'w-full'}>
+              <CardTitleText numberOfLines={2}>{label}</CardTitleText>
+            </Box>
+          )}
           {!!headerRight && headerRight}
         </HStack>
       )}

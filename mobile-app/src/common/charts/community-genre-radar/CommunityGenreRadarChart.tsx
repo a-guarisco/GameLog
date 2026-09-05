@@ -10,7 +10,6 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import { WarningBox } from '@gamelog/common/feedbacks';
 import ProgressTrack from '@gamelog/common/ProgressTrack';
-import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
 import { useCommunityGenreRadarChart } from './useCommunityGenreRadarChart';
 import { useOrientation } from '@gamelog/common/useOrientation';
@@ -203,19 +202,17 @@ const CommunityGenreRadarChart = ({
             <HStack space="lg" className="items-center justify-center pt-1 pb-1">
               <HStack space="xs" className="items-center">
                 <Box
-                  className="w-2.5 h-2.5 rounded-full"
                   className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
                 />
                 <Text size="xs" className="font-bold text-primary-500">
                   You (%)
                 </Text>
               </HStack>
-              <HStack space="xs" className="items-center">
+              <HStack space="xs" className="items-center max-w-[50%]">
                 <Box
-                  className="w-2.5 h-2.5 rounded-full"
-                  className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-comparison-compare-500"
                 />
-                <Text size="xs" className="font-bold text-comparison-compare-500">
+                <Text size="xs" className="font-bold text-comparison-compare-500" numberOfLines={2}>
                   {othersLabel}
                 </Text>
               </HStack>

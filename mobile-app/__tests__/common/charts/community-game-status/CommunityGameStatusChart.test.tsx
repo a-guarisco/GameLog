@@ -153,4 +153,36 @@ describe('CommunityGameStatusChart', () => {
     expect(screen.queryByText('67.31%')).toBeNull();
     expect(screen.queryByTestId('user-status-progress-playing')).toBeNull();
   });
+
+  it('renders targetUserName with numberOfLines={2} for donut title and legend', () => {
+    (useCommunityGameStatus as jest.Mock).mockReturnValue({
+      data: {
+        user: [{ status: 'playing', count: 5, percentage: 100 }],
+        community: [{ status: 'playing', count: 5, percentage: 100 }],
+        user_num_of_games: 5,
+        community_num_of_games: 5,
+      },
+      isLoading: false,
+      error: false,
+      errorMessage: null,
+    });
+
+    render(
+      <CommunityGameStatusChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="DeadSkorpioProGamerMC"
+      />
+    );
+
+    const donutTitle = screen.getByText('DeadSkorpioProGamerMC');
+    expect(donutTitle).toBeTruthy();
+    expect(donutTitle.props.numberOfLines).toBe(2);
+
+    // Expand toggle to verify legend
+    fireEvent.press(screen.getByTestId('community-status-expand-toggle'));
+    const legendItems = screen.getAllByText('DeadSkorpioProGamerMC');
+    expect(legendItems.length).toBeGreaterThanOrEqual(2);
+    expect(legendItems[1].props.numberOfLines).toBe(2);
+  });
 });

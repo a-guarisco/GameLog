@@ -96,6 +96,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
   }
 
   const username = user.username;
+  const isFriend = friendship?.friendship_status === 'accepted';
 
   if (isLandscape) {
     const leftRailOffset = insets.left + 74;
@@ -179,6 +180,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
                     targetUserName={username}
                     chartTitle={`${username}'s Top Games`}
                     ownedGames={currentUserOwnedGames}
+                    isFriend={isFriend}
                   />
 
                   {/* 3. Library Status Breakdown with friend scope */}
@@ -259,6 +261,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
                   targetUserName={username}
                   chartTitle={`${username}'s Top Games`}
                   ownedGames={currentUserOwnedGames}
+                  isFriend={isFriend}
                 />
 
                 {/* 3. Library Status Breakdown with friend scope */}

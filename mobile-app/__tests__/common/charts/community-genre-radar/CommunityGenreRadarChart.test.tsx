@@ -198,5 +198,29 @@ describe('CommunityGenreRadarChart', () => {
     // Height 400 * 0.55 = 220, cardWidth 350 - 8 = 342 => min(220, 342) = 220
     expect(radarChart.props.chartSize).toBe(220);
   });
+
+  it('renders targetUserName in legend with numberOfLines={2}', () => {
+    (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
+      dataSet: [[50, 20]],
+      labels: ['Action'],
+      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      maxValue: 50,
+      isLoading: false,
+      errorCommunity: false,
+      errorMessageCommunity: null,
+    });
+
+    render(
+      <CommunityGenreRadarChart
+        ownedGames={null}
+        targetUserId="user-123"
+        targetUserName="DeadSkorpioProGamerMC"
+      />
+    );
+
+    const legendText = screen.getByText('DeadSkorpioProGamerMC (%)');
+    expect(legendText).toBeTruthy();
+    expect(legendText.props.numberOfLines).toBe(2);
+  });
 });
 
