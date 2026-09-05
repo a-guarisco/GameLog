@@ -4,7 +4,8 @@ import SplashScreen from '../../src/onboarding/SplashScreen';
 
 describe('SplashScreen', () => {
   it('renders correctly', () => {
-    const { getByText } = render(<SplashScreen />);
-    expect(getByText('GameLog')).toBeTruthy();
+    const { getByTestId, getByLabelText } = render(<SplashScreen />);
+    expect(getByTestId('splash-logo')).toBeTruthy();
+    expect(getByLabelText('GameLog')).toBeTruthy();
   });
 });
