@@ -154,14 +154,14 @@ const CommunityTopGamesHistogramChart = ({
                     onPress={() => setReference('user')}
                     testID="community-top-games-reference-user"
                     className={`flex-1 py-1 flex-row items-center justify-center border-r border-outline-300 ${
-                      reference === 'user' ? 'bg-comparison-user-500/20' : 'bg-transparent'
+                      reference === 'user' ? 'bg-comparison-user-500' : 'bg-transparent'
                     }`}
                   >
                     <Text
                       size="xs"
                       className={
                         reference === 'user'
-                          ? 'text-typography-0 font-bold'
+                          ? 'text-white font-bold'
                           : 'text-typography-300 font-medium'
                       }
                       numberOfLines={1}
@@ -174,14 +174,14 @@ const CommunityTopGamesHistogramChart = ({
                     onPress={() => setReference('community')}
                     testID="community-top-games-reference-community"
                     className={`flex-1 py-1 flex-row items-center justify-center ${
-                      reference === 'community' ? 'bg-comparison-compare-500/20' : 'bg-transparent'
+                      reference === 'community' ? 'bg-comparison-compare-500' : 'bg-transparent'
                     }`}
                   >
                     <Text
                       size="xs"
                       className={
                         reference === 'community'
-                          ? 'text-typography-0 font-bold'
+                          ? 'text-white font-bold'
                           : 'text-typography-300 font-medium'
                       }
                       numberOfLines={1}
