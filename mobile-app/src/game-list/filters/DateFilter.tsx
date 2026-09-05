@@ -3,7 +3,7 @@ import { Pressable, Platform } from 'react-native';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { DateSelectorText } from '@gamelog/common/typography/CardTypography';
@@ -60,7 +60,9 @@ export const DateFilter = ({ dateRangeFilter, setDateRangeFilter }: DateFilterPr
                 From
               </Text>
               <Pressable onPress={() => setShowStartPicker(true)} hitSlop={12}>
-                <DateSelectorText>{tempStart ? tempStart.toLocaleDateString() : 'Select Date'}</DateSelectorText>
+                <DateSelectorText>
+                  {tempStart ? tempStart.toLocaleDateString() : 'Select Date'}
+                </DateSelectorText>
               </Pressable>
             </VStack>
 
@@ -69,16 +71,30 @@ export const DateFilter = ({ dateRangeFilter, setDateRangeFilter }: DateFilterPr
                 To
               </Text>
               <Pressable onPress={() => setShowEndPicker(true)} hitSlop={12}>
-                <DateSelectorText>{tempEnd ? tempEnd.toLocaleDateString() : 'Select Date'}</DateSelectorText>
+                <DateSelectorText>
+                  {tempEnd ? tempEnd.toLocaleDateString() : 'Select Date'}
+                </DateSelectorText>
               </Pressable>
             </VStack>
           </HStack>
-          
+
           <HStack space="md" className="mt-6">
-            <Button className="flex-1" isOnCard onPress={clearDateFilter}>
+            <Button
+              className="flex-1"
+              variant="outline"
+              action="secondary"
+              isOnCard
+              onPress={clearDateFilter}
+            >
               <ButtonText>Clear</ButtonText>
             </Button>
-            <Button className="flex-1" isOnCard onPress={applyDateFilter}>
+            <Button
+              className="flex-1"
+              variant="solid"
+              action="primary"
+              isOnCard
+              onPress={applyDateFilter}
+            >
               <ButtonText>Apply</ButtonText>
             </Button>
           </HStack>

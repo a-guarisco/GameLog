@@ -6,7 +6,8 @@ import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmented
 import { GLGoogleButton } from './GLGoogleButton';
 import { ErrorBox, SuccessBox, WarningBox } from '@gamelog/common/feedbacks';
 import { Divider } from '@gamelog/common/gluestack/divider';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
+
 import { getAuthErrorMessage } from '@gamelog/auth/authErrorMessages';
 import { useLogin, AuthMode } from './useLogin';
 import { SignInForm } from './SignInForm';

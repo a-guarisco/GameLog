@@ -1,6 +1,6 @@
 import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { useState } from 'react';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -74,9 +74,16 @@ export const BackendTestAuth = ({ className }: BackendTestAuthProps) => {
 
   return (
     <Box className={`w-full max-w-[320px] gap-2 self-center ${className ?? ''}`}>
-      <Button isOnCard onPress={testAuthEndpoint} isDisabled={isLoading}>
+      <Button
+        isOnCard
+        variant="solid"
+        action="primary"
+        onPress={testAuthEndpoint}
+        isDisabled={isLoading}
+      >
         <ButtonText>Test Backend Auth</ButtonText>
       </Button>
+
       {isLoading ? <LoadingBox message="Testing getFirebaseAuth() endpoint..." /> : null}
       {statusMessage ? (
         <SuccessBox

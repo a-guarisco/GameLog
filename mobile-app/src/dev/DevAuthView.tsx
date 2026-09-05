@@ -9,7 +9,7 @@ import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Card } from '@gamelog/common/gluestack/card';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { SuccessBox, InfoBox } from '@gamelog/common/feedbacks';
 
 import { FirebaseTokenGenerator } from './FirebaseTokenGenerator';
@@ -69,6 +69,8 @@ export const DevAuthView = () => {
 
           <Button
             isOnCard
+            variant="solid"
+            action="negative"
             onPress={handleSignOutAndClearStorage}
             className="w-full mt-1"
             testID="signout-clear-storage-btn"

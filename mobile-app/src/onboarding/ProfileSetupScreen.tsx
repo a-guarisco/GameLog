@@ -1,7 +1,8 @@
 import { KeyboardAvoidingView, Platform, ScrollView, Linking, Pressable } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/button';
+
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { ErrorBox } from '@gamelog/common/feedbacks';
 import { useProfileSetup } from './useProfileSetup';

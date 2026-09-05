@@ -11,6 +11,7 @@ import { selectMemberSinceLabel } from '@gamelog/profile/selectProfile';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { ActionConfirmModal } from '@gamelog/common/ActionConfirmModal';
+import { SocialActionButton } from '@gamelog/common/button';
 import { UserCardMenu, UserCardMenuItem } from '../user-card/UserCardMenu';
 import { FriendshipStatusBadge } from '../user-card/FriendshipStatusBadge';
 import type { UserSearchResult, UserRead, FriendshipInfo, Player } from '@gamelog/api-manager/dto';
@@ -213,37 +214,21 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
             (!!handlers.onAcceptFriend || !!handlers.onRefuseFriend) && (
               <HStack space="xs" className="items-center justify-center pt-1 z-10">
                 {!!handlers.onAcceptFriend && (
-                  <Pressable
+                  <SocialActionButton
+                    actionType="accept"
                     onPress={() => handlers.onAcceptFriend!(friendshipId)}
-                    disabled={isActionLoading}
+                    isDisabled={isActionLoading}
                     testID={`accept-btn-${user.id}`}
-                    hitSlop={6}
-                    className="flex-row items-center justify-center gap-1 rounded-lg border border-primary-500/60 bg-primary-500/15 px-3 py-1.5 active:opacity-70"
-                  >
-                    <Ionicons
-                      name="checkmark"
-                      size={13}
-                      color={HEX_COLORS.social.action.accept.hex}
-                    />
-                    <Text size="xs" className="font-semibold text-primary-500">
-                      Accept
-                    </Text>
-                  </Pressable>
+                  />
                 )}
 
                 {!!handlers.onRefuseFriend && (
-                  <Pressable
+                  <SocialActionButton
+                    actionType="refuse"
                     onPress={() => handlers.onRefuseFriend!(friendshipId)}
-                    disabled={isActionLoading}
+                    isDisabled={isActionLoading}
                     testID={`refuse-btn-${user.id}`}
-                    hitSlop={6}
-                    className="flex-row items-center justify-center gap-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 active:opacity-70"
-                  >
-                    <Ionicons name="close" size={13} color={HEX_COLORS.social.action.neutral.hex} />
-                    <Text size="xs" className="font-semibold text-typography-300">
-                      Refuse
-                    </Text>
-                  </Pressable>
+                  />
                 )}
               </HStack>
             )}

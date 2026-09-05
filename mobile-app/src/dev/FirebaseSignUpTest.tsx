@@ -10,7 +10,7 @@ import {
 import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { ErrorBox, LoadingBox, SuccessBox, InfoBox, WarningBox } from '@gamelog/common/feedbacks';
 import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 
@@ -232,19 +232,43 @@ export const FirebaseSignUpTest = ({ className }: FirebaseSignUpTestProps) => {
       </Box>
 
       <Box className="gap-2 pt-1">
-        <Button isOnCard onPress={handleSignUp} isDisabled={isLoading}>
+        <Button
+          isOnCard
+          variant="solid"
+          action="primary"
+          onPress={handleSignUp}
+          isDisabled={isLoading}
+        >
           <ButtonText>1. Sign Up (Firebase Auth)</ButtonText>
         </Button>
 
-        <Button isOnCard onPress={handleSendVerification} isDisabled={isLoading || !currentUser}>
+        <Button
+          isOnCard
+          variant="outline"
+          action="primary"
+          onPress={handleSendVerification}
+          isDisabled={isLoading || !currentUser}
+        >
           <ButtonText>2. Send Verification Email</ButtonText>
         </Button>
 
-        <Button isOnCard onPress={handleCheckStatus} isDisabled={isLoading || !currentUser}>
+        <Button
+          isOnCard
+          variant="outline"
+          action="secondary"
+          onPress={handleCheckStatus}
+          isDisabled={isLoading || !currentUser}
+        >
           <ButtonText>3. Reload & Check Verification</ButtonText>
         </Button>
 
-        <Button isOnCard onPress={handleRegisterBackend} isDisabled={isLoading || !currentUser}>
+        <Button
+          isOnCard
+          variant="solid"
+          action="positive"
+          onPress={handleRegisterBackend}
+          isDisabled={isLoading || !currentUser}
+        >
           <ButtonText>4. Complete Backend Sync</ButtonText>
         </Button>
       </Box>

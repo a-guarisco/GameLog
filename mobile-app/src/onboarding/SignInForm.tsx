@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
-import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/button';
+
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 
 interface SignInFormProps {

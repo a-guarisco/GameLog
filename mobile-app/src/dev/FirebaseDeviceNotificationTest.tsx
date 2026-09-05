@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications';
 
 import apiManager from '@gamelog/api-manager/apiManager';
 import { Box } from '@gamelog/common/gluestack/box';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { SuccessBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 
 // Configure notifications handler: shouldShowAlert = false as requested, so real OS system notifications handle closed/background app states
@@ -157,22 +157,25 @@ export const FirebaseDeviceNotificationTest = ({
 
       <Box className="flex-row gap-2">
         <Button
+          isOnCard
+          variant="solid"
+          action="primary"
           onPress={handleRegisterDevice}
           isDisabled={loading}
-          className="flex-1 bg-primary-600"
+          className="flex-1"
         >
           <ButtonText>{loading ? 'Registering...' : 'Register Device (FCM)'}</ButtonText>
         </Button>
 
         <Button
+          isOnCard
+          variant="outline"
+          action="negative"
           onPress={handleUnregisterDevice}
           isDisabled={loading || !fcmToken}
-          variant="outline"
-          className="flex-1 border-error-600"
+          className="flex-1"
         >
-          <ButtonText className="text-error-600">
-            {loading ? 'Unregistering...' : 'Unregister Device'}
-          </ButtonText>
+          <ButtonText>{loading ? 'Unregistering...' : 'Unregister Device'}</ButtonText>
         </Button>
       </Box>
 

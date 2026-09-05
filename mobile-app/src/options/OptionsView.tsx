@@ -11,7 +11,8 @@ import { clearSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Card } from '@gamelog/common/gluestack/card';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
+
 import { ActionConfirmModal } from '@gamelog/common/ActionConfirmModal';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { PageTitle } from '@gamelog/common/typography/CommonTypography';
@@ -83,6 +84,8 @@ export const OptionsView = () => {
             <Text className="text-sm font-semibold text-typography-0">Theme Mode</Text>
             <Button
               isOnCard
+              variant="outline"
+              action="primary"
               onPress={toggleTheme}
               className="w-full flex-row items-center justify-center gap-2"
               testID="options-theme-toggle-btn"
@@ -105,6 +108,8 @@ export const OptionsView = () => {
           >
             <Text className="text-sm font-semibold text-typography-0">Account</Text>
             <Button
+              isOnCard
+              variant="solid"
               action="negative"
               onPress={() => setShowLogoutModal(true)}
               isDisabled={isLoggingOut}

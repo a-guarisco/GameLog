@@ -1,7 +1,8 @@
 import { ScrollView } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/button';
+
 import { ErrorBox, SuccessBox } from '@gamelog/common/feedbacks';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { toHex } from '@gamelog/theme/themeHelpers';
@@ -24,7 +25,12 @@ export default function UnverifiedScreen() {
   return (
     <ScrollView
       className="flex-1 bg-background-0 dark:bg-background-0"
-      contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+      }}
     >
       <Box className="w-full max-w-[400px] items-center">
         <Ionicons

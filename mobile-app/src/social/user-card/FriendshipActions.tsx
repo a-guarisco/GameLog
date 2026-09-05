@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
-import { Pressable } from 'react-native';
 import { HStack } from '@gamelog/common/gluestack/hstack';
-import { Text } from '@gamelog/common/gluestack/text';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
-import Ionicons from '@react-native-vector-icons/ionicons';
-import { brand } from '@gamelog/theme/theme';
-import { toHex } from '@gamelog/theme/themeHelpers';
 import { UserCardMenu, UserCardMenuItem } from './UserCardMenu';
 import { ActionConfirmModal } from '@gamelog/common/ActionConfirmModal';
-import { HEX_COLORS } from '@gamelog/theme/hexColors';
-
+import { SocialActionButton } from '@gamelog/common/button';
 
 interface AddFriendActionProps {
   userId: string;
@@ -42,18 +36,12 @@ export const AddFriendAction: React.FC<AddFriendActionProps> = ({
   return (
     <>
       <HStack space="xs" className="items-center">
-        <Pressable
+        <SocialActionButton
+          actionType="add"
           onPress={() => onAddFriend(userId)}
-          disabled={isDisabled}
+          isDisabled={isDisabled}
           testID={`add-friend-btn-${userId}`}
-          hitSlop={6}
-          className="flex-row items-center justify-center gap-1.5 rounded-lg border border-primary-500/60 bg-transparent px-3 py-1.5 active:opacity-70"
-        >
-          <Ionicons name="person-add" size={13} color={HEX_COLORS.social.action.add.hex} />
-          <Text size="xs" className="font-semibold text-primary-500">
-            Add Friend
-          </Text>
-        </Pressable>
+        />
 
         {menuItems.length > 0 && (
           <UserCardMenu
@@ -283,31 +271,19 @@ export const IncomingRequestActions: React.FC<IncomingRequestActionsProps> = ({
   return (
     <>
       <HStack space="xs" className="items-center">
-        <Pressable
+        <SocialActionButton
+          actionType="accept"
           onPress={() => onAccept(friendshipId)}
-          disabled={isDisabled}
+          isDisabled={isDisabled}
           testID={`accept-btn-${userId}`}
-          hitSlop={6}
-          className="flex-row items-center justify-center gap-1 rounded-lg border border-primary-500/60 bg-primary-500/15 px-3 py-1.5 active:opacity-70"
-        >
-          <Ionicons name="checkmark" size={13} color={HEX_COLORS.social.action.accept.hex} />
-          <Text size="xs" className="font-semibold text-primary-500">
-            Accept
-          </Text>
-        </Pressable>
+        />
 
-        <Pressable
+        <SocialActionButton
+          actionType="refuse"
           onPress={() => onRefuse(friendshipId)}
-          disabled={isDisabled}
+          isDisabled={isDisabled}
           testID={`refuse-btn-${userId}`}
-          hitSlop={6}
-          className="flex-row items-center justify-center gap-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 active:opacity-70"
-        >
-          <Ionicons name="close" size={13} color={HEX_COLORS.social.action.neutral.hex} />
-          <Text size="xs" className="font-semibold text-typography-300">
-            Refuse
-          </Text>
-        </Pressable>
+        />
 
         {menuItems.length > 0 && (
           <UserCardMenu

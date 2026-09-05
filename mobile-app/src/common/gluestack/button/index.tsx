@@ -1,3 +1,4 @@
+'use client';
 import { ComponentPropsWithoutRef, forwardRef, ElementRef, ElementType } from 'react';
 
 import { createButton } from '@gluestack-ui/core/button/creator';
@@ -12,7 +13,6 @@ import { Pressable, View } from 'react-native';
 import { Spinner } from '../spinner';
 import { Text } from '../text';
 import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
-('use client');
 
 const SCOPE = 'BUTTON';
 
@@ -44,12 +44,13 @@ const buttonStyle = tva({
   variants: {
     isOnCard: {
       true: '',
+      false: '',
     },
     action: {
       primary:
-        'bg-background-200 dark:bg-background-50 data-[hover=true]:bg-background-300 dark:data-[hover=true]:bg-background-100 data-[active=true]:bg-background-400 dark:data-[active=true]:bg-background-200 data-[focus-visible=true]:web:ring-indicator-info',
+        'bg-primary-500 data-[hover=true]:bg-primary-600 data-[active=true]:bg-primary-700 data-[focus-visible=true]:web:ring-indicator-info',
       secondary:
-        'bg-secondary-500 border-secondary-300 data-[hover=true]:bg-secondary-600 data-[hover=true]:border-secondary-400 data-[active=true]:bg-secondary-700 data-[active=true]:border-secondary-700 data-[focus-visible=true]:web:ring-indicator-info',
+        'bg-background-100 border border-outline-200 data-[hover=true]:bg-background-200 data-[active=true]:bg-background-300 data-[focus-visible=true]:web:ring-indicator-info',
       positive:
         'bg-success-500 border-success-300 data-[hover=true]:bg-success-600 data-[hover=true]:border-success-400 data-[active=true]:bg-success-700 data-[active=true]:border-success-500 data-[focus-visible=true]:web:ring-indicator-info',
       negative:
@@ -58,26 +59,39 @@ const buttonStyle = tva({
         'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
     },
     variant: {
-      link: 'px-0',
+      link: 'px-0 bg-transparent',
+      ghost:
+        'bg-transparent border-transparent data-[hover=true]:bg-background-100/60 data-[active=true]:bg-background-200/60',
       outline:
-        'bg-transparent border data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+        'bg-transparent border border-outline-200 data-[hover=true]:bg-background-100/50 data-[active=true]:bg-background-200/50',
+      outlined:
+        'bg-transparent border border-outline-200 data-[hover=true]:bg-background-100/50 data-[active=true]:bg-background-200/50',
       solid: '',
+      default: '',
     },
 
     size: {
-      xs: 'px-3.5 h-8',
-      sm: 'px-4 h-9',
-      md: 'px-5 h-10',
-      lg: 'px-6 h-11',
-      xl: 'px-7 h-12',
+      xs: 'px-3 h-8',
+      sm: 'px-3.5 h-9',
+      md: 'px-4 h-10',
+      lg: 'px-5 h-11',
+      xl: 'px-6 h-12',
     },
   },
   compoundVariants: [
     {
       action: 'primary',
       isOnCard: true,
+      variant: 'solid',
       class:
-        'bg-background-100 dark:bg-background-100 data-[hover=true]:bg-background-200 dark:data-[hover=true]:bg-background-200 data-[active=true]:bg-background-300 dark:data-[active=true]:bg-background-300',
+        'bg-background-0 dark:bg-background-100 border border-outline-100 shadow-sm data-[hover=true]:bg-background-100 dark:data-[hover=true]:bg-background-200 data-[active=true]:bg-background-200 dark:data-[active=true]:bg-background-300',
+    },
+    {
+      action: 'primary',
+      isOnCard: true,
+      variant: 'default',
+      class:
+        'bg-background-0 dark:bg-background-100 border border-outline-100 shadow-sm data-[hover=true]:bg-background-100 dark:data-[hover=true]:bg-background-200 data-[active=true]:bg-background-200 dark:data-[active=true]:bg-background-300',
     },
     {
       action: 'primary',
@@ -103,25 +117,79 @@ const buttonStyle = tva({
       class:
         'px-0 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent',
     },
+    // Ghost variants
+    {
+      action: 'primary',
+      variant: 'ghost',
+      class:
+        'bg-transparent border-transparent data-[hover=true]:bg-primary-500/10 data-[active=true]:bg-primary-500/20',
+    },
+    {
+      action: 'secondary',
+      variant: 'ghost',
+      class:
+        'bg-transparent border-transparent data-[hover=true]:bg-background-100 data-[active=true]:bg-background-200',
+    },
+    {
+      action: 'positive',
+      variant: 'ghost',
+      class:
+        'bg-transparent border-transparent data-[hover=true]:bg-success-500/10 data-[active=true]:bg-success-500/20',
+    },
+    {
+      action: 'negative',
+      variant: 'ghost',
+      class:
+        'bg-transparent border-transparent data-[hover=true]:bg-error-500/10 data-[active=true]:bg-error-500/20',
+    },
+    // Outline / Outlined variants
     {
       action: 'primary',
       variant: 'outline',
-      class: 'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+      class:
+        'bg-primary-500/10 dark:bg-primary-500/15 border border-primary-500/60 data-[hover=true]:bg-primary-500/20 data-[active=true]:bg-primary-500/25',
+    },
+    {
+      action: 'primary',
+      variant: 'outlined',
+      class:
+        'bg-primary-500/10 dark:bg-primary-500/15 border border-primary-500/60 data-[hover=true]:bg-primary-500/20 data-[active=true]:bg-primary-500/25',
     },
     {
       action: 'secondary',
       variant: 'outline',
-      class: 'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+      class:
+        'bg-transparent border border-outline-200 data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+    },
+    {
+      action: 'secondary',
+      variant: 'outlined',
+      class:
+        'bg-transparent border border-outline-200 data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
     },
     {
       action: 'positive',
       variant: 'outline',
-      class: 'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+      class:
+        'bg-success-500/10 dark:bg-success-500/15 border border-success-500/60 data-[hover=true]:bg-success-500/20 data-[active=true]:bg-success-500/25',
+    },
+    {
+      action: 'positive',
+      variant: 'outlined',
+      class:
+        'bg-success-500/10 dark:bg-success-500/15 border border-success-500/60 data-[hover=true]:bg-success-500/20 data-[active=true]:bg-success-500/25',
     },
     {
       action: 'negative',
       variant: 'outline',
-      class: 'bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent',
+      class:
+        'bg-error-500/10 dark:bg-error-500/15 border border-error-500/60 data-[hover=true]:bg-error-500/20 data-[active=true]:bg-error-500/25',
+    },
+    {
+      action: 'negative',
+      variant: 'outlined',
+      class:
+        'bg-error-500/10 dark:bg-error-500/15 border border-error-500/60 data-[hover=true]:bg-error-500/20 data-[active=true]:bg-error-500/25',
     },
   ],
 });
@@ -131,7 +199,7 @@ const buttonTextStyle = tva({
   parentVariants: {
     action: {
       primary:
-        'text-primary-600 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
+        'text-primary-500 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
       secondary:
         'text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700',
       positive:
@@ -144,9 +212,13 @@ const buttonTextStyle = tva({
     },
     variant: {
       link: 'data-[hover=true]:underline data-[active=true]:underline',
+      ghost: '',
       outline: '',
+      outlined: '',
       solid:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+      default:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     size: {
       xs: 'text-xs',
@@ -162,10 +234,24 @@ const buttonTextStyle = tva({
       action: 'primary',
       isOnCard: false,
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-50',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
+      variant: 'default',
+      action: 'primary',
+      isOnCard: false,
+      class:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     {
       variant: 'solid',
+      action: 'primary',
+      isOnCard: true,
+      class:
+        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-50',
+    },
+    {
+      variant: 'default',
       action: 'primary',
       isOnCard: true,
       class:
@@ -178,13 +264,31 @@ const buttonTextStyle = tva({
         'text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800',
     },
     {
+      variant: 'default',
+      action: 'secondary',
+      class:
+        'text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800',
+    },
+    {
       variant: 'solid',
       action: 'positive',
       class:
         'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     {
+      variant: 'default',
+      action: 'positive',
+      class:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
       variant: 'solid',
+      action: 'negative',
+      class:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
+      variant: 'default',
       action: 'negative',
       class:
         'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
@@ -193,25 +297,71 @@ const buttonTextStyle = tva({
       variant: 'outline',
       action: 'primary',
       class:
-        'text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500',
+        'text-primary-500 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
+    },
+    {
+      variant: 'outlined',
+      action: 'primary',
+      class:
+        'text-primary-500 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
     },
     {
       variant: 'outline',
       action: 'secondary',
       class:
-        'text-typography-500 data-[hover=true]:text-primary-600 data-[active=true]:text-typography-700',
+        'text-typography-300 data-[hover=true]:text-typography-200 data-[active=true]:text-typography-100',
+    },
+    {
+      variant: 'outlined',
+      action: 'secondary',
+      class:
+        'text-typography-300 data-[hover=true]:text-typography-200 data-[active=true]:text-typography-100',
     },
     {
       variant: 'outline',
       action: 'positive',
       class:
-        'text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500',
+        'text-success-600 data-[hover=true]:text-success-700 data-[active=true]:text-success-800',
+    },
+    {
+      variant: 'outlined',
+      action: 'positive',
+      class:
+        'text-success-600 data-[hover=true]:text-success-700 data-[active=true]:text-success-800',
     },
     {
       variant: 'outline',
       action: 'negative',
+      class: 'text-error-500 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
+    },
+    {
+      variant: 'outlined',
+      action: 'negative',
+      class: 'text-error-500 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
+    },
+    // Ghost variants
+    {
+      variant: 'ghost',
+      action: 'primary',
       class:
-        'text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500',
+        'text-primary-500 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700',
+    },
+    {
+      variant: 'ghost',
+      action: 'secondary',
+      class:
+        'text-typography-300 data-[hover=true]:text-typography-200 data-[active=true]:text-typography-100',
+    },
+    {
+      variant: 'ghost',
+      action: 'positive',
+      class:
+        'text-success-600 data-[hover=true]:text-success-700 data-[active=true]:text-success-800',
+    },
+    {
+      variant: 'ghost',
+      action: 'negative',
+      class: 'text-error-500 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
     },
   ],
 });
@@ -225,9 +375,13 @@ const buttonIconStyle = tva({
     },
     variant: {
       link: 'data-[hover=true]:underline data-[active=true]:underline',
+      ghost: '',
       outline: '',
+      outlined: '',
       solid:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+      default:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     size: {
       xs: 'h-3.5 w-3.5',
@@ -243,7 +397,6 @@ const buttonIconStyle = tva({
         'text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700',
       positive:
         'text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700',
-
       negative: 'text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700',
     },
   },
@@ -253,10 +406,24 @@ const buttonIconStyle = tva({
       action: 'primary',
       isOnCard: false,
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
+      variant: 'default',
+      action: 'primary',
+      isOnCard: false,
+      class:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     {
       variant: 'solid',
+      action: 'primary',
+      isOnCard: true,
+      class:
+        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+    },
+    {
+      variant: 'default',
       action: 'primary',
       isOnCard: true,
       class:
@@ -269,16 +436,64 @@ const buttonIconStyle = tva({
         'text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800',
     },
     {
+      variant: 'default',
+      action: 'secondary',
+      class:
+        'text-typography-800 data-[hover=true]:text-typography-800 data-[active=true]:text-typography-800',
+    },
+    {
       variant: 'solid',
       action: 'positive',
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
+      variant: 'default',
+      action: 'positive',
+      class:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
     },
     {
       variant: 'solid',
       action: 'negative',
       class:
-        'text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0',
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
+      variant: 'default',
+      action: 'negative',
+      class:
+        'text-typography-white data-[hover=true]:text-typography-white data-[active=true]:text-typography-white',
+    },
+    {
+      variant: 'outline',
+      action: 'primary',
+      class: 'text-primary-500',
+    },
+    {
+      variant: 'outlined',
+      action: 'primary',
+      class: 'text-primary-500',
+    },
+    {
+      variant: 'ghost',
+      action: 'primary',
+      class: 'text-primary-500',
+    },
+    {
+      variant: 'outline',
+      action: 'negative',
+      class: 'text-error-500',
+    },
+    {
+      variant: 'outlined',
+      action: 'negative',
+      class: 'text-error-500',
+    },
+    {
+      variant: 'ghost',
+      action: 'negative',
+      class: 'text-error-500',
     },
   ],
 });
@@ -313,16 +528,42 @@ type IButtonProps = Omit<ComponentPropsWithoutRef<typeof UIButton>, 'context'> &
 
 const Button = forwardRef<ElementRef<typeof UIButton>, IButtonProps>(
   (
-    { className, variant = 'solid', size = 'md', action = 'primary', isOnCard = false, ...props },
+    {
+      className,
+      variant = 'solid',
+      size = 'md',
+      action = 'primary',
+      isOnCard = false,
+      children,
+      ...props
+    },
     ref
   ) => {
+    const normalizedVariant =
+      variant === 'default' ? 'solid' : variant === 'outlined' ? 'outline' : variant;
+
+    const content =
+      typeof children === 'string' || typeof children === 'number' ? (
+        <ButtonText>{children}</ButtonText>
+      ) : (
+        children
+      );
+
     return (
       <UIButton
         ref={ref}
         {...props}
-        className={buttonStyle({ variant, size, action, isOnCard, class: className })}
-        context={{ variant, size, action, isOnCard }}
-      />
+        className={buttonStyle({
+          variant: normalizedVariant,
+          size,
+          action,
+          isOnCard,
+          class: className,
+        })}
+        context={{ variant: normalizedVariant, size, action, isOnCard }}
+      >
+        {content}
+      </UIButton>
     );
   }
 );
@@ -332,12 +573,13 @@ type IButtonTextProps = ComponentPropsWithoutRef<typeof UIButton.Text> &
 
 const ButtonText = forwardRef<ElementRef<typeof UIButton.Text>, IButtonTextProps>(
   ({ className, variant, size, action, ...props }, ref) => {
-    const {
-      variant: parentVariant,
-      size: parentSize,
-      action: parentAction,
-      isOnCard: parentIsOnCard,
-    } = useStyleContext(SCOPE);
+    const context = useStyleContext(SCOPE);
+    const parentVariant =
+      context.variant === 'default'
+        ? 'solid'
+        : context.variant === 'outlined'
+          ? 'outline'
+          : context.variant;
 
     return (
       <UIButton.Text
@@ -346,9 +588,9 @@ const ButtonText = forwardRef<ElementRef<typeof UIButton.Text>, IButtonTextProps
         className={buttonTextStyle({
           parentVariants: {
             variant: parentVariant,
-            size: parentSize,
-            action: parentAction,
-            isOnCard: parentIsOnCard,
+            size: context.size,
+            action: context.action,
+            isOnCard: context.isOnCard,
           },
           variant,
           size,
@@ -372,11 +614,15 @@ type IButtonIcon = ComponentPropsWithoutRef<typeof UIButton.Icon> &
 
 const ButtonIcon = forwardRef<ElementRef<typeof UIButton.Icon>, IButtonIcon>(
   ({ className, size, ...props }, ref) => {
-    const {
-      variant: parentVariant,
-      size: parentSize,
-      action: parentAction,
-    } = useStyleContext(SCOPE);
+    const context = useStyleContext(SCOPE);
+    const parentVariant =
+      context.variant === 'default'
+        ? 'solid'
+        : context.variant === 'outlined'
+          ? 'outline'
+          : context.variant;
+    const parentSize = context.size;
+    const parentAction = context.action;
 
     if (typeof size === 'number') {
       return (
