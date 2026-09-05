@@ -5,7 +5,7 @@ import * as Notifications from 'expo-notifications';
 import apiManager from '@gamelog/api-manager/apiManager';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Button, ButtonText } from '@gamelog/common/button';
-import { SuccessBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
+import { ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 
 // Configure notifications handler: shouldShowAlert = false as requested, so real OS system notifications handle closed/background app states
 Notifications.setNotificationHandler({
@@ -179,7 +179,7 @@ export const FirebaseDeviceNotificationTest = ({
         </Button>
       </Box>
 
-      {statusMessage ? <SuccessBox message={statusMessage} /> : null}
+      {statusMessage ? <InfoBox message={statusMessage} /> : null}
       {errorMessage ? <ErrorBox errorMessage={errorMessage} /> : null}
     </Box>
   );

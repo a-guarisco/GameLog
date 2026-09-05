@@ -11,3 +11,5 @@ export { ExpoEnvInfo } from './ExpoEnvInfo';
 export { FirebaseSignUpTest } from './FirebaseSignUpTest';
 export { GoogleAuthTest } from './GoogleAuthTest';
 export { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest';
+export { DevHeader } from './DevHeader';
+export { DevScreenWrapper } from './DevScreenWrapper';

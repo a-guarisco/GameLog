@@ -1,6 +1,8 @@
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useOrientation } from '@gamelog/common/useOrientation';
+import { getNavRailOffset } from '@gamelog/common/navConstants';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 interface BackButtonProps {
@@ -17,6 +19,8 @@ const BackButton = ({
   style,
 }: BackButtonProps) => {
   const insets = useSafeAreaInsets();
+  const { isLandscape, isTablet } = useOrientation();
+  const railOffset = getNavRailOffset({ isLandscape, isTablet, insetsLeft: insets.left });
 
   return (
     <Pressable
@@ -25,8 +29,8 @@ const BackButton = ({
       accessibilityLabel="Go back"
       testID={testID}
       hitSlop={8}
-      className={`absolute left-4 z-50 h-11 w-11 items-center justify-center rounded-xl border border-white/15 bg-black/40 ${className}`}
-      style={StyleSheet.flatten([{ top: insets.top + 8 }, style])}
+      className={`absolute z-50 h-11 w-11 items-center justify-center rounded-xl border border-white/15 bg-black/40 ${className}`}
+      style={StyleSheet.flatten([{ top: insets.top + 8, left: railOffset + 16 }, style])}
     >
       <Ionicons name="arrow-back" size={22} color={HEX_COLORS.overlay.icon.hex} />
     </Pressable>

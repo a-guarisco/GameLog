@@ -18,6 +18,7 @@ import { FirebaseSignUpTest } from './FirebaseSignUpTest';
 import { GoogleAuthTest } from './GoogleAuthTest';
 import { FirebaseDeviceNotificationTest } from './FirebaseDeviceNotificationTest';
 import { SteamApiKeyUpdateTest } from './SteamApiKeyUpdateTest';
+import { DevScreenWrapper } from './DevScreenWrapper';
 
 export const DevAuthView = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(getFirebaseAuth().currentUser);
@@ -46,99 +47,107 @@ export const DevAuthView = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <Box className="flex-1 justify-start gap-2.5 px-4 py-4">
-        <Box className="mb-1">
-          <Text className="text-xl font-bold text-typography-0">Authentication</Text>
-        </Box>
+    <DevScreenWrapper>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Box className="flex-1 justify-start gap-2.5 px-4 py-4">
+          <Box className="mb-1">
+            <Text className="text-xl font-bold text-typography-0">Authentication</Text>
+          </Box>
 
-        {/* Active Session & Clear Storage Card (Top) */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">Active Session & Storage</Text>
-
-          <InfoBox
-            message={
-              currentUser
-                ? `Active Firebase User:\nEmail: ${currentUser.email}\nUID: ${currentUser.uid}\nVerified: ${currentUser.emailVerified ? 'TRUE' : 'FALSE'}`
-                : 'No active session (Logged Out)'
-            }
-          />
-
-          <Button
-            isOnCard
-            variant="solid"
-            action="negative"
-            onPress={handleSignOutAndClearStorage}
-            className="w-full mt-1"
-            testID="signout-clear-storage-btn"
+          {/* Active Session & Clear Storage Card (Top) */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
           >
-            <ButtonText>Sign Out & Clear AsyncStorage</ButtonText>
-          </Button>
+            <Text className="text-sm font-semibold text-typography-0">
+              Active Session & Storage
+            </Text>
 
-          {sessionMessage ? <SuccessBox message={sessionMessage} /> : null}
-        </Card>
+            <InfoBox
+              message={
+                currentUser
+                  ? `Active Firebase User:\nEmail: ${currentUser.email}\nUID: ${currentUser.uid}\nVerified: ${currentUser.emailVerified ? 'TRUE' : 'FALSE'}`
+                  : 'No active session (Logged Out)'
+              }
+            />
 
-        {/* FCM Push Notification Device Card */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">
-            FCM Device Push Registration
-          </Text>
-          <FirebaseDeviceNotificationTest className="w-full" />
-        </Card>
+            <Button
+              isOnCard
+              variant="solid"
+              action="negative"
+              onPress={handleSignOutAndClearStorage}
+              className="w-full mt-1"
+              testID="signout-clear-storage-btn"
+            >
+              <ButtonText>Sign Out & Clear AsyncStorage</ButtonText>
+            </Button>
 
-        {/* Token Generator Card */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">Firebase Token Generator</Text>
-          <FirebaseTokenGenerator className="w-full" />
-        </Card>
+            {sessionMessage ? <SuccessBox message={sessionMessage} /> : null}
+          </Card>
 
-        {/* Steam API Key Management Card */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">Steam API Key</Text>
-          <SteamApiKeyUpdateTest />
-        </Card>
+          {/* FCM Push Notification Device Card */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+          >
+            <Text className="text-sm font-semibold text-typography-0">
+              FCM Device Push Registration
+            </Text>
+            <FirebaseDeviceNotificationTest className="w-full" />
+          </Card>
 
-        {/* Backend & Environment Card */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">Backend Auth Verification</Text>
-          <BackendTestAuth className="w-full" />
-        </Card>
+          {/* Token Generator Card */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+          >
+            <Text className="text-sm font-semibold text-typography-0">
+              Firebase Token Generator
+            </Text>
+            <FirebaseTokenGenerator className="w-full" />
+          </Card>
 
-        {/* Google OAuth2 Card */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">Google OAuth2 Sign-In</Text>
-          <GoogleAuthTest className="w-full" />
-        </Card>
+          {/* Steam API Key Management Card */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+          >
+            <Text className="text-sm font-semibold text-typography-0">Steam API Key</Text>
+            <SteamApiKeyUpdateTest />
+          </Card>
 
-        {/* User Registration Pipeline Card */}
-        <Card
-          variant="elevated"
-          className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
-        >
-          <Text className="text-sm font-semibold text-typography-0">
-            User Sign Up & Email Verification
-          </Text>
-          <FirebaseSignUpTest className="w-full" />
-        </Card>
-      </Box>
-    </ScrollView>
+          {/* Backend & Environment Card */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+          >
+            <Text className="text-sm font-semibold text-typography-0">
+              Backend Auth Verification
+            </Text>
+            <BackendTestAuth className="w-full" />
+          </Card>
+
+          {/* Google OAuth2 Card */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+          >
+            <Text className="text-sm font-semibold text-typography-0">Google OAuth2 Sign-In</Text>
+            <GoogleAuthTest className="w-full" />
+          </Card>
+
+          {/* User Registration Pipeline Card */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[640px] self-center p-3.5 gap-2  rounded-md"
+          >
+            <Text className="text-sm font-semibold text-typography-0">
+              User Sign Up & Email Verification
+            </Text>
+            <FirebaseSignUpTest className="w-full" />
+          </Card>
+        </Box>
+      </ScrollView>
+    </DevScreenWrapper>
   );
 };
