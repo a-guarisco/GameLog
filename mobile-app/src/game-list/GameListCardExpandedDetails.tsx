@@ -43,7 +43,7 @@ export const GameListCardExpandedDetails = ({
 
       {/* STREAK */}
       <HStack space="sm" className="items-center">
-        <Ionicons name="flame" size={16} color={HEX_COLORS.streak.hex} />
+        <Ionicons name="flame" size={16} color={HEX_COLORS.gameStreak.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Streak
         </Text>

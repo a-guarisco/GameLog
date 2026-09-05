@@ -9,36 +9,7 @@ import { formatGameStatus } from '@gamelog/api-manager/dto';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const MinimalBadge = ({
-
-  iconName,
-  text,
-  colorHex = HEX_COLORS.muted.icon.hex,
-  borderColorClass = 'border-outline-300',
-  textColorClass = 'text-typography-200',
-  bgClass = 'bg-transparent',
-  hideText = false,
-}: {
-  iconName: string;
-  text: string;
-  colorHex?: string;
-  borderColorClass?: string;
-  textColorClass?: string;
-  bgClass?: string;
-  hideText?: boolean;
-}) => (
-  <HStack
-    style={{ height: 22, minWidth: hideText ? 32 : undefined }}
-    className={`items-center justify-center px-1.5 gap-0.5 rounded-full border ${borderColorClass} ${bgClass}`}
-  >
-    <Ionicons name={iconName} size={12} color={colorHex} />
-    {!hideText && (
-      <Text style={{ fontSize: 10 }} className={`font-bold ${textColorClass}`} numberOfLines={1}>
-        {text}
-      </Text>
-    )}
-  </HStack>
-);
+import { MinimalBadge } from '@gamelog/common/MinimalBadge';
 
 interface GameListCardBadgesProps {
   gameItem: GameListItemData;
@@ -73,7 +44,7 @@ export const GameListCardBadges = ({
       id: 'streak',
       text: String(gameItem.streak),
       icon: 'flame',
-      metric: { hex: HEX_COLORS.streak.hex, bgClass: 'bg-semantic-streak-100 dark:bg-semantic-streak-900/40', textClass: 'text-semantic-streak-600', borderClass: 'border-semantic-streak-600' },
+      metric: { hex: HEX_COLORS.gameStreak.hex, bgClass: 'bg-semantic-gameStreak-100 dark:bg-semantic-gameStreak-900/40', textClass: 'text-semantic-gameStreak-600', borderClass: 'border-semantic-gameStreak-600' },
       show: gameItem.streak > 0,
       hideText: false,
     },
