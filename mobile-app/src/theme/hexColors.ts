@@ -66,6 +66,18 @@ export const HEX_COLORS = {
     info: { hex: parseRGB(brand.primary['500']) },
     warning: { hex: parseRGB(brand.warning['500']) },
   },
+  social: {
+    action: {
+      add: { hex: parseRGB(brand.primary['500']) },
+      accept: { hex: parseRGB(brand.primary['500']) },
+      destructive: { hex: parseRGB(brand.error['500']) },
+      neutral: { hex: '#737373' }, // Matches muted.icon
+    },
+  },
+  recommender: {
+    sparkles: { hex: parseRGB(brand.primary['500']) },
+    match: { hex: parseRGB(brand.primary['500']) },
+  },
 } as const;
 
 export const CHART_PALETTE = [

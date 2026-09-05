@@ -169,8 +169,8 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
               <VStack space="xs">
                 {items.map((item, index) => {
                   const iconColor = item.isDestructive
-                    ? HEX_COLORS.feedback.error.hex
-                    : toHex(brand.primary['400']);
+                    ? HEX_COLORS.social.action.destructive.hex
+                    : HEX_COLORS.social.action.add.hex;
 
                   return (
                     <Pressable
@@ -183,7 +183,7 @@ export const UserCardMenu: React.FC<UserCardMenuProps> = ({
                       <Text
                         size="xs"
                         className={`font-semibold ${
-                          item.isDestructive ? 'text-red-400' : 'text-typography-100'
+                          item.isDestructive ? 'text-error-500' : 'text-typography-100'
                         }`}
                       >
                         {item.label}
