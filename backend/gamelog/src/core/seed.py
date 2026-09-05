@@ -248,7 +248,7 @@ def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
                     firebase_uid=t_fbid,
                     username=f"{t_name}_{c_user['personaname'][:15]}",
                     steam_id=s_id,
-                    steam_api_key="",
+                    steam_api_key=default_api_key,
                     region=c_user["region"]
                 )
             )
@@ -268,7 +268,7 @@ def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
                     firebase_uid=f"mock_{s_id}",
                     username=c_user["personaname"][:30],
                     steam_id=s_id,
-                    steam_api_key="",
+                    steam_api_key=default_api_key,
                     region=c_user["region"]
                 )
             )
