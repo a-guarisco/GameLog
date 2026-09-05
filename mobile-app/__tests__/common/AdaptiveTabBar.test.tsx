@@ -109,6 +109,19 @@ describe('AdaptiveTabBar', () => {
 
     expect(getByText('Options')).toBeTruthy();
     expect(queryByText('Dev')).toBeNull();
+
+    const tabConfig = require('@gamelog/common/AdaptiveTabBar').getTabConfig();
+    expect(tabConfig.DevTab.defaultIcon).toBe('settings');
+    expect(tabConfig.DevTab.focusedIcon).toBe('settings');
+  });
+
+  it('uses construct icon for DevTab when dev menu is enabled', () => {
+    const devMenuConfig = require('@gamelog/common/devMenuConfig');
+    jest.spyOn(devMenuConfig, 'isDevMenuEnabled').mockReturnValue(true);
+
+    const tabConfig = require('@gamelog/common/AdaptiveTabBar').getTabConfig();
+    expect(tabConfig.DevTab.defaultIcon).toBe('construct');
+    expect(tabConfig.DevTab.focusedIcon).toBe('construct');
   });
 
   it('renders bottom tab bar on tablet in portrait mode', () => {

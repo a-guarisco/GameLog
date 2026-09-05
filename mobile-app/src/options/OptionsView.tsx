@@ -16,10 +16,18 @@ import { ActionConfirmModal } from '@gamelog/common/ActionConfirmModal';
 import ScrollablePage from '@gamelog/common/ScrollablePage';
 import { PageTitle } from '@gamelog/common/typography/CommonTypography';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import { brand } from '@gamelog/theme/theme';
+import { toHex } from '@gamelog/theme/themeHelpers';
+import { useOrientation } from '@gamelog/common/useOrientation';
 
 export const OptionsView = () => {
   const { colorScheme, setColorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
+  const { isLandscape, width } = useOrientation();
+  const isCenteredLayout = isLandscape || width > 640;
+  const textColor = isDarkMode
+    ? toHex(brand.typographyDark['0'])
+    : toHex(brand.typographyLight['0']);
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -49,8 +57,17 @@ export const OptionsView = () => {
     <Box className="flex-1 relative bg-background-0">
       <ScrollablePage hasBanner={false}>
         {/* Title */}
-        <Box className="w-full px-4 pt-2 pb-1">
-          <PageTitle size="2xl" className="text-left font-bold uppercase tracking-wide">
+        <Box
+          className={`w-full max-w-[640px] px-4 pt-2 pb-1 ${
+            isCenteredLayout ? 'self-center' : 'self-start'
+          }`}
+        >
+          <PageTitle
+            size="2xl"
+            className={`${
+              isCenteredLayout ? 'text-center' : 'text-left'
+            } font-bold uppercase tracking-wide`}
+          >
             Options
           </PageTitle>
         </Box>
@@ -59,7 +76,9 @@ export const OptionsView = () => {
           {/* Theme Settings Card */}
           <Card
             variant="elevated"
-            className="w-full max-w-[640px] self-center p-4 gap-2 rounded-md"
+            className={`w-full max-w-[640px] p-4 gap-2 rounded-md ${
+              isCenteredLayout ? 'self-center' : 'self-start'
+            }`}
           >
             <Text className="text-sm font-semibold text-typography-0">Theme Mode</Text>
             <Button
@@ -69,9 +88,9 @@ export const OptionsView = () => {
               testID="options-theme-toggle-btn"
             >
               <Ionicons
-                name={isDarkMode ? 'moon' : 'sunny'}
+                name={isDarkMode ? 'moon-outline' : 'sunny-outline'}
                 size={18}
-                color={isDarkMode ? '#93c5fd' : '#f59e0b'}
+                color={textColor}
               />
               <ButtonText>Toggle Theme: {isDarkMode ? 'Dark' : 'Light'}</ButtonText>
             </Button>
@@ -80,7 +99,9 @@ export const OptionsView = () => {
           {/* Account / Session Management Card */}
           <Card
             variant="elevated"
-            className="w-full max-w-[640px] self-center p-4 gap-2 rounded-md"
+            className={`w-full max-w-[640px] p-4 gap-2 rounded-md ${
+              isCenteredLayout ? 'self-center' : 'self-start'
+            }`}
           >
             <Text className="text-sm font-semibold text-typography-0">Account</Text>
             <Button

@@ -13,28 +13,31 @@ import { shouldShowNavRail, getNavRailWidth } from './navConstants';
 export const getTabConfig = (): Record<
   string,
   { label: string; defaultIcon: string; focusedIcon: string }
-> => ({
-  GameListTab: {
-    label: 'Games',
-    defaultIcon: 'game-controller',
-    focusedIcon: 'game-controller',
-  },
-  ProfileTab: {
-    label: 'Profile',
-    defaultIcon: 'person',
-    focusedIcon: 'person',
-  },
-  SocialTab: {
-    label: 'Social',
-    defaultIcon: 'people',
-    focusedIcon: 'people',
-  },
-  DevTab: {
-    label: isDevMenuEnabled() ? 'Dev' : 'Options',
-    defaultIcon: 'construct-outline',
-    focusedIcon: 'construct',
-  },
-});
+> => {
+  const isDev = isDevMenuEnabled();
+  return {
+    GameListTab: {
+      label: 'Games',
+      defaultIcon: 'game-controller',
+      focusedIcon: 'game-controller',
+    },
+    ProfileTab: {
+      label: 'Profile',
+      defaultIcon: 'person',
+      focusedIcon: 'person',
+    },
+    SocialTab: {
+      label: 'Social',
+      defaultIcon: 'people',
+      focusedIcon: 'people',
+    },
+    DevTab: {
+      label: isDev ? 'Dev' : 'Options',
+      defaultIcon: isDev ? 'construct' : 'settings',
+      focusedIcon: isDev ? 'construct' : 'settings',
+    },
+  };
+};
 
 export const TAB_CONFIG: Record<
   string,
