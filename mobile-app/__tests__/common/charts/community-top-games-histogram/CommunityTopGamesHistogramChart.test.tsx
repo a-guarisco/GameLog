@@ -129,7 +129,11 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     render(<CommunityTopGamesHistogramChart scope="global" />);
 
-    const prevBtn = await waitFor(() => screen.getByTestId('community-top-games-prev'));
+    await waitFor(() => {
+      expect(screen.getByTestId('top-game-item-1245620')).toBeTruthy();
+    });
+
+    const prevBtn = screen.getByTestId('community-top-games-prev');
     fireEvent.press(prevBtn);
 
     await waitFor(() => {
@@ -137,7 +141,7 @@ describe('CommunityTopGamesHistogramChart', () => {
     });
   });
 
-  it('renders warning error box when request fails with 400 error', async () => {
+  it('renders warning error box when request fails with 400 error while keeping header controls intact', async () => {
     (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockRejectedValue(
       new Error('User region is not set')
     );
@@ -146,6 +150,41 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     await waitFor(() => {
       expect(screen.getByText('User region is not set')).toBeTruthy();
+      expect(screen.getByTestId('community-top-games-prev')).toBeTruthy();
+      expect(screen.getByTestId('community-top-games-reference-community')).toBeTruthy();
+    });
+  });
+
+  it('renders date skeleton and in-place spinner while loading, with disabled header controls', async () => {
+    let resolveFetch: (value: any) => void;
+    const fetchPromise = new Promise((resolve) => {
+      resolveFetch = resolve;
+    });
+
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockReturnValue(fetchPromise);
+
+    render(<CommunityTopGamesHistogramChart scope="global" />);
+
+    // While loading:
+    // 1. Date skeleton is visible
+    expect(screen.getByTestId('community-top-games-date-shimmer')).toBeTruthy();
+    // 2. Others/You buttons and prev chevron are visible and disabled
+    expect(screen.getByTestId('community-top-games-reference-community')).toBeDisabled();
+    expect(screen.getByTestId('community-top-games-reference-user')).toBeDisabled();
+    expect(screen.getByTestId('community-top-games-prev')).toBeDisabled();
+    // 3. Content area shows spinner
+    expect(screen.getByTestId('spinner')).toBeTruthy();
+
+    // Resolve fetch
+    resolveFetch!([
+      { id: '1245620', user_playtime: 10, community_playtime: 5 },
+    ]);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('community-top-games-date-shimmer')).toBeNull();
+      expect(screen.queryByTestId('spinner')).toBeNull();
+      expect(screen.getByTestId('community-top-games-reference-community')).not.toBeDisabled();
+      expect(screen.getByTestId('top-game-item-1245620')).toBeTruthy();
     });
   });
 
