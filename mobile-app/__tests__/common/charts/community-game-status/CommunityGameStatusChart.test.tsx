@@ -1,6 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import CommunityGameStatusChart from '@gamelog/common/charts/community-game-status/CommunityGameStatusChart';
+import CommunityGameStatusChart, {
+  computeDonutRadius,
+} from '@gamelog/common/charts/community-game-status/CommunityGameStatusChart';
 import { useCommunityGameStatus } from '@gamelog/common/charts/community-game-status/useCommunityGameStatus';
+import * as OrientationHook from '@gamelog/common/useOrientation';
 
 jest.mock('react-native-gifted-charts', () => {
   const { View } = jest.requireActual('react-native');
@@ -184,5 +187,150 @@ describe('CommunityGameStatusChart', () => {
     const legendItems = screen.getAllByText('DeadSkorpioProGamerMC');
     expect(legendItems.length).toBeGreaterThanOrEqual(2);
     expect(legendItems[1].props.numberOfLines).toBe(2);
+  });
+
+  describe('computeDonutRadius', () => {
+    it('caps radius at 68 for phone portrait even when card width is large', () => {
+      expect(computeDonutRadius(600, false, false)).toBe(68);
+    });
+
+    it('caps radius at 76 for landscape on both phone and tablet', () => {
+      expect(computeDonutRadius(600, true, false)).toBe(76);
+      expect(computeDonutRadius(800, true, true)).toBe(76);
+    });
+
+    it('caps radius at 120 for tablet portrait', () => {
+      expect(computeDonutRadius(800, false, true)).toBe(120);
+    });
+
+    it('enforces minimum radius of 48', () => {
+      expect(computeDonutRadius(100, false, false)).toBe(48);
+      expect(computeDonutRadius(100, false, true)).toBe(48);
+    });
+  });
+
+  describe('Tablet portrait layout', () => {
+    it('scales up typography and donut size on tablet portrait', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: false,
+        isTablet: true,
+        width: 768,
+        height: 1024,
+      });
+
+      (useCommunityGameStatus as jest.Mock).mockReturnValue({
+        data: {
+          user: [{ status: 'playing', count: 5, percentage: 100 }],
+          community: [{ status: 'playing', count: 5, percentage: 100 }],
+          user_num_of_games: 42,
+          community_num_of_games: 10,
+        },
+        isLoading: false,
+        error: false,
+        errorMessage: null,
+      });
+
+      render(<CommunityGameStatusChart scope="global" />);
+
+      const countText = screen.getByText('42');
+      expect(countText).toBeTruthy();
+      expect(countText.props.style).toEqual(
+        expect.objectContaining({ fontSize: 28, lineHeight: 32 })
+      );
+
+      const subtitleTexts = screen.getAllByText('Games');
+      expect(subtitleTexts[0].props.style).toEqual(
+        expect.objectContaining({ fontSize: 13, lineHeight: 16 })
+      );
+
+      const titleText = screen.getByText('You');
+      expect(titleText.props.className).toContain('text-base');
+
+      // Expand to verify horizontal bars text scaling on tablet portrait
+      fireEvent.press(screen.getByTestId('community-status-expand-toggle'));
+      const statusTitle = screen.getByText('Playing');
+      expect(statusTitle.props.className).toContain('text-sm');
+
+      const percentTexts = screen.getAllByText('100%');
+      expect(percentTexts[0].props.className).toContain('text-sm');
+      expect(percentTexts[0].props.className).toContain('w-16');
+    });
+
+    it('keeps standard typography on phone portrait', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: false,
+        isTablet: false,
+        width: 375,
+        height: 812,
+      });
+
+      (useCommunityGameStatus as jest.Mock).mockReturnValue({
+        data: {
+          user: [{ status: 'playing', count: 5, percentage: 100 }],
+          community: [{ status: 'playing', count: 5, percentage: 100 }],
+          user_num_of_games: 42,
+          community_num_of_games: 10,
+        },
+        isLoading: false,
+        error: false,
+        errorMessage: null,
+      });
+
+      render(<CommunityGameStatusChart scope="global" />);
+
+      const countText = screen.getByText('42');
+      expect(countText.props.style).toEqual(
+        expect.objectContaining({ fontSize: 20, lineHeight: 24 })
+      );
+
+      const subtitleTexts = screen.getAllByText('Games');
+      expect(subtitleTexts[0].props.style).toEqual(
+        expect.objectContaining({ fontSize: 10, lineHeight: 12 })
+      );
+
+      const titleText = screen.getByText('You');
+      expect(titleText.props.className).toContain('text-sm');
+
+      // Expand to verify horizontal bars text on phone portrait
+      fireEvent.press(screen.getByTestId('community-status-expand-toggle'));
+      const statusTitle = screen.getByText('Playing');
+      expect(statusTitle.props.className).toContain('text-xs');
+
+      const percentTexts = screen.getAllByText('100%');
+      expect(percentTexts[0].props.className).toContain('text-xs');
+      expect(percentTexts[0].props.className).toContain('w-14');
+    });
+
+    it('scales horizontal bar text to sm on tablet landscape as well', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: true,
+        isTablet: true,
+        width: 1024,
+        height: 768,
+      });
+
+      (useCommunityGameStatus as jest.Mock).mockReturnValue({
+        data: {
+          user: [{ status: 'playing', count: 5, percentage: 100 }],
+          community: [{ status: 'playing', count: 5, percentage: 100 }],
+          user_num_of_games: 42,
+          community_num_of_games: 10,
+        },
+        isLoading: false,
+        error: false,
+        errorMessage: null,
+      });
+
+      render(<CommunityGameStatusChart scope="global" />);
+
+      // Expand to verify horizontal bars text on tablet landscape
+      fireEvent.press(screen.getByTestId('community-status-expand-toggle'));
+      const statusTitle = screen.getByText('Playing');
+      expect(statusTitle.props.className).toContain('text-sm');
+
+      const percentTexts = screen.getAllByText('100%');
+      expect(percentTexts[0].props.className).toContain('text-sm');
+      expect(percentTexts[0].props.className).toContain('w-16');
+    });
   });
 });

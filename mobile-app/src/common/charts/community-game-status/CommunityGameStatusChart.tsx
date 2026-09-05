@@ -32,6 +32,7 @@ interface DonutItemProps {
   innerRadius: number;
   theme: any;
   testID?: string;
+  isTabletPortrait?: boolean;
 }
 
 const Tooltip = memo(({ item, theme }: any) => {
@@ -71,7 +72,17 @@ const Tooltip = memo(({ item, theme }: any) => {
 Tooltip.displayName = 'Tooltip';
 
 const SingleDonut = memo(
-  ({ title, data, count, subtitle, radius, innerRadius, theme, testID }: DonutItemProps) => {
+  ({
+    title,
+    data,
+    count,
+    subtitle,
+    radius,
+    innerRadius,
+    theme,
+    testID,
+    isTabletPortrait = false,
+  }: DonutItemProps) => {
     const scale = useRef(new Animated.Value(0.3)).current;
     const opacity = useRef(new Animated.Value(0)).current;
 
@@ -102,14 +113,20 @@ const SingleDonut = memo(
       >
         <Text
           className="font-bold text-typography-0 text-center"
-          style={{ fontSize: radius > 60 ? 20 : 17, lineHeight: radius > 60 ? 24 : 20 }}
+          style={{
+            fontSize: isTabletPortrait ? 28 : radius > 60 ? 20 : 17,
+            lineHeight: isTabletPortrait ? 32 : radius > 60 ? 24 : 20,
+          }}
           numberOfLines={1}
         >
           {count}
         </Text>
         <Text
           className="text-typography-400 font-medium text-center"
-          style={{ fontSize: 10, lineHeight: 12 }}
+          style={{
+            fontSize: isTabletPortrait ? 13 : 10,
+            lineHeight: isTabletPortrait ? 16 : 12,
+          }}
           numberOfLines={1}
         >
           {subtitle}
@@ -125,7 +142,11 @@ const SingleDonut = memo(
     return (
       <VStack className="items-center flex-1" space="xs" testID={testID}>
         <Box className="min-h-[38px] justify-center items-center w-full px-1 mb-1">
-          <Text size="sm" className="font-bold text-typography-0 text-center" numberOfLines={2}>
+          <Text
+            size={isTabletPortrait ? 'md' : 'sm'}
+            className="font-bold text-typography-0 text-center"
+            numberOfLines={2}
+          >
             {title}
           </Text>
         </Box>
@@ -156,10 +177,11 @@ const SingleDonut = memo(
 );
 SingleDonut.displayName = 'SingleDonut';
 
-const computeDonutRadius = (cardWidth: number, isLandscape: boolean) => {
+export const computeDonutRadius = (cardWidth: number, isLandscape: boolean, isTablet = false) => {
   const halfWidth = cardWidth > 0 ? (cardWidth - 32) / 2 : 160;
   const target = Math.floor(halfWidth * 0.42);
-  return Math.min(isLandscape ? 76 : 68, Math.max(48, target));
+  const maxRadius = isTablet && !isLandscape ? 120 : isLandscape ? 76 : 68;
+  return Math.min(maxRadius, Math.max(48, target));
 };
 
 const CommunityGameStatusChart = ({
@@ -169,7 +191,8 @@ const CommunityGameStatusChart = ({
   chartTitle = 'Library Status Breakdown',
 }: CommunityGameStatusChartProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
+  const isTabletPortrait = isTablet && !isLandscape;
   const { data, isLoading, error, errorMessage } = useCommunityGameStatus(scope, targetUserId);
 
   const {
@@ -218,7 +241,7 @@ const CommunityGameStatusChart = ({
           );
         }
 
-        const radius = computeDonutRadius(cardWidth, isLandscape);
+        const radius = computeDonutRadius(cardWidth, isLandscape, isTablet);
         const innerRadius = Math.floor(radius * 0.7);
 
         return (
@@ -233,6 +256,7 @@ const CommunityGameStatusChart = ({
                 radius={radius}
                 innerRadius={innerRadius}
                 theme={theme}
+                isTabletPortrait={isTabletPortrait}
                 testID="user-donut-chart"
               />
               <SingleDonut
@@ -243,11 +267,12 @@ const CommunityGameStatusChart = ({
                 radius={radius}
                 innerRadius={innerRadius}
                 theme={theme}
+                isTabletPortrait={isTabletPortrait}
                 testID="community-donut-chart"
               />
             </HStack>
 
-            <Text size="xs" className="text-typography-300 text-center">
+            <Text size={isTablet ? 'sm' : 'xs'} className="text-typography-300 text-center">
               Comparing your game statuses with {comparisonScopeText}.
             </Text>
 
@@ -258,7 +283,7 @@ const CommunityGameStatusChart = ({
                 <HStack space="lg" className="items-center justify-center pb-1">
                   <HStack space="xs" className="items-center">
                     <Box className="w-2.5 h-2.5 rounded-full bg-comparison-user-500" />
-                    <Text size="xs" className="font-bold text-primary-500">
+                    <Text size={isTablet ? 'sm' : 'xs'} className="font-bold text-primary-500">
                       You
                     </Text>
                   </HStack>
@@ -266,7 +291,7 @@ const CommunityGameStatusChart = ({
                     <Box
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-comparison-compare-500"
                     />
-                    <Text size="xs" className="font-bold text-comparison-compare-500" numberOfLines={2}>
+                    <Text size={isTablet ? 'sm' : 'xs'} className="font-bold text-comparison-compare-500" numberOfLines={2}>
                       {othersLabel}
                     </Text>
                   </HStack>
@@ -275,7 +300,7 @@ const CommunityGameStatusChart = ({
                 {comparisonItems.map((item) => (
                   <VStack key={item.status} space="xs" className="w-full">
                     <Text
-                      size="xs"
+                      size={isTablet ? 'sm' : 'xs'}
                       className="font-bold uppercase text-typography-0"
                       numberOfLines={1}
                     >
@@ -292,7 +317,10 @@ const CommunityGameStatusChart = ({
                           testID={`user-status-progress-${item.status}`}
                         />
                       </Box>
-                      <Text size="xs" className="font-bold text-primary-500 w-14 text-right">
+                      <Text
+                        size={isTablet ? 'sm' : 'xs'}
+                        className={`font-bold text-primary-500 ${isTablet ? 'w-16' : 'w-14'} text-right`}
+                      >
                         {item.userPercentage}%
                       </Text>
                     </HStack>
@@ -308,8 +336,8 @@ const CommunityGameStatusChart = ({
                         />
                       </Box>
                       <Text
-                        size="xs"
-                        className="font-bold w-14 text-right text-comparison-compare-500"
+                        size={isTablet ? 'sm' : 'xs'}
+                        className={`font-bold text-comparison-compare-500 ${isTablet ? 'w-16' : 'w-14'} text-right`}
                       >
                         {item.communityPercentage}%
                       </Text>

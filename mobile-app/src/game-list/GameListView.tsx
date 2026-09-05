@@ -10,15 +10,16 @@ import { ErrorBox, LoadingBox, InfoBox, WarningBox } from '@gamelog/common/feedb
 import { GameListControls } from './GameListControls';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getNavRailOffset } from '@gamelog/common/navConstants';
 
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 const GameListView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const playerID = getSteamId();
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
-  const leftPadding = isLandscape ? insets.left + 74 : 0;
+  const leftPadding = getNavRailOffset({ isLandscape, isTablet, insetsLeft: insets.left });
 
   const {
     processedGames,
@@ -97,9 +98,7 @@ const GameListView = () => {
           numColumns={isLandscape ? 3 : 2}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 20 }}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
-          refreshControl={
-            <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
+          refreshControl={<GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
           refreshing={refreshing}
           onRefresh={handleRefresh}
         />

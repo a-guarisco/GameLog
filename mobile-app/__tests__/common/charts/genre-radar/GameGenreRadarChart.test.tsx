@@ -118,5 +118,18 @@ describe('GameGenreRadarChart', () => {
       expect.objectContaining({ minHeight: 380 })
     );
   });
+
+  it('caps chartSize at MAX_RADAR_SIZE (400) when cardWidth is large', () => {
+    (useGenreRadarChart as jest.Mock).mockReturnValue({
+      values: [600, 300],
+      labels: ['Action\n600m', 'RPG\n300m'],
+    });
+
+    const { UNSAFE_getByType } = render(
+      <GameGenreRadarChart ownedGames={null} />
+    );
+    const radarChart = UNSAFE_getByType('RadarChart' as any);
+    expect(radarChart.props.chartSize).toBeLessThanOrEqual(400);
+  });
 });
 

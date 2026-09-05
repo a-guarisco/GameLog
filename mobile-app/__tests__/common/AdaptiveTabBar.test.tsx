@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
 import { AdaptiveTabBar } from '@gamelog/common/AdaptiveTabBar';
 import * as OrientationHook from '@gamelog/common/useOrientation';
@@ -35,6 +36,8 @@ describe('AdaptiveTabBar', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    const devMenuConfig = require('@gamelog/common/devMenuConfig');
+    jest.spyOn(devMenuConfig, 'isDevMenuEnabled').mockReturnValue(true);
   });
 
   it('renders bottom tab bar in portrait mode with labels and handles tab press', () => {
@@ -95,6 +98,7 @@ describe('AdaptiveTabBar', () => {
   it('renders "Options" label when dev menu is disabled', () => {
     jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
       isLandscape: false,
+      isTablet: false,
       width: 390,
       height: 844,
     });
@@ -105,5 +109,52 @@ describe('AdaptiveTabBar', () => {
 
     expect(getByText('Options')).toBeTruthy();
     expect(queryByText('Dev')).toBeNull();
+  });
+
+  it('renders bottom tab bar on tablet in portrait mode', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: true,
+      width: 768,
+      height: 1024,
+    });
+
+    const { getByLabelText, getByText } = render(<AdaptiveTabBar {...defaultProps} />);
+
+    expect(getByText('Games')).toBeTruthy();
+    expect(getByText('Profile')).toBeTruthy();
+    expect(getByText('Social')).toBeTruthy();
+    expect(getByText('Dev')).toBeTruthy();
+
+    const gamesTab = getByLabelText('Games');
+    expect(gamesTab).toBeTruthy();
+
+    const profileTab = getByLabelText('Profile');
+    fireEvent.press(profileTab);
+    expect(mockNavigation.emit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'tabPress', target: 'ProfileTab' })
+    );
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('ProfileTab');
+  });
+
+  it('renders left rail with tablet dimensions in tablet landscape mode', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      isTablet: true,
+      width: 1024,
+      height: 768,
+    });
+
+    const { getByLabelText, getByText } = render(<AdaptiveTabBar {...defaultProps} />);
+
+    const gamesTab = getByLabelText('Games');
+    expect(StyleSheet.flatten(gamesTab.props.style)).toEqual(
+      expect.objectContaining({ width: 76 })
+    );
+
+    const gamesLabel = getByText('Games');
+    expect(StyleSheet.flatten(gamesLabel.props.style)).toEqual(
+      expect.objectContaining({ fontSize: 12 })
+    );
   });
 });

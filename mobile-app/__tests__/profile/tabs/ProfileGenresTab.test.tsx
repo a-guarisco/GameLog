@@ -189,4 +189,26 @@ describe('ProfileGenresTab', () => {
       expect.objectContaining({ minHeight: 350 })
     );
   });
+
+  it('renders side-by-side 2-column layout in tablet portrait mode and equalizes height', () => {
+    (useOrientation as jest.Mock).mockReturnValue({
+      isLandscape: false,
+      isTablet: true,
+      width: 768,
+      height: 1024,
+    });
+
+    const { getByTestId } = render(<ProfileGenresTab ownedGames={null} />);
+
+    // In tablet portrait, initial fallback is min(1024 * 0.45, 520) = 461
+    expect(getByTestId('target-height').props.children).toBe('461');
+
+    // Simulate community card measuring 480
+    const communityWrapper = getByTestId('mock-community-genre-radar').parent;
+    fireEvent(communityWrapper, 'layout', {
+      nativeEvent: { layout: { height: 480 } },
+    });
+
+    expect(getByTestId('target-height').props.children).toBe('480');
+  });
 });

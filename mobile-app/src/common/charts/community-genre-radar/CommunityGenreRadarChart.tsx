@@ -33,6 +33,8 @@ const SCOPE_OPTIONS: GLSegmentOption<CommunityScope>[] = [
   { id: 'friends', label: 'Friends', testID: 'community-radar-scope-friends' },
 ];
 
+export const MAX_RADAR_SIZE = 400;
+
 interface MemoizedCommunityRadarProps {
   targetSize?: number;
   cardWidth?: number;
@@ -44,16 +46,8 @@ interface MemoizedCommunityRadarProps {
 }
 
 const MemoizedCommunityRadar = memo(
-  ({
-    targetSize,
-    cardWidth,
-    radarPadding,
-    dataSet,
-    labels,
-    maxValue,
-    theme,
-  }: MemoizedCommunityRadarProps) => {
-    const size = targetSize ?? (cardWidth ? cardWidth - (radarPadding ?? 16) : 320);
+  ({ targetSize, cardWidth, radarPadding, dataSet, labels, maxValue, theme }: MemoizedCommunityRadarProps) => {
+    const size = targetSize ?? Math.min(cardWidth ? cardWidth - (radarPadding ?? 16) : 320, MAX_RADAR_SIZE);
     return (
       <Box
         className="items-center justify-center w-full"
@@ -180,10 +174,8 @@ const CommunityGenreRadarChart = ({
         }
 
         const targetSize = isLandscape
-          ? Math.min(Math.round(height * 0.55), cardWidth ? cardWidth - radarPadding : 240)
-          : cardWidth
-            ? cardWidth - radarPadding
-            : 320;
+          ? Math.min(Math.round(height * 0.55), cardWidth ? cardWidth - radarPadding : 240, MAX_RADAR_SIZE)
+          : Math.min(cardWidth ? cardWidth - radarPadding : 320, MAX_RADAR_SIZE);
 
         return (
           <VStack className="w-full items-center" space="md">

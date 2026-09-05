@@ -222,5 +222,23 @@ describe('CommunityGenreRadarChart', () => {
     expect(legendText).toBeTruthy();
     expect(legendText.props.numberOfLines).toBe(2);
   });
+
+  it('caps chartSize at MAX_RADAR_SIZE (400) when cardWidth is large', () => {
+    (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
+      dataSet: [[50, 20]],
+      labels: ['Action'],
+      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      maxValue: 50,
+      isLoading: false,
+      errorCommunity: false,
+      errorMessageCommunity: null,
+    });
+
+    const { UNSAFE_getByType } = render(
+      <CommunityGenreRadarChart ownedGames={null} />
+    );
+    const radarChart = UNSAFE_getByType('RadarChart' as any);
+    expect(radarChart.props.chartSize).toBeLessThanOrEqual(400);
+  });
 });
 

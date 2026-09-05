@@ -99,5 +99,30 @@ describe('HeaderGameImage', () => {
     const banner = screen.getByTestId('banner');
     expect(banner.props.accessibilityLabel).toContain('-static');
   });
+
+  it('passes scrollable=true when isTablet is true regardless of portrait or landscape', () => {
+    // Portrait tablet
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: true,
+      width: 800,
+      height: 1280,
+    });
+    const portraitRender = render(<HeaderGameImage {...defaultProps} />);
+    const portraitBanner = portraitRender.getByTestId('banner');
+    expect(portraitBanner.props.accessibilityLabel).toContain('-scrollable');
+    portraitRender.unmount();
+
+    // Landscape tablet
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      isTablet: true,
+      width: 1280,
+      height: 800,
+    });
+    const landscapeRender = render(<HeaderGameImage {...defaultProps} />);
+    const landscapeBanner = landscapeRender.getByTestId('banner');
+    expect(landscapeBanner.props.accessibilityLabel).toContain('-scrollable');
+  });
 });
 
