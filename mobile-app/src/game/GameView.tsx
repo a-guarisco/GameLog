@@ -92,7 +92,6 @@ const GameView = () => {
             chips={
               <GameStatusChips
                 livePlayers={livePlayers}
-                streakText={streakText}
                 appId={String(gameItem.appid)}
                 status={gameStatus}
                 onStatusChange={refetchGameStatus}
@@ -204,7 +203,6 @@ const GameView = () => {
               chips={
                 <GameStatusChips
                   livePlayers={livePlayers}
-                  streakText={streakText}
                   appId={String(gameItem.appid)}
                   status={gameStatus}
                   onStatusChange={refetchGameStatus}

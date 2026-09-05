@@ -36,7 +36,7 @@ const GameIdentity = ({
             {secondaryText && (
               <Box className="bg-background-200 border border-outline-100 rounded-full px-3 py-1 mt-1">
                 <HStack space="xs" className="items-center">
-                  <Ionicons name="flame" size={12} color={HEX_COLORS.streak.hex} />
+                  <Ionicons name="flame" size={12} color={HEX_COLORS.gameStreak.hex} />
                   <Text size="xs" className="font-bold text-typography-100">
                     {secondaryText}
                   </Text>

@@ -22,7 +22,6 @@ interface GameStatusChipsProps {
  */
 const GameStatusChips = ({
   livePlayers,
-  streakText,
   appId,
   status,
   onStatusChange,
@@ -36,14 +35,6 @@ const GameStatusChips = ({
       </Text>
     </Chip>
 
-    <Chip className="bg-background-200">
-      <HStack space="xs" className="items-center">
-        <Ionicons name="flame" size={12} color={HEX_COLORS.streak.hex} />
-        <Text size="xs" className="font-bold text-typography-100">
-          {streakText}
-        </Text>
-      </HStack>
-    </Chip>
 
     {appId && (
       <GameStatusSelectorChip
