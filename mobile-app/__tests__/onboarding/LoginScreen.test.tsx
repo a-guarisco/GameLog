@@ -35,7 +35,7 @@ describe('LoginScreen', () => {
   });
 
   it('renders correctly in signin mode', () => {
-    const { getByText, getByPlaceholderText, queryByPlaceholderText } = render(<LoginScreen />);
+    const { getByText, queryByText, getByPlaceholderText, queryByPlaceholderText } = render(<LoginScreen />);
 
     expect(getByText('GameLog')).toBeTruthy();
     expect(getByPlaceholderText('Email')).toBeTruthy();
@@ -43,8 +43,8 @@ describe('LoginScreen', () => {
     expect(queryByPlaceholderText('Confirm Password')).toBeNull();
 
     expect(getByText('Continue with Google')).toBeTruthy();
-    expect(getByText('Continue with Facebook')).toBeTruthy();
-    expect(getByText('Continue with GitHub')).toBeTruthy();
+    expect(queryByText('Continue with Facebook')).toBeNull();
+    expect(queryByText('Continue with GitHub')).toBeNull();
   });
 
   it('renders correctly in signup mode', () => {
@@ -115,15 +115,12 @@ describe('LoginScreen', () => {
   });
 
   it('handles social login presses', () => {
-    const { getByTestId } = render(<LoginScreen />);
+    const { getByTestId, queryByTestId } = render(<LoginScreen />);
 
     fireEvent.press(getByTestId('gl-google-button'));
     expect(mockUseLogin.handleGoogleSignIn).toHaveBeenCalled();
 
-    fireEvent.press(getByTestId('gl-facebook-button'));
-    expect(mockUseLogin.handleFacebookSignIn).toHaveBeenCalled();
-
-    fireEvent.press(getByTestId('gl-github-button'));
-    expect(mockUseLogin.handleGithubSignIn).toHaveBeenCalled();
+    expect(queryByTestId('gl-facebook-button')).toBeNull();
+    expect(queryByTestId('gl-github-button')).toBeNull();
   });
 });

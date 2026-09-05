@@ -4,8 +4,6 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import { GLGoogleButton } from './GLGoogleButton';
-import { GLFacebookButton } from './GLFacebookButton';
-import { GLGithubButton } from './GLGithubButton';
 import { ErrorBox, SuccessBox, WarningBox } from '@gamelog/common/feedbacks';
 import { Divider } from '@gamelog/common/gluestack/divider';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
@@ -28,8 +26,6 @@ export default function LoginScreen() {
     authMode,
     setAuthMode,
     handleGoogleSignIn,
-    handleFacebookSignIn,
-    handleGithubSignIn,
     handleEmailAuth,
   } = useLogin();
 
@@ -114,8 +110,6 @@ export default function LoginScreen() {
 
           <Box className="gap-3">
             <GLGoogleButton onPress={handleGoogleSignIn} isLoading={loading} />
-            <GLFacebookButton onPress={handleFacebookSignIn} isLoading={loading} />
-            <GLGithubButton onPress={handleGithubSignIn} isLoading={loading} />
           </Box>
 
           <Box className="mt-4">
