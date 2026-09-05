@@ -25,6 +25,10 @@ jobs:
         working-directory: mobile-app
         run: npm ci
 
+      - name: Run OpenAPI Contract Tests
+        working-directory: mobile-app
+        run: npm run test:contracts
+
       - name: Run Jest tests with coverage
         working-directory: mobile-app
         run: npx jest --ci
