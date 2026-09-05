@@ -1,22 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 
-import apiManager from '@gamelog/api-manager/apiManager';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
+import {
+  getStoredRegistration,
+  requestAndRegisterPushToken,
+  unregisterPushToken,
+  initNotificationChannel,
+} from '@gamelog/notifications';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Button, ButtonText } from '@gamelog/common/button';
 import { ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
-
-// Configure notifications handler: shouldShowAlert = false as requested, so real OS system notifications handle closed/background app states
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
 
 interface FirebaseDeviceNotificationTestProps {
   className?: string;
@@ -26,6 +20,7 @@ export const FirebaseDeviceNotificationTest = ({
   className = '',
 }: FirebaseDeviceNotificationTestProps) => {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,43 +28,50 @@ export const FirebaseDeviceNotificationTest = ({
   useEffect(() => {
     let isMounted = true;
 
-    // Check permissions and sync existing token if already granted
-    Notifications.getPermissionsAsync().then(async ({ status }) => {
-      if (status === 'granted') {
-        try {
-          if (Platform.OS === 'android') {
-            await Notifications.setNotificationChannelAsync('default', {
-              name: 'Default Channel',
-              importance: Notifications.AndroidImportance.MAX,
-              vibrationPattern: [0, 250, 250, 250],
-              lightColor: '#FF231F7C',
-            });
-          }
+    const checkRegistration = async () => {
+      try {
+        const stored = await getStoredRegistration();
+        const { status } = await Notifications.getPermissionsAsync();
+
+        if (status === 'granted') {
+          await initNotificationChannel();
           const tokenData = await Notifications.getDevicePushTokenAsync();
-          if (isMounted && tokenData.data) {
+          if (isMounted && tokenData?.data) {
             setFcmToken(tokenData.data);
-            await apiManager.registerDeviceToken(tokenData.data, Platform.OS);
-            setStatusMessage(`Device synced with Backend!\nToken: ${tokenData.data}`);
+            setRegisteredUserId(stored.userId);
+            if (stored.token === tokenData.data) {
+              setStatusMessage(
+                `Device synced with Backend & Storage!\nOwner: ${stored.userId || 'N/A'}`
+              );
+            }
           }
-        } catch {
-          // Silent catch for initial background check
         }
-      } else {
-        if (isMounted) setStatusMessage('Notification permissions not yet granted');
+      } catch (err: unknown) {
+        if (isMounted) {
+          setErrorMessage(err instanceof Error ? err.message : 'Error checking registration');
+        }
       }
-    });
+    };
+
+    checkRegistration();
 
     // Listen for FCM push token refreshes from Google Play Services / Expo
     const tokenSub = Notifications.addPushTokenListener(async (tokenData) => {
-      if (tokenData.data) {
+      if (tokenData.data && isMounted) {
         setFcmToken(tokenData.data);
-        try {
-          await apiManager.registerDeviceToken(tokenData.data, Platform.OS);
-          setStatusMessage(`FCM Token refreshed & synced with Backend!\nToken: ${tokenData.data}`);
-        } catch (err: unknown) {
-          setErrorMessage(
-            err instanceof Error ? err.message : 'Error syncing refreshed FCM device token'
-          );
+        const user = getFirebaseAuth().currentUser;
+        if (user) {
+          try {
+            await requestAndRegisterPushToken(user.uid);
+            setRegisteredUserId(user.uid);
+            setStatusMessage(
+              `FCM Token refreshed & synced with Backend & Storage!\nToken: ${tokenData.data}`
+            );
+          } catch (err: unknown) {
+            setErrorMessage(
+              err instanceof Error ? err.message : 'Error syncing refreshed FCM device token'
+            );
+          }
         }
       }
     });
@@ -86,37 +88,17 @@ export const FirebaseDeviceNotificationTest = ({
     setErrorMessage(null);
 
     try {
-      // 1. Request permissions
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+      const user = getFirebaseAuth().currentUser;
+      const res = await requestAndRegisterPushToken(user?.uid);
+      if (res.success && res.token) {
+        setFcmToken(res.token);
+        setRegisteredUserId(user?.uid ?? null);
+        setStatusMessage(
+          `Device successfully registered with Backend & Local Storage!\nOwner: ${user?.uid || 'anonymous'}\nToken: ${res.token}`
+        );
+      } else {
+        throw new Error(res.error || 'Failed to register push token');
       }
-
-      if (finalStatus !== 'granted') {
-        throw new Error('Permission to receive push notifications was denied.');
-      }
-
-      // 2. Configure Android channel if on Android
-      if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('default', {
-          name: 'Default Channel',
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF231F7C',
-        });
-      }
-
-      // 3. Get native FCM Device Token
-      const tokenData = await Notifications.getDevicePushTokenAsync();
-      const deviceToken = tokenData.data;
-      setFcmToken(deviceToken);
-
-      // 4. Register FCM Token with backend
-      await apiManager.registerDeviceToken(deviceToken, Platform.OS);
-      setStatusMessage(`Device successfully registered with Backend!\nToken: ${deviceToken}`);
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Error registering device token');
     } finally {
@@ -125,19 +107,21 @@ export const FirebaseDeviceNotificationTest = ({
   };
 
   const handleUnregisterDevice = async () => {
-    if (!fcmToken) {
-      setErrorMessage('No active FCM token found to unregister.');
-      return;
-    }
-
     setLoading(true);
     setStatusMessage(null);
     setErrorMessage(null);
 
     try {
-      await apiManager.unregisterDeviceToken(fcmToken);
-      setStatusMessage('Device token successfully unregistered from Backend!');
-      setFcmToken(null);
+      const res = await unregisterPushToken(fcmToken || undefined);
+      if (res.success) {
+        setStatusMessage(
+          'Device token successfully unregistered from Backend & Local Storage cleared!'
+        );
+        setFcmToken(null);
+        setRegisteredUserId(null);
+      } else {
+        throw new Error(res.error || 'Failed to unregister device token');
+      }
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Error unregistering device token');
     } finally {
@@ -150,7 +134,7 @@ export const FirebaseDeviceNotificationTest = ({
       <InfoBox
         message={
           fcmToken
-            ? `Active Device FCM Token:\n${fcmToken}`
+            ? `Active Device FCM Token:\n${fcmToken}\n\nRegistered Owner (Local Storage):\n${registeredUserId || 'None'}`
             : 'No device registered yet for push notifications.'
         }
       />
@@ -163,6 +147,7 @@ export const FirebaseDeviceNotificationTest = ({
           onPress={handleRegisterDevice}
           isDisabled={loading}
           className="flex-1"
+          testID="dev-register-device-btn"
         >
           <ButtonText>{loading ? 'Registering...' : 'Register Device (FCM)'}</ButtonText>
         </Button>
@@ -174,6 +159,7 @@ export const FirebaseDeviceNotificationTest = ({
           onPress={handleUnregisterDevice}
           isDisabled={loading || !fcmToken}
           className="flex-1"
+          testID="dev-unregister-device-btn"
         >
           <ButtonText>{loading ? 'Unregistering...' : 'Unregister Device'}</ButtonText>
         </Button>
