@@ -55,6 +55,10 @@ const GameListView = () => {
     }
   }, [refetchAll]);
 
+  const numColumns = isTablet ? (isLandscape ? 4 : 3) : isLandscape ? 3 : 2;
+  const itemWidthClass =
+    numColumns === 4 ? 'w-1/4 p-1' : numColumns === 3 ? 'w-1/3 p-1' : 'w-1/2 p-1';
+
   return (
     <Box className="flex-1" style={{ paddingLeft: leftPadding }}>
       <GameListControls
@@ -84,7 +88,7 @@ const GameListView = () => {
         <FlatList
           data={processedGames}
           renderItem={({ item }) => (
-            <Box className={isLandscape ? 'w-1/3 p-1' : 'w-1/2 p-1'}>
+            <Box className={itemWidthClass}>
               <GameListCard
                 gameItem={item}
                 sortBy={sortBy}
@@ -94,10 +98,10 @@ const GameListView = () => {
             </Box>
           )}
           keyExtractor={(item) => item.appid.toString()}
-          key={isLandscape ? 'grid-3' : 'grid-2'}
-          numColumns={isLandscape ? 3 : 2}
+          key={`grid-${numColumns}`}
+          numColumns={numColumns}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 20 }}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          columnWrapperStyle={{ justifyContent: 'flex-start' }}
           refreshControl={<GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
           refreshing={refreshing}
           onRefresh={handleRefresh}
