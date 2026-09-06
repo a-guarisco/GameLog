@@ -15,3 +15,6 @@ serviceAccountKey.json
 # Database snapshots
 postgres/snapshots/*
 !postgres/snapshots/.gitkeep
+
+# Auto-generated seed data
+gamelog/src/core/seed_data_users.json

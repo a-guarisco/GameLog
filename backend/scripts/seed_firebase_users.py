@@ -38,40 +38,52 @@ EMULATOR_URL = "http://localhost:9099"
 
 TEST_USERS = [
     {
+        "email": "samuele.grisoni@gmail.com",
+        "password": "12345678",
+        "displayName": "dedepivot",
+        "localId": "dede1234567890abcdefghijklmn",
+    },
+    {
+        "email": "alessio.guarisco@gmail.com",
+        "password": "12345678",
+        "displayName": "xrayman",
+        "localId": "xrayman1234567890abcdefghijk",
+    },
+    {
+        "email": "slaitroc@gmail.com",
+        "password": "12345678",
+        "displayName": "slaitroc",
+        "localId": "slaitroc1234567890abcdefghij",
+    },
+    {
         "email": "test-01@test.com",
         "password": "12345678",
         "displayName": "test-01",
-        "localId": "YLRMA6otQ1YDqHlD5j8Wr0u0lpJ2",
+        "localId": "test011234567890abcdefghijkl",
     },
     {
         "email": "test-02@test.com",
         "password": "12345678",
         "displayName": "test-02",
-        "localId": "tcYaHPGYDkVBlnNrcI7jNf2z4MS2",
+        "localId": "test021234567890abcdefghijkl",
     },
     {
         "email": "test-03@test.com",
         "password": "12345678",
         "displayName": "test-03",
-        "localId": "GRbqhGIYlzb1GHEaBINeJq1ZXld2",
+        "localId": "test031234567890abcdefghijkl",
     },
     {
         "email": "test-04@test.com",
         "password": "12345678",
         "displayName": "test-04",
-        "localId": "6vF11uBvD2O33uLdC8yNntLpBwt2",
-    },
-    {
-        "email": "slait-graph@test.com",
-        "password": "12345678",
-        "displayName": "slait-graph",
-        "localId": "slaitgraph1234567890",
+        "localId": "test041234567890abcdefghijkl",
     },
     {
         "email": "test-05@test.com",
         "password": "12345678",
         "displayName": "test-05",
-        "localId": "a7swvzI0APgq57SMa8B7PsHevG02",
+        "localId": "test051234567890abcdefghijkl",
     },
 ]
 
@@ -141,6 +153,8 @@ def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = Fal
                 if u.uid == uid:
                     mode_str = "emulator" if use_emulator else "Cloud Auth"
                     print(f"  ℹ️ User {display_name} ({email}) exists in {mode_str} ➔ UID: {u.uid}")
+                    # Force update password and verified status to ensure we can retrieve a token later via REST API
+                    auth.update_user(uid, password=password, email_verified=True)
                 else:
                     mode_str = "emulator" if use_emulator else "Cloud Auth"
                     print(f"  ⚠️ User {display_name} ({email}) in {mode_str} has wrong UID ({u.uid}). Recreating with correct UID ({uid})...")

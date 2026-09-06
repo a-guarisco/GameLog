@@ -18,6 +18,7 @@ from src.community.schemas import (
     CommunityWeeklyTopGameResponse,
     TopGameReference,
 )
+from src.community.sql import get_community_daily_totals, get_community_game_totals_and_players
 from src.games import game_service
 from src.games.schemas import DayByDayPlaytime
 from src.models import (
@@ -67,14 +68,12 @@ def get_community_weekly_playtime(
     user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
     user_hours = [round(user_daily_map.get(d, 0) / 60.0, 2) for d in week_dates]
 
-    community_daily_totals = [0] * 7
-    for target_id in target_user_ids:
-        t_daily_map = _get_user_daily_playtimes_map(db, target_id, end_date)
-        for idx, d in enumerate(week_dates):
-            community_daily_totals[idx] += t_daily_map.get(d, 0)
+    community_daily_map = get_community_daily_totals(db, target_user_ids, start_date, end_date)
+    
+    community_daily_totals = [community_daily_map.get(d, 0) for d in week_dates]
 
     num_target_users = len(target_user_ids)
-    community_hours = [round(total_mins / (60.0 * num_target_users), 2) for total_mins in community_daily_totals]
+    community_hours = [round(total_mins / (60.0 * num_target_users), 2) if num_target_users > 0 else 0.0 for total_mins in community_daily_totals]
 
     return CommunityWeeklyPlaytimeResponse(user=user_hours, community=community_hours)
 
@@ -106,7 +105,7 @@ def get_community_monthly_playtime(
 
     user_daily_map = _get_user_daily_playtimes_map(db, current_user.id, end_date)
 
-    target_daily_maps = [_get_user_daily_playtimes_map(db, target_id, end_date) for target_id in target_user_ids]
+    community_daily_map = get_community_daily_totals(db, target_user_ids, start_date, end_date)
 
     user_hours: list[float] = []
     community_hours: list[float] = []
@@ -119,8 +118,8 @@ def get_community_monthly_playtime(
         user_month_mins = sum(user_daily_map.get(d, 0) for d in days_in_month)
         user_hours.append(round(user_month_mins / 60.0, 2))
 
-        community_month_mins = sum(t_map.get(d, 0) for t_map in target_daily_maps for d in days_in_month)
-        community_hours.append(round(community_month_mins / (60.0 * num_target_users), 2))
+        community_month_mins = sum(community_daily_map.get(d, 0) for d in days_in_month)
+        community_hours.append(round(community_month_mins / (60.0 * num_target_users), 2) if num_target_users > 0 else 0.0)
 
     return CommunityMonthlyPlaytimeResponse(user=user_hours, community=community_hours)
 
@@ -247,15 +246,13 @@ def _compute_community_top_games_for_dates(
     user_daily_game_map = _get_user_daily_game_playtimes_map(db, current_user.id, end_date)
     user_game_totals = _aggregate_game_playtimes_for_dates(user_daily_game_map, dates)
 
-    community_game_totals: dict[str, int] = defaultdict(int)
-    community_game_player_counts: dict[str, int] = defaultdict(int)
-    for target_id in target_user_ids:
-        t_daily_game_map = _get_user_daily_game_playtimes_map(db, target_id, end_date)
-        t_totals = _aggregate_game_playtimes_for_dates(t_daily_game_map, dates)
-        for app_id, mins in t_totals.items():
-            if mins > 0:
-                community_game_totals[app_id] += mins
-                community_game_player_counts[app_id] += 1
+    # Use SQL helper to get all community top games in one fast query
+    community_game_totals, community_game_player_counts = get_community_game_totals_and_players(
+        db, 
+        target_user_ids, 
+        start_date=min(dates), 
+        end_date=max(dates)
+    )
 
     all_game_ids = set(user_game_totals.keys()) | set(community_game_totals.keys())
 

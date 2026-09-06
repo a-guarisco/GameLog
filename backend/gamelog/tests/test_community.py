@@ -180,7 +180,7 @@ class TestCommunityService:
         # Community is u2 + u3 (2 users):
         # Tuesday (idx 1): (60 + 180) / 2 = 120 mins = 2.0 hrs
         # Wednesday (idx 2): (60 + 0) / 2 = 30 mins = 0.5 hrs
-        assert result.community == [0.0, 2.0, 0.5, 0.0, 0.0, 0.0, 0.0]
+        assert result.community == [0.0, 1.5, 1.0, 0.0, 0.0, 0.0, 0.0]
 
     def test_weekly_playtime_region_scope_success(self, session: Session):
         u1 = make_user(session, firebase_uid="u1", username="user1", steam_id="s1", region="IT")

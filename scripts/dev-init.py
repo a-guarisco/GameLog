@@ -74,7 +74,7 @@ def main():
 
     print("✅ Emulator is ready. Starting processes...")
     try:
-        make_cmd = ["make", "dev-init-internal", "EMULATOR=true", "START_EMULATOR=false"]
+        make_cmd = ["make", "dev-init-internal", "EMULATOR=true", "START_EMULATOR=false"] + sys.argv[1:]
         result = subprocess.run(make_cmd)
         sys.exit(result.returncode)
     except Exception as e:

@@ -19,8 +19,24 @@ USE_FIREBASE_EMULATOR := $(EMULATOR)
 
 EXPO_PUBLIC_USE_FIREBASE_EMULATOR := $(EMULATOR)
 
+MOCK_USERS ?= 50
+
 export USE_FIREBASE_EMULATOR
 export EXPO_PUBLIC_USE_FIREBASE_EMULATOR
+
+define run_with_timer
+	@start=$$(date +%s); \
+	$(1); \
+	end=$$(date +%s); \
+	duration=$$((end - start)); \
+	mins=$$((duration / 60)); \
+	secs=$$((duration % 60)); \
+	if [ $$mins -gt 0 ]; then \
+		echo "⏱️  [$(2)] Completed in $${mins}m $${secs}s"; \
+	else \
+		echo "⏱️  [$(2)] Completed in $${secs}s"; \
+	fi
+endef
 
 .PHONY: help up down emulator emulator-bg seed-firebase test test-backend test-mobile lint lint-backend lint-mobile dev-mobile dev-mobile-fast dev-android-mobile dev-init dev-cloud dev-emulator dev-emulator-fast dev-run-fast dev-android dev-android-emulator dev-android-cloud dev-android-run db-reset logs
 
@@ -83,13 +99,13 @@ endif
 
 
 dev-init:
-	@$(PYTHON) ./scripts/dev-init.py
+	@$(PYTHON) ./scripts/dev-init.py MOCK_USERS=$(MOCK_USERS)
 
 dev-init-internal: emulator-bg
 	@echo "🔄 [All Processes] Starting backend & resetting database (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
-	@make -C backend db-reset USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend db-reset USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR) MOCK_USERS=$(MOCK_USERS), Backend DB Reset)
 	@echo "🔑 [All Processes] Seeding Firebase test accounts..."
-	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Firebase Seed)
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
 	@npm --prefix mobile-app run start:fresh
 
@@ -105,17 +121,17 @@ dev-cloud:
 
 dev-run: emulator-bg
 	@echo "🔄 [All Processes] Starting backend services (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
-	@make -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Backend Startup)
 	@echo "🔑 [All Processes] Seeding Firebase test accounts..."
-	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Firebase Seed)
 	@echo "📱 [All Processes] Launching Expo Mobile App (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
 	@npm --prefix mobile-app run start:fresh
 
 dev-run-fast: emulator-bg
 	@echo "🔄 [All Processes] Starting backend services (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
-	@make -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Backend Startup)
 	@echo "🔑 [All Processes] Seeding Firebase test accounts..."
-	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Firebase Seed)
 	@echo "📱 [All Processes] Launching Expo Mobile App (fast mode without -c)..."
 	@npm --prefix mobile-app run start:fast
 
@@ -129,9 +145,9 @@ dev-android-cloud:
 
 dev-android-run: emulator-bg
 	@echo "🔄 [Android Native Build] Starting backend services (USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR))..."
-	@make -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend up USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Backend Startup)
 	@echo "🔑 [Android Native Build] Seeding Firebase test accounts..."
-	@make -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR)
+	$(call run_with_timer, $(MAKE) -C backend seed-firebase USE_FIREBASE_EMULATOR=$(USE_FIREBASE_EMULATOR), Firebase Seed)
 	@echo "📂 [Android Native Build] Syncing google-services.json..."
 	@node -e "try{require('fs').copyFileSync('mobile-app/google-services.json','mobile-app/android/app/google-services.json')}catch(e){}"
 	@echo "📱 [Android Native Build] Launching Expo Native Android Build (EXPO_PUBLIC_USE_FIREBASE_EMULATOR=$(EXPO_PUBLIC_USE_FIREBASE_EMULATOR))..."
