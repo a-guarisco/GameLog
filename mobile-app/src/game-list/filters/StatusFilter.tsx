@@ -82,6 +82,7 @@ export const StatusFilter = ({ statusFilter, setStatusFilter }: StatusFilterProp
         value={getChipValue()}
         onPress={() => setIsOpen(true)}
         isActive={statusFilter !== 'All'}
+        testID="filter-chip-status"
         {...activeColors}
       />
 
