@@ -74,6 +74,20 @@ describe('computePieRadius', () => {
     expect(computePieRadius(cardWidth)).toBe(140);
   });
 
+  it('should calculate proportional radius in portrait for standard mobile widths', () => {
+    expect(computePieRadius(300)).toBe(135);
+  });
+
+  it('should clamp portrait radius at 140 for large screen widths', () => {
+    expect(computePieRadius(600)).toBe(140);
+  });
+
+  it('should clamp radius in landscape mode between 130 and 145', () => {
+    expect(computePieRadius(800, true)).toBe(144);
+    expect(computePieRadius(1200, true)).toBe(145);
+    expect(computePieRadius(600, true)).toBe(130);
+  });
+
   it('should return 140 when cardWidth is 0 or less', () => {
     expect(computePieRadius(0)).toBe(140);
     expect(computePieRadius(-10)).toBe(140);

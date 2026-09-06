@@ -54,9 +54,7 @@ describe('useCommunityTopGamesHistogramData', () => {
       },
     };
 
-    const mockData = [
-      { id: '1245620', user_playtime: 10.0, community_playtime: 5.0 },
-    ];
+    const mockData = [{ id: '1245620', user_playtime: 10.0, community_playtime: 5.0 }];
 
     const { result } = renderHook(() =>
       useCommunityTopGamesHistogramData({
@@ -79,9 +77,7 @@ describe('useCommunityTopGamesHistogramData', () => {
       '730': { data: { name: 'Counter-Strike 2' } },
     });
 
-    const mockData = [
-      { id: '730', user_playtime: 14.333, community_playtime: 8.75 },
-    ];
+    const mockData = [{ id: '730', user_playtime: 14.333, community_playtime: 8.75 }];
 
     const { result } = renderHook(() =>
       useCommunityTopGamesHistogramData({

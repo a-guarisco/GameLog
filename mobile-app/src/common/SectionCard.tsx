@@ -21,7 +21,10 @@ const SectionCard = ({
   testID,
 }: SectionCardProps) => (
   <Card variant="elevated" className={`p-3 overflow-visible ${className}`} testID={testID}>
-    <VStack space="sm" className="w-full">
+    <VStack
+      space="sm"
+      className={`w-full ${className.includes('h-full') ? 'h-full flex-1 justify-between' : ''}`}
+    >
       {(!!label || !!headerRight) && (
         <HStack className="w-full justify-between items-center">
           {!!label && <CardTitleText>{label}</CardTitleText>}
@@ -34,3 +37,4 @@ const SectionCard = ({
 );
 
 export default SectionCard;
+

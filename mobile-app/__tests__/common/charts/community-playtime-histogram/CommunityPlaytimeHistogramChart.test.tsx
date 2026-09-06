@@ -19,7 +19,10 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
       return (
         <View testID={testID}>
           {headerRight}
-          {children({ cardWidth: 350, theme: { '--color-typography-200': '0,0,0', '--color-primary-500': '255,0,0' } })}
+          {children({
+            cardWidth: 350,
+            theme: { '--color-typography-200': '0,0,0', '--color-primary-500': '255,0,0' },
+          })}
         </View>
       );
     },
@@ -33,12 +36,18 @@ jest.mock('react-native-gifted-charts', () => {
   };
 });
 
+const mockUseOrientation = jest.fn(() => ({ isLandscape: false }));
+jest.mock('@gamelog/common/useOrientation', () => ({
+  useOrientation: () => mockUseOrientation(),
+}));
+
 describe('CommunityPlaytimeHistogramChart', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseOrientation.mockReturnValue({ isLandscape: false });
   });
 
-  it('renders correctly with data', async () => {
+  it('renders correctly with data in portrait mode', async () => {
     (ApiManager.getCommunityWeeklyPlaytime as jest.Mock).mockResolvedValue({
       user: [1.5, 2.0, 0, 3.5, 1.0, 4.0, 0],
       community: [2.0, 1.5, 1.0, 2.5, 2.0, 3.0, 1.5],
@@ -51,6 +60,10 @@ describe('CommunityPlaytimeHistogramChart', () => {
       expect(screen.getByTestId('mock-bar-chart')).toBeTruthy();
       expect(screen.getByText('You')).toBeTruthy();
       expect(screen.getByText('Others')).toBeTruthy();
+      expect(screen.getByText('1W')).toBeTruthy();
+      expect(screen.getByText('6M')).toBeTruthy();
+      expect(screen.queryByText('2W')).toBeNull();
+      expect(screen.queryByText('1Y')).toBeNull();
     });
   });
 
@@ -70,6 +83,56 @@ describe('CommunityPlaytimeHistogramChart', () => {
 
     await waitFor(() => {
       expect(ApiManager.getCommunityMonthlyPlaytime).toHaveBeenCalled();
+    });
+  });
+
+  it('renders 2W, 6M, 1Y options and auto-selects 2W in landscape mode', async () => {
+    mockUseOrientation.mockReturnValue({ isLandscape: true });
+    (ApiManager.getCommunityWeeklyPlaytime as jest.Mock).mockResolvedValue({
+      user: [1, 2, 3, 4, 5, 6, 7],
+      community: [2, 2, 2, 2, 2, 2, 2],
+    });
+
+    render(<CommunityPlaytimeHistogramChart scope="global" />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('1W')).toBeNull();
+      expect(screen.getByText('2W')).toBeTruthy();
+      expect(screen.getByText('6M')).toBeTruthy();
+      expect(screen.getByText('1Y')).toBeTruthy();
+      // Auto-selects 2W in landscape, calling getCommunityWeeklyPlaytime twice
+      expect(ApiManager.getCommunityWeeklyPlaytime).toHaveBeenCalledTimes(2);
+      const mockChart = screen.getByTestId('mock-bar-chart');
+      // In landscape twoWeeks mode, barWidth is 14 and height is 200
+      expect(mockChart.props.barWidth).toBe(14);
+      expect(mockChart.props.height).toBe(200);
+    });
+  });
+
+  it('allows manual selection of 1Y in landscape mode', async () => {
+    mockUseOrientation.mockReturnValue({ isLandscape: true });
+    (ApiManager.getCommunityWeeklyPlaytime as jest.Mock).mockResolvedValue({
+      user: [1, 2, 3, 4, 5, 6, 7],
+      community: [2, 2, 2, 2, 2, 2, 2],
+    });
+    (ApiManager.getCommunityMonthlyPlaytime as jest.Mock).mockResolvedValue({
+      user: Array(12).fill(10),
+      community: Array(12).fill(12),
+    });
+
+    render(<CommunityPlaytimeHistogramChart scope="global" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('2W')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('1Y'));
+
+    await waitFor(() => {
+      expect(ApiManager.getCommunityMonthlyPlaytime).toHaveBeenCalled();
+      const mockChart = screen.getByTestId('mock-bar-chart');
+      // In landscape year mode, barWidth is 14
+      expect(mockChart.props.barWidth).toBe(14);
     });
   });
 

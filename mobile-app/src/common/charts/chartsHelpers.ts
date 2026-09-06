@@ -48,8 +48,17 @@ export const getPercentileInfoGradient = (
   return INFO_GRADIENT_TIERS[tierIndex];
 };
 
-export const computePieRadius = (cardWidth: number, isLandscape = false) =>
-  cardWidth > 0 ? Math.floor(cardWidth * (isLandscape ? 0.42 : 0.35)) : 140;
+export const computePieRadius = (cardWidth: number, isLandscape = false) => {
+  if (cardWidth <= 0) return 140;
+  if (isLandscape) {
+    // In landscape, scale comfortably up to 145px (diameter ~280-290px)
+    // so all 5 games are prominently displayed with plenty of space in the center hole,
+    // while remaining well-proportioned within the card.
+    return Math.min(145, Math.max(130, Math.floor(cardWidth * 0.18)));
+  }
+  // In portrait, scale with card width capped at 140px
+  return Math.min(140, Math.floor(cardWidth * 0.45));
+};
 export const computePieInnerRadius = (r: number) => Math.floor(r * 0.7);
 
 export const getTopGames = (games: OwnedGames['response']['games'], gamesToFetch: number) => {

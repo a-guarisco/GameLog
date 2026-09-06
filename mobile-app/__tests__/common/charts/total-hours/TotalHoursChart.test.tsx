@@ -71,4 +71,9 @@ describe('TotalHoursChart', () => {
     const { getByText } = render(<TotalHoursChart ownedGames={null} />);
     expect(getByText('No games found')).toBeTruthy();
   });
+
+  it('renders correctly with targetHeight prop', () => {
+    const { getByText } = render(<TotalHoursChart ownedGames={null} targetHeight={350} />);
+    expect(getByText('Game A')).toBeTruthy();
+  });
 });

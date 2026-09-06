@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
@@ -35,10 +35,30 @@ interface PlaytimeTrendChartProps {
 }
 
 const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
-  const [trendRange, setTrendRange] = useState<number>(14);
+  const { isLandscape } = useOrientation();
+  const hasUserSelectedRange = useRef(false);
+
+  const [trendRange, setTrendRange] = useState<number>(() => (isLandscape ? 30 : 14));
   const [trendMode, setTrendMode] = useState<'avg' | 'tot'>('avg');
   const [activePoint, setActivePoint] = useState<any>(null);
-  const { isLandscape } = useOrientation();
+
+  useEffect(() => {
+    if (!hasUserSelectedRange.current) {
+      if (isLandscape) {
+        if (trendMode === 'avg') {
+          const trend30 = selectPlaytimeTrend(playtimeByUser, 30);
+          if (trend30.previousTotalMinutes > 0) {
+            setTrendRange(30);
+          }
+        } else {
+          setTrendRange(30);
+        }
+      } else {
+        setTrendRange(14);
+      }
+    }
+  }, [isLandscape, trendMode, playtimeByUser]);
+
   const chartHeight = isLandscape ? 220 : 140;
   const chartContainerHeight = isLandscape ? 240 : 160;
 
@@ -50,7 +70,7 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
     finalAverageFormatted,
     cumulativeDeltaInfo,
     baselineAverageFormatted,
-  } = usePlaytimeTrendChart(playtimeByUser, trendRange, trendMode);
+  } = usePlaytimeTrendChart(playtimeByUser, trendRange, trendMode, isLandscape);
 
   let prevDateRangeStr = '';
   if (trend.days && trend.days.length > 0 && trendRange < 99999) {
@@ -150,7 +170,7 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
                 }}
               >
                 <LineChart
-                  parentWidth={cardWidth || 370}
+                  parentWidth={cardWidth || (isLandscape ? 750 : 370)}
                   adjustToWidth
                   disableScroll
                   initialSpacing={0}
@@ -204,7 +224,12 @@ const PlaytimeTrendChart = ({ playtimeByUser }: PlaytimeTrendChartProps) => {
                   return (
                     <Pressable
                       key={opt.id}
-                      onPress={() => !isDisabled && setTrendRange(opt.id)}
+                      onPress={() => {
+                        if (!isDisabled) {
+                          hasUserSelectedRange.current = true;
+                          setTrendRange(opt.id);
+                        }
+                      }}
                       disabled={isDisabled}
                       className={`px-2 py-1 rounded-full ${
                         isSelected

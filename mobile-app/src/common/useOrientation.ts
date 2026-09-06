@@ -8,5 +8,6 @@ import { useWindowDimensions } from 'react-native';
 export const useOrientation = () => {
   const { width, height } = useWindowDimensions();
   const isLandscape = width >= height;
-  return { isLandscape, width, height };
+  const isTablet = Math.min(width, height) >= 600;
+  return { isLandscape, isTablet, width, height };
 };

@@ -1,5 +1,5 @@
 import { useState, ReactNode, ComponentType } from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, ViewStyle } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
 import SectionCard from '@gamelog/common/SectionCard';
@@ -14,6 +14,7 @@ interface ChartCardProps {
   error: boolean;
   ErrorBehaviour?: ComponentType;
   testID?: string;
+  style?: ViewStyle;
 }
 
 const useChartTheme = () => {
@@ -30,18 +31,33 @@ const ChartWrapperCard = ({
   error,
   ErrorBehaviour,
   testID,
+  style,
 }: ChartCardProps) => {
   // Per-instance measured width — not shared. This ensures re-layout on rotation
   // is always picked up; each card measures its own container independently.
   const [cardWidth, setCardWidth] = useState(0);
   const theme = useChartTheme();
 
+  const isStretched = Boolean(
+    style &&
+      ('height' in (style as any) ||
+        'minHeight' in (style as any) ||
+        (style as any).flex)
+  );
+
+  const hasFlex = Boolean(style && (style as any).flex);
+
   return (
-    <Box className="w-full items-center">
-      <SectionCard label={label} headerRight={headerRight} className="w-full" testID={testID}>
+    <Box className={`w-full items-center ${hasFlex ? 'flex-1 h-full' : ''}`} style={style}>
+      <SectionCard
+        label={label}
+        headerRight={headerRight}
+        className={`w-full ${isStretched ? 'h-full flex-1' : ''}`}
+        testID={testID}
+      >
         <Box
           testID="card"
-          className="w-full items-center"
+          className={`w-full items-center ${isStretched ? 'h-full flex-1 justify-center' : ''}`}
           onLayout={(e) => {
             const width = e.nativeEvent.layout.width;
             // Always update on every layout event so rotation re-measures correctly.

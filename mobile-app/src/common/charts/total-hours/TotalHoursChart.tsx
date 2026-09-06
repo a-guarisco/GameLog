@@ -14,9 +14,10 @@ import type { OwnedGames } from '@gamelog/api-manager/dto';
 
 interface TotalHoursChartProps {
   ownedGames?: OwnedGames | null;
+  targetHeight?: number;
 }
 
-const TotalHoursChart = ({ ownedGames }: TotalHoursChartProps) => {
+const TotalHoursChart = ({ ownedGames, targetHeight }: TotalHoursChartProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { barData } = useTotalHoursChart(ownedGames);
 
@@ -26,22 +27,25 @@ const TotalHoursChart = ({ ownedGames }: TotalHoursChartProps) => {
       isLoading={false}
       error={false}
       testID="total-hours-chart"
+      style={targetHeight ? { height: targetHeight } : undefined}
     >
       {({ cardWidth, theme }) => {
         if (barData.length === 0) {
           return (
-            <Box className="py-8 items-center justify-center w-full">
+            <Box className="flex-1 items-center justify-center w-full py-8">
               <Text className="text-typography-400">No games found</Text>
             </Box>
           );
         }
 
         const maxHours = barData.length > 0 ? Math.max(...barData.map((d) => d.value)) : 1;
+        const scrollHeight = targetHeight ? targetHeight - 55 : undefined;
 
         return (
           <ScrollView
-            style={{ width: '100%', maxHeight: 400 }}
-            showsVerticalScrollIndicator={false}
+            style={{ width: '100%', height: scrollHeight, maxHeight: scrollHeight ?? 400 }}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={!!scrollHeight}
             contentContainerStyle={{ paddingBottom: 8 }}
           >
             <VStack space="md" className="w-full mt-2">

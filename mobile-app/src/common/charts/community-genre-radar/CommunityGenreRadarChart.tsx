@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, ViewStyle } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { RadarChart } from 'react-native-gifted-charts';
 import ChartWrapperCard from '../ChartWrapperCard';
@@ -23,6 +23,8 @@ interface CommunityGenreRadarChartProps {
   targetUserName?: string;
   chartTitle?: string;
   hideScopeSelector?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
+  style?: ViewStyle;
 }
 
 const SCOPE_OPTIONS: GLSegmentOption<CommunityScope>[] = [
@@ -32,8 +34,9 @@ const SCOPE_OPTIONS: GLSegmentOption<CommunityScope>[] = [
 ];
 
 interface MemoizedCommunityRadarProps {
-  cardWidth: number;
-  radarPadding: number;
+  targetSize?: number;
+  cardWidth?: number;
+  radarPadding?: number;
   dataSet: number[][];
   labels: string[];
   maxValue: number;
@@ -41,13 +44,15 @@ interface MemoizedCommunityRadarProps {
 }
 
 const MemoizedCommunityRadar = memo(
-  ({ cardWidth, radarPadding, dataSet, labels, maxValue, theme }: MemoizedCommunityRadarProps) => (
-    <Box style={{ marginTop: -15, marginBottom: -10 }}>
-      <RadarChart
-        chartSize={cardWidth ? cardWidth - radarPadding : 320}
-        dataSet={dataSet}
-        labels={labels}
-        maxValue={maxValue}
+  ({ targetSize, cardWidth, radarPadding, dataSet, labels, maxValue, theme }: MemoizedCommunityRadarProps) => {
+    const size = targetSize ?? (cardWidth ? cardWidth - (radarPadding ?? 16) : 320);
+    return (
+      <Box className="items-center justify-center w-full" style={{ marginTop: -15, marginBottom: -10 }}>
+        <RadarChart
+          chartSize={size}
+          dataSet={dataSet}
+          labels={labels}
+          maxValue={maxValue}
         noOfSections={5}
         isAnimated
         animationDuration={500}
@@ -82,7 +87,8 @@ const MemoizedCommunityRadar = memo(
         ]}
       />
     </Box>
-  )
+  );
+}
 );
 MemoizedCommunityRadar.displayName = 'MemoizedCommunityRadar';
 
@@ -93,11 +99,19 @@ const CommunityGenreRadarChart = ({
   targetUserName,
   chartTitle,
   hideScopeSelector = false,
+  onExpandedChange,
+  style,
 }: CommunityGenreRadarChartProps) => {
   const [scope, setScope] = useState<CommunityScope>(initialScope);
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isLandscape } = useOrientation();
+  const { isLandscape, height } = useOrientation();
   const radarPadding = isLandscape ? 8 : 16;
+
+  const handleToggleExpand = () => {
+    const nextExpanded = !isExpanded;
+    setIsExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
 
   const currentScope = hideScopeSelector || targetUserId ? initialScope : scope;
 
@@ -143,6 +157,7 @@ const CommunityGenreRadarChart = ({
       isLoading={isLoading}
       error={errorCommunity}
       ErrorBehaviour={renderError}
+      style={style}
     >
       {({ theme, cardWidth }) => {
         if (dataSet.length === 0 || labels.length === 0) {
@@ -153,10 +168,15 @@ const CommunityGenreRadarChart = ({
           );
         }
 
+        const targetSize = isLandscape
+          ? Math.min(Math.round(height * 0.55), cardWidth ? cardWidth - radarPadding : 240)
+          : (cardWidth ? cardWidth - radarPadding : 320);
+
         return (
           <VStack className="w-full items-center" space="md">
             {/* Radar Chart */}
             <MemoizedCommunityRadar
+              targetSize={targetSize}
               cardWidth={cardWidth}
               radarPadding={radarPadding}
               dataSet={dataSet}
@@ -236,7 +256,7 @@ const CommunityGenreRadarChart = ({
 
             {/* Expand Toggle */}
             <Pressable
-              onPress={() => setIsExpanded(!isExpanded)}
+              onPress={handleToggleExpand}
               className="self-stretch py-1.5 items-center justify-center bg-background-50 active:bg-background-100 -mx-3 -mb-3 rounded-b-lg mt-1"
               testID="community-genre-expand-toggle"
               accessibilityRole="button"

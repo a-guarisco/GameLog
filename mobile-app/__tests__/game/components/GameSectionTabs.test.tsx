@@ -132,10 +132,10 @@ describe('GameSectionTabs', () => {
       fireEvent.press(screen.getByTestId('game-tab-news'));
     };
 
-    it('asks for the five most recent items of the current game', () => {
+    it('asks for the items of the current game', () => {
       openNewsTab();
 
-      expect(mockUseGetGameNews).toHaveBeenCalledWith('236390');
+      expect(mockUseGetGameNews).toHaveBeenCalledWith('236390', expect.any(Number));
     });
 
     it('shows the byline, the short date and the title of every item', () => {
@@ -281,6 +281,27 @@ describe('GameSectionTabs', () => {
       openGuidesTab();
 
       expect(screen.getByText('No guides yet')).toBeTruthy();
+    });
+  });
+
+  describe('screenshots tab and sticky header', () => {
+    it('renders 4 tabs when screenshotsSlot is provided', () => {
+      render(
+        <GameSectionTabs
+          appid="236390"
+          achievementsSlot={<Text>Achievements slot</Text>}
+          screenshotsSlot={<Text>Screenshots slot</Text>}
+          stickyHeader
+        />
+      );
+
+      expect(screen.getByTestId('game-tab-achievements')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-news')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-guides')).toBeTruthy();
+      expect(screen.getByTestId('game-tab-screenshots')).toBeTruthy();
+
+      fireEvent.press(screen.getByTestId('game-tab-screenshots'));
+      expect(screen.getByText('Screenshots slot')).toBeTruthy();
     });
   });
 });
