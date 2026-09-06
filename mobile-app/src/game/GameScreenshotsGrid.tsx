@@ -51,9 +51,7 @@ const GameScreenshotsGrid = ({
         </HStack>
       )}
 
-      {isLoadingMore && (
-        <SectionSpinner className="h-12 w-full items-center justify-center my-2" />
-      )}
+      {isLoadingMore && <SectionSpinner className="h-12 w-full items-center justify-center my-2" />}
     </VStack>
   );
 };

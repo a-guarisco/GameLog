@@ -107,7 +107,9 @@ describe('TotalHoursDoughnut', () => {
   });
 
   it('renders placeholder when data is empty', () => {
-    const { useTotalHoursDoughnut } = require('@gamelog/common/charts/total-hours/useTotalHoursDoughnut');
+    const {
+      useTotalHoursDoughnut,
+    } = require('@gamelog/common/charts/total-hours/useTotalHoursDoughnut');
     useTotalHoursDoughnut.mockReturnValueOnce({
       pieData: [],
       totalMinutes: 0,

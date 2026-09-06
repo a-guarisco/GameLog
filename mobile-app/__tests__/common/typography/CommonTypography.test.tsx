@@ -1,9 +1,5 @@
 import { render } from '@testing-library/react-native';
-import {
-  ModalTitle,
-  ModalOptionText,
-  SectionTitle,
-} from '@gamelog/common/CommonTypography';
+import { ModalTitle, ModalOptionText, SectionTitle } from '@gamelog/common/CommonTypography';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 
 describe('CommonTypography', () => {

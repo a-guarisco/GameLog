@@ -1,7 +1,13 @@
 import { contractValidator } from '../../contracts/contractValidator';
-import type { CommunityGameStatusResponse, CommunityGenreHour } from '../../src/api-manager/dto/community';
+import type {
+  CommunityGameStatusResponse,
+  CommunityGenreHour,
+} from '../../src/api-manager/dto/community';
 import type { DailyReport } from '../../src/api-manager/dto/report';
-import type { RecommendationResponse, UserSearchResult } from '../../src/api-manager/dto/userSocial';
+import type {
+  RecommendationResponse,
+  UserSearchResult,
+} from '../../src/api-manager/dto/userSocial';
 
 describe('Cross-Boundary / OpenAPI Contract Validation Tests', () => {
   describe('Community Endpoint Contracts', () => {
@@ -159,6 +165,77 @@ describe('Cross-Boundary / OpenAPI Contract Validation Tests', () => {
   });
 
   describe('Contract Drift Detection (Negative / Failure Cases)', () => {
+    it('validates a payload against a named component schema', () => {
+      const result = contractValidator.validateComponentSchema('CommunityGameStatusResponse', {
+        user: [],
+        community: [],
+        user_num_of_games: 0,
+        community_num_of_games: 0,
+      });
+
+      expect(result).toEqual({
+        isValid: true,
+        errors: null,
+        errorSummary: '',
+      });
+    });
+
+    it('returns component schema validation errors and a summary for invalid data', () => {
+      const result = contractValidator.validateComponentSchema('CommunityGameStatusResponse', {});
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors).not.toBeNull();
+      expect(result.errorSummary).toContain("must have required property 'user'");
+    });
+
+    it('throws when the component schema does not exist', () => {
+      expect(() => contractValidator.validateComponentSchema('MissingSchema', {})).toThrow(
+        "Schema '#/components/schemas/MissingSchema' not found in OpenAPI spec."
+      );
+    });
+
+    it('throws when the response path does not exist', () => {
+      expect(() =>
+        contractValidator.validateResponse({
+          path: '/missing',
+          method: 'get',
+          body: {},
+        })
+      ).toThrow("Path '/missing' not found in OpenAPI spec.");
+    });
+
+    it('throws when the response method does not exist for a path', () => {
+      expect(() =>
+        contractValidator.validateResponse({
+          path: '/community/genre',
+          method: 'post',
+          body: {},
+        })
+      ).toThrow("Method 'POST' not found for path '/community/genre' in OpenAPI spec.");
+    });
+
+    it('throws when the response status is not defined', () => {
+      expect(() =>
+        contractValidator.validateResponse({
+          path: '/community/genre',
+          method: 'get',
+          statusCode: 201,
+          body: {},
+        })
+      ).toThrow("Response status '201' not defined for GET /community/genre.");
+    });
+
+    it('throws when a response has no JSON schema', () => {
+      expect(() =>
+        contractValidator.validateResponse({
+          path: '/notifications/unregister_device',
+          method: 'delete',
+          statusCode: 204,
+          body: undefined,
+        })
+      ).toThrow('No JSON schema defined for DELETE /notifications/unregister_device status 204.');
+    });
+
     it('detects and rejects schema drift when field names are renamed (e.g., camelCase vs snake_case)', () => {
       const driftedPayload = {
         user: [{ status: 'playing', count: 5, percentage: 50.0 }],

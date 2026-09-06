@@ -52,16 +52,19 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     render(<CommunityTopGamesHistogramChart scope="global" />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('community-top-games-histogram-chart')).toBeTruthy();
-      expect(screen.getByTestId('top-game-item-1245620')).toBeTruthy();
-      expect(screen.getByTestId('game-capsule-1245620')).toBeTruthy();
-      expect(screen.getByText('Elden Ring')).toBeTruthy();
-      expect(screen.getByText('14h 20m')).toBeTruthy();
-      expect(screen.getByText('8h 45m')).toBeTruthy();
-      expect(screen.getAllByText('You').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText('Others').length).toBeGreaterThanOrEqual(1);
-    }, { timeout: 5000 });
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('community-top-games-histogram-chart')).toBeTruthy();
+        expect(screen.getByTestId('top-game-item-1245620')).toBeTruthy();
+        expect(screen.getByTestId('game-capsule-1245620')).toBeTruthy();
+        expect(screen.getByText('Elden Ring')).toBeTruthy();
+        expect(screen.getByText('14h 20m')).toBeTruthy();
+        expect(screen.getByText('8h 45m')).toBeTruthy();
+        expect(screen.getAllByText('You').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText('Others').length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 5000 }
+    );
   });
 
   it('slices top 5 games in portrait mode even if backend returns more', async () => {
@@ -180,9 +183,7 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     // Resolve fetch
     await act(async () => {
-      resolveFetch!([
-        { id: '1245620', user_playtime: 10, community_playtime: 5 },
-      ]);
+      resolveFetch!([{ id: '1245620', user_playtime: 10, community_playtime: 5 }]);
     });
 
     await waitFor(() => {

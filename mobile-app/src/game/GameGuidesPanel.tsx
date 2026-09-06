@@ -12,7 +12,6 @@ import Chip from '@gamelog/common/Chip';
 import { formatThousands } from '@gamelog/utils/formatUtils';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
-
 const openExternalUrl = (url: string) => {
   Linking.openURL(url).catch((error) => console.warn(`Could not open ${url}`, error));
 };

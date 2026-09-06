@@ -1,4 +1,7 @@
-import { parseFriendshipDate, formatRelationshipSince } from '@gamelog/social/other-user-profile/OtherUserStats';
+import {
+  parseFriendshipDate,
+  formatRelationshipSince,
+} from '@gamelog/social/other-user-profile/OtherUserStats';
 
 describe('OtherUserStats helpers', () => {
   describe('parseFriendshipDate', () => {

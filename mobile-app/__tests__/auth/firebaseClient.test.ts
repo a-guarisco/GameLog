@@ -90,7 +90,11 @@ describe('firebaseClient', () => {
     await jest.isolateModules(async () => {
       const client = require('../../src/auth/firebaseClient');
       await client.setupAuthEmulator();
-      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(expect.anything(), 'http://10.0.2.2:9099', { disableWarnings: true });
+      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(
+        expect.anything(),
+        'http://10.0.2.2:9099',
+        { disableWarnings: true }
+      );
     });
   });
 
@@ -104,14 +108,18 @@ describe('firebaseClient', () => {
     await jest.isolateModules(async () => {
       const client = require('../../src/auth/firebaseClient');
       await client.setupAuthEmulator();
-      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(expect.anything(), 'http://localhost:9099', { disableWarnings: true });
+      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(
+        expect.anything(),
+        'http://localhost:9099',
+        { disableWarnings: true }
+      );
     });
   });
 
   it('skips emulator when EXPO_PUBLIC_USE_FIREBASE_EMULATOR is false', async () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'false';
-    
+
     await jest.isolateModules(async () => {
       const client = require('../../src/auth/firebaseClient');
       await client.setupAuthEmulator();

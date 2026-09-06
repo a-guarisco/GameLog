@@ -448,17 +448,13 @@ const CommunityPlaytimeHistogramChart = ({
                   {/* Caption / Legend colored as in communityGenreRadar */}
                   <HStack space="lg" className="items-center justify-center pt-2 pb-1">
                     <HStack space="xs" className="items-center">
-                      <Box
-                        className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
-                      />
+                      <Box className="w-2.5 h-2.5 rounded-full bg-comparison-user-500" />
                       <Text size="xs" className="font-bold text-primary-500">
                         You
                       </Text>
                     </HStack>
                     <HStack space="xs" className="items-center">
-                      <Box
-                        className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
-                      />
+                      <Box className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500" />
                       <Text size="xs" className="font-bold text-comparison-compare-500">
                         {othersLabel}
                       </Text>

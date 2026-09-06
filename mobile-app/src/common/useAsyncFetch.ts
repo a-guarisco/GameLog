@@ -30,7 +30,9 @@ export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
       });
   }, [asyncFunction]);
 
-  useEffect(() => { refetch(); }, [refetch]);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   useEffect(
     () => () => {

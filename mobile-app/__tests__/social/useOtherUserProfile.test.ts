@@ -36,9 +36,7 @@ describe('useOtherUserProfile', () => {
   });
 
   it('fetches player info, target games, and current user games', async () => {
-    const { result } = renderHook(() =>
-      useOtherUserProfile({ user: mockUser })
-    );
+    const { result } = renderHook(() => useOtherUserProfile({ user: mockUser }));
 
     await waitFor(() => {
       expect(result.current.player?.personaname).toBe('PlayerTwo');
@@ -55,9 +53,7 @@ describe('useOtherUserProfile', () => {
       steam_id: '',
       has_steam_api_key: false,
     };
-    const { result } = renderHook(() =>
-      useOtherUserProfile({ user: noSteamUser })
-    );
+    const { result } = renderHook(() => useOtherUserProfile({ user: noSteamUser }));
 
     expect(result.current.totalGamesCount).toBe(0);
     expect(result.current.totalPlaytimeHours).toBe(0);
@@ -69,9 +65,7 @@ describe('useOtherUserProfile', () => {
     });
     const emitSpy = jest.spyOn(DeviceEventEmitter, 'emit');
 
-    const { result } = renderHook(() =>
-      useOtherUserProfile({ user: mockUser })
-    );
+    const { result } = renderHook(() => useOtherUserProfile({ user: mockUser }));
 
     await act(async () => {
       await result.current.handleAddFriend();
@@ -122,9 +116,7 @@ describe('useOtherUserProfile', () => {
     (ApiManager.manageFriendship as jest.Mock).mockResolvedValueOnce({
       message: 'Blocked',
     });
-    const { result } = renderHook(() =>
-      useOtherUserProfile({ user: mockUser })
-    );
+    const { result } = renderHook(() => useOtherUserProfile({ user: mockUser }));
 
     await act(async () => {
       await result.current.handleBlockFriend('f-1');
@@ -188,9 +180,7 @@ describe('useOtherUserProfile', () => {
   });
 
   it('refetches all data when refetchAll is called', async () => {
-    const { result } = renderHook(() =>
-      useOtherUserProfile({ user: mockUser })
-    );
+    const { result } = renderHook(() => useOtherUserProfile({ user: mockUser }));
 
     await waitFor(() => {
       expect(result.current.player?.personaname).toBe('PlayerTwo');
@@ -203,7 +193,11 @@ describe('useOtherUserProfile', () => {
       await result.current.refetchAll();
     });
 
-    expect((ApiManager.getPlayersInfo as jest.Mock).mock.calls.length).toBeGreaterThan(initialPlayerCalls);
-    expect((ApiManager.getOwnedGames as jest.Mock).mock.calls.length).toBeGreaterThan(initialGamesCalls);
+    expect((ApiManager.getPlayersInfo as jest.Mock).mock.calls.length).toBeGreaterThan(
+      initialPlayerCalls
+    );
+    expect((ApiManager.getOwnedGames as jest.Mock).mock.calls.length).toBeGreaterThan(
+      initialGamesCalls
+    );
   });
 });

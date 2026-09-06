@@ -70,4 +70,3 @@ const useAppInit = () => {
 };
 
 export default useAppInit;
-

@@ -55,10 +55,9 @@ describe('useCommunityGenre', () => {
       .mockResolvedValueOnce(mockGlobal)
       .mockResolvedValueOnce(mockFriends);
 
-    const { result, rerender } = renderHook(
-      ({ scope }) => useCommunityGenre(scope as any),
-      { initialProps: { scope: 'global' } }
-    );
+    const { result, rerender } = renderHook(({ scope }) => useCommunityGenre(scope as any), {
+      initialProps: { scope: 'global' },
+    });
 
     await waitFor(() => {
       expect(result.current.communityGenres).toEqual(mockGlobal);

@@ -166,7 +166,9 @@ export const ReportBox = () => {
 
       <Box
         className="w-[60%] flex-1"
-        style={!report && retrievalInitialHeight ? { minHeight: retrievalInitialHeight } : undefined}
+        style={
+          !report && retrievalInitialHeight ? { minHeight: retrievalInitialHeight } : undefined
+        }
       >
         {report ? (
           <ReportResultsCard
@@ -191,7 +193,8 @@ export const ReportBox = () => {
           >
             <Box className="py-8 items-center justify-center w-full flex-1">
               <Text className="text-typography-400 text-center">
-                Select a date range on the left and tap Generate Report to view your playtime summary.
+                Select a date range on the left and tap Generate Report to view your playtime
+                summary.
               </Text>
             </Box>
           </SectionCard>

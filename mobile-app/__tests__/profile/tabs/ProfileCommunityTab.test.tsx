@@ -1,29 +1,35 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import ProfileCommunityTab from '@gamelog/profile/tabs/ProfileCommunityTab';
 
-jest.mock('@gamelog/common/charts/community-playtime-histogram/CommunityPlaytimeHistogramChart', () => {
-  const { View, Text } = jest.requireActual('react-native');
-  return {
-    __esModule: true,
-    default: ({ scope }: { scope: string }) => (
-      <View testID="mock-community-playtime-histogram">
-        <Text testID="histogram-scope">{scope}</Text>
-      </View>
-    ),
-  };
-});
+jest.mock(
+  '@gamelog/common/charts/community-playtime-histogram/CommunityPlaytimeHistogramChart',
+  () => {
+    const { View, Text } = jest.requireActual('react-native');
+    return {
+      __esModule: true,
+      default: ({ scope }: { scope: string }) => (
+        <View testID="mock-community-playtime-histogram">
+          <Text testID="histogram-scope">{scope}</Text>
+        </View>
+      ),
+    };
+  }
+);
 
-jest.mock('@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart', () => {
-  const { View, Text } = jest.requireActual('react-native');
-  return {
-    __esModule: true,
-    default: ({ scope }: { scope: string }) => (
-      <View testID="mock-community-top-games-histogram">
-        <Text testID="top-games-scope">{scope}</Text>
-      </View>
-    ),
-  };
-});
+jest.mock(
+  '@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart',
+  () => {
+    const { View, Text } = jest.requireActual('react-native');
+    return {
+      __esModule: true,
+      default: ({ scope }: { scope: string }) => (
+        <View testID="mock-community-top-games-histogram">
+          <Text testID="top-games-scope">{scope}</Text>
+        </View>
+      ),
+    };
+  }
+);
 
 describe('ProfileCommunityTab', () => {
   it('renders correctly with scope navigation tabs', () => {
@@ -51,4 +57,3 @@ describe('ProfileCommunityTab', () => {
     expect(screen.getByTestId('top-games-scope').props.children).toBe('friends');
   });
 });
-

@@ -1,10 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import { UserAvatar } from '@gamelog/social/user-card/UserAvatar';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
-import {
-  clearSteamAvatarCache,
-  cachePlayerAvatars,
-} from '@gamelog/social/steamAvatarCache';
+import { clearSteamAvatarCache, cachePlayerAvatars } from '@gamelog/social/steamAvatarCache';
 
 const renderWithProvider = (component: React.ReactElement) =>
   render(<GluestackUIProvider mode="light">{component}</GluestackUIProvider>);
@@ -30,9 +27,7 @@ describe('UserAvatar', () => {
   });
 
   it('renders avatar image when avatarUrl is provided', () => {
-    renderWithProvider(
-      <UserAvatar username="Alex" avatarUrl="https://example.com/avatar.jpg" />
-    );
+    renderWithProvider(<UserAvatar username="Alex" avatarUrl="https://example.com/avatar.jpg" />);
 
     const image = screen.getByTestId('user-avatar-image');
     expect(image).toBeTruthy();
@@ -41,9 +36,7 @@ describe('UserAvatar', () => {
   });
 
   it('falls back to letter box when avatar image errors', () => {
-    renderWithProvider(
-      <UserAvatar username="Alex" avatarUrl="https://example.com/invalid.jpg" />
-    );
+    renderWithProvider(<UserAvatar username="Alex" avatarUrl="https://example.com/invalid.jpg" />);
 
     const image = screen.getByTestId('user-avatar-image');
     expect(image).toBeTruthy();
@@ -65,9 +58,7 @@ describe('UserAvatar', () => {
       },
     ]);
 
-    renderWithProvider(
-      <UserAvatar username="Charlie" steamId="76561198000000001" />
-    );
+    renderWithProvider(<UserAvatar username="Charlie" steamId="76561198000000001" />);
 
     const image = screen.getByTestId('user-avatar-image');
     expect(image).toBeTruthy();
@@ -77,9 +68,7 @@ describe('UserAvatar', () => {
   });
 
   it('applies highlighted styling when isHighlighted is true', () => {
-    const { rerender } = renderWithProvider(
-      <UserAvatar username="Alex" isHighlighted={true} />
-    );
+    const { rerender } = renderWithProvider(<UserAvatar username="Alex" isHighlighted={true} />);
 
     expect(screen.getByText('A')).toBeTruthy();
 

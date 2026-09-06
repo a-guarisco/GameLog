@@ -28,15 +28,10 @@ describe('FilterChip', () => {
 
   it('applies active styling when isActive is true', () => {
     const { getByTestId } = render(
-      <FilterChip 
-        label="Test" 
-        value="Value" 
-        onPress={jest.fn()} 
-        isActive={true} 
-      />,
+      <FilterChip label="Test" value="Value" onPress={jest.fn()} isActive={true} />,
       { wrapper }
     );
-    // Active styling checks would be done on the Pressable/HStack classes, 
+    // Active styling checks would be done on the Pressable/HStack classes,
     // but the most important thing is it doesn't crash and renders
     expect(getByTestId).toBeDefined();
   });

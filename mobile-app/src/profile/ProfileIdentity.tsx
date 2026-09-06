@@ -43,7 +43,7 @@ const ProfileIdentity = ({
       <HStack space="xs" className="flex-wrap items-center justify-center z-10">
         {!!memberSinceLabel && (
           <Chip
-              className="bg-background-50 border border-outline-50 shadow-sm"
+            className="bg-background-50 border border-outline-50 shadow-sm"
             testID="profile-member-since-chip"
           >
             <Text size="xs" className="font-bold text-typography-100">
@@ -52,15 +52,15 @@ const ProfileIdentity = ({
           </Chip>
         )}
 
-          <MinimalBadge
-            iconName="flame"
-            text={`${streak ?? 0} Days Streak`}
-            colorHex={HEX_COLORS.dayStreak.hex}
-            borderColorClass="border-semantic-dayStreak-600"
-            textColorClass="text-semantic-dayStreak-600"
-            bgClass="bg-semantic-dayStreak-100 dark:bg-semantic-dayStreak-900/40"
-            testID="profile-streak-chip"
-          />
+        <MinimalBadge
+          iconName="flame"
+          text={`${streak ?? 0} Days Streak`}
+          colorHex={HEX_COLORS.dayStreak.hex}
+          borderColorClass="border-semantic-dayStreak-600"
+          textColorClass="text-semantic-dayStreak-600"
+          bgClass="bg-semantic-dayStreak-100 dark:bg-semantic-dayStreak-900/40"
+          testID="profile-streak-chip"
+        />
       </HStack>
     </>
   );

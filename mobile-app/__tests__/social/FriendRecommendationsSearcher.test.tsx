@@ -82,7 +82,9 @@ describe('FriendRecommendationsSearcher', () => {
     );
 
     expect(
-      getByText(/You don't have any friends added yet. Add friends from the Social tab to compare recommendations!/)
+      getByText(
+        /You don't have any friends added yet. Add friends from the Social tab to compare recommendations!/
+      )
     ).toBeTruthy();
   });
 

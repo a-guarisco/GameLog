@@ -27,9 +27,7 @@ export const ExpoEnvInfo = () => {
   const envObj = process.env || {};
   const publicKeys = Object.keys(envObj).filter((key) => key.startsWith('EXPO_PUBLIC_'));
 
-  const defaultKeys = [
-    'EXPO_PUBLIC_BACKEND_BASE_URL',
-  ];
+  const defaultKeys = ['EXPO_PUBLIC_BACKEND_BASE_URL'];
   const allKeys = Array.from(new Set([...defaultKeys, ...publicKeys])).sort();
 
   return (

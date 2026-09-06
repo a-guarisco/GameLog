@@ -21,12 +21,7 @@ describe('UserCard', () => {
   };
 
   it('renders user card with friend status and avatar image when avatarUrl is provided', () => {
-    renderWithProvider(
-      <UserCard
-        item={baseItem}
-        avatarUrl="https://example.com/avatar.jpg"
-      />
-    );
+    renderWithProvider(<UserCard item={baseItem} avatarUrl="https://example.com/avatar.jpg" />);
 
     expect(screen.getByText('GamerOne')).toBeTruthy();
     expect(screen.getByText('Friend')).toBeTruthy();

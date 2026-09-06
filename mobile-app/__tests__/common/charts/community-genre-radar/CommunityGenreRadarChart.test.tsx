@@ -19,7 +19,13 @@ jest.mock('@gamelog/common/charts/community-genre-radar/useCommunityGenreRadarCh
 
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   const { View } = jest.requireActual('react-native');
-  const MockChartWrapperCard = ({ children, headerRight, isLoading, error, ErrorBehaviour }: any) => (
+  const MockChartWrapperCard = ({
+    children,
+    headerRight,
+    isLoading,
+    error,
+    ErrorBehaviour,
+  }: any) => (
     <View testID="chart-wrapper">
       {headerRight}
       {error && ErrorBehaviour ? (
@@ -157,7 +163,9 @@ describe('CommunityGenreRadarChart', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [[50, 20]],
       labels: ['Action'],
-      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      comparisonItems: [
+        { id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 },
+      ],
       maxValue: 50,
       isLoading: false,
       errorCommunity: false,
@@ -185,7 +193,9 @@ describe('CommunityGenreRadarChart', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [[50, 20]],
       labels: ['Action'],
-      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      comparisonItems: [
+        { id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 },
+      ],
       maxValue: 50,
       isLoading: false,
       errorCommunity: false,
@@ -203,7 +213,9 @@ describe('CommunityGenreRadarChart', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [[50, 20]],
       labels: ['Action'],
-      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      comparisonItems: [
+        { id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 },
+      ],
       maxValue: 50,
       isLoading: false,
       errorCommunity: false,
@@ -227,18 +239,17 @@ describe('CommunityGenreRadarChart', () => {
     (useCommunityGenreRadarChart as jest.Mock).mockReturnValue({
       dataSet: [[50, 20]],
       labels: ['Action'],
-      comparisonItems: [{ id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 }],
+      comparisonItems: [
+        { id: '1', description: 'Action', userPercentage: 50, communityPercentage: 40 },
+      ],
       maxValue: 50,
       isLoading: false,
       errorCommunity: false,
       errorMessageCommunity: null,
     });
 
-    const { UNSAFE_getByType } = render(
-      <CommunityGenreRadarChart ownedGames={null} />
-    );
+    const { UNSAFE_getByType } = render(<CommunityGenreRadarChart ownedGames={null} />);
     const radarChart = UNSAFE_getByType('RadarChart' as any);
     expect(radarChart.props.chartSize).toBeLessThanOrEqual(400);
   });
 });
-

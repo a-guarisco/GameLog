@@ -12,4 +12,3 @@ export interface UserCardActionHandlers {
   onSelectRecommendations?: (item: UserSearchResult) => void;
   onSelectUser?: (item: UserSearchResult) => void;
 }
-

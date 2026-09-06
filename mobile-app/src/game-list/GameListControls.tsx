@@ -3,7 +3,12 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { SearchIcon, CloseIcon } from '@gamelog/common/gluestack/icon';
-import { SortBy, PlatformFilter as PlatformFilterType, StatusFilter as StatusFilterType, DateRange } from './useGameList';
+import {
+  SortBy,
+  PlatformFilter as PlatformFilterType,
+  StatusFilter as StatusFilterType,
+  DateRange,
+} from './useGameList';
 
 import { SortFilter } from './filters/SortFilter';
 import { GenreFilter } from './filters/GenreFilter';

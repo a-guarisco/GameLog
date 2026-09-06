@@ -4,1951 +4,1953 @@
  */
 
 export interface paths {
-    "/achievements/helloAchievements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Hello World */
-        get: operations["hello_world_achievements_helloAchievements_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  '/achievements/helloAchievements': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/community/game_statuses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return the game status breakdown for user and community scope */
-        get: operations["get_community_game_statuses_community_game_statuses_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Hello World */
+    get: operations['hello_world_achievements_helloAchievements_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/community/game_statuses': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/community/genre": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return the percentage playtime for each genre for the specified community scope */
-        get: operations["get_community_genre_community_genre_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return the game status breakdown for user and community scope */
+    get: operations['get_community_game_statuses_community_game_statuses_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/community/genre': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/community/monthly_playtime": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return the month-by-month playtime comparison for the specified period and community scope */
-        get: operations["get_community_monthly_playtime_community_monthly_playtime_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return the percentage playtime for each genre for the specified community scope */
+    get: operations['get_community_genre_community_genre_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/community/monthly_playtime': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/community/monthly_top_game_playtime": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return the average playtime for the most played games in the specified month period and community scope */
-        get: operations["get_community_monthly_top_game_playtime_community_monthly_top_game_playtime_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return the month-by-month playtime comparison for the specified period and community scope */
+    get: operations['get_community_monthly_playtime_community_monthly_playtime_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/community/monthly_top_game_playtime': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/community/weekly_playtime": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return the weekly playtime comparison for the specified period and community scope */
-        get: operations["get_community_weekly_playtime_community_weekly_playtime_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return the average playtime for the most played games in the specified month period and community scope */
+    get: operations['get_community_monthly_top_game_playtime_community_monthly_top_game_playtime_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/community/weekly_playtime': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/community/weekly_top_game_playtime": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return the average playtime for the most played games in the specified week and community scope */
-        get: operations["get_community_weekly_top_game_playtime_community_weekly_top_game_playtime_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return the weekly playtime comparison for the specified period and community scope */
+    get: operations['get_community_weekly_playtime_community_weekly_playtime_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/community/weekly_top_game_playtime': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/game_status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get user game status
-         * @description Get the status of a game for the current user, or all game statuses if steam_app_id is not provided.
-         */
-        get: operations["get_game_status_games_game_status_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return the average playtime for the most played games in the specified week and community scope */
+    get: operations['get_community_weekly_top_game_playtime_community_weekly_top_game_playtime_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/game_status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/genres_batch": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Get all genres for a list of app_ids
-         * @description Returns a list of GameGenres containing the app_id and genre descriptions for the requested app_ids.
-         */
-        post: operations["get_genres_batch_games_genres_batch_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get user game status
+     * @description Get the status of a game for the current user, or all game statuses if steam_app_id is not provided.
+     */
+    get: operations['get_game_status_games_game_status_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/genres_batch': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/playtime_by_game": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Returns the user's daily playtime for the specified game. Default on days=-1 to get all history. */
-        get: operations["get_weekly_playtime_by_game_games_playtime_by_game_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Get all genres for a list of app_ids
+     * @description Returns a list of GameGenres containing the app_id and genre descriptions for the requested app_ids.
+     */
+    post: operations['get_genres_batch_games_genres_batch_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/playtime_by_game': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/playtime_by_user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Returns the user's total playtime for each day, summed across all games played on that day. Default on days=-1 to get all history. */
-        get: operations["get_weekly_playtime_games_playtime_by_user_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Returns the user's daily playtime for the specified game. Default on days=-1 to get all history. */
+    get: operations['get_weekly_playtime_by_game_games_playtime_by_game_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/playtime_by_user': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/recommendations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Returns a list of recommended games for the user who made the request and the specified userID, sorted by combined play time */
-        get: operations["get_recommendations_games_recommendations_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Returns the user's total playtime for each day, summed across all games played on that day. Default on days=-1 to get all history. */
+    get: operations['get_weekly_playtime_games_playtime_by_user_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/recommendations': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/report": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the daily report for the current user
-         * @description Generate an on-demand daily report for the user identified by firebase_uid between start_date and end_date (defaults to today).
-         */
-        get: operations["get_daily_report_games_report_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Returns a list of recommended games for the user who made the request and the specified userID, sorted by combined play time */
+    get: operations['get_recommendations_games_recommendations_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/report': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/streak_by_game": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Returns the user's current streak of consecutive days played for the specified game */
-        get: operations["get_streak_by_game_games_streak_by_game_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the daily report for the current user
+     * @description Generate an on-demand daily report for the user identified by firebase_uid between start_date and end_date (defaults to today).
+     */
+    get: operations['get_daily_report_games_report_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/streak_by_game': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/streak_by_user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Returns the user's current streak of consecutive days played, computed across all games */
-        get: operations["get_streak_by_user_games_streak_by_user_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Returns the user's current streak of consecutive days played for the specified game */
+    get: operations['get_streak_by_game_games_streak_by_game_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/streak_by_user': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/games/update_game_status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Update user game status
-         * @description Update the user's game status for a specific game.
-         */
-        post: operations["update_game_status_games_update_game_status_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Returns the user's current streak of consecutive days played, computed across all games */
+    get: operations['get_streak_by_user_games_streak_by_user_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/games/update_game_status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Healthcheck */
-        get: operations["healthcheck_health_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Update user game status
+     * @description Update the user's game status for a specific game.
+     */
+    post: operations['update_game_status_games_update_game_status_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/health': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/hello": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Hello World */
-        get: operations["hello_world_hello_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Healthcheck */
+    get: operations['healthcheck_health_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/hello': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Me */
-        get: operations["me_me_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Hello World */
+    get: operations['hello_world_hello_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/notifications/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get notification history for authenticated user */
-        get: operations["get_notifications_notifications_history_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Me */
+    get: operations['me_me_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/notifications/read_all": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mark all notifications for authenticated user as read */
-        post: operations["mark_all_notifications_read_notifications_read_all_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get notification history for authenticated user */
+    get: operations['get_notifications_notifications_history_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/read_all': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/notifications/register_device": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Register a new device token for the authenticated user */
-        post: operations["register_device_notifications_register_device_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Mark all notifications for authenticated user as read */
+    post: operations['mark_all_notifications_read_notifications_read_all_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/register_device': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/notifications/unregister_device": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Unregister a device token for the authenticated user */
-        delete: operations["unregister_device_notifications_unregister_device_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Register a new device token for the authenticated user */
+    post: operations['register_device_notifications_register_device_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/unregister_device': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/notifications/{notification_id}/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mark a specific notification as read */
-        post: operations["mark_notification_read_notifications__notification_id__read_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Unregister a device token for the authenticated user */
+    delete: operations['unregister_device_notifications_unregister_device_delete'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/{notification_id}/read': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/protected": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Protected */
-        get: operations["protected_protected_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Mark a specific notification as read */
+    post: operations['mark_notification_read_notifications__notification_id__read_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/protected': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/add_friend": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Send a friend request to another user. The addressee_id must be the UUID of the user you want to send a friend request to. */
-        post: operations["add_friend_users_add_friend_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Protected */
+    get: operations['protected_protected_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/add_friend': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/friend_list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Return a list of pending_incoming and accepted friendship */
-        get: operations["get_friend_list_users_friend_list_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Send a friend request to another user. The addressee_id must be the UUID of the user you want to send a friend request to. */
+    post: operations['add_friend_users_add_friend_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/friend_list': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/manage_friendship": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Manage friendship state transitions (ACCEPT, REJECT, CANCEL, REMOVE, BLOCK, UNBLOCK). */
-        post: operations["manage_friendship_users_manage_friendship_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Return a list of pending_incoming and accepted friendship */
+    get: operations['get_friend_list_users_friend_list_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/manage_friendship': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current registered user profile including steam_api_key */
-        get: operations["get_current_user_profile_users_me_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Manage friendship state transitions (ACCEPT, REJECT, CANCEL, REMOVE, BLOCK, UNBLOCK). */
+    post: operations['manage_friendship_users_manage_friendship_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/me/steam-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Update the Steam API Key for the current user */
-        post: operations["update_steam_api_key_users_me_steam_api_key_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get current registered user profile including steam_api_key */
+    get: operations['get_current_user_profile_users_me_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/me/steam-api-key': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Register a new user in PostgreSQL linked to their Firebase Auth UID */
-        post: operations["register_user_users_register_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Update the Steam API Key for the current user */
+    post: operations['update_steam_api_key_users_me_steam_api_key_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/register': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/users/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Search users by username (case-insensitive) and return their basic info along with their relationship status with the current authenticated user. */
-        get: operations["search_users_users_search_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Register a new user in PostgreSQL linked to their Firebase Auth UID */
+    post: operations['register_user_users_register_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/search': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /** Search users by username (case-insensitive) and return their basic info along with their relationship status with the current authenticated user. */
+    get: operations['search_users_users_search_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /** CommonGames */
-        CommonGames: {
-            /** Friend Play Time */
-            friend_play_time: number;
-            /** Gamesteamid */
-            gameSteamId: string;
-            /** Requester Play Time */
-            requester_play_time: number;
-        };
-        /** CommunityGameStatusItem */
-        CommunityGameStatusItem: {
-            /** Count */
-            count: number;
-            /** Percentage */
-            percentage: number;
-            status: components["schemas"]["GameStatus"];
-        };
-        /** CommunityGameStatusResponse */
-        CommunityGameStatusResponse: {
-            /** Community */
-            community: components["schemas"]["CommunityGameStatusItem"][];
-            /** Community Num Of Games */
-            community_num_of_games: number;
-            /** User */
-            user: components["schemas"]["CommunityGameStatusItem"][];
-            /** User Num Of Games */
-            user_num_of_games: number;
-        };
-        /** CommunityGenreHour */
-        CommunityGenreHour: {
-            /** Description */
-            description: string;
-            /** Id */
-            id: string;
-            /** Percentage */
-            percentage: number;
-        };
-        /** CommunityMonthlyPlaytimeResponse */
-        CommunityMonthlyPlaytimeResponse: {
-            /** Community */
-            community: number[];
-            /** User */
-            user: number[];
-        };
-        /** CommunityMonthlyTopGameResponse */
-        CommunityMonthlyTopGameResponse: {
-            /** Community Playtime */
-            community_playtime: number;
-            /** Id */
-            id: string;
-            /** User Playtime */
-            user_playtime: number;
-        };
-        /**
-         * CommunityScope
-         * @enum {string}
-         */
-        CommunityScope: "global" | "region" | "friends" | "user";
-        /** CommunityWeeklyPlaytimeResponse */
-        CommunityWeeklyPlaytimeResponse: {
-            /** Community */
-            community: number[];
-            /** User */
-            user: number[];
-        };
-        /** CommunityWeeklyTopGameResponse */
-        CommunityWeeklyTopGameResponse: {
-            /** Community Playtime */
-            community_playtime: number;
-            /** Id */
-            id: string;
-            /** User Playtime */
-            user_playtime: number;
-        };
-        /** DailyGameReport */
-        DailyGameReport: {
-            /** App Id */
-            app_id: string;
-            /** Days Played Count */
-            days_played_count: number;
-            /** Max Playtime Per Day */
-            max_playtime_per_day: number;
-            /** Streak */
-            streak: number;
-            /** Today Play Time */
-            today_play_time: number;
-        };
-        /** DailyReport */
-        DailyReport: {
-            /**
-             * Date
-             * Format: date
-             */
-            date: string;
-            /** Game Reports */
-            game_reports: components["schemas"]["DailyGameReport"][];
-        };
-        /** FriendshipInfo */
-        FriendshipInfo: {
-            /** Friendship Id */
-            friendship_id?: string | null;
-            /** Friendship Requester Id */
-            friendship_requester_id?: string | null;
-            friendship_status?: components["schemas"]["FriendshipStatus"] | null;
-            /** Since */
-            since?: string | null;
-        };
-        /**
-         * FriendshipManageAction
-         * @enum {string}
-         */
-        FriendshipManageAction: "ACCEPT" | "REJECT" | "CANCEL" | "REMOVE" | "BLOCK" | "UNBLOCK";
-        /** FriendshipManageRequest */
-        FriendshipManageRequest: {
-            action: components["schemas"]["FriendshipManageAction"];
-            /** Friendship Id */
-            friendship_id?: string | null;
-            /** Target User Id */
-            target_user_id?: string | null;
-        };
-        /** FriendshipRequest */
-        FriendshipRequest: {
-            /**
-             * Addressee Id
-             * Format: uuid
-             */
-            addressee_id: string;
-        };
-        /**
-         * FriendshipStatus
-         * @enum {string}
-         */
-        FriendshipStatus: "pending_outgoing" | "pending_incoming" | "accepted" | "blocked";
-        /** GameGenres */
-        GameGenres: {
-            /** App Id */
-            app_id: string;
-            /** Genres */
-            genres?: string[];
-        };
-        /**
-         * GameStatus
-         * @enum {string}
-         */
-        GameStatus: "shelved" | "to_be_played" | "playing" | "platinato";
-        /** GameStatusesResponse */
-        GameStatusesResponse: {
-            /** App Id */
-            app_id: string;
-            status: components["schemas"]["GameStatus"];
-        };
-        /** Genre */
-        Genre: {
-            /** Description */
-            description: string;
-            /** Id */
-            id: string;
-        };
-        /** GenresBatchRequest */
-        GenresBatchRequest: {
-            /** App Ids */
-            app_ids?: string[];
-        };
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /** NotificationRead */
-        NotificationRead: {
-            /** Body */
-            body: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Data */
-            data?: {
-                [key: string]: unknown;
-            } | null;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Is Read */
-            is_read: boolean;
-            /** Title */
-            title: string;
-            /**
-             * User Id
-             * Format: uuid
-             */
-            user_id: string;
-        };
-        /** RecommendationResponse */
-        RecommendationResponse: {
-            /** Common Games */
-            common_games: components["schemas"]["CommonGames"][];
-            /** Common Genres */
-            common_genres: components["schemas"]["Genre"][];
-            /** Top Games */
-            top_games: components["schemas"]["RecommendedTopGame"][];
-        };
-        /** RecommendedTopGame */
-        RecommendedTopGame: {
-            /** Gamesteamid */
-            gameSteamId: string;
-            /** Keys */
-            keys: components["schemas"]["Genre"][];
-        };
-        /** RegisterDeviceRequest */
-        RegisterDeviceRequest: {
-            /**
-             * Device Type
-             * @default android
-             */
-            device_type: string;
-            /** Token */
-            token: string;
-        };
-        /** SteamApiKeyUpdateRequest */
-        SteamApiKeyUpdateRequest: {
-            /** Steam Api Key */
-            steam_api_key: string;
-        };
-        /**
-         * TopGameReference
-         * @enum {string}
-         */
-        TopGameReference: "community" | "user";
-        /** UnregisterDeviceRequest */
-        UnregisterDeviceRequest: {
-            /** Token */
-            token: string;
-        };
-        /** UpdateStatus */
-        UpdateStatus: {
-            /** App Id */
-            app_id: string;
-            status: components["schemas"]["GameStatus"];
-        };
-        /** UserMeRead */
-        UserMeRead: {
-            /** Firebase Uid */
-            firebase_uid: string;
-            /**
-             * Has Steam Api Key
-             * @default false
-             */
-            has_steam_api_key: boolean;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Steam Api Key */
-            steam_api_key: string;
-            /** Steam Id */
-            steam_id: string;
-            /** Username */
-            username: string;
-        };
-        /** UserRead */
-        UserRead: {
-            /** Firebase Uid */
-            firebase_uid: string;
-            /**
-             * Has Steam Api Key
-             * @default false
-             */
-            has_steam_api_key: boolean;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Steam Id */
-            steam_id: string;
-            /** Username */
-            username: string;
-        };
-        /** UserRegisterRequest */
-        UserRegisterRequest: {
-            /**
-             * Steam Api Key
-             * @default
-             */
-            steam_api_key: string | null;
-            /** Steam Id */
-            steam_id: string;
-            /** Username */
-            username: string;
-        };
-        /** UserSearchResult */
-        UserSearchResult: {
-            friendship: components["schemas"]["FriendshipInfo"];
-            user: components["schemas"]["UserRead"];
-        };
-        /** ValidationError */
-        ValidationError: {
-            /** Context */
-            ctx?: Record<string, never>;
-            /** Input */
-            input?: unknown;
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-        };
+  schemas: {
+    /** CommonGames */
+    CommonGames: {
+      /** Friend Play Time */
+      friend_play_time: number;
+      /** Gamesteamid */
+      gameSteamId: string;
+      /** Requester Play Time */
+      requester_play_time: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    /** CommunityGameStatusItem */
+    CommunityGameStatusItem: {
+      /** Count */
+      count: number;
+      /** Percentage */
+      percentage: number;
+      status: components['schemas']['GameStatus'];
+    };
+    /** CommunityGameStatusResponse */
+    CommunityGameStatusResponse: {
+      /** Community */
+      community: components['schemas']['CommunityGameStatusItem'][];
+      /** Community Num Of Games */
+      community_num_of_games: number;
+      /** User */
+      user: components['schemas']['CommunityGameStatusItem'][];
+      /** User Num Of Games */
+      user_num_of_games: number;
+    };
+    /** CommunityGenreHour */
+    CommunityGenreHour: {
+      /** Description */
+      description: string;
+      /** Id */
+      id: string;
+      /** Percentage */
+      percentage: number;
+    };
+    /** CommunityMonthlyPlaytimeResponse */
+    CommunityMonthlyPlaytimeResponse: {
+      /** Community */
+      community: number[];
+      /** User */
+      user: number[];
+    };
+    /** CommunityMonthlyTopGameResponse */
+    CommunityMonthlyTopGameResponse: {
+      /** Community Playtime */
+      community_playtime: number;
+      /** Id */
+      id: string;
+      /** User Playtime */
+      user_playtime: number;
+    };
+    /**
+     * CommunityScope
+     * @enum {string}
+     */
+    CommunityScope: 'global' | 'region' | 'friends' | 'user';
+    /** CommunityWeeklyPlaytimeResponse */
+    CommunityWeeklyPlaytimeResponse: {
+      /** Community */
+      community: number[];
+      /** User */
+      user: number[];
+    };
+    /** CommunityWeeklyTopGameResponse */
+    CommunityWeeklyTopGameResponse: {
+      /** Community Playtime */
+      community_playtime: number;
+      /** Id */
+      id: string;
+      /** User Playtime */
+      user_playtime: number;
+    };
+    /** DailyGameReport */
+    DailyGameReport: {
+      /** App Id */
+      app_id: string;
+      /** Days Played Count */
+      days_played_count: number;
+      /** Max Playtime Per Day */
+      max_playtime_per_day: number;
+      /** Streak */
+      streak: number;
+      /** Today Play Time */
+      today_play_time: number;
+    };
+    /** DailyReport */
+    DailyReport: {
+      /**
+       * Date
+       * Format: date
+       */
+      date: string;
+      /** Game Reports */
+      game_reports: components['schemas']['DailyGameReport'][];
+    };
+    /** FriendshipInfo */
+    FriendshipInfo: {
+      /** Friendship Id */
+      friendship_id?: string | null;
+      /** Friendship Requester Id */
+      friendship_requester_id?: string | null;
+      friendship_status?: components['schemas']['FriendshipStatus'] | null;
+      /** Since */
+      since?: string | null;
+    };
+    /**
+     * FriendshipManageAction
+     * @enum {string}
+     */
+    FriendshipManageAction: 'ACCEPT' | 'REJECT' | 'CANCEL' | 'REMOVE' | 'BLOCK' | 'UNBLOCK';
+    /** FriendshipManageRequest */
+    FriendshipManageRequest: {
+      action: components['schemas']['FriendshipManageAction'];
+      /** Friendship Id */
+      friendship_id?: string | null;
+      /** Target User Id */
+      target_user_id?: string | null;
+    };
+    /** FriendshipRequest */
+    FriendshipRequest: {
+      /**
+       * Addressee Id
+       * Format: uuid
+       */
+      addressee_id: string;
+    };
+    /**
+     * FriendshipStatus
+     * @enum {string}
+     */
+    FriendshipStatus: 'pending_outgoing' | 'pending_incoming' | 'accepted' | 'blocked';
+    /** GameGenres */
+    GameGenres: {
+      /** App Id */
+      app_id: string;
+      /** Genres */
+      genres?: string[];
+    };
+    /**
+     * GameStatus
+     * @enum {string}
+     */
+    GameStatus: 'shelved' | 'to_be_played' | 'playing' | 'platinato';
+    /** GameStatusesResponse */
+    GameStatusesResponse: {
+      /** App Id */
+      app_id: string;
+      status: components['schemas']['GameStatus'];
+    };
+    /** Genre */
+    Genre: {
+      /** Description */
+      description: string;
+      /** Id */
+      id: string;
+    };
+    /** GenresBatchRequest */
+    GenresBatchRequest: {
+      /** App Ids */
+      app_ids?: string[];
+    };
+    /** HTTPValidationError */
+    HTTPValidationError: {
+      /** Detail */
+      detail?: components['schemas']['ValidationError'][];
+    };
+    /** NotificationRead */
+    NotificationRead: {
+      /** Body */
+      body: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Data */
+      data?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Read */
+      is_read: boolean;
+      /** Title */
+      title: string;
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+    };
+    /** RecommendationResponse */
+    RecommendationResponse: {
+      /** Common Games */
+      common_games: components['schemas']['CommonGames'][];
+      /** Common Genres */
+      common_genres: components['schemas']['Genre'][];
+      /** Top Games */
+      top_games: components['schemas']['RecommendedTopGame'][];
+    };
+    /** RecommendedTopGame */
+    RecommendedTopGame: {
+      /** Gamesteamid */
+      gameSteamId: string;
+      /** Keys */
+      keys: components['schemas']['Genre'][];
+    };
+    /** RegisterDeviceRequest */
+    RegisterDeviceRequest: {
+      /**
+       * Device Type
+       * @default android
+       */
+      device_type: string;
+      /** Token */
+      token: string;
+    };
+    /** SteamApiKeyUpdateRequest */
+    SteamApiKeyUpdateRequest: {
+      /** Steam Api Key */
+      steam_api_key: string;
+    };
+    /**
+     * TopGameReference
+     * @enum {string}
+     */
+    TopGameReference: 'community' | 'user';
+    /** UnregisterDeviceRequest */
+    UnregisterDeviceRequest: {
+      /** Token */
+      token: string;
+    };
+    /** UpdateStatus */
+    UpdateStatus: {
+      /** App Id */
+      app_id: string;
+      status: components['schemas']['GameStatus'];
+    };
+    /** UserMeRead */
+    UserMeRead: {
+      /** Firebase Uid */
+      firebase_uid: string;
+      /**
+       * Has Steam Api Key
+       * @default false
+       */
+      has_steam_api_key: boolean;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Steam Api Key */
+      steam_api_key: string;
+      /** Steam Id */
+      steam_id: string;
+      /** Username */
+      username: string;
+    };
+    /** UserRead */
+    UserRead: {
+      /** Firebase Uid */
+      firebase_uid: string;
+      /**
+       * Has Steam Api Key
+       * @default false
+       */
+      has_steam_api_key: boolean;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Steam Id */
+      steam_id: string;
+      /** Username */
+      username: string;
+    };
+    /** UserRegisterRequest */
+    UserRegisterRequest: {
+      /**
+       * Steam Api Key
+       * @default
+       */
+      steam_api_key: string | null;
+      /** Steam Id */
+      steam_id: string;
+      /** Username */
+      username: string;
+    };
+    /** UserSearchResult */
+    UserSearchResult: {
+      friendship: components['schemas']['FriendshipInfo'];
+      user: components['schemas']['UserRead'];
+    };
+    /** ValidationError */
+    ValidationError: {
+      /** Context */
+      ctx?: Record<string, never>;
+      /** Input */
+      input?: unknown;
+      /** Location */
+      loc: (string | number)[];
+      /** Message */
+      msg: string;
+      /** Error Type */
+      type: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    hello_world_achievements_helloAchievements_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
+  hello_world_achievements_helloAchievements_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    get_community_game_statuses_community_game_statuses_get: {
-        parameters: {
-            query: {
-                /** @description Community scope: global, region, friends, or user */
-                scope: components["schemas"]["CommunityScope"];
-                /** @description Target user UUID (required when scope is 'user') */
-                user_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommunityGameStatusResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': unknown;
         };
+      };
     };
-    get_community_genre_community_genre_get: {
-        parameters: {
-            query: {
-                /** @description Community scope: global, region, friends, or user */
-                scope: components["schemas"]["CommunityScope"];
-                /** @description Target user UUID (required when scope is 'user') */
-                user_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommunityGenreHour"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_community_game_statuses_community_game_statuses_get: {
+    parameters: {
+      query: {
+        /** @description Community scope: global, region, friends, or user */
+        scope: components['schemas']['CommunityScope'];
+        /** @description Target user UUID (required when scope is 'user') */
+        user_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_community_monthly_playtime_community_monthly_playtime_get: {
-        parameters: {
-            query: {
-                /** @description Community scope: global, region, friends, or user */
-                scope: components["schemas"]["CommunityScope"];
-                /** @description Start date of the period (YYYY-MM-01) */
-                start_date: string;
-                /** @description End date of the period (last day of month) */
-                end_date: string;
-                /** @description Target user UUID (required when scope is 'user') */
-                user_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommunityMonthlyPlaytimeResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['CommunityGameStatusResponse'];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_community_monthly_top_game_playtime_community_monthly_top_game_playtime_get: {
-        parameters: {
-            query: {
-                /** @description Community scope: global, region, friends, or user */
-                scope: components["schemas"]["CommunityScope"];
-                /** @description Start date of the period (YYYY-MM-01) */
-                start_date: string;
-                /** @description End date of the period (last day of month) */
-                end_date: string;
-                /** @description Reference point for ranking: 'community' or 'user' */
-                reference?: components["schemas"]["TopGameReference"] | null;
-                /** @description Target user UUID (required when scope is 'user') */
-                user_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommunityMonthlyTopGameResponse"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_community_genre_community_genre_get: {
+    parameters: {
+      query: {
+        /** @description Community scope: global, region, friends, or user */
+        scope: components['schemas']['CommunityScope'];
+        /** @description Target user UUID (required when scope is 'user') */
+        user_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_community_weekly_playtime_community_weekly_playtime_get: {
-        parameters: {
-            query: {
-                /** @description Community scope: global, region, friends, or user */
-                scope: components["schemas"]["CommunityScope"];
-                /** @description Start date of the week (YYYY-MM-DD) */
-                start_date: string;
-                /** @description End date of the week (YYYY-MM-DD) */
-                end_date: string;
-                /** @description Target user UUID (required when scope is 'user') */
-                user_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommunityWeeklyPlaytimeResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['CommunityGenreHour'][];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_community_weekly_top_game_playtime_community_weekly_top_game_playtime_get: {
-        parameters: {
-            query: {
-                /** @description Community scope: global, region, friends, or user */
-                scope: components["schemas"]["CommunityScope"];
-                /** @description Start date of the week (YYYY-MM-DD) */
-                start_date: string;
-                /** @description End date of the week (YYYY-MM-DD) */
-                end_date: string;
-                /** @description Reference point for ranking: 'community' or 'user' */
-                reference?: components["schemas"]["TopGameReference"] | null;
-                /** @description Target user UUID (required when scope is 'user') */
-                user_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommunityWeeklyTopGameResponse"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_community_monthly_playtime_community_monthly_playtime_get: {
+    parameters: {
+      query: {
+        /** @description Community scope: global, region, friends, or user */
+        scope: components['schemas']['CommunityScope'];
+        /** @description Start date of the period (YYYY-MM-01) */
+        start_date: string;
+        /** @description End date of the period (last day of month) */
+        end_date: string;
+        /** @description Target user UUID (required when scope is 'user') */
+        user_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_game_status_games_game_status_get: {
-        parameters: {
-            query?: {
-                steam_app_id?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GameStatus"] | components["schemas"]["GameStatusesResponse"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['CommunityMonthlyPlaytimeResponse'];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_genres_batch_games_genres_batch_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GenresBatchRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GameGenres"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_community_monthly_top_game_playtime_community_monthly_top_game_playtime_get: {
+    parameters: {
+      query: {
+        /** @description Community scope: global, region, friends, or user */
+        scope: components['schemas']['CommunityScope'];
+        /** @description Start date of the period (YYYY-MM-01) */
+        start_date: string;
+        /** @description End date of the period (last day of month) */
+        end_date: string;
+        /** @description Reference point for ranking: 'community' or 'user' */
+        reference?: components['schemas']['TopGameReference'] | null;
+        /** @description Target user UUID (required when scope is 'user') */
+        user_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_weekly_playtime_by_game_games_playtime_by_game_get: {
-        parameters: {
-            query: {
-                steam_app_id: string;
-                days?: number;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['CommunityMonthlyTopGameResponse'][];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_weekly_playtime_games_playtime_by_user_get: {
-        parameters: {
-            query?: {
-                days?: number;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_community_weekly_playtime_community_weekly_playtime_get: {
+    parameters: {
+      query: {
+        /** @description Community scope: global, region, friends, or user */
+        scope: components['schemas']['CommunityScope'];
+        /** @description Start date of the week (YYYY-MM-DD) */
+        start_date: string;
+        /** @description End date of the week (YYYY-MM-DD) */
+        end_date: string;
+        /** @description Target user UUID (required when scope is 'user') */
+        user_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_recommendations_games_recommendations_get: {
-        parameters: {
-            query?: {
-                friend?: string | null;
-                steam_friend_id?: string | null;
-                include_top_games?: boolean;
-                top_game_length?: number;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecommendationResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['CommunityWeeklyPlaytimeResponse'];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_daily_report_games_report_get: {
-        parameters: {
-            query?: {
-                /** @description Start date for the report (YYYY-MM-DD) */
-                start_date?: string | null;
-                /** @description End date for the report (YYYY-MM-DD) */
-                end_date?: string | null;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DailyReport"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_community_weekly_top_game_playtime_community_weekly_top_game_playtime_get: {
+    parameters: {
+      query: {
+        /** @description Community scope: global, region, friends, or user */
+        scope: components['schemas']['CommunityScope'];
+        /** @description Start date of the week (YYYY-MM-DD) */
+        start_date: string;
+        /** @description End date of the week (YYYY-MM-DD) */
+        end_date: string;
+        /** @description Reference point for ranking: 'community' or 'user' */
+        reference?: components['schemas']['TopGameReference'] | null;
+        /** @description Target user UUID (required when scope is 'user') */
+        user_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_streak_by_game_games_streak_by_game_get: {
-        parameters: {
-            query: {
-                steam_app_id: string;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['CommunityWeeklyTopGameResponse'][];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_streak_by_user_games_streak_by_user_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_game_status_games_game_status_get: {
+    parameters: {
+      query?: {
+        steam_app_id?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    update_game_status_games_update_game_status_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateStatus"];
-            };
+        content: {
+          'application/json':
+            | components['schemas']['GameStatus']
+            | components['schemas']['GameStatusesResponse'][];
         };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    healthcheck_health_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
+  };
+  get_genres_batch_games_genres_batch_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    hello_world_hello_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenresBatchRequest'];
+      };
     };
-    me_me_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['GameGenres'][];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    get_notifications_notifications_history_get: {
-        parameters: {
-            query?: {
-                limit?: number;
-                offset?: number;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotificationRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_weekly_playtime_by_game_games_playtime_by_game_get: {
+    parameters: {
+      query: {
+        steam_app_id: string;
+        days?: number;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    mark_all_notifications_read_notifications_read_all_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': unknown;
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    register_device_notifications_register_device_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterDeviceRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_weekly_playtime_games_playtime_by_user_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    unregister_device_notifications_unregister_device_delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UnregisterDeviceRequest"];
-            };
+        content: {
+          'application/json': unknown;
         };
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    mark_notification_read_notifications__notification_id__read_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                notification_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotificationRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_recommendations_games_recommendations_get: {
+    parameters: {
+      query?: {
+        friend?: string | null;
+        steam_friend_id?: string | null;
+        include_top_games?: boolean;
+        top_game_length?: number;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    protected_protected_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['RecommendationResponse'];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    add_friend_users_add_friend_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["FriendshipRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_daily_report_games_report_get: {
+    parameters: {
+      query?: {
+        /** @description Start date for the report (YYYY-MM-DD) */
+        start_date?: string | null;
+        /** @description End date for the report (YYYY-MM-DD) */
+        end_date?: string | null;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_friend_list_users_friend_list_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': components['schemas']['DailyReport'];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    manage_friendship_users_manage_friendship_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["FriendshipManageRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_streak_by_game_games_streak_by_game_get: {
+    parameters: {
+      query: {
+        steam_app_id: string;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    get_current_user_profile_users_me_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMeRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          'application/json': unknown;
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    update_steam_api_key_users_me_steam_api_key_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SteamApiKeyUpdateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMeRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  get_streak_by_user_games_streak_by_user_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    register_user_users_register_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserRegisterRequest"];
-            };
+        content: {
+          'application/json': unknown;
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
     };
-    search_users_users_search_get: {
-        parameters: {
-            query: {
-                q: string;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserSearchResult"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  update_game_status_games_update_game_status_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStatus'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  healthcheck_health_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+    };
+  };
+  hello_world_hello_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+    };
+  };
+  me_me_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_notifications_notifications_history_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        offset?: number;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NotificationRead'][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  mark_all_notifications_read_notifications_read_all_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  register_device_notifications_register_device_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterDeviceRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  unregister_device_notifications_unregister_device_delete: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UnregisterDeviceRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  mark_notification_read_notifications__notification_id__read_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path: {
+        notification_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NotificationRead'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  protected_protected_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  add_friend_users_add_friend_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FriendshipRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_friend_list_users_friend_list_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  manage_friendship_users_manage_friendship_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FriendshipManageRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_current_user_profile_users_me_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserMeRead'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  update_steam_api_key_users_me_steam_api_key_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SteamApiKeyUpdateRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserMeRead'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  register_user_users_register_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserRegisterRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserRead'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  search_users_users_search_get: {
+    parameters: {
+      query: {
+        q: string;
+      };
+      header?: {
+        authorization?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserSearchResult'][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
 }

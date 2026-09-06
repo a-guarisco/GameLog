@@ -14,8 +14,8 @@ interface SeeAllLinkProps {
 
 const SeeAllLink = ({ label, onPress, accessibilityRole = 'link', testID }: SeeAllLinkProps) => {
   const isDark = useColorScheme() === 'dark';
-  const chevronColor = isDark 
-    ? toHex(brand.typographyDark['300']) 
+  const chevronColor = isDark
+    ? toHex(brand.typographyDark['300'])
     : toHex(brand.typographyLight['300']);
 
   return (

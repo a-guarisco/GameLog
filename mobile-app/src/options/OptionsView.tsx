@@ -48,7 +48,10 @@ export const OptionsView = () => {
   // Steam API Key update
   const [newSteamApiKey, setNewSteamApiKey] = useState('');
   const [updatingApiKey, setUpdatingApiKey] = useState(false);
-  const [apiKeyFeedback, setApiKeyFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [apiKeyFeedback, setApiKeyFeedback] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -121,7 +124,9 @@ export const OptionsView = () => {
       const isInvalid = detail.toLowerCase().includes('invalid');
       setApiKeyFeedback({
         type: 'error',
-        message: isInvalid ? 'Invalid Steam API Key or Steam ID.' : 'Failed to update. Please try again.',
+        message: isInvalid
+          ? 'Invalid Steam API Key or Steam ID.'
+          : 'Failed to update. Please try again.',
       });
     } finally {
       setUpdatingApiKey(false);

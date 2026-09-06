@@ -45,25 +45,19 @@ jest.mock(
   }
 );
 
-jest.mock(
-  '@gamelog/common/charts/community-game-status/CommunityGameStatusChart',
-  () => {
-    const { Text } = require('react-native');
-    return (props: any) => (
-      <Text testID="mock-game-status-chart">{props.chartTitle || 'Status Chart'}</Text>
-    );
-  }
-);
+jest.mock('@gamelog/common/charts/community-game-status/CommunityGameStatusChart', () => {
+  const { Text } = require('react-native');
+  return (props: any) => (
+    <Text testID="mock-game-status-chart">{props.chartTitle || 'Status Chart'}</Text>
+  );
+});
 
-jest.mock(
-  '@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart',
-  () => {
-    const { Text } = require('react-native');
-    return (props: any) => (
-      <Text testID="mock-genre-radar-chart">{props.chartTitle || 'Radar Chart'}</Text>
-    );
-  }
-);
+jest.mock('@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart', () => {
+  const { Text } = require('react-native');
+  return (props: any) => (
+    <Text testID="mock-genre-radar-chart">{props.chartTitle || 'Radar Chart'}</Text>
+  );
+});
 
 const mockApiManager = ApiManager as jest.Mocked<typeof ApiManager>;
 
@@ -149,7 +143,11 @@ describe('OtherUserProfileView', () => {
       fireEvent(scrollView, 'refresh');
     });
 
-    expect(mockApiManager.getPlayersInfo.mock.calls.length).toBeGreaterThan(initialGetPlayersInfoCalls);
-    expect(mockApiManager.getOwnedGames.mock.calls.length).toBeGreaterThan(initialGetOwnedGamesCalls);
+    expect(mockApiManager.getPlayersInfo.mock.calls.length).toBeGreaterThan(
+      initialGetPlayersInfoCalls
+    );
+    expect(mockApiManager.getOwnedGames.mock.calls.length).toBeGreaterThan(
+      initialGetOwnedGamesCalls
+    );
   });
 });

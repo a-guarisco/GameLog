@@ -35,7 +35,9 @@ describe('FriendshipStatusBadge', () => {
   });
 
   it('renders correctly when using legacy config prop', () => {
-    render(<FriendshipStatusBadge config={{ label: 'Friend', tone: 'success' }} testID="badge-config" />);
+    render(
+      <FriendshipStatusBadge config={{ label: 'Friend', tone: 'success' }} testID="badge-config" />
+    );
     expect(screen.getByTestId('badge-config')).toBeTruthy();
     expect(screen.getByText('Friend')).toBeTruthy();
   });

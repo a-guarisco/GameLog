@@ -91,11 +91,7 @@ describe('GameStatusSelectorChip', () => {
     mockUpdateGameStatus.mockResolvedValueOnce({ message: 'Success' });
 
     render(
-      <GameStatusSelectorChip
-        appId="730"
-        initialStatus="playing"
-        onStatusChange={onStatusChange}
-      />
+      <GameStatusSelectorChip appId="730" initialStatus="playing" onStatusChange={onStatusChange} />
     );
 
     fireEvent.press(screen.getByText('Playing'));

@@ -1,10 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import FriendRecommendationsView from '@gamelog/social/social-view/FriendRecommendationsView';
-import {
-  useGetFriendRecommendations,
-  useGetFriendList,
-} from '@gamelog/api-manager/useApi';
+import { useGetFriendRecommendations, useGetFriendList } from '@gamelog/api-manager/useApi';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
 jest.mock('@gamelog/api-manager/useApi');
@@ -294,6 +291,3 @@ describe('FriendRecommendationsView', () => {
     expect(mockRefetchRecommendations).not.toHaveBeenCalled();
   });
 });
-
-
-

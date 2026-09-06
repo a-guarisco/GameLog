@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { render } from '@testing-library/react-native';
 import {
   NAV_RAIL_WIDTH_PHONE,
@@ -16,9 +16,8 @@ import { useGameList } from '@gamelog/game-list/useGameList';
 
 jest.mock('@gamelog/common/Banner', () => {
   const { View } = jest.requireActual('react-native');
-  return ({ imageUrl, minHeight, heightPercentage, scrollable }: any) => (
-    <View testID="mock-banner" />
-  );
+  // eslint-disable-next-line react/display-name, no-empty-pattern
+  return ({}: any) => <View testID="mock-banner" />;
 });
 
 jest.mock('expo-blur', () => {

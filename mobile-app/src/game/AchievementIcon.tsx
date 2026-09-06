@@ -18,28 +18,15 @@ const AchievementIcon = ({ isUnlocked, size = 20 }: AchievementIconProps) => {
       : toHex(brand.typographyLight['400']);
 
     return (
-      <Ionicons
-        name="lock-closed"
-        size={size}
-        color={lockColor}
-        testID="achievement-icon-locked"
-      />
+      <Ionicons name="lock-closed" size={size} color={lockColor} testID="achievement-icon-locked" />
     );
   }
 
-  const trophyColor = isDark
-    ? toHex(brand.primary['400'])
-    : toHex(brand.primary['500']);
+  const trophyColor = isDark ? toHex(brand.primary['400']) : toHex(brand.primary['500']);
 
   return (
-    <Ionicons
-      name="trophy"
-      size={size}
-      color={trophyColor}
-      testID="achievement-icon-unlocked"
-    />
+    <Ionicons name="trophy" size={size} color={trophyColor} testID="achievement-icon-unlocked" />
   );
 };
 
 export default AchievementIcon;
-

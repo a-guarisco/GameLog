@@ -20,13 +20,13 @@ interface GameListCardBadgesProps {
   platformFilter: PlatformFilter;
 }
 
-export const GameListCardBadges = ({ 
-  gameItem, 
-  topPlatform, 
-  lastPlayedText, 
-  isExpanded = false, 
-  sortBy, 
-  platformFilter 
+export const GameListCardBadges = ({
+  gameItem,
+  topPlatform,
+  lastPlayedText,
+  isExpanded = false,
+  sortBy,
+  platformFilter,
 }: GameListCardBadgesProps) => {
   const { isLandscape, width: screenWidth } = useOrientation();
   const insets = useSafeAreaInsets() ?? { top: 0, left: 0, right: 0, bottom: 0 };
@@ -36,7 +36,12 @@ export const GameListCardBadges = ({
       id: 'playtime',
       text: formatMinutesToHoursShort(gameItem.playtime_forever),
       icon: 'time',
-      metric: { hex: HEX_COLORS.playtime.hex, bgClass: 'bg-semantic-playtime-100 dark:bg-semantic-playtime-900/40', textClass: 'text-semantic-playtime-600', borderClass: 'border-semantic-playtime-600' },
+      metric: {
+        hex: HEX_COLORS.playtime.hex,
+        bgClass: 'bg-semantic-playtime-100 dark:bg-semantic-playtime-900/40',
+        textClass: 'text-semantic-playtime-600',
+        borderClass: 'border-semantic-playtime-600',
+      },
       show: true,
       hideText: false,
     },
@@ -44,7 +49,12 @@ export const GameListCardBadges = ({
       id: 'streak',
       text: String(gameItem.streak),
       icon: 'flame',
-      metric: { hex: HEX_COLORS.gameStreak.hex, bgClass: 'bg-semantic-gameStreak-100 dark:bg-semantic-gameStreak-900/40', textClass: 'text-semantic-gameStreak-600', borderClass: 'border-semantic-gameStreak-600' },
+      metric: {
+        hex: HEX_COLORS.gameStreak.hex,
+        bgClass: 'bg-semantic-gameStreak-100 dark:bg-semantic-gameStreak-900/40',
+        textClass: 'text-semantic-gameStreak-600',
+        borderClass: 'border-semantic-gameStreak-600',
+      },
       show: gameItem.streak > 0,
       hideText: false,
     },
@@ -52,7 +62,12 @@ export const GameListCardBadges = ({
       id: 'max_per_day',
       text: formatMinutesToHoursShort(gameItem.maxPlaytimePerDay),
       icon: 'flash',
-      metric: { hex: HEX_COLORS.maxPerDay.hex, bgClass: 'bg-semantic-maxPerDay-100 dark:bg-semantic-maxPerDay-900/40', textClass: 'text-semantic-maxPerDay-600', borderClass: 'border-semantic-maxPerDay-600' },
+      metric: {
+        hex: HEX_COLORS.maxPerDay.hex,
+        bgClass: 'bg-semantic-maxPerDay-100 dark:bg-semantic-maxPerDay-900/40',
+        textClass: 'text-semantic-maxPerDay-600',
+        borderClass: 'border-semantic-maxPerDay-600',
+      },
       show: gameItem.maxPlaytimePerDay > 0,
       hideText: false,
     },
@@ -60,7 +75,12 @@ export const GameListCardBadges = ({
       id: 'last_played',
       text: lastPlayedText,
       icon: 'calendar-clear',
-      metric: { hex: HEX_COLORS.lastPlayed.hex, bgClass: 'bg-semantic-lastPlayed-100 dark:bg-semantic-lastPlayed-900/40', textClass: 'text-semantic-lastPlayed-600', borderClass: 'border-semantic-lastPlayed-600' },
+      metric: {
+        hex: HEX_COLORS.lastPlayed.hex,
+        bgClass: 'bg-semantic-lastPlayed-100 dark:bg-semantic-lastPlayed-900/40',
+        textClass: 'text-semantic-lastPlayed-600',
+        borderClass: 'border-semantic-lastPlayed-600',
+      },
       show: gameItem.rtime_last_played > 0,
       hideText: false,
     },
@@ -116,10 +136,15 @@ export const GameListCardBadges = ({
       id: 'top_platform',
       text: topPlatform.name,
       icon: topPlatform.iconName,
-      metric: { hex: HEX_COLORS.topPlatform.hex, bgClass: 'bg-semantic-topPlatform-100 dark:bg-semantic-topPlatform-900/40', textClass: 'text-semantic-topPlatform-600', borderClass: 'border-semantic-topPlatform-600' },
+      metric: {
+        hex: HEX_COLORS.topPlatform.hex,
+        bgClass: 'bg-semantic-topPlatform-100 dark:bg-semantic-topPlatform-900/40',
+        textClass: 'text-semantic-topPlatform-600',
+        borderClass: 'border-semantic-topPlatform-600',
+      },
       show: topPlatform.time > 0,
       hideText: true,
-    }
+    },
   ];
 
   let activeChips = allChips.filter((c) => c.show);
@@ -135,7 +160,6 @@ export const GameListCardBadges = ({
     ? ['playtime', 'streak', 'game_status', 'max_per_day', 'last_played', 'top_platform']
     : ['playtime', 'streak', 'max_per_day', 'last_played', 'game_status', 'top_platform'];
 
-  
   activeChips.sort((a, b) => {
     const aPrio = isPriority(a.id);
     const bPrio = isPriority(b.id);
@@ -173,24 +197,24 @@ export const GameListCardBadges = ({
       activeChips = fittingChips;
     } else {
       const charWidth = 6;
-      const baseChipWidth = 24; 
+      const baseChipWidth = 24;
       const MAX_WIDTH = 145; // Cards are in a 2-column grid, max width is roughly 160-180px
 
       let estimatedWidth = 0;
       activeChips.forEach((c) => {
-        estimatedWidth += c.hideText ? baseChipWidth : ((c.text.length * charWidth) + baseChipWidth);
+        estimatedWidth += c.hideText ? baseChipWidth : c.text.length * charWidth + baseChipWidth;
       });
 
       // Iterate from right to left (least priority to highest priority)
       for (let i = activeChips.length - 1; i >= 0; i--) {
         if (estimatedWidth > MAX_WIDTH) {
           const c = activeChips[i];
-          const chipW = c.hideText ? baseChipWidth : ((c.text.length * charWidth) + baseChipWidth);
+          const chipW = c.hideText ? baseChipWidth : c.text.length * charWidth + baseChipWidth;
           estimatedWidth -= chipW;
           (c as any).hidden = true;
         }
       }
-      
+
       activeChips = activeChips.filter((c: any) => !c.hidden);
     }
   }

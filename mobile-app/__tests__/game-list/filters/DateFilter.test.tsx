@@ -9,7 +9,10 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('DateFilter', () => {
   it('renders Date chip with "All Time" when no filter is set', () => {
     const { getByText } = render(
-      <DateFilter dateRangeFilter={{ from: undefined, to: undefined }} setDateRangeFilter={jest.fn()} />,
+      <DateFilter
+        dateRangeFilter={{ from: undefined, to: undefined }}
+        setDateRangeFilter={jest.fn()}
+      />,
       { wrapper }
     );
     expect(getByText('Date', { exact: false })).toBeTruthy();
@@ -30,7 +33,10 @@ describe('DateFilter', () => {
   it('opens modal on press and allows applying dates', () => {
     const setDateRangeFilter = jest.fn();
     const { getByText, queryByText } = render(
-      <DateFilter dateRangeFilter={{ from: undefined, to: undefined }} setDateRangeFilter={setDateRangeFilter} />,
+      <DateFilter
+        dateRangeFilter={{ from: undefined, to: undefined }}
+        setDateRangeFilter={setDateRangeFilter}
+      />,
       { wrapper }
     );
 

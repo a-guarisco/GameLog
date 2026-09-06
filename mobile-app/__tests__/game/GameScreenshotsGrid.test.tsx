@@ -24,11 +24,7 @@ describe('GameScreenshotsGrid', () => {
 
   it('renders loading more spinner when isLoadingMore is true', () => {
     render(
-      <GameScreenshotsGrid
-        screenshots={mockScreenshots}
-        totalCount={2}
-        isLoadingMore={true}
-      />
+      <GameScreenshotsGrid screenshots={mockScreenshots} totalCount={2} isLoadingMore={true} />
     );
 
     expect(screen.getByTestId('section-spinner')).toBeTruthy();

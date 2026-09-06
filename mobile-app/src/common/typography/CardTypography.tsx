@@ -49,7 +49,12 @@ export const SeeMoreText = ({ children, className = '', ...props }: TypographyPr
 
 /** Large bold value displayed in stat blocks (e.g. "45h", "8", "CS2"). */
 export const StatValueText = ({ children, className = '', ...props }: TypographyProps) => (
-  <Text size="md" className={`font-bold text-typography-0 ${className}`} numberOfLines={2} {...props}>
+  <Text
+    size="md"
+    className={`font-bold text-typography-0 ${className}`}
+    numberOfLines={2}
+    {...props}
+  >
     {children}
   </Text>
 );

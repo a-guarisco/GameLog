@@ -1,13 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  Animated,
-  Dimensions,
-  Easing,
-  Modal,
-  Platform,
-  Pressable,
-  View,
-} from 'react-native';
+import { Animated, Dimensions, Easing, Modal, Platform, Pressable, View } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
@@ -15,7 +7,6 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
-
 
 export interface UserCardMenuItem {
   label: string;

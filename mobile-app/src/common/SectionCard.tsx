@@ -25,11 +25,13 @@ const SectionCard = ({
 }: SectionCardProps) => {
   const isFill = className.includes('h-full') || className.includes('flex-1');
   return (
-    <Card variant="elevated" className={`p-3 overflow-visible ${className}`} style={style} testID={testID}>
-      <VStack
-        space="sm"
-        className={`w-full ${isFill ? 'h-full flex-1 justify-between' : ''}`}
-      >
+    <Card
+      variant="elevated"
+      className={`p-3 overflow-visible ${className}`}
+      style={style}
+      testID={testID}
+    >
+      <VStack space="sm" className={`w-full ${isFill ? 'h-full flex-1 justify-between' : ''}`}>
         {(!!label || !!headerRight) && (
           <HStack className="w-full justify-between items-center">
             {!!label && (
@@ -47,4 +49,3 @@ const SectionCard = ({
 };
 
 export default SectionCard;
-

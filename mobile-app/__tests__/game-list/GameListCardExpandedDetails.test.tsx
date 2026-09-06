@@ -87,4 +87,3 @@ describe('GameListCardExpandedDetails', () => {
     expect(getByText('None')).toBeTruthy();
   });
 });
-

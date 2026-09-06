@@ -1,5 +1,7 @@
 import { Text } from '@gamelog/common/gluestack/text';
 
+import { DateRangeText, ContextText } from './CardTypography';
+
 export const ChartSummaryText = ({ children, className = '', ...props }: any) => (
   <Text size="xl" className={`font-bold text-typography-0 ${className}`} {...props}>
     {children}
@@ -26,8 +28,6 @@ export const ChartDeltaText = ({
     </Text>
   );
 };
-
-import { DateRangeText, ContextText } from './CardTypography';
 
 /** @deprecated Use ContextText from CardTypography directly. Kept for backward compatibility. */
 export const ChartContextText = ContextText;

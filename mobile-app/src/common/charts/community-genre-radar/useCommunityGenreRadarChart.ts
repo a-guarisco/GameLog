@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { buildGenreChartData, GenreChartItem } from '@gamelog/common/charts/genre-radar/buildGenreChartData';
+import {
+  buildGenreChartData,
+  GenreChartItem,
+} from '@gamelog/common/charts/genre-radar/buildGenreChartData';
 import { useCommunityGenre } from './useCommunityGenre';
 import type { OwnedGames, CommunityScope } from '@gamelog/api-manager/dto';
 

@@ -1,6 +1,4 @@
-import { configureGoogleAuth, signInWithGoogle, signOutGoogle } from '../../src/auth/googleAuth';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import { signInWithCredential } from 'firebase/auth';
 
 jest.mock('expo-constants', () => ({
   __esModule: true,

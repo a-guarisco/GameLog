@@ -8,10 +8,9 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('SortFilter', () => {
   it('renders Sort chip with current selection', () => {
-    const { getByText } = render(
-      <SortFilter sortBy="playtime" onSortChange={jest.fn()} />,
-      { wrapper }
-    );
+    const { getByText } = render(<SortFilter sortBy="playtime" onSortChange={jest.fn()} />, {
+      wrapper,
+    });
     expect(getByText('Sort', { exact: false })).toBeTruthy();
     expect(getByText('Playtime')).toBeTruthy();
   });
@@ -22,7 +21,7 @@ describe('SortFilter', () => {
       <SortFilter sortBy="playtime" onSortChange={onSortChange} />,
       { wrapper }
     );
-    
+
     // Initial state: modal should be closed
     expect(queryByText('Sort By')).toBeNull();
 
@@ -35,34 +34,30 @@ describe('SortFilter', () => {
     expect(onSortChange).toHaveBeenCalledWith('last_played');
   });
 
-
   it('renders Sort chip with last_played selection', () => {
-    const { getByText } = render(
-      <SortFilter sortBy="last_played" onSortChange={jest.fn()} />,
-      { wrapper }
-    );
+    const { getByText } = render(<SortFilter sortBy="last_played" onSortChange={jest.fn()} />, {
+      wrapper,
+    });
     expect(getByText('Last Played')).toBeTruthy();
   });
 
   it('renders Sort chip with max_per_day selection', () => {
-    const { getByText } = render(
-      <SortFilter sortBy="max_per_day" onSortChange={jest.fn()} />,
-      { wrapper }
-    );
+    const { getByText } = render(<SortFilter sortBy="max_per_day" onSortChange={jest.fn()} />, {
+      wrapper,
+    });
     expect(getByText('Max per Day')).toBeTruthy();
   });
 
   it('renders Sort chip with top_platform selection', () => {
-    const { getByText } = render(
-      <SortFilter sortBy="top_platform" onSortChange={jest.fn()} />,
-      { wrapper }
-    );
+    const { getByText } = render(<SortFilter sortBy="top_platform" onSortChange={jest.fn()} />, {
+      wrapper,
+    });
     expect(getByText('Top Platform Time')).toBeTruthy();
   });
 
   it('renders Sort chip with unknown selection (default case)', () => {
     const { getByText } = render(
-      <SortFilter sortBy={"unknown" as any} onSortChange={jest.fn()} />,
+      <SortFilter sortBy={'unknown' as any} onSortChange={jest.fn()} />,
       { wrapper }
     );
     expect(getByText('Sort', { exact: false })).toBeTruthy();

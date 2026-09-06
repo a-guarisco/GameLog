@@ -35,7 +35,9 @@ describe('secureStorage', () => {
 
     it('returns false when SecureStore.isAvailableAsync throws', async () => {
       Platform.OS = 'android';
-      (SecureStore.isAvailableAsync as jest.Mock).mockRejectedValueOnce(new Error('Hardware Keystore unavailable'));
+      (SecureStore.isAvailableAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Hardware Keystore unavailable')
+      );
       const available = await isSecureStoreAvailable();
       expect(available).toBe(false);
     });
@@ -77,7 +79,9 @@ describe('secureStorage', () => {
 
     it('handles errors gracefully in getSecureItem without throwing and returns null', async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
-      (SecureStore.getItemAsync as jest.Mock).mockRejectedValueOnce(new Error('Keychain Read Error'));
+      (SecureStore.getItemAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Keychain Read Error')
+      );
 
       const result = await getSecureItem('fail_key');
       expect(result).toBeNull();
@@ -87,7 +91,9 @@ describe('secureStorage', () => {
 
     it('handles errors gracefully in deleteSecureItem without throwing', async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
-      (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValueOnce(new Error('Keychain Delete Error'));
+      (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Keychain Delete Error')
+      );
 
       await expect(deleteSecureItem('fail_key')).resolves.not.toThrow();
       expect(warnSpy).toHaveBeenCalled();

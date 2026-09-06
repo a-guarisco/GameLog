@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native';
 import { useAuthSession } from '../../src/auth/useAuthSession';
 import { onIdTokenChanged } from 'firebase/auth';
-import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
 import {
   setSteamId,

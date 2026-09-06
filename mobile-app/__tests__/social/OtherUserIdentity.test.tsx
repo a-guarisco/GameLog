@@ -137,17 +137,9 @@ describe('OtherUserIdentity', () => {
   });
 
   it('renders correctly when no friendship exists (Player status)', () => {
-    render(
-      <OtherUserIdentity
-        user={mockUser}
-        player={undefined}
-        friendship={null}
-      />
-    );
+    render(<OtherUserIdentity user={mockUser} player={undefined} friendship={null} />);
 
     expect(screen.getByText('TestUser')).toBeTruthy();
     expect(screen.getByText('Player')).toBeTruthy();
   });
 });
-
-

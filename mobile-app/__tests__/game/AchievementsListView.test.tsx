@@ -52,9 +52,12 @@ describe('AchievementsListView', () => {
     (ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mockResolvedValueOnce({});
     render(<AchievementsListView route={mockRoute} />);
 
-    await waitFor(() => {
-      expect(screen.getByText(/Achievements for\s*Unknown Game/)).toBeTruthy();
-    }, { timeout: 5000 });
+    await waitFor(
+      () => {
+        expect(screen.getByText(/Achievements for\s*Unknown Game/)).toBeTruthy();
+      },
+      { timeout: 5000 }
+    );
   });
 
   it('displays error text when the API call fails', async () => {
@@ -125,7 +128,9 @@ describe('AchievementsListView', () => {
       fireEvent(scrollView, 'refresh');
     });
 
-    expect((ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mock.calls.length).toBeGreaterThan(initialCalls);
+    expect(
+      (ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mock.calls.length
+    ).toBeGreaterThan(initialCalls);
   });
 
   it('navigates to Game with showAchievements: true and resolved gameItem when orientation is landscape', () => {
@@ -171,4 +176,3 @@ describe('AchievementsListView', () => {
     });
   });
 });
-

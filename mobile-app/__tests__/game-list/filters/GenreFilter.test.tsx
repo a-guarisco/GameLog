@@ -19,10 +19,14 @@ describe('GenreFilter', () => {
   it('opens modal and calls setGenreFilter when an option is selected', () => {
     const setGenreFilter = jest.fn();
     const { getByText, queryByText } = render(
-      <GenreFilter genreFilter="All" setGenreFilter={setGenreFilter} allAvailableGenres={['Action', 'RPG']} />,
+      <GenreFilter
+        genreFilter="All"
+        setGenreFilter={setGenreFilter}
+        allAvailableGenres={['Action', 'RPG']}
+      />,
       { wrapper }
     );
-    
+
     expect(queryByText('Filter by Genre')).toBeNull();
 
     fireEvent.press(getByText('Genre', { exact: false }));

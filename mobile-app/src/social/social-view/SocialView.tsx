@@ -84,12 +84,7 @@ export const SocialView: React.FC = () => {
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([
-        refetchUserMe(),
-        refetchFriendList(),
-        refetchSearch(),
-        refetchAvatars(),
-      ]);
+      await Promise.all([refetchUserMe(), refetchFriendList(), refetchSearch(), refetchAvatars()]);
     } finally {
       setRefreshing(false);
     }

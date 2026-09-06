@@ -24,16 +24,10 @@ jest.mock('@gamelog/common/charts/community-genre-radar/CommunityGenreRadarChart
     __esModule: true,
     default: ({ ownedGames, onExpandedChange, style }: any) => (
       <View testID="mock-community-genre-radar" style={style}>
-        <TouchableOpacity
-          testID="toggle-expand"
-          onPress={() => onExpandedChange?.(true)}
-        >
+        <TouchableOpacity testID="toggle-expand" onPress={() => onExpandedChange?.(true)}>
           <Text>Expand</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          testID="toggle-collapse"
-          onPress={() => onExpandedChange?.(false)}
-        >
+        <TouchableOpacity testID="toggle-collapse" onPress={() => onExpandedChange?.(false)}>
           <Text>Collapse</Text>
         </TouchableOpacity>
       </View>
@@ -185,9 +179,7 @@ describe('ProfileGenresTab', () => {
 
     // Community card receives minHeight style to prevent shrinking
     const communityRadar = getByTestId('mock-community-genre-radar');
-    expect(communityRadar.props.style).toEqual(
-      expect.objectContaining({ minHeight: 350 })
-    );
+    expect(communityRadar.props.style).toEqual(expect.objectContaining({ minHeight: 350 }));
   });
 
   it('renders side-by-side 2-column layout in tablet portrait mode and equalizes height', () => {

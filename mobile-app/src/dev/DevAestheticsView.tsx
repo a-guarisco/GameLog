@@ -175,16 +175,16 @@ export const DevAestheticsView = () => {
             <Text className="text-xs font-semibold text-typography-400 mt-1">
               Specialized Wrappers
             </Text>
-            <ReportCtaButton onPress={() => { }} label="Generate Report" />
+            <ReportCtaButton onPress={() => {}} label="Generate Report" />
             <HStack space="xs" className="justify-center items-center gap-2">
-              <ModalCancelButton onPress={() => { }} />
-              <ModalConfirmButton onPress={() => { }} variant="destructive" />
-              <ModalConfirmButton onPress={() => { }} variant="primary" label="Save" />
+              <ModalCancelButton onPress={() => {}} />
+              <ModalConfirmButton onPress={() => {}} variant="destructive" />
+              <ModalConfirmButton onPress={() => {}} variant="primary" label="Save" />
             </HStack>
             <HStack space="xs" className="justify-center items-center gap-2">
-              <SocialActionButton actionType="add" onPress={() => { }} />
-              <SocialActionButton actionType="accept" onPress={() => { }} />
-              <SocialActionButton actionType="refuse" onPress={() => { }} />
+              <SocialActionButton actionType="add" onPress={() => {}} />
+              <SocialActionButton actionType="accept" onPress={() => {}} />
+              <SocialActionButton actionType="refuse" onPress={() => {}} />
             </HStack>
           </Card>
         </Box>

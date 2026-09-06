@@ -10,7 +10,11 @@ import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { GLSegmentedControl } from '@gamelog/common/GLSegmentedControl';
 import { ChartAxisText } from '@gamelog/common/typography/ChartTypography';
-import { formatMinutesToHours, formatMinutesToHoursShort, toIsoDate } from '@gamelog/utils/formatUtils';
+import {
+  formatMinutesToHours,
+  formatMinutesToHoursShort,
+  toIsoDate,
+} from '@gamelog/utils/formatUtils';
 import { usePlaytimeBlocksData } from './usePlaytimeBlocksData';
 import { useChartScrollShimmer } from './useChartScrollShimmer';
 import { PlaytimeBlocksHeader, ShimmerBox } from './PlaytimeBlocksHeader';
@@ -72,13 +76,7 @@ const PlaytimeBlocksChart = ({ playtimeByUser, hasError = false }: PlaytimeBlock
 
   const { isScrolling, setIsScrolling, shimmerAnim } = useChartScrollShimmer();
 
-  const barWidth = isLandscape
-    ? trendRange === '30'
-      ? 12
-      : trendRange === '14'
-        ? 22
-        : 26
-    : 18;
+  const barWidth = isLandscape ? (trendRange === '30' ? 12 : trendRange === '14' ? 22 : 26) : 18;
   const barChartHeight = isLandscape ? 200 : 140;
   const containerHeight = isLandscape ? 240 : 180;
 
@@ -120,7 +118,7 @@ const PlaytimeBlocksChart = ({ playtimeByUser, hasError = false }: PlaytimeBlock
     <ChartWrapperCard
       label={`Playtime Blocks`}
       headerRight={
-        <Box className={isLandscape ? "w-[170px] ml-auto" : "w-[120px] ml-auto"}>
+        <Box className={isLandscape ? 'w-[170px] ml-auto' : 'w-[120px] ml-auto'}>
           <GLSegmentedControl
             options={isLandscape ? LANDSCAPE_RANGE_OPTIONS : PORTRAIT_RANGE_OPTIONS}
             activeId={trendRange}
@@ -322,7 +320,9 @@ const PlaytimeBlocksChart = ({ playtimeByUser, hasError = false }: PlaytimeBlock
                   yAxisLabelWidth={44}
                   showFractionalValues={false}
                   xAxisColor={axisColor}
-                  disableScroll={trendRange === 'week' || (isLandscape && trend.days.length <= visibleBarsCount)}
+                  disableScroll={
+                    trendRange === 'week' || (isLandscape && trend.days.length <= visibleBarsCount)
+                  }
                   dashWidth={0}
                   scrollToEnd={trendRange === '14' || trendRange === '30'}
                   scrollAnimation={false}

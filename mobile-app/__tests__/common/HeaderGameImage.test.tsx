@@ -131,4 +131,3 @@ describe('HeaderGameImage', () => {
     expect(banner.props.accessibilityLabel).toContain('-top');
   });
 });
-

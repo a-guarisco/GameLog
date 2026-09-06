@@ -51,7 +51,7 @@ interface GameNewsPanelProps {
 
 const GameNewsPanel = ({ appid }: GameNewsPanelProps) => {
   const { isLandscape, isTablet } = useOrientation();
-  const newsCount = (!isLandscape || isTablet) ? 8 : 5;
+  const newsCount = !isLandscape || isTablet ? 8 : 5;
   const { gameNews, isLoadingGameNews, errorGameNews } = useGetGameNews(appid, newsCount);
   const newsItems = gameNews?.appnews?.newsitems ?? [];
 

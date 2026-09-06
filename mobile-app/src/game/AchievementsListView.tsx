@@ -25,7 +25,8 @@ type AchievementsListViewProps = {
 const AchievementsListView = ({ route }: any) => {
   const navigation = useNavigation<any>();
   const { isLandscape } = useOrientation();
-  const { globalAchievements, gameID, playerID, gameItem } = route.params as AchievementsListViewProps;
+  const { globalAchievements, gameID, playerID, gameItem } =
+    route.params as AchievementsListViewProps;
   const { gameStreak, isLoadingGameStreak, refetchGameStreak } = useGetGameStreak(gameID);
   const secondaryText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
 
@@ -131,4 +132,3 @@ const AchievementsListView = ({ route }: any) => {
 };
 
 export default AchievementsListView;
-

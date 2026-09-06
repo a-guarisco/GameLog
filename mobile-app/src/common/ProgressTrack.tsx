@@ -17,7 +17,8 @@ const ProgressTrack = ({
   fillStyle,
 }: ProgressTrackProps) => (
   <Box
-    className={`h-2.5 w-full   overflow-hidden rounded-full bg-background-200 dark:bg-background-300 border border-outline-100/40 dark:border-outline-50/20 ${className}`}>
+    className={`h-2.5 w-full   overflow-hidden rounded-full bg-background-200 dark:bg-background-300 border border-outline-100/40 dark:border-outline-50/20 ${className}`}
+  >
     <Box
       testID={testID}
       className={`h-full rounded-full ${fillClassName}`}

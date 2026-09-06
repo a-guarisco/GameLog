@@ -30,12 +30,7 @@ describe('TopNotchBlurOverlay', () => {
     const opacity = animValue.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
 
     const { getByTestId } = render(
-      <TopNotchBlurOverlay
-        blurTargetRef={dummyRef}
-        height={60}
-        opacity={opacity}
-        isDark={false}
-      />
+      <TopNotchBlurOverlay blurTargetRef={dummyRef} height={60} opacity={opacity} isDark={false} />
     );
 
     expect(getByTestId('mock-masked-view')).toBeTruthy();
@@ -48,12 +43,7 @@ describe('TopNotchBlurOverlay', () => {
     const opacity = animValue.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
 
     const { getByTestId } = render(
-      <TopNotchBlurOverlay
-        blurTargetRef={dummyRef}
-        height={80}
-        opacity={opacity}
-        isDark={true}
-      />
+      <TopNotchBlurOverlay blurTargetRef={dummyRef} height={80} opacity={opacity} isDark={true} />
     );
 
     expect(getByTestId('mock-blur-view').props.accessibilityLabel).toBe('tint-dark');

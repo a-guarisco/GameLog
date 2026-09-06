@@ -7,6 +7,8 @@ import {
   CommunityGameStatusResponse,
 } from '@gamelog/api-manager/dto';
 
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 export interface GameStatusPieItem {
   value: number;
   color: string;
@@ -23,8 +25,6 @@ export interface StatusComparisonItem {
 }
 
 export const STATUS_ORDER: GameStatus[] = ['playing', 'to_be_played', 'shelved', 'platinato'];
-
-import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
 export const STATUS_COLORS: Record<GameStatus, string> = {
   playing: HEX_COLORS.gameStatus.playing.hex,
@@ -47,7 +47,7 @@ export interface UseCommunityGameStatusDataParams {
 
 export const useCommunityGameStatusData = ({
   data,
-  emptyColor = "transparent",
+  emptyColor = 'transparent',
 }: UseCommunityGameStatusDataParams) => {
   const comparisonItems = useMemo<StatusComparisonItem[]>(() => {
     if (!data) return [];

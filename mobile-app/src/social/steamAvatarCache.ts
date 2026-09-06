@@ -30,7 +30,7 @@ export const getAvatarFromCache = (steamId?: string | null): string | undefined 
 };
 
 export const cachePlayerAvatars = (
-  players?: Array<Pick<PlayerPublicInfo, 'steamid' | 'avatarfull' | 'avatarmedium' | 'avatar'>>
+  players?: Pick<PlayerPublicInfo, 'steamid' | 'avatarfull' | 'avatarmedium' | 'avatar'>[]
 ): void => {
   if (!Array.isArray(players) || players.length === 0) return;
 
@@ -55,15 +55,11 @@ export const fetchSteamAvatars = async (
 ): Promise<Record<string, string>> => {
   const validIds = [
     ...new Set(
-      steamIds.filter(
-        (id): id is string => typeof id === 'string' && id.trim().length > 0
-      )
+      steamIds.filter((id): id is string => typeof id === 'string' && id.trim().length > 0)
     ),
   ];
 
-  const missingIds = validIds.filter(
-    (id) => !avatarCache.has(id) && !inFlightIds.has(id)
-  );
+  const missingIds = validIds.filter((id) => !avatarCache.has(id) && !inFlightIds.has(id));
 
   if (missingIds.length > 0) {
     missingIds.forEach((id) => inFlightIds.add(id));
@@ -76,8 +72,7 @@ export const fetchSteamAvatars = async (
           const players = response?.response?.players;
           if (Array.isArray(players) && players.length > 0) {
             for (const player of players) {
-              const avatarUrl =
-                player.avatarfull || player.avatarmedium || player.avatar;
+              const avatarUrl = player.avatarfull || player.avatarmedium || player.avatar;
               if (player.steamid && avatarUrl) {
                 avatarCache.set(player.steamid, avatarUrl);
               }

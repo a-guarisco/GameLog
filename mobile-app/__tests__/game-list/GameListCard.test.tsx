@@ -40,10 +40,9 @@ describe('GameListCard', () => {
 
     // Expand the card by clicking the chevron icon
     fireEvent.press(getByText(''));
-    
+
     // Check that expanded details and status chip/section are now present
     expect(getByText('Platform Split')).toBeTruthy();
     expect(getAllByText('Playing').length).toBeGreaterThanOrEqual(1);
   });
 });
-

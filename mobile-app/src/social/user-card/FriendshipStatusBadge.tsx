@@ -1,10 +1,7 @@
 import React from 'react';
 import Chip, { ChipVariant } from '@gamelog/common/Chip';
 import { Text } from '@gamelog/common/gluestack/text';
-import {
-  FriendshipBadgeConfig,
-  getFriendshipStatusStyle,
-} from './friendshipStatus';
+import { FriendshipBadgeConfig, getFriendshipStatusStyle } from './friendshipStatus';
 
 interface FriendshipStatusBadgeProps {
   status?: string | null;
