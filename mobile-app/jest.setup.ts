@@ -103,9 +103,6 @@ jest.mock('firebase/auth', () => ({
   sendEmailVerification: jest.fn(),
 }));
 
-if (!process.env.EXPO_PUBLIC_STEAM_API_KEY) {
-  process.env.EXPO_PUBLIC_STEAM_API_KEY = 'test-steam-api-key';
-}
 
 jest.mock('@react-native-google-signin/google-signin', () => ({
   GoogleSignin: {
