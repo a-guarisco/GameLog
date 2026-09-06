@@ -21,22 +21,22 @@ export const TAB_CONFIG: Record<
 > = {
   GameListTab: {
     label: 'Games',
-    defaultIcon: 'game-controller-outline',
+    defaultIcon: 'game-controller',
     focusedIcon: 'game-controller',
   },
   ProfileTab: {
     label: 'Profile',
-    defaultIcon: 'person-outline',
+    defaultIcon: 'person',
     focusedIcon: 'person',
   },
   SocialTab: {
     label: 'Social',
-    defaultIcon: 'people-outline',
+    defaultIcon: 'people',
     focusedIcon: 'people',
   },
   DevTab: {
     label: 'Dev',
-    defaultIcon: 'construct-outline',
+    defaultIcon: 'construct',
     focusedIcon: 'construct',
   },
 };
@@ -53,7 +53,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
 
-  const barBg = parseRGB(theme['--color-background-0']);
+  const barBg = parseRGB(theme['--color-background-50']);
   const borderColor = parseRGB(theme['--color-outline-100']);
   const activeColor = parseRGB(theme['--color-primary-400']);
   const inactiveColor = parseRGB(theme['--color-typography-400']);
@@ -94,7 +94,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
             const focused = state.index === index;
             const config = TAB_CONFIG[route.name] ?? {
               label: route.name,
-              defaultIcon: 'ellipse-outline',
+              defaultIcon: 'ellipse',
               focusedIcon: 'ellipse',
             };
 
@@ -151,7 +151,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
         const focused = state.index === index;
         const config = TAB_CONFIG[route.name] ?? {
           label: route.name,
-          defaultIcon: 'ellipse-outline',
+          defaultIcon: 'ellipse',
           focusedIcon: 'ellipse',
         };
 

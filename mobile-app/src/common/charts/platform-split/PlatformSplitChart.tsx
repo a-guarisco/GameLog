@@ -5,7 +5,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
-import { CHART_PALETTE } from '@gamelog/theme/metrics';
+import { CHART_PALETTE } from '@gamelog/theme/hexColors';
 import type { PlatformSplit } from './selectPlatformSplit';
 
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';

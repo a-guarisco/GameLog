@@ -75,7 +75,7 @@ export const GLTextInput = forwardRef<RNTextInput, GLTextInputProps>(
           <InputField
             ref={ref as any}
             className={`text-typography-0 px-3 ${className}`}
-            placeholderTextColor="#9ca3af"
+            placeholderClassName="text-typography-400"
             {...props}
           />
           {RightIcon ? (

@@ -5,171 +5,6 @@ export const navigationFonts = {
   heavy: { fontFamily: 'DMSans-Heavy', fontWeight: '800' as const },
 };
 
-export const brand = {
-  primary: {
-    '0': '230 240 255',
-    '50': '170 205 255',
-    '100': '150 190 255',
-    '200': '100 165 255',
-    '300': '35 140 255',
-    '400': '0 120 235',
-    '500': '0 102 210',
-    '600': '0 83 171',
-    '700': '0 64 133',
-    '800': '0 45 94',
-    '900': '15 26 40',
-    '950': '0 0 0',
-  },
-
-  // SEMANTIC SCALE STRATEGY (0-950)
-  // bg-0: Root App Background
-  // bg-50: Elevated Surface (Card) Background
-  // bg-100/200: Interactive Background (Input, Hover)
-  // bg-500/600: Mid-level elements (Solid borders or placeholders)
-  // bg-800/900: High contrast backgrounds or text
-
-  bgLight: {
-    '0': '244 244 245', // zinc-100: Root App Background (Darker to pop cards)
-    '50': '255 255 255', // white: Card / Base Elevation
-    '100': '228 228 231', // zinc-200: Card Hover / Muted bg
-    '200': '212 212 216', // zinc-300: Light interactive background
-    '300': '161 161 170', // zinc-400
-    '400': '113 113 122', // zinc-500
-    '500': '82 82 91', // zinc-600
-    '600': '63 63 70', // zinc-700
-    '700': '39 39 42', // zinc-800
-    '800': '24 24 27', // zinc-900
-    '900': '9 9 11', // zinc-950 (Tooltip bg)
-    '950': '0 0 0', // black
-  },
-  outlineLight: {
-    '0': '255 255 255', // white
-    '50': '228 228 231', // zinc-200: Faint border
-    '100': '212 212 216', // zinc-300: Standard card border
-    '200': '161 161 170', // zinc-400: Darker border / hover
-    '300': '113 113 122', // zinc-500
-    '400': '82 82 91', // zinc-600
-    '500': '63 63 70', // zinc-700
-    '600': '39 39 42', // zinc-800
-    '700': '24 24 27', // zinc-900
-    '800': '9 9 11', // zinc-950
-    '900': '0 0 0', // black
-    '950': '0 0 0',
-  },
-  typographyLight: {
-    '0': '9 9 11', // zinc-950: Main Text / Heading
-    '50': '24 24 27', // zinc-900: Standard Text / Body
-    '100': '39 39 42', // zinc-800: Secondary Text
-    '200': '63 63 70', // zinc-700: Tertiary Text
-    '300': '82 82 91', // zinc-600: Dark placeholder
-    '400': '113 113 122', // zinc-500: Placeholder / Muted
-    '500': '161 161 170', // zinc-400
-    '600': '212 212 216', // zinc-300
-    '700': '228 228 231', // zinc-200
-    '800': '244 244 245', // zinc-100
-    '900': '250 250 250', // zinc-50
-    '950': '255 255 255', // white: Text on dark backgrounds
-  },
-  bgDark: {
-    '0': '0 0 0', // black: Root App Background (Darker to pop cards)
-    '50': '24 24 27', // zinc-900: Card / Base Elevation
-    '100': '39 39 42', // zinc-800: Card Hover / Muted bg
-    '200': '63 63 70', // zinc-700: Light interactive background
-    '300': '82 82 91', // zinc-600
-    '400': '113 113 122', // zinc-500
-    '500': '161 161 170', // zinc-400
-    '600': '212 212 216', // zinc-300
-    '700': '228 228 231', // zinc-200
-    '800': '244 244 245', // zinc-100
-    '900': '250 250 250', // zinc-50 (Tooltip bg in dark)
-    '950': '255 255 255', // white
-  },
-  outlineDark: {
-    '0': '9 9 11', // zinc-950
-    '50': '39 39 42', // zinc-800: Faint border
-    '100': '63 63 70', // zinc-700: Standard card border
-    '200': '82 82 91', // zinc-600: Light border / hover
-    '300': '113 113 122', // zinc-500
-    '400': '161 161 170', // zinc-400
-    '500': '212 212 216', // zinc-300
-    '600': '228 228 231', // zinc-200
-    '700': '244 244 245', // zinc-100
-    '800': '250 250 250', // zinc-50
-    '900': '255 255 255', // white
-    '950': '255 255 255', // white
-  },
-  typographyDark: {
-    '0': '255 255 255', // white: Main Text / Heading
-    '50': '250 250 250', // zinc-50: Standard Text / Body
-    '100': '244 244 245', // zinc-100: Secondary Text
-    '200': '228 228 231', // zinc-200: Tertiary Text
-    '300': '212 212 216', // zinc-300: Light placeholder
-    '400': '161 161 170', // zinc-400: Placeholder / Muted
-    '500': '113 113 122', // zinc-500
-    '600': '82 82 91', // zinc-600
-    '700': '63 63 70', // zinc-700
-    '800': '39 39 42', // zinc-800
-    '900': '24 24 27', // zinc-900
-    '950': '9 9 11', // zinc-950: Black text on light backgrounds
-  },
-  info: {
-    '0': '235 245 255',
-    '50': '169 212 255',
-    '100': '148 202 255',
-    '200': '106 182 255',
-    '300': '58 160 255',
-    '400': '0 140 255',
-    '500': '0 124 233',
-    '600': '0 102 195',
-    '700': '0 79 152',
-    '800': '0 54 106',
-    '900': '16 30 50',
-    '950': '0 0 0',
-  },
-  error: {
-    '0': '255 242 240',
-    '50': '255 186 180',
-    '100': '255 170 165',
-    '200': '255 137 136',
-    '300': '255 102 105',
-    '400': '255 67 76',
-    '500': '231 51 59',
-    '600': '186 35 44',
-    '700': '141 21 29',
-    '800': '95 8 16',
-    '900': '38 18 19',
-    '950': '0 0 0',
-  },
-  success: {
-    '0': '238 255 233',
-    '50': '187 254 184',
-    '100': '165 252 163',
-    '200': '124 249 130',
-    '300': '81 247 101',
-    '400': '32 245 77',
-    '500': '0 231 66',
-    '600': '0 188 56',
-    '700': '0 145 46',
-    '800': '0 98 33',
-    '900': '25 41 26',
-    '950': '0 0 0',
-  },
-  warning: {
-    '0': '255 255 240',
-    '50': '255 246 195',
-    '100': '253 238 178',
-    '200': '250 223 147',
-    '300': '247 207 116',
-    '400': '244 192 86',
-    '500': '221 169 57',
-    '600': '179 135 41',
-    '700': '138 103 26',
-    '800': '98 72 13',
-    '900': '44 32 10',
-    '950': '0 0 0',
-  },
-};
-
 export const tailwindColors = {
   red: {
     0: '255 249 249',
@@ -467,4 +302,184 @@ export const tailwindColors = {
   },
   white: '255 255 255',
   black: '0 0 0',
+};
+
+export const brand = {
+  primary: {
+    '0': '230 240 255',
+    '50': '170 205 255',
+    '100': '150 190 255',
+    '200': '100 165 255',
+    '300': '35 140 255',
+    '400': '0 120 235',
+    '500': '0 102 210',
+    '600': '0 83 171',
+    '700': '0 64 133',
+    '800': '0 45 94',
+    '900': '15 26 40',
+    '950': '0 0 0',
+  },
+
+  // SEMANTIC SCALE STRATEGY (0-950)
+  // bg-0: Root App Background
+  // bg-50: Elevated Surface (Card) Background
+  // bg-100/200: Interactive Background (Input, Hover)
+  // bg-500/600: Mid-level elements (Solid borders or placeholders)
+  // bg-800/900: High contrast backgrounds or text
+
+  bgLight: {
+    '0': '244 244 245', // zinc-100: Root App Background (Darker to pop cards)
+    '50': '255 255 255', // white: Card / Base Elevation
+    '100': '228 228 231', // zinc-200: Card Hover / Muted bg
+    '200': '212 212 216', // zinc-300: Light interactive background
+    '300': '161 161 170', // zinc-400
+    '400': '113 113 122', // zinc-500
+    '500': '82 82 91', // zinc-600
+    '600': '63 63 70', // zinc-700
+    '700': '39 39 42', // zinc-800
+    '800': '24 24 27', // zinc-900
+    '900': '9 9 11', // zinc-950 (Tooltip bg)
+    '950': '0 0 0', // black
+  },
+  outlineLight: {
+    '0': '255 255 255', // white
+    '50': '228 228 231', // zinc-200: Faint border
+    '100': '212 212 216', // zinc-300: Standard card border
+    '200': '161 161 170', // zinc-400: Darker border / hover
+    '300': '113 113 122', // zinc-500
+    '400': '82 82 91', // zinc-600
+    '500': '63 63 70', // zinc-700
+    '600': '39 39 42', // zinc-800
+    '700': '24 24 27', // zinc-900
+    '800': '9 9 11', // zinc-950
+    '900': '0 0 0', // black
+    '950': '0 0 0',
+  },
+  typographyLight: {
+    '0': '9 9 11', // zinc-950: Main Text / Heading
+    '50': '24 24 27', // zinc-900: Standard Text / Body
+    '100': '39 39 42', // zinc-800: Secondary Text
+    '200': '63 63 70', // zinc-700: Tertiary Text
+    '300': '82 82 91', // zinc-600: Dark placeholder
+    '400': '113 113 122', // zinc-500: Placeholder / Muted
+    '500': '161 161 170', // zinc-400
+    '600': '212 212 216', // zinc-300
+    '700': '228 228 231', // zinc-200
+    '800': '244 244 245', // zinc-100
+    '900': '250 250 250', // zinc-50
+    '950': '255 255 255', // white: Text on dark backgrounds
+  },
+  bgDark: {
+    '0': '0 0 0', // black: Root App Background (Darker to pop cards)
+    '50': '24 24 27', // zinc-900: Card / Base Elevation
+    '100': '39 39 42', // zinc-800: Card Hover / Muted bg
+    '200': '63 63 70', // zinc-700: Light interactive background
+    '300': '82 82 91', // zinc-600
+    '400': '113 113 122', // zinc-500
+    '500': '161 161 170', // zinc-400
+    '600': '212 212 216', // zinc-300
+    '700': '228 228 231', // zinc-200
+    '800': '244 244 245', // zinc-100
+    '900': '250 250 250', // zinc-50 (Tooltip bg in dark)
+    '950': '255 255 255', // white
+  },
+  outlineDark: {
+    '0': '9 9 11', // zinc-950
+    '50': '39 39 42', // zinc-800: Faint border
+    '100': '63 63 70', // zinc-700: Standard card border
+    '200': '82 82 91', // zinc-600: Light border / hover
+    '300': '113 113 122', // zinc-500
+    '400': '161 161 170', // zinc-400
+    '500': '212 212 216', // zinc-300
+    '600': '228 228 231', // zinc-200
+    '700': '244 244 245', // zinc-100
+    '800': '250 250 250', // zinc-50
+    '900': '255 255 255', // white
+    '950': '255 255 255', // white
+  },
+  typographyDark: {
+    '0': '255 255 255', // white: Main Text / Heading
+    '50': '250 250 250', // zinc-50: Standard Text / Body
+    '100': '244 244 245', // zinc-100: Secondary Text
+    '200': '228 228 231', // zinc-200: Tertiary Text
+    '300': '212 212 216', // zinc-300: Light placeholder
+    '400': '161 161 170', // zinc-400: Placeholder / Muted
+    '500': '113 113 122', // zinc-500
+    '600': '82 82 91', // zinc-600
+    '700': '63 63 70', // zinc-700
+    '800': '39 39 42', // zinc-800
+    '900': '24 24 27', // zinc-900
+    '950': '9 9 11', // zinc-950: Black text on light backgrounds
+  },
+  info: {
+    '0': '235 245 255',
+    '50': '169 212 255',
+    '100': '148 202 255',
+    '200': '106 182 255',
+    '300': '58 160 255',
+    '400': '0 140 255',
+    '500': '0 124 233',
+    '600': '0 102 195',
+    '700': '0 79 152',
+    '800': '0 54 106',
+    '900': '16 30 50',
+    '950': '0 0 0',
+  },
+  error: {
+    '0': '255 242 240',
+    '50': '255 186 180',
+    '100': '255 170 165',
+    '200': '255 137 136',
+    '300': '255 102 105',
+    '400': '255 67 76',
+    '500': '231 51 59',
+    '600': '186 35 44',
+    '700': '141 21 29',
+    '800': '95 8 16',
+    '900': '38 18 19',
+    '950': '0 0 0',
+  },
+  success: {
+    '0': '238 255 233',
+    '50': '187 254 184',
+    '100': '165 252 163',
+    '200': '124 249 130',
+    '300': '81 247 101',
+    '400': '32 245 77',
+    '500': '0 231 66',
+    '600': '0 188 56',
+    '700': '0 145 46',
+    '800': '0 98 33',
+    '900': '25 41 26',
+    '950': '0 0 0',
+  },
+  warning: {
+    '0': '255 255 240',
+    '50': '255 246 195',
+    '100': '253 238 178',
+    '200': '250 223 147',
+    '300': '247 207 116',
+    '400': '244 192 86',
+    '500': '221 169 57',
+    '600': '179 135 41',
+    '700': '138 103 26',
+    '800': '98 72 13',
+    '900': '44 32 10',
+    '950': '0 0 0',
+  },
+  semantic: {
+    playtime: tailwindColors.blue,
+    lastPlayed: tailwindColors.violet,
+    genre: tailwindColors.fuchsia,
+    maxPerDay: tailwindColors.orange,
+    dayStreak: tailwindColors.red,
+    gameStreak: tailwindColors.lime,
+    topPlatform: tailwindColors.emerald,
+  },
+  gameStatus: {
+    playing: tailwindColors.yellow,
+    toBePlayed: tailwindColors.amber,
+    platinato: tailwindColors.slate,
+    shelved: tailwindColors.zinc,
+  },
 };

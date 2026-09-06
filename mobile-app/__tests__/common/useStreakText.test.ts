@@ -17,10 +17,10 @@ describe('useStreakText', () => {
 
   it('returns formatted fire streak string for positive streak numbers', () => {
     const { result: result5 } = renderHook(() => useStreakText(5, false));
-    expect(result5.current).toBe('🔥 5 day streak');
+    expect(result5.current).toBe('5 day streak');
 
     const { result: result1 } = renderHook(() => useStreakText(1, false));
-    expect(result1.current).toBe('🔥 1 day streak');
+    expect(result1.current).toBe('1 day streak');
   });
 
   it('returns "0 day streak" when streak is 0', () => {

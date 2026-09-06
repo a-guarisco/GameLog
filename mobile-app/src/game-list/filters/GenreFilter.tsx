@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, Pressable } from 'react-native';
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { ModalOptionText } from '@gamelog/common/CommonTypography';
 import { FilterChip } from './FilterChip';
@@ -26,10 +26,10 @@ export const GenreFilter = ({
         value={genreFilter === 'All' ? 'All' : genreFilter}
         onPress={() => setIsOpen(true)}
         isActive={genreFilter !== 'All'}
-        activeBgClass={METRICS.genre.bgClass}
-        activeBorderClass={METRICS.genre.borderClass}
-        activeTextClass={METRICS.genre.textClass}
-        activeIconColor={METRICS.genre.hex}
+        activeBgClass={'bg-semantic-genre-100 dark:bg-semantic-genre-900/40'}
+        activeBorderClass={'border-semantic-genre-600'}
+        activeTextClass={'text-semantic-genre-600'}
+        activeIconColor={HEX_COLORS.genre.hex}
       />
 
       <FilterModalWrapper

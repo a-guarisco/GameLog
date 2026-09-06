@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable } from 'react-native';
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { ModalOptionText } from '@gamelog/common/CommonTypography';
 import { FilterChip } from './FilterChip';
@@ -24,10 +24,10 @@ export const PlatformFilter = ({ platformFilter, setPlatformFilter }: PlatformFi
         value={platformFilter}
         onPress={() => setIsOpen(true)}
         isActive={platformFilter !== 'All'}
-        activeBgClass={METRICS.topPlatform.bgClass}
-        activeBorderClass={METRICS.topPlatform.borderClass}
-        activeTextClass={METRICS.topPlatform.textClass}
-        activeIconColor={METRICS.topPlatform.hex}
+        activeBgClass={'bg-semantic-topPlatform-100 dark:bg-semantic-topPlatform-900/40'}
+        activeBorderClass={'border-semantic-topPlatform-600'}
+        activeTextClass={'text-semantic-topPlatform-600'}
+        activeIconColor={HEX_COLORS.topPlatform.hex}
       />
 
       <FilterModalWrapper

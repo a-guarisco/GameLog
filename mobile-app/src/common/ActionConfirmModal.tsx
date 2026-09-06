@@ -5,6 +5,8 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { ModalTitle } from './CommonTypography';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 export interface ActionConfirmModalProps {
   isVisible: boolean;
@@ -52,16 +54,16 @@ export const ActionConfirmModal: React.FC<ActionConfirmModalProps> = ({
             <HStack className="justify-between items-center mb-3">
               <HStack space="sm" className="items-center flex-1 pr-2">
                 {isDestructive ? (
-                  <Ionicons name="warning-outline" size={20} color="#f87171" />
+                  <Ionicons name="warning-outline" size={20} color={HEX_COLORS.feedback.error.hex} />
                 ) : (
-                  <Ionicons name="information-circle-outline" size={20} color="#60a5fa" />
+                  <Ionicons name="information-circle-outline" size={20} color={HEX_COLORS.feedback.info.hex} />
                 )}
                 <ModalTitle className="text-lg font-bold text-typography-0">
                   {title}
                 </ModalTitle>
               </HStack>
               <Pressable onPress={onClose} hitSlop={8} testID={`${testIDPrefix}-cancel-x-btn`}>
-                <Ionicons name="close" size={20} color="#a3a3a3" />
+                <Ionicons name="close" size={20} color={HEX_COLORS.muted.icon.hex} />
               </Pressable>
             </HStack>
 

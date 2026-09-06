@@ -43,13 +43,11 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
 
   const badgeBgClass = isFriend
     ? 'bg-primary-500 border-background-0'
-    : isPending || isPendingOutgoing
-      ? 'bg-warning-500 border-background-0'
-      : isBlocked
-        ? 'bg-error-500 border-background-0'
-        : 'bg-background-200 border-background-0';
+    : isPending || isPendingOutgoing || isBlocked
+      ? 'bg-background-200 border-background-0'
+      : 'bg-background-200 border-background-0';
 
-  const badgeTextClass = isFriend || isBlocked || isPending || isPendingOutgoing
+  const badgeTextClass = isFriend
     ? 'text-white'
     : 'text-typography-100';
 
@@ -82,6 +80,17 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
         </Box>
 
         <HStack space="xs" className="flex-wrap items-center justify-center z-10">
+          {!!memberSinceLabel && (
+            <Chip
+              className="bg-background-50 border border-outline-50 shadow-sm"
+              testID="other-user-member-since-chip"
+            >
+              <Text size="xs" className="font-bold text-typography-100">
+                {memberSinceLabel}
+              </Text>
+            </Chip>
+          )}
+
           <Chip
             className={`${badgeBgClass} border-[4px]`}
             testID="other-user-status-chip"
@@ -90,17 +99,6 @@ export const OtherUserIdentity: React.FC<OtherUserIdentityProps> = ({
               {statusLabel}
             </Text>
           </Chip>
-
-          {!!memberSinceLabel && (
-            <Chip
-              className="bg-background-200 border-[4px] border-background-0"
-              testID="other-user-member-since-chip"
-            >
-              <Text size="xs" className="font-bold text-typography-100">
-                {memberSinceLabel}
-              </Text>
-            </Chip>
-          )}
 
           <UserCardActions
             item={searchResultItem}

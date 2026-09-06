@@ -2,43 +2,14 @@ import React from 'react';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GameListItemData, SortBy, PlatformFilter } from './useGameList';
 import { formatGameStatus } from '@gamelog/api-manager/dto';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const MinimalBadge = ({
-
-  iconName,
-  text,
-  colorHex = '#737373',
-  borderColorClass = 'border-outline-300',
-  textColorClass = 'text-typography-200',
-  bgClass = 'bg-transparent',
-  hideText = false,
-}: {
-  iconName: string;
-  text: string;
-  colorHex?: string;
-  borderColorClass?: string;
-  textColorClass?: string;
-  bgClass?: string;
-  hideText?: boolean;
-}) => (
-  <HStack
-    style={{ height: 22, minWidth: hideText ? 32 : undefined }}
-    className={`items-center justify-center px-1.5 gap-0.5 rounded-full border ${borderColorClass} ${bgClass}`}
-  >
-    <Ionicons name={iconName} size={12} color={colorHex} />
-    {!hideText && (
-      <Text style={{ fontSize: 10 }} className={`font-bold ${textColorClass}`} numberOfLines={1}>
-        {text}
-      </Text>
-    )}
-  </HStack>
-);
+import { MinimalBadge } from '@gamelog/common/MinimalBadge';
 
 interface GameListCardBadgesProps {
   gameItem: GameListItemData;
@@ -64,8 +35,8 @@ export const GameListCardBadges = ({
     {
       id: 'playtime',
       text: formatMinutesToHoursShort(gameItem.playtime_forever),
-      icon: 'time-outline',
-      metric: METRICS.playtime,
+      icon: 'time',
+      metric: { hex: HEX_COLORS.playtime.hex, bgClass: 'bg-semantic-playtime-100 dark:bg-semantic-playtime-900/40', textClass: 'text-semantic-playtime-600', borderClass: 'border-semantic-playtime-600' },
       show: true,
       hideText: false,
     },
@@ -73,7 +44,7 @@ export const GameListCardBadges = ({
       id: 'streak',
       text: String(gameItem.streak),
       icon: 'flame',
-      metric: METRICS.streak,
+      metric: { hex: HEX_COLORS.gameStreak.hex, bgClass: 'bg-semantic-gameStreak-100 dark:bg-semantic-gameStreak-900/40', textClass: 'text-semantic-gameStreak-600', borderClass: 'border-semantic-gameStreak-600' },
       show: gameItem.streak > 0,
       hideText: false,
     },
@@ -81,23 +52,63 @@ export const GameListCardBadges = ({
       id: 'max_per_day',
       text: formatMinutesToHoursShort(gameItem.maxPlaytimePerDay),
       icon: 'flash',
-      metric: METRICS.maxPerDay,
+      metric: { hex: HEX_COLORS.maxPerDay.hex, bgClass: 'bg-semantic-maxPerDay-100 dark:bg-semantic-maxPerDay-900/40', textClass: 'text-semantic-maxPerDay-600', borderClass: 'border-semantic-maxPerDay-600' },
       show: gameItem.maxPlaytimePerDay > 0,
       hideText: false,
     },
     {
       id: 'last_played',
       text: lastPlayedText,
-      icon: 'calendar-clear-outline',
-      metric: METRICS.lastPlayed,
+      icon: 'calendar-clear',
+      metric: { hex: HEX_COLORS.lastPlayed.hex, bgClass: 'bg-semantic-lastPlayed-100 dark:bg-semantic-lastPlayed-900/40', textClass: 'text-semantic-lastPlayed-600', borderClass: 'border-semantic-lastPlayed-600' },
       show: gameItem.rtime_last_played > 0,
       hideText: false,
     },
     {
       id: 'game_status',
       text: formatGameStatus(gameItem.gameStatus),
-      icon: 'bookmark-outline',
-      metric: METRICS.status,
+      icon: 'bookmark',
+      metric: (() => {
+        const gs = gameItem.gameStatus;
+        if (gs === 'playing') {
+          return {
+            hex: HEX_COLORS.gameStatus[gs]?.hex || HEX_COLORS.muted.icon.hex,
+            bgClass: 'bg-gameStatus-playing-100 dark:bg-gameStatus-playing-900/40',
+            textClass: 'text-gameStatus-playing-600',
+            borderClass: 'border-gameStatus-playing-600',
+          };
+        }
+        if (gs === 'to_be_played') {
+          return {
+            hex: HEX_COLORS.gameStatus[gs]?.hex || HEX_COLORS.muted.icon.hex,
+            bgClass: 'bg-gameStatus-toBePlayed-100 dark:bg-gameStatus-toBePlayed-900/40',
+            textClass: 'text-gameStatus-toBePlayed-600',
+            borderClass: 'border-gameStatus-toBePlayed-600',
+          };
+        }
+        if (gs === 'shelved') {
+          return {
+            hex: HEX_COLORS.gameStatus[gs]?.hex || HEX_COLORS.muted.icon.hex,
+            bgClass: 'bg-gameStatus-shelved-100 dark:bg-gameStatus-shelved-900/40',
+            textClass: 'text-gameStatus-shelved-600',
+            borderClass: 'border-gameStatus-shelved-600',
+          };
+        }
+        if (gs === 'platinato') {
+          return {
+            hex: HEX_COLORS.gameStatus[gs]?.hex || HEX_COLORS.muted.icon.hex,
+            bgClass: 'bg-gameStatus-platinato-100 dark:bg-gameStatus-platinato-900/40',
+            textClass: 'text-gameStatus-platinato-600',
+            borderClass: 'border-gameStatus-platinato-600',
+          };
+        }
+        return {
+          hex: HEX_COLORS.muted.icon.hex,
+          bgClass: 'bg-transparent',
+          textClass: 'text-typography-200',
+          borderClass: 'border-outline-300',
+        };
+      })(),
       show: (isExpanded || isLandscape) && Boolean(gameItem.gameStatus),
       hideText: false,
     },
@@ -105,7 +116,7 @@ export const GameListCardBadges = ({
       id: 'top_platform',
       text: topPlatform.name,
       icon: topPlatform.iconName,
-      metric: METRICS.topPlatform,
+      metric: { hex: HEX_COLORS.topPlatform.hex, bgClass: 'bg-semantic-topPlatform-100 dark:bg-semantic-topPlatform-900/40', textClass: 'text-semantic-topPlatform-600', borderClass: 'border-semantic-topPlatform-600' },
       show: topPlatform.time > 0,
       hideText: true,
     }

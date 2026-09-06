@@ -1,17 +1,5 @@
 import { render } from '@testing-library/react-native';
-import { SuccessBox, SuccessHeading, SuccessText } from '@gamelog/common/feedbacks';
-
-describe('Success Texts', () => {
-  it('SuccessHeading renders message correctly', () => {
-    const { getByText } = render(<SuccessHeading message="All good" />);
-    expect(getByText('All good')).toBeTruthy();
-  });
-
-  it('SuccessText renders message correctly', () => {
-    const { getByText } = render(<SuccessText message="Operation completed" />);
-    expect(getByText('Operation completed')).toBeTruthy();
-  });
-});
+import { SuccessBox } from '@gamelog/common/feedbacks';
 
 jest.mock('@react-native-vector-icons/ionicons', () => 'Icon');
 

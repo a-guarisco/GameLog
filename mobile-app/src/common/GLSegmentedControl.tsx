@@ -14,6 +14,7 @@ export interface GLSegmentedControlProps<T extends string = string> {
   activeId: T;
   onSelect: (id: T) => void;
   className?: string;
+  activeIndicatorClassName?: string;
   isOnCard?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const GLSegmentedControl = <T extends string = string>({
   activeId,
   onSelect,
   className = '',
+  activeIndicatorClassName = 'bg-primary-500',
   isOnCard = false,
 }: GLSegmentedControlProps<T>) => {
   const activeIndex = options.findIndex((opt) => opt.id === activeId);
@@ -73,7 +75,7 @@ export const GLSegmentedControl = <T extends string = string>({
       >
         {segmentWidth > 0 && (
           <Animated.View
-            className="absolute rounded-full bg-primary-500"
+            className={`absolute rounded-full ${activeIndicatorClassName}`}
             style={activeIndicatorStyle}
           />
         )}

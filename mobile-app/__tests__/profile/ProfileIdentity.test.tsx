@@ -4,7 +4,7 @@ import ProfileIdentity from '@gamelog/profile/ProfileIdentity';
 const PROPS = {
   name: 'filopixel',
   avatarUrl: 'https://cdn/avatar.jpg',
-  streakText: '🔥 12 day streak',
+  streak: 12,
   memberSinceLabel: 'Since 2011',
   mostPlayedName: 'War Thunder',
 };
@@ -19,8 +19,15 @@ describe('ProfileIdentity', () => {
   it('shows the streak in the accent chip', () => {
     render(<ProfileIdentity {...PROPS} />);
 
-    expect(screen.getByTestId('profile-streak-chip').props.className).toContain('bg-primary-500');
-    expect(screen.getByText('🔥 12 day streak')).toBeTruthy();
+    expect(screen.getByTestId('profile-streak-chip').props.className).toContain('bg-semantic-dayStreak-100');
+    expect(screen.getByText('12 Days Streak')).toBeTruthy();
+  });
+
+  it('renders the streak chip even when streak is 0', () => {
+    render(<ProfileIdentity {...PROPS} streak={0} />);
+
+    expect(screen.getByTestId('profile-streak-chip')).toBeTruthy();
+    expect(screen.getByText('0 Days Streak')).toBeTruthy();
   });
 
   it('shows the account age chip when Steam reports a creation date', () => {

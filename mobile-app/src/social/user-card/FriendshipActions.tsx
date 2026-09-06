@@ -8,6 +8,8 @@ import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 import { UserCardMenu, UserCardMenuItem } from './UserCardMenu';
 import { ActionConfirmModal } from '@gamelog/common/ActionConfirmModal';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 interface AddFriendActionProps {
   userId: string;
@@ -30,7 +32,7 @@ export const AddFriendAction: React.FC<AddFriendActionProps> = ({
   if (onBlock) {
     menuItems.push({
       label: 'Block User',
-      icon: 'ban',
+      icon: 'hand-right',
       isDestructive: true,
       testID: `block-menu-item-${userId}`,
       onPress: () => setShowBlockModal(true),
@@ -47,8 +49,8 @@ export const AddFriendAction: React.FC<AddFriendActionProps> = ({
           hitSlop={6}
           className="flex-row items-center justify-center gap-1.5 rounded-lg border border-primary-500/60 bg-transparent px-3 py-1.5 active:opacity-70"
         >
-          <Ionicons name="person-add-outline" size={13} color={toHex(brand.primary['400'])} />
-          <Text size="xs" className="font-semibold text-primary-400">
+          <Ionicons name="person-add" size={13} color={HEX_COLORS.social.action.add.hex} />
+          <Text size="xs" className="font-semibold text-primary-500">
             Add Friend
           </Text>
         </Pressable>
@@ -114,7 +116,7 @@ export const BlockedUserActions: React.FC<BlockedUserActionsProps> = ({
   const menuItems: UserCardMenuItem[] = [
     {
       label: 'Unblock',
-      icon: 'lock-open-outline',
+      icon: 'lock-open',
       testID: `unblock-btn-${userId}`,
       onPress: () => setShowUnblockModal(true),
     },
@@ -123,7 +125,7 @@ export const BlockedUserActions: React.FC<BlockedUserActionsProps> = ({
   if (onAddFriend) {
     menuItems.push({
       label: 'Add Friend',
-      icon: 'person-add-outline',
+      icon: 'person-add',
       testID: `add-friend-btn-${userId}`,
       onPress: () => onAddFriend(userId),
     });
@@ -182,7 +184,7 @@ export const PendingOutgoingAction: React.FC<PendingOutgoingActionProps> = ({
   if (onRemovePending) {
     menuItems.push({
       label: 'Remove Pending',
-      icon: 'close-circle-outline',
+      icon: 'close-circle',
       isDestructive: true,
       testID: `remove-pending-btn-${userId}`,
       onPress: () => setShowRemoveModal(true),
@@ -192,7 +194,7 @@ export const PendingOutgoingAction: React.FC<PendingOutgoingActionProps> = ({
   if (onBlock) {
     menuItems.push({
       label: 'Block',
-      icon: 'ban',
+      icon: 'hand-right',
       isDestructive: true,
       testID: `block-btn-${userId}`,
       onPress: () => setShowBlockModal(true),
@@ -271,7 +273,7 @@ export const IncomingRequestActions: React.FC<IncomingRequestActionsProps> = ({
   if (onBlock) {
     menuItems.push({
       label: 'Block',
-      icon: 'ban',
+      icon: 'hand-right',
       isDestructive: true,
       testID: `block-btn-${userId}`,
       onPress: () => setShowBlockModal(true),
@@ -288,8 +290,8 @@ export const IncomingRequestActions: React.FC<IncomingRequestActionsProps> = ({
           hitSlop={6}
           className="flex-row items-center justify-center gap-1 rounded-lg border border-primary-500/60 bg-primary-500/15 px-3 py-1.5 active:opacity-70"
         >
-          <Ionicons name="checkmark" size={13} color={toHex(brand.primary['400'])} />
-          <Text size="xs" className="font-semibold text-primary-400">
+          <Ionicons name="checkmark" size={13} color={HEX_COLORS.social.action.accept.hex} />
+          <Text size="xs" className="font-semibold text-primary-500">
             Accept
           </Text>
         </Pressable>
@@ -301,7 +303,7 @@ export const IncomingRequestActions: React.FC<IncomingRequestActionsProps> = ({
           hitSlop={6}
           className="flex-row items-center justify-center gap-1 rounded-lg border border-transparent bg-transparent px-2 py-1.5 active:opacity-70"
         >
-          <Ionicons name="close" size={13} color="#9ca3af" />
+          <Ionicons name="close" size={13} color={HEX_COLORS.social.action.neutral.hex} />
           <Text size="xs" className="font-semibold text-typography-300">
             Refuse
           </Text>
@@ -363,7 +365,7 @@ export const AcceptedFriendActions: React.FC<AcceptedFriendActionsProps> = ({
   if (item && onSelectRecommendations) {
     menuItems.push({
       label: 'Recommend Games',
-      icon: 'game-controller-outline',
+      icon: 'game-controller',
       testID: `recommend-btn-${userId}`,
       onPress: () => onSelectRecommendations(item),
     });
@@ -371,7 +373,7 @@ export const AcceptedFriendActions: React.FC<AcceptedFriendActionsProps> = ({
 
   menuItems.push({
     label: 'Remove Friend',
-    icon: 'person-remove-outline',
+    icon: 'person-remove',
     isDestructive: true,
     testID: `remove-friend-btn-${userId}`,
     onPress: () => setShowRemoveModal(true),
@@ -380,7 +382,7 @@ export const AcceptedFriendActions: React.FC<AcceptedFriendActionsProps> = ({
   if (onBlock) {
     menuItems.push({
       label: 'Block',
-      icon: 'ban',
+      icon: 'hand-right',
       isDestructive: true,
       testID: `block-friend-btn-${userId}`,
       onPress: () => setShowBlockModal(true),

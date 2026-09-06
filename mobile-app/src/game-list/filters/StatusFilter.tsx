@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, Pressable } from 'react-native';
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { ModalOptionText } from '@gamelog/common/CommonTypography';
 import { FilterChip } from './FilterChip';
@@ -31,6 +31,50 @@ export const StatusFilter = ({ statusFilter, setStatusFilter }: StatusFilterProp
     return GAME_STATUS_LABELS[statusFilter as GameStatus] || statusFilter;
   };
 
+  const getActiveColors = () => {
+    if (statusFilter !== 'All' && statusFilter !== 'none') {
+      const statusKey = statusFilter as GameStatus;
+      switch (statusKey) {
+        case 'playing':
+          return {
+            activeBgClass: 'bg-gameStatus-playing-100 dark:bg-gameStatus-playing-900/40',
+            activeBorderClass: 'border-gameStatus-playing-600',
+            activeTextClass: 'text-gameStatus-playing-600',
+            activeIconColor: HEX_COLORS.gameStatus[statusKey]?.hex || HEX_COLORS.muted.icon.hex,
+          };
+        case 'to_be_played':
+          return {
+            activeBgClass: 'bg-gameStatus-toBePlayed-100 dark:bg-gameStatus-toBePlayed-900/40',
+            activeBorderClass: 'border-gameStatus-toBePlayed-600',
+            activeTextClass: 'text-gameStatus-toBePlayed-600',
+            activeIconColor: HEX_COLORS.gameStatus[statusKey]?.hex || HEX_COLORS.muted.icon.hex,
+          };
+        case 'shelved':
+          return {
+            activeBgClass: 'bg-gameStatus-shelved-100 dark:bg-gameStatus-shelved-900/40',
+            activeBorderClass: 'border-gameStatus-shelved-600',
+            activeTextClass: 'text-gameStatus-shelved-600',
+            activeIconColor: HEX_COLORS.gameStatus[statusKey]?.hex || HEX_COLORS.muted.icon.hex,
+          };
+        case 'platinato':
+          return {
+            activeBgClass: 'bg-gameStatus-platinato-100 dark:bg-gameStatus-platinato-900/40',
+            activeBorderClass: 'border-gameStatus-platinato-600',
+            activeTextClass: 'text-gameStatus-platinato-600',
+            activeIconColor: HEX_COLORS.gameStatus[statusKey]?.hex || HEX_COLORS.muted.icon.hex,
+          };
+      }
+    }
+    return {
+      activeBgClass: 'bg-primary-100 dark:bg-primary-900/40',
+      activeBorderClass: 'border-primary-600',
+      activeTextClass: 'text-primary-600',
+      activeIconColor: HEX_COLORS.comparison.user.hex,
+    };
+  };
+
+  const activeColors = getActiveColors();
+
   return (
     <>
       <FilterChip
@@ -38,10 +82,7 @@ export const StatusFilter = ({ statusFilter, setStatusFilter }: StatusFilterProp
         value={getChipValue()}
         onPress={() => setIsOpen(true)}
         isActive={statusFilter !== 'All'}
-        activeBgClass={METRICS.status.bgClass}
-        activeBorderClass={METRICS.status.borderClass}
-        activeTextClass={METRICS.status.textClass}
-        activeIconColor={METRICS.status.hex}
+        {...activeColors}
       />
 
       <FilterModalWrapper

@@ -1,3 +1,4 @@
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { ScrollView, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -71,7 +72,7 @@ const TotalHoursChart = ({ ownedGames, targetHeight }: TotalHoursChartProps) => 
                         source={{
                           uri: `https://steamcdn-a.akamaihd.net/steam/apps/${gameItem.appid}/capsule_184x69.jpg`,
                         }}
-                        style={{ width: 46, height: 21, borderRadius: 4, backgroundColor: '#333' }}
+                        style={{ width: 46, height: 21, borderRadius: 4, backgroundColor: HEX_COLORS.muted.divider.hex }}
                         resizeMode="cover"
                       />
 

@@ -1,3 +1,4 @@
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { useState } from 'react';
 import { Pressable, Image } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -74,7 +75,7 @@ const CommunityTopGamesHistogramChart = ({
     <HStack key="user" className="w-full items-center" space="md">
       <Box className="flex-1 flex-row items-center h-1.5">
         <Box
-          className="h-1.5 rounded-full bg-primary-400"
+          className="h-1.5 rounded-full bg-comparison-user-500"
           style={{
             width: `${item.userPlaytime > 0 ? Math.max(1, item.userPercent) : 0}%`,
             opacity: item.userPlaytime > 0 ? 1 : 0,
@@ -82,7 +83,7 @@ const CommunityTopGamesHistogramChart = ({
           testID={`user-bar-${item.id}`}
         />
       </Box>
-      <Text size="sm" className="font-bold text-typography-0 w-16 text-right">
+      <Text size="sm" className="font-bold w-16 text-right" className="font-bold w-16 text-right text-comparison-user-500">
         {item.userFormatted}
       </Text>
     </HStack>
@@ -92,7 +93,7 @@ const CommunityTopGamesHistogramChart = ({
     <HStack key="community" className="w-full items-center" space="md">
       <Box className="flex-1 flex-row items-center h-1.5">
         <Box
-          className="h-1.5 rounded-full bg-purple-500"
+          className="h-1.5 rounded-full bg-comparison-compare-500"
           style={{
             width: `${item.communityPlaytime > 0 ? Math.max(1, item.communityPercent) : 0}%`,
             opacity: item.communityPlaytime > 0 ? 1 : 0,
@@ -100,7 +101,7 @@ const CommunityTopGamesHistogramChart = ({
           testID={`community-bar-${item.id}`}
         />
       </Box>
-      <Text size="sm" className="font-bold text-typography-0 w-16 text-right">
+      <Text size="sm" className="font-bold w-16 text-right" className="font-bold w-16 text-right text-comparison-compare-500">
         {item.communityFormatted}
       </Text>
     </HStack>
@@ -150,42 +151,42 @@ const CommunityTopGamesHistogramChart = ({
                 {/* Left: Reference segmented pill ("Others" / "You") with equal button dimensions */}
                 <HStack className="w-[130px] items-center rounded-full border border-outline-300 overflow-hidden">
                   <Pressable
-                    onPress={() => setReference('community')}
-                    testID="community-top-games-reference-community"
-                    className={`flex-1 py-1 flex-row items-center justify-center border-r border-outline-300 ${
-                      reference === 'community' ? 'bg-purple-500/20' : 'bg-transparent'
-                    }`}
-                  >
-                    <Text
-                      size="xs"
-                      className={
-                        reference === 'community'
-                          ? 'text-typography-0 font-bold'
-                          : 'text-typography-300 font-medium'
-                      }
-                      numberOfLines={1}
-                    >
-                      {othersLabel}
-                    </Text>
-                  </Pressable>
-
-                  <Pressable
                     onPress={() => setReference('user')}
                     testID="community-top-games-reference-user"
-                    className={`flex-1 py-1 flex-row items-center justify-center ${
-                      reference === 'user' ? 'bg-primary-500/20' : 'bg-transparent'
+                    className={`flex-1 py-1 flex-row items-center justify-center border-r border-outline-300 ${
+                      reference === 'user' ? 'bg-comparison-user-500' : 'bg-transparent'
                     }`}
                   >
                     <Text
                       size="xs"
                       className={
                         reference === 'user'
-                          ? 'text-typography-0 font-bold'
+                          ? 'text-white font-bold'
                           : 'text-typography-300 font-medium'
                       }
                       numberOfLines={1}
                     >
                       You
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setReference('community')}
+                    testID="community-top-games-reference-community"
+                    className={`flex-1 py-1 flex-row items-center justify-center ${
+                      reference === 'community' ? 'bg-comparison-compare-500' : 'bg-transparent'
+                    }`}
+                  >
+                    <Text
+                      size="xs"
+                      className={
+                        reference === 'community'
+                          ? 'text-white font-bold'
+                          : 'text-typography-300 font-medium'
+                      }
+                      numberOfLines={1}
+                    >
+                      {othersLabel}
                     </Text>
                   </Pressable>
                 </HStack>
@@ -242,7 +243,7 @@ const CommunityTopGamesHistogramChart = ({
                           width: 105,
                           height: 62,
                           borderRadius: 6,
-                          backgroundColor: '#333',
+                          backgroundColor: HEX_COLORS.muted.divider.hex,
                         }}
                         resizeMode="cover"
                         testID={`game-capsule-${item.id}`}
@@ -282,7 +283,12 @@ const CommunityTopGamesHistogramChart = ({
                     {/* Left: Capsule Image with height matching title + 2 bars */}
                     <Image
                       source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
-                      style={{ width: 115, height: 68, borderRadius: 6, backgroundColor: '#333' }}
+                      style={{
+                        width: 115,
+                        height: 68,
+                        borderRadius: 6,
+                        backgroundColor: HEX_COLORS.muted.divider.hex,
+                      }}
                       resizeMode="cover"
                       testID={`game-capsule-${item.id}`}
                     />
@@ -315,7 +321,7 @@ const CommunityTopGamesHistogramChart = ({
               <HStack space="xs" className="items-center">
                 <Box
                   className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: `rgb(${brand.primary['500']})` }}
+                  className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
                 />
                 <Text size="xs" className="font-bold text-primary-500">
                   You
@@ -324,9 +330,13 @@ const CommunityTopGamesHistogramChart = ({
               <HStack space="xs" className="items-center">
                 <Box
                   className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
+                  className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
                 />
-                <Text size="xs" className="font-bold text-purple-500">
+                <Text
+                  size="xs"
+                  className="font-bold "
+                  className="font-bold w-16 text-right text-comparison-compare-500"
+                >
                   {othersLabel}
                 </Text>
               </HStack>

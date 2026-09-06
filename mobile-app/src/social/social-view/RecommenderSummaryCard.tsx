@@ -7,6 +7,7 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
 interface RecommenderSummaryCardProps {
   onPress: () => void;
@@ -27,7 +28,7 @@ export const RecommenderSummaryCard: React.FC<RecommenderSummaryCardProps> = ({
       <Card variant="elevated" className="p-4 bg-background-50 border border-outline-100">
         <HStack space="md" className="items-center justify-between">
           <Box className="w-10 h-10 rounded-full bg-primary-500/15 items-center justify-center">
-            <Ionicons name="sparkles" size={20} color={toHex(brand.primary['500'])} />
+            <Ionicons name="sparkles" size={20} color={HEX_COLORS.recommender.sparkles.hex} />
           </Box>
 
           <VStack className="flex-1 pr-2">

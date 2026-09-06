@@ -1,6 +1,6 @@
 import { OwnedGames } from '@gamelog/api-manager/dto';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
-import { CHART_GRADIENT_PALETTE } from '@gamelog/theme/metrics';
+import { CHART_GRADIENT_PALETTE } from '@gamelog/theme/hexColors';
 
 export interface PieData {
   value: number;

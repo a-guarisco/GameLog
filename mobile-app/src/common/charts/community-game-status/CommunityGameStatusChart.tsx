@@ -15,6 +15,8 @@ import { useOrientation } from '@gamelog/common/useOrientation';
 import { useCommunityGameStatus } from './useCommunityGameStatus';
 import { useCommunityGameStatusData } from './useCommunityGameStatusData';
 import type { CommunityScope } from '@gamelog/api-manager/dto';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 interface CommunityGameStatusChartProps {
   scope?: CommunityScope;
@@ -257,7 +259,7 @@ const CommunityGameStatusChart = ({
                   <HStack space="xs" className="items-center">
                     <Box
                       className="w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: `rgb(${brand.primary['500']})` }}
+                      className="bg-comparison-user-500"
                     />
                     <Text size="xs" className="font-bold text-primary-500">
                       You
@@ -266,9 +268,9 @@ const CommunityGameStatusChart = ({
                   <HStack space="xs" className="items-center">
                     <Box
                       className="w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: `rgb(${tailwindColors.purple['500']})` }}
+                      className="bg-comparison-compare-500"
                     />
-                    <Text size="xs" className="font-bold text-purple-500">
+                    <Text size="xs" className="font-bold text-comparison-compare-500">
                       {othersLabel}
                     </Text>
                   </HStack>
@@ -304,12 +306,12 @@ const CommunityGameStatusChart = ({
                       <Box className="flex-1">
                         <ProgressTrack
                           percent={item.communityPercentage}
-                          fillClassName="bg-purple-500"
+                          fillClassName="bg-comparison-compare-500"
                           className="h-1.5"
                           testID={`others-status-progress-${item.status}`}
                         />
                       </Box>
-                      <Text size="xs" className="font-bold text-purple-500 w-14 text-right">
+                      <Text size="xs" className="font-bold w-14 text-right text-comparison-compare-500">
                         {item.communityPercentage}%
                       </Text>
                     </HStack>
@@ -329,7 +331,7 @@ const CommunityGameStatusChart = ({
               <Ionicons
                 name={isExpanded ? 'chevron-up' : 'chevron-down'}
                 size={16}
-                color="#737373"
+                color={HEX_COLORS.muted.icon.hex}
               />
             </Pressable>
           </VStack>

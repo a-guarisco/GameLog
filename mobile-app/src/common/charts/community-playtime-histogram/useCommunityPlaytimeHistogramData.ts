@@ -1,3 +1,4 @@
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { useMemo } from 'react';
 import type { CommunityPlaytimeResponse } from '@gamelog/api-manager/dto';
 import { formatMinutesToHours } from '@gamelog/utils/formatUtils';
@@ -12,7 +13,7 @@ export interface UseCommunityPlaytimeHistogramDataProps {
   offset: number;
   axisColor: string;
   primaryColor: string;
-  purpleColor: string;
+  compareColor: string;
   theme: any;
   barWidth?: number;
   currentDate?: Date;
@@ -25,7 +26,7 @@ export const useCommunityPlaytimeHistogramData = ({
   offset,
   axisColor,
   primaryColor,
-  purpleColor,
+  compareColor,
   theme,
   barWidth = 12,
   currentDate,
@@ -136,7 +137,7 @@ export const useCommunityPlaytimeHistogramData = ({
       items.push({
         value: cVal,
         spacing: 12,
-        frontColor: purpleColor,
+        frontColor: compareColor,
         topRadius: 4,
         bottomRadius: 4,
         borderRadius: 4,
@@ -157,7 +158,7 @@ export const useCommunityPlaytimeHistogramData = ({
     theme,
     primaryColor,
     axisColor,
-    purpleColor,
+    compareColor,
     pairWidth,
     barWidth,
   ]);

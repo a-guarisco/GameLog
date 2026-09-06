@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import type { PlaytimeByUser } from '@gamelog/api-manager/dto';
 import { selectPlaytimeTrend } from '../playtime-trend/selectPlaytimeTrend';
 import { getChartAxisStyle } from '@gamelog/common/typography/ChartTypography';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
 
 export const usePlaytimeBlocksData = (
@@ -70,7 +71,7 @@ export const usePlaytimeBlocksData = (
 
       return {
         stacks: day.stacks.map((stack, stackIndex) => {
-          let finalColor = stack.color || '#3b82f6';
+          let finalColor = stack.color || HEX_COLORS.comparison.user.hex;
           if (!finalColor.startsWith('#') && !finalColor.startsWith('rgb')) {
             finalColor = parseRGB(finalColor);
           }

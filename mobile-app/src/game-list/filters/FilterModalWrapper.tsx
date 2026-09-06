@@ -5,6 +5,8 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModalTitle } from '@gamelog/common/CommonTypography';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 export interface FilterModalWrapperProps {
   isVisible: boolean;
@@ -33,7 +35,7 @@ export const FilterModalWrapper = ({
             <HStack className="justify-between items-center mb-6">
               <ModalTitle>{title}</ModalTitle>
               <Pressable onPress={onClose}>
-                <Ionicons name="close" size={24} color="#a3a3a3" />
+                <Ionicons name="close" size={24} color={HEX_COLORS.muted.icon.hex} />
               </Pressable>
             </HStack>
             {children}

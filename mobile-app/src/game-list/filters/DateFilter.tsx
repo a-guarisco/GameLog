@@ -5,7 +5,7 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { METRICS } from '@gamelog/theme/metrics';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { DateSelectorText } from '@gamelog/common/typography/CardTypography';
 import { FilterChip } from './FilterChip';
 import { FilterModalWrapper } from './FilterModalWrapper';
@@ -42,10 +42,10 @@ export const DateFilter = ({ dateRangeFilter, setDateRangeFilter }: DateFilterPr
         value={dateRangeFilter.from || dateRangeFilter.to ? 'Custom' : 'All'}
         onPress={() => setIsOpen(true)}
         isActive={!!(dateRangeFilter.from || dateRangeFilter.to)}
-        activeBgClass={METRICS.lastPlayed.bgClass}
-        activeBorderClass={METRICS.lastPlayed.borderClass}
-        activeTextClass={METRICS.lastPlayed.textClass}
-        activeIconColor={METRICS.lastPlayed.hex}
+        activeBgClass={'bg-semantic-lastPlayed-100 dark:bg-semantic-lastPlayed-900/40'}
+        activeBorderClass={'border-semantic-lastPlayed-600'}
+        activeTextClass={'text-semantic-lastPlayed-600'}
+        activeIconColor={HEX_COLORS.lastPlayed.hex}
       />
 
       <FilterModalWrapper

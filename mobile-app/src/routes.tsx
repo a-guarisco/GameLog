@@ -104,7 +104,7 @@ export const RootTabs = createBottomTabNavigator({
         title: 'Games',
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
-            name={focused ? 'game-controller' : 'game-controller-outline'}
+            name="game-controller"
             size={size}
             color={color}
           />
@@ -116,7 +116,7 @@ export const RootTabs = createBottomTabNavigator({
       options: {
         title: 'Profile',
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />
+          <Ionicons name="person" size={size} color={color} />
         ),
         headerShown: false,
       },
@@ -126,7 +126,7 @@ export const RootTabs = createBottomTabNavigator({
       options: {
         title: 'Social',
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons name={focused ? 'people' : 'people-outline'} size={size} color={color} />
+          <Ionicons name="people" size={size} color={color} />
         ),
         headerShown: false,
       },
@@ -136,7 +136,7 @@ export const RootTabs = createBottomTabNavigator({
       options: {
         title: 'Dev',
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons name={focused ? 'construct' : 'construct-outline'} size={size} color={color} />
+          <Ionicons name="construct" size={size} color={color} />
         ),
       },
     },

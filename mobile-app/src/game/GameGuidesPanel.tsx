@@ -10,6 +10,8 @@ import GoToLink from '@gamelog/common/GoToLink';
 import SectionState from '@gamelog/common/SectionState';
 import Chip from '@gamelog/common/Chip';
 import { formatThousands } from '@gamelog/utils/formatUtils';
+import { HEX_COLORS } from '@gamelog/theme/hexColors';
+
 
 const openExternalUrl = (url: string) => {
   Linking.openURL(url).catch((error) => console.warn(`Could not open ${url}`, error));
@@ -23,7 +25,7 @@ const GuideStat = ({
   value: number;
 }) => (
   <HStack space="xs" className="items-center">
-    <Ionicons name={icon} size={12} color="#8C8C8C" />
+    <Ionicons name={icon} size={12} color={HEX_COLORS.muted.icon.hex} />
     <Text size="2xs" className="text-typography-300">
       {formatThousands(value)}
     </Text>

@@ -17,7 +17,7 @@ export const ChartDeltaText = ({
   if (isNeutral) {
     colorClass = 'text-typography-400';
   } else if (isPositive !== undefined) {
-    colorClass = isPositive ? 'text-success-500' : 'text-error-500';
+    colorClass = isPositive ? 'text-primary-500' : 'text-error-500';
   }
 
   return (

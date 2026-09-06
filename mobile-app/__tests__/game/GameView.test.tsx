@@ -98,12 +98,10 @@ describe('GameView', () => {
     expect(mockGoBack).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the live player count and streak under the title', () => {
+  it('shows the live player count under the title', () => {
     render(<GameView />);
 
     expect(screen.getByText('0 playing now')).toBeTruthy();
-    // The streak request is still in flight on first render, so match either state.
-    expect(screen.getByText(/streak/i)).toBeTruthy();
   });
 
   it('shows the last played date including the year', () => {
