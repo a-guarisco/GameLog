@@ -28,15 +28,23 @@ export function SignInForm({
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        testID="signin-email-input"
       />
       <GLTextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        testID="signin-password-input"
       />
 
-      <Button onPress={onSubmit} isDisabled={loading} className="w-full mt-2" size="lg">
+      <Button
+        onPress={onSubmit}
+        isDisabled={loading}
+        className="w-full mt-2"
+        size="lg"
+        testID="signin-submit-button"
+      >
         {loading ? <ButtonSpinner className="mr-2" /> : null}
         <ButtonText>Sign In with Email</ButtonText>
       </Button>

@@ -101,6 +101,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
             return (
               <TouchableOpacity
                 key={route.key}
+                testID={route.name}
                 onPress={() => handlePress(route.name, focused)}
                 style={styles.railItem}
                 accessibilityRole="tab"
@@ -158,6 +159,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
         return (
           <TouchableOpacity
             key={route.key}
+            testID={route.name}
             onPress={() => handlePress(route.name, focused)}
             style={styles.bottomItem}
             accessibilityRole="tab"

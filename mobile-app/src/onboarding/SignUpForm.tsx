@@ -32,21 +32,30 @@ export function SignUpForm({
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        testID="signup-email-input"
       />
       <GLTextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        testID="signup-password-input"
       />
       <GLTextInput
         placeholder="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
+        testID="signup-confirm-password-input"
       />
 
-      <Button onPress={onSubmit} isDisabled={loading} className="w-full mt-2" size="lg">
+      <Button
+        onPress={onSubmit}
+        isDisabled={loading}
+        className="w-full mt-2"
+        size="lg"
+        testID="signup-submit-button"
+      >
         {loading ? <ButtonSpinner className="mr-2" /> : null}
         <ButtonText>Create Account</ButtonText>
       </Button>

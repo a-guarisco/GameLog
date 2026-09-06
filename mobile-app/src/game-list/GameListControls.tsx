@@ -53,6 +53,7 @@ export const GameListControls = ({
           leftIcon={(props: any) => <SearchIcon {...props} size="xl" />}
           rightIcon={searchQuery ? CloseIcon : undefined}
           onRightIconPress={() => setSearchQuery('')}
+          testID="game-list-search-input"
         />
       </Box>
 

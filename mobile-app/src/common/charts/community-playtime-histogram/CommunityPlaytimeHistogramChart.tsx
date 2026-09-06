@@ -378,7 +378,11 @@ const CommunityPlaytimeHistogramChart = ({
                 </HStack>
               </HStack>
 
-              <Text size="xs" className="text-typography-300 text-center">
+              <Text
+                size="xs"
+                className="text-typography-300 text-center"
+                testID="community-playtime-scope-caption"
+              >
                 Comparing your hours with {comparisonScopeText}.
               </Text>
             </VStack>

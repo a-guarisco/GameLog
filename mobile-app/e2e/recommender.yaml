@@ -1,0 +1,77 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: common/logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Sign In'
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: common/login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 100000
+
+# 1. Navigate to Social Tab
+- tapOn:
+    id: 'SocialTab'
+
+- extendedWaitUntil:
+    visible:
+      id: 'social-recommender-card'
+    timeout: 30000
+
+# 2. Enter Game Recommender
+- tapOn:
+    id: 'social-recommender-card'
+
+- extendedWaitUntil:
+    visible: 'Game Recommender'
+    timeout: 30000
+
+# 3. Select friend from seed (test-02) to compare
+- extendedWaitUntil:
+    visible:
+      id: 'compare-friend-btn-22222222-2222-2222-2222-222222222222'
+    timeout: 30000
+
+- tapOn:
+    id: 'compare-friend-btn-22222222-2222-2222-2222-222222222222'
+
+# 4. Assert active friend banner and recommendations loaded
+- extendedWaitUntil:
+    visible:
+      id: 'search-another-friend-btn'
+    timeout: 30000
+
+- assertVisible: 'Active Friend'
+- assertVisible: 'test-02'
+
+# 5. Tap "Change Friend" to return to friend selection
+- tapOn:
+    id: 'search-another-friend-btn'
+
+- extendedWaitUntil:
+    visible:
+      id: 'friend-search-input'
+    timeout: 10000
+
+# 6. Exit Recommender back to Social Home
+- tapOn:
+    id: 'recommendations-back-btn'
+- tapOn:
+    id: 'recommendations-back-btn'
+
+- extendedWaitUntil:
+    visible:
+      id: 'social-recommender-card'
+    timeout: 30000

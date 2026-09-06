@@ -1,0 +1,38 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Sign In"
+    timeout: 100000
+
+# Try invalid credentials
+- tapOn:
+    id: "signin-email-input"
+- inputText: "invalid_user_99@test.com"
+
+- tapOn:
+    id: "signin-password-input"
+- inputText: "wrongpassword"
+
+- doubleTapOn:
+    id: "signin-submit-button"
+
+- extendedWaitUntil:
+    visible: "Go to Sign Up"
+    timeout: 10000
+
+# Switch to Sign Up tab
+- tapOn: "Sign Up"
+- extendedWaitUntil:
+    visible:
+      id: "signup-confirm-password-input"
+    timeout: 10000
+
+# Switch back to Sign In tab
+- tapOn: "Sign In"
+- extendedWaitUntil:
+    visible:
+      id: "signin-submit-button"
+    timeout: 10000

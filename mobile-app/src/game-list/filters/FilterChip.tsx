@@ -5,7 +5,6 @@ import { Text } from '@gamelog/common/gluestack/text';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
-
 export interface FilterChipProps {
   label: string;
   value: string | undefined;
@@ -15,6 +14,7 @@ export interface FilterChipProps {
   activeBorderClass?: string;
   activeTextClass?: string;
   activeIconColor?: string;
+  testID?: string;
 }
 
 export const FilterChip = ({
@@ -26,8 +26,9 @@ export const FilterChip = ({
   activeBorderClass = 'border-primary-500',
   activeTextClass = 'text-typography-0',
   activeIconColor = HEX_COLORS.overlay.icon.hex,
+  testID,
 }: FilterChipProps) => (
-  <Pressable onPress={onPress}>
+  <Pressable onPress={onPress} testID={testID}>
     <HStack
       space="xs"
       className={`items-center px-3 py-1.5 rounded-full border ${isActive ? `${activeBgClass} ${activeBorderClass}` : 'bg-background-50 border-outline-300'}`}
@@ -41,7 +42,11 @@ export const FilterChip = ({
           {value}
         </Text>
       </Text>
-      <Ionicons name="chevron-down" size={14} color={isActive ? activeIconColor : HEX_COLORS.muted.icon.hex} />
+      <Ionicons
+        name="chevron-down"
+        size={14}
+        color={isActive ? activeIconColor : HEX_COLORS.muted.icon.hex}
+      />
     </HStack>
   </Pressable>
 );

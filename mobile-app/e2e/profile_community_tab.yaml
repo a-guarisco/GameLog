@@ -1,0 +1,58 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: common/logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Sign In'
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: common/login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 100000
+
+- tapOn:
+    id: 'ProfileTab'
+
+- extendedWaitUntil:
+    visible:
+      id: 'profile-tab-overview'
+    timeout: 30000
+
+- tapOn:
+    id: 'profile-tab-community'
+
+- extendedWaitUntil:
+    visible:
+      id: 'community-playtime-histogram-chart'
+    timeout: 30000
+
+- assertVisible: 'Comparing your hours with the global community.'
+
+- tapOn:
+    id: 'community-scope-tab-region'
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible: 'Comparing your hours with your region.'
+
+- tapOn:
+    id: 'community-scope-tab-friends'
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible: 'Comparing your hours with your friends.'
+
+- tapOn:
+    id: 'community-scope-tab-global'
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible: 'Comparing your hours with the global community.'

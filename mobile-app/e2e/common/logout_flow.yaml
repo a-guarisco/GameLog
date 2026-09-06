@@ -1,0 +1,8 @@
+appId: com.gamelog.app
+---
+- tapOn:
+    id: "DevTab"
+- tapOn:
+    id: "dev-menu-item-auth"
+- tapOn:
+    id: "signout-clear-storage-btn"

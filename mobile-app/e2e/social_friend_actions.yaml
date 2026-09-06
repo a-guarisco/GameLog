@@ -1,0 +1,86 @@
+appId: com.gamelog.app
+onFlowComplete:
+  - runFlow:
+      file: common/logout_flow.yaml
+  - stopApp
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Sign In'
+    timeout: 100000
+
+- runFlow:
+    when:
+      visible: 'Sign In'
+    file: common/login_flow.yaml
+    env:
+      EMAIL: test-01@test.com
+      PASSWORD: 12345678
+
+- extendedWaitUntil:
+    visible: 'Games'
+    timeout: 100000
+
+# 1. Navigate to Social Tab
+- tapOn:
+    id: 'SocialTab'
+
+# 2. Check Pending Friend Request (test-04 in seed)
+- extendedWaitUntil:
+    visible: 'test-04'
+    timeout: 30000
+
+# Verify Accept and Refuse buttons are present without tapping them
+- assertVisible:
+    id: 'accept-btn-44444444-4444-4444-4444-444444444444'
+- assertVisible:
+    id: 'refuse-btn-44444444-4444-4444-4444-444444444444'
+
+# Open menu for pending user to verify Block option and modal
+- tapOn:
+    id: 'user-card-menu-btn-44444444-4444-4444-4444-444444444444'
+
+- extendedWaitUntil:
+    visible:
+      id: 'block-btn-44444444-4444-4444-4444-444444444444'
+    timeout: 5000
+
+- tapOn:
+    id: 'block-btn-44444444-4444-4444-4444-444444444444'
+
+- extendedWaitUntil:
+    visible: 'Block User'
+    timeout: 5000
+
+# Safely Cancel the modal without executing the block action
+- tapOn:
+    id: 'block-friend-44444444-4444-4444-4444-444444444444-cancel-btn'
+
+# 3. Check Accepted Friend Menu (test-02 in seed)
+- tapOn:
+    id: 'user-card-menu-btn-22222222-2222-2222-2222-222222222222'
+
+- extendedWaitUntil:
+    visible:
+      id: 'block-friend-btn-22222222-2222-2222-2222-222222222222'
+    timeout: 5000
+
+- tapOn:
+    id: 'block-friend-btn-22222222-2222-2222-2222-222222222222'
+
+- extendedWaitUntil:
+    visible: 'Block User'
+    timeout: 5000
+
+# Cancel without executing block
+- tapOn:
+    id: 'block-friend-22222222-2222-2222-2222-222222222222-cancel-btn'
+
+# 4. Switch to Find Users Tab and Search User (test-03)
+- tapOn:
+    id: 'social-tab-search'
+
+- extendedWaitUntil:
+    visible:
+      id: 'user-search-input'
+    timeout: 10000

@@ -14,7 +14,6 @@ import { GameListCardExpandedDetails } from './GameListCardExpandedDetails';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
-
 interface GameListCardProps {
   gameItem: GameListItemData;
   sortBy: SortBy;
@@ -63,11 +62,12 @@ export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: Game
   const toggleExpand = () => setIsExpanded(!isExpanded);
 
   return (
-    <Card
-      variant="elevated"
-      className="m-1 overflow-hidden p-0"
-    >
-      <Pressable onPress={onPress} accessibilityRole="button">
+    <Card variant="elevated" className="m-1 overflow-hidden p-0">
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        testID={`game-list-card-press-${gameItem.appid}`}
+      >
         <Box
           className={`bg-background-100 items-center justify-center overflow-hidden w-full ${isTablet ? 'h-36' : 'h-24'}`}
         >
@@ -94,10 +94,10 @@ export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: Game
           )}
         </Box>
         <VStack className="p-2 bg-background-50" space="sm">
-          <GameListCardBadges 
-            gameItem={gameItem} 
-            topPlatform={topPlatform} 
-            lastPlayedText={lastPlayedText} 
+          <GameListCardBadges
+            gameItem={gameItem}
+            topPlatform={topPlatform}
+            lastPlayedText={lastPlayedText}
             isExpanded={isExpanded}
             sortBy={sortBy}
             platformFilter={platformFilter}
@@ -108,17 +108,24 @@ export const GameListCard = ({ gameItem, sortBy, platformFilter, onPress }: Game
       {/* Expand Toggle */}
       <Pressable
         onPress={toggleExpand}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: isExpanded }}
+        testID={`game-list-card-expand-${gameItem.appid}`}
         className="py-1.5 items-center justify-center bg-background-50 active:bg-background-100"
       >
-        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={HEX_COLORS.muted.icon.hex} />
+        <Ionicons
+          name={isExpanded ? 'chevron-up' : 'chevron-down'}
+          size={16}
+          color={HEX_COLORS.muted.icon.hex}
+        />
       </Pressable>
 
       {/* Expanded Details */}
       {isExpanded && (
-        <GameListCardExpandedDetails 
-          gameItem={gameItem} 
-          exactDateString={exactDateString} 
-          platforms={platforms} 
+        <GameListCardExpandedDetails
+          gameItem={gameItem}
+          exactDateString={exactDateString}
+          platforms={platforms}
           lastPlayedText={lastPlayedText}
         />
       )}
