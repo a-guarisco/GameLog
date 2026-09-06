@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import SocialView from '@gamelog/social/social-view/SocialView';
 import {
   useGetFriendList,
@@ -305,5 +305,47 @@ describe('SocialView', () => {
       user: mockFriendList[0].user,
       friendship: mockFriendList[0].friendship,
     });
+  });
+
+  it('calls all refetch functions on pull-to-refresh', async () => {
+    const mockRefetchUserMe = jest.fn().mockResolvedValue(undefined);
+    const mockRefetchFriendList = jest.fn().mockResolvedValue(undefined);
+    const mockRefetchSearch = jest.fn().mockResolvedValue(undefined);
+
+    mockUseGetUserMe.mockReturnValue({
+      currentUser: { id: 'current-user-id', username: 'Me', steam_id: '0000' },
+      isLoadingUserMe: false,
+      errorUserMe: null,
+      errorMessageUserMe: null,
+      refetchUserMe: mockRefetchUserMe,
+    });
+
+    mockUseGetFriendList.mockReturnValue({
+      friendList: mockFriendList,
+      isLoadingFriendList: false,
+      errorFriendList: null,
+      errorMessageFriendList: null,
+      refetchFriendList: mockRefetchFriendList,
+    });
+
+    mockUseSearchUsers.mockReturnValue({
+      searchResults: [],
+      isLoadingSearch: false,
+      errorSearch: null,
+      errorMessageSearch: null,
+      refetchSearch: mockRefetchSearch,
+    });
+
+    render(<SocialView />);
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect(mockRefetchUserMe).toHaveBeenCalledTimes(1);
+    expect(mockRefetchFriendList).toHaveBeenCalledTimes(1);
+    expect(mockRefetchSearch).toHaveBeenCalledTimes(1);
   });
 });

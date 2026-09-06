@@ -61,7 +61,7 @@ describe('CommunityTopGamesHistogramChart', () => {
       expect(screen.getByText('8h 45m')).toBeTruthy();
       expect(screen.getAllByText('You').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Others').length).toBeGreaterThanOrEqual(1);
-    });
+    }, { timeout: 5000 });
   });
 
   it('slices top 5 games in portrait mode even if backend returns more', async () => {

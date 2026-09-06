@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { ScrollView } from 'react-native';
+import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -52,6 +53,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
     mostPlayedGame,
     friendship,
     isActionLoading,
+    refetchAll,
     handleAddFriend,
     handleAcceptFriend,
     handleRefuseFriend,
@@ -63,6 +65,19 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
     user: user || { id: '', firebase_uid: '', username: 'User', steam_id: '', has_steam_api_key: false },
     initialFriendship,
   });
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setRefreshKey((k) => k + 1);
+    try {
+      await refetchAll();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchAll]);
 
   const handleBack = () => {
     if (onClose) {
@@ -115,6 +130,9 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
           className="flex-1"
           contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={true}
+          refreshControl={
+            <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
         >
           <Box className="pt-2">
             <OtherUserIdentity
@@ -143,9 +161,10 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
               {/* 4 Comparison charts in order */}
               <Box className={horizontalPadding}>
-                <VStack space="lg" className="w-full">
+                <VStack space="lg" className="w-full" key={`charts-landscape-${refreshKey}`}>
                   {/* 1. Community Playtime with friend scope */}
                   <CommunityPlaytimeHistogramChart
+                    key={`playtime-landscape-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -154,6 +173,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                   {/* 2. Top Community Games with friend scope */}
                   <CommunityTopGamesHistogramChart
+                    key={`topgames-landscape-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -163,6 +183,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                   {/* 3. Library Status Breakdown with friend scope */}
                   <CommunityGameStatusChart
+                    key={`gamestatus-landscape-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -171,6 +192,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                   {/* 4. Community Radar with friend scope and selector hidden */}
                   <CommunityGenreRadarChart
+                    key={`radar-landscape-${refreshKey}`}
                     scope="user"
                     targetUserId={user.id}
                     targetUserName={username}
@@ -191,7 +213,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
     <Box className="relative flex-1 bg-background-0" testID="other-user-profile-view">
       <HeaderGameImage appid={mostPlayedGame?.appid} />
 
-      <ScrollablePage>
+      <ScrollablePage refreshing={refreshing} onRefresh={handleRefresh}>
         <VSpace size={vspaceHeight} testID="other-user-vspace" />
 
         <OtherUserIdentity
@@ -219,9 +241,10 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
             {/* 4 Comparison charts in order */}
             <Box className={horizontalPadding}>
-              <VStack space="lg" className="w-full">
+              <VStack space="lg" className="w-full" key={`charts-portrait-${refreshKey}`}>
                 {/* 1. Community Playtime with friend scope */}
                 <CommunityPlaytimeHistogramChart
+                  key={`playtime-portrait-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}
@@ -230,6 +253,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                 {/* 2. Top Community Games with friend scope */}
                 <CommunityTopGamesHistogramChart
+                  key={`topgames-portrait-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}
@@ -239,6 +263,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                 {/* 3. Library Status Breakdown with friend scope */}
                 <CommunityGameStatusChart
+                  key={`gamestatus-portrait-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}
@@ -247,6 +272,7 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
 
                 {/* 4. Community Radar with friend scope and selector hidden */}
                 <CommunityGenreRadarChart
+                  key={`radar-portrait-${refreshKey}`}
                   scope="user"
                   targetUserId={user.id}
                   targetUserName={username}

@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { GlobalAchievement } from '@gamelog/api-manager/dto';
 import AchievementItem from '@gamelog/game/AchievementItem';
@@ -23,7 +24,7 @@ type AchievementsListViewProps = {
 const AchievementsListView = ({ route }: any) => {
   const navigation = useNavigation<any>();
   const { globalAchievements, gameID, playerID } = route.params as AchievementsListViewProps;
-  const { gameStreak, isLoadingGameStreak } = useGetGameStreak(gameID);
+  const { gameStreak, isLoadingGameStreak, refetchGameStreak } = useGetGameStreak(gameID);
   const secondaryText = useStreakText(gameStreak?.streak, isLoadingGameStreak);
 
   const {
@@ -34,7 +35,19 @@ const AchievementsListView = ({ route }: any) => {
     gameName,
     isLoading,
     error,
+    refetchAchievements,
   } = useAchievementsData(gameID, playerID, globalAchievements);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refetchGameStreak?.(), refetchAchievements?.()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchGameStreak, refetchAchievements]);
 
   const content = isLoading ? (
     <LoadingBox className="flex-1 shadow-xl" message="Loading achievements..." />
@@ -46,7 +59,7 @@ const AchievementsListView = ({ route }: any) => {
   ) : (
     <>
       <HeaderGameImage appid={gameID} />
-      <ScrollablePage>
+      <ScrollablePage refreshing={refreshing} onRefresh={handleRefresh}>
         <GameIdentity className="bg-background-0" title={gameName} secondaryText={secondaryText} />
 
         <Box className="pt-6 pb-6 bg-background-0">

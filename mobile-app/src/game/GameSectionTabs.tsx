@@ -70,6 +70,7 @@ const GameSectionTabs = ({
           className="flex-1"
           contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
         >
           {panelContent}
         </ScrollView>

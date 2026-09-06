@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,7 +17,7 @@ export const SocialView: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { currentUser } = useGetUserMe();
+  const { currentUser, refetchUserMe } = useGetUserMe();
 
   const {
     friendList,
@@ -53,6 +53,17 @@ export const SocialView: React.FC = () => {
     return () => sub.remove();
   }, [refetchFriendList, refetchSearch]);
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refetchUserMe(), refetchFriendList(), refetchSearch()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchUserMe, refetchFriendList, refetchSearch]);
+
   const pendingRequests = selectPendingRequests(friendList);
   const acceptedFriends = selectAcceptedFriends(friendList);
 
@@ -72,7 +83,7 @@ export const SocialView: React.FC = () => {
 
   return (
     <Box className="flex-1 relative bg-background-0">
-      <ScrollablePage hasBanner={false}>
+      <ScrollablePage hasBanner={false} refreshing={refreshing} onRefresh={handleRefresh}>
         <SocialIdentity />
 
         <Box className="bg-background-0 pb-6">

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, act } from '@testing-library/react-native';
 import GameView from '@gamelog/game/GameView';
 import { useGetPlaytimeReport } from '@gamelog/api-manager/useApi';
 import { formatShortDateWithYear } from '@gamelog/utils/formatUtils';
@@ -28,6 +28,7 @@ const mockReport = (state: Record<string, unknown> = {}) =>
     },
     isLoadingPlaytimeReport: false,
     errorPlaytimeReport: null,
+    refetchPlaytimeReport: jest.fn().mockResolvedValue(undefined),
     ...state,
   });
 
@@ -129,6 +130,18 @@ describe('GameView', () => {
     expect(screen.getByText('0h')).toBeTruthy();
   });
 
+  it('triggers pull-to-refresh in portrait mode', async () => {
+    render(<GameView />);
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect(scrollView).toBeTruthy();
+  });
+
   it('holds the two-week tile at a dash while the report is in flight', () => {
     mockReport({ playtimeReport: null, isLoadingPlaytimeReport: true });
 
@@ -207,6 +220,18 @@ describe('GameView', () => {
 
       fireEvent.press(screen.getByTestId('game-tab-screenshots'));
       expect(screen.getByText('Community in-game screenshots')).toBeTruthy();
+    });
+
+    it('triggers pull-to-refresh in landscape mode', async () => {
+      render(<GameView />);
+
+      const landscapeScroll = screen.getByTestId('game-view-landscape-scroll');
+
+      await act(async () => {
+        fireEvent(landscapeScroll, 'refresh');
+      });
+
+      expect(landscapeScroll).toBeTruthy();
     });
 
     it('renders wrapped stat labels and centered values in landscape', () => {

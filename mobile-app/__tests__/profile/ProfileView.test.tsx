@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import ProfileView from '@gamelog/profile/ProfileView';
 import {
   useGetOwnedGames,
@@ -112,6 +112,7 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
     },
     isLoadingOwnedGames: false,
     errorOwnedGames: null,
+    refetchOwnedGames: jest.fn().mockResolvedValue(undefined),
     ...overrides.ownedGames,
   });
   mockUseGetGameGenreChartData.mockReturnValue({
@@ -123,11 +124,15 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
     playersInfo: { response: { players: [{ ...PLAYER, ...overrides.player }] } },
     isLoadingPlayersInfo: false,
     errorPlayersInfo: null,
+    refetchPlayersInfo: jest.fn().mockResolvedValue(undefined),
+    ...overrides.playersInfo,
   });
   mockUseGetUserStreak.mockReturnValue({
     userStreak: { streak: 12 },
     isLoadingUserStreak: false,
     errorUserStreak: null,
+    refetchUserStreak: jest.fn().mockResolvedValue(undefined),
+    ...overrides.userStreak,
   });
   mockUseGetPlaytimeReport.mockReturnValue({
     playtimeReport: {
@@ -139,6 +144,7 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
     },
     isLoadingPlaytimeReport: false,
     errorPlaytimeReport: null,
+    refetchPlaytimeReport: jest.fn().mockResolvedValue(undefined),
     ...overrides.playtimeReport,
   });
   mockUseGetPlaytimeByUser.mockReturnValue({
@@ -148,6 +154,7 @@ const setupLoadedMocks = (overrides: Record<string, any> = {}) => {
     ],
     isLoadingPlaytimeByUser: false,
     errorPlaytimeByUser: null,
+    refetchPlaytimeByUser: jest.fn().mockResolvedValue(undefined),
     ...overrides.playtimeByUser,
   });
 };
@@ -338,5 +345,48 @@ describe('ProfileView — loaded', () => {
 
     fireEvent.press(screen.getByTestId('profile-tab-community'));
     expect(screen.getByTestId('profile-community-tab')).toBeTruthy();
+  });
+
+  it('calls all refetch functions on pull-to-refresh', async () => {
+    const mockRefetchOwnedGames = jest.fn().mockResolvedValue(undefined);
+    const mockRefetchPlayersInfo = jest.fn().mockResolvedValue(undefined);
+    const mockRefetchUserStreak = jest.fn().mockResolvedValue(undefined);
+    const mockRefetchPlaytimeReport = jest.fn().mockResolvedValue(undefined);
+    const mockRefetchPlaytimeByUser = jest.fn().mockResolvedValue(undefined);
+
+    setupLoadedMocks({
+      ownedGames: { refetchOwnedGames: mockRefetchOwnedGames },
+      player: {}, // mockUseGetPlayersInfo returns player
+      playtimeReport: { refetchPlaytimeReport: mockRefetchPlaytimeReport },
+      playtimeByUser: { refetchPlaytimeByUser: mockRefetchPlaytimeByUser },
+    });
+
+    mockUseGetPlayersInfo.mockReturnValue({
+      playersInfo: { response: { players: [PLAYER] } },
+      isLoadingPlayersInfo: false,
+      errorPlayersInfo: null,
+      refetchPlayersInfo: mockRefetchPlayersInfo,
+    });
+
+    mockUseGetUserStreak.mockReturnValue({
+      userStreak: { streak: 12 },
+      isLoadingUserStreak: false,
+      errorUserStreak: null,
+      refetchUserStreak: mockRefetchUserStreak,
+    });
+
+    render(<ProfileView />);
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect(mockRefetchOwnedGames).toHaveBeenCalledTimes(1);
+    expect(mockRefetchPlayersInfo).toHaveBeenCalledTimes(1);
+    expect(mockRefetchUserStreak).toHaveBeenCalledTimes(1);
+    expect(mockRefetchPlaytimeReport).toHaveBeenCalledTimes(1);
+    expect(mockRefetchPlaytimeByUser).toHaveBeenCalledTimes(1);
   });
 });

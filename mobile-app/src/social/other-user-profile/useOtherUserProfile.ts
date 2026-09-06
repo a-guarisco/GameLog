@@ -34,6 +34,7 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
     data: playersInfo,
     isLoading: isLoadingPlayer,
     error: errorPlayer,
+    refetch: refetchPlayerInfo,
   } = useAsyncFetch<PlayersInfo>(fetchTargetPlayerInfo);
 
   // Fetch target user's Steam owned games
@@ -58,6 +59,7 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
   const {
     data: currentUserOwnedGames,
     isLoading: isLoadingCurrentUserGames,
+    refetch: refetchCurrentUserGames,
   } = useAsyncFetch<OwnedGames>(fetchCurrentUserGames);
 
   const player = playersInfo?.response?.players?.[0];
@@ -182,6 +184,14 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
     }
   }, []);
 
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      refetchPlayerInfo(),
+      refetchTargetGames(),
+      refetchCurrentUserGames(),
+    ]);
+  }, [refetchPlayerInfo, refetchTargetGames, refetchCurrentUserGames]);
+
   return {
     player,
     targetOwnedGames,
@@ -195,6 +205,7 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
     error: errorPlayer || errorTargetGames,
     isActionLoading,
     refetchTargetGames,
+    refetchAll,
     handleAddFriend,
     handleAcceptFriend,
     handleRefuseFriend,

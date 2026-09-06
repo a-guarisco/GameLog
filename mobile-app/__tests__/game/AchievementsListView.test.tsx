@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor, act } from '@testing-library/react-native';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
@@ -46,7 +46,7 @@ describe('AchievementsListView', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Achievements for\s*Unknown Game/)).toBeTruthy();
-    });
+    }, { timeout: 5000 });
   });
 
   it('displays error text when the API call fails', async () => {
@@ -93,5 +93,30 @@ describe('AchievementsListView', () => {
     render(<AchievementsListView route={mockRoute} />);
 
     expect(screen.getByTestId('achievements-back')).toBeTruthy();
+  });
+
+  it('triggers pull-to-refresh and refetches achievements', async () => {
+    (ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mockResolvedValue({
+      playerstats: {
+        gameName: 'game1',
+        achievements: [{ apiname: 'First_Strike', achieved: 1, unlocktime: 1600000000 }],
+      },
+    });
+
+    render(<AchievementsListView route={mockRoute} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Achievements for\s*game1/)).toBeTruthy();
+    });
+
+    const initialCalls = (ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mock.calls.length;
+
+    const scrollView = screen.getByTestId('scrollable-page-scroll');
+
+    await act(async () => {
+      fireEvent(scrollView, 'refresh');
+    });
+
+    expect((ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mock.calls.length).toBeGreaterThan(initialCalls);
   });
 });

@@ -13,7 +13,7 @@ export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
     setIsLoading(true);
     setErrorMessage(null);
 
-    asyncFunction()
+    return asyncFunction()
       .then((result) => {
         if (isMountedRef.current && requestId === requestIdRef.current) setData(result);
       })
@@ -30,7 +30,7 @@ export const useAsyncFetch = <T>(asyncFunction: () => Promise<T>) => {
       });
   }, [asyncFunction]);
 
-  useEffect(() => refetch(), [refetch]);
+  useEffect(() => { refetch(); }, [refetch]);
 
   useEffect(
     () => () => {
