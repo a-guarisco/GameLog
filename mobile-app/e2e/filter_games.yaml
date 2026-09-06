@@ -26,7 +26,8 @@ onFlowComplete:
 - extendedWaitUntil:
     visible: 'Filter by Genre'
     timeout: 10000
-- tapOn: 'Action'
+- tapOn:
+    id: 'filter-genre-option-Action'
 - extendedWaitUntil:
     visible: 'Genre: Action'
     timeout: 10000

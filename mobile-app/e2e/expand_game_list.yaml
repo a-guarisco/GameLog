@@ -19,13 +19,13 @@ onFlowComplete:
 - extendedWaitUntil:
     visible: 'Games'
     timeout: 100000
-- assertVisible: 'Counter-Strike 2 header'
+- assertVisible: "Europa Universalis IV header"
 - assertVisible:
     point: 6%,28%
 - assertVisible:
     point: 4%,28%
 - tapOn:
-    id: 'game-list-card-expand-730'
+    id: 'game-list-card-expand-236850'
 - assertVisible: 'LAST PLAYED'
 - assertVisible: 'STREAK'
 - assertVisible: 'MAX / DAY'

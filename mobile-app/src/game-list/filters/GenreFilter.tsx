@@ -30,6 +30,7 @@ export const GenreFilter = ({
         activeBorderClass={'border-semantic-genre-600'}
         activeTextClass={'text-semantic-genre-600'}
         activeIconColor={HEX_COLORS.genre.hex}
+        testID="filter-chip-genre"
       />
 
       <FilterModalWrapper

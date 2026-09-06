@@ -46,6 +46,7 @@ export const DateFilter = ({ dateRangeFilter, setDateRangeFilter }: DateFilterPr
         activeBorderClass={'border-semantic-lastPlayed-600'}
         activeTextClass={'text-semantic-lastPlayed-600'}
         activeIconColor={HEX_COLORS.lastPlayed.hex}
+        testID="filter-chip-date"
       />
 
       <FilterModalWrapper

@@ -28,6 +28,7 @@ export const PlatformFilter = ({ platformFilter, setPlatformFilter }: PlatformFi
         activeBorderClass={'border-semantic-topPlatform-600'}
         activeTextClass={'text-semantic-topPlatform-600'}
         activeIconColor={HEX_COLORS.topPlatform.hex}
+        testID="filter-chip-platform"
       />
 
       <FilterModalWrapper
