@@ -18,10 +18,15 @@ const AuthNavigation = createStaticNavigation(AuthNavigator);
 const OnboardingNavigation = createStaticNavigation(OnboardingNavigator);
 const UnverifiedNavigation = createStaticNavigation(UnverifiedNavigator);
 
-const App = () => {
-  const { isReady } = useAppInit();
-  const { authState, refreshBackendUser } = useAuthSession();
+const navigators: Record<string, React.ComponentType<any>> = {
+  unauthenticated: AuthNavigation,
+  onboarding: OnboardingNavigation,
+  unverified: UnverifiedNavigation,
+  authenticated: MainNavigation,
+};
 
+const AppContent = () => {
+  const { authState, refreshBackendUser } = useAuthSession();
   const { colorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const navTheme = useMemo(() => getNavigationTheme(isDarkMode), [isDarkMode]);
@@ -33,32 +38,28 @@ const App = () => {
     return () => sub.remove();
   }, [refreshBackendUser]);
 
-  if (!isReady || authState === 'loading') {
-    return (
-      <SafeAreaProvider>
-        <GluestackUIProvider mode={colorScheme ?? 'light'}>
-          <SplashScreen />
-        </GluestackUIProvider>
-      </SafeAreaProvider>
-    );
+  if (authState === 'loading') {
+    return <SplashScreen />;
   }
 
-  const currentMode = colorScheme ?? 'light';
+  const NavigationToRender = navigators[authState] || MainNavigation;
 
-  let NavigationToRender = MainNavigation;
-  if (authState === 'unauthenticated') {
-    NavigationToRender = AuthNavigation;
-  } else if (authState === 'onboarding') {
-    NavigationToRender = OnboardingNavigation;
-  } else if (authState === 'unverified') {
-    NavigationToRender = UnverifiedNavigation;
-  }
+  return (
+    <>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+      <NavigationToRender theme={navTheme} />
+    </>
+  );
+};
+
+const App = () => {
+  const { isReady } = useAppInit();
+  const { colorScheme } = useColorScheme();
 
   return (
     <SafeAreaProvider>
-      <GluestackUIProvider mode={currentMode}>
-        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-        <NavigationToRender theme={navTheme} />
+      <GluestackUIProvider mode={colorScheme ?? 'light'}>
+        {!isReady ? <SplashScreen /> : <AppContent />}
       </GluestackUIProvider>
     </SafeAreaProvider>
   );

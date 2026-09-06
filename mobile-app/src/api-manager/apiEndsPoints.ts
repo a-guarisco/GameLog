@@ -1,66 +1,46 @@
-import { getApiProvider } from '@gamelog/api-manager/apiProvider';
+import { Platform } from 'react-native';
 import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 import { CommunityScope, TopGameReference } from '@gamelog/api-manager/dto';
 
 const STEAM_BASE_URL = 'https://api.steampowered.com/';
 const STORE_BASE_URL = 'https://store.steampowered.com';
 
-const getBackendBaseUrl = (): string =>
-  process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8000';
-
 const getRelationship = (includePending: boolean): string => (includePending ? 'all' : 'friend');
-
-/**
- * Checks if the current API provider is backend.
- * Use this method to add granular control per endpoint based on the provider.
- *
- * @returns true if backend provider is selected, false if steam provider
- */
-const isBackendProvider = (): boolean => getApiProvider() === 'backend';
 
 const EndPoints = {
   getNewsForApp: (appId: string, count: number, maxLength: number) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamNews/GetNewsForApp/v2/?appid=${appId}&count=${count}&maxlength=${maxLength}`;
   },
 
   getGlobalAchievementsForApp: (appId: string) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${appId}`;
   },
 
   getPlayerAchievements: (appId: string, steamId: string) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appId}&key=${getSteamApiKey()}&steamid=${steamId}`;
   },
 
   getPlayerStats: (appId: string, steamId: string) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUserStats/GetUserStatsForGame/v0002/?appid=${appId}&key=${getSteamApiKey()}&steamid=${steamId}`;
   },
 
   getPlayersInfo: (steamIds: string[]) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUser/GetPlayerSummaries/v0002/?key=${getSteamApiKey()}&steamids=${steamIds.join(',')}`;
   },
 
   getPlayerFriendsList: (steamId: string, includePending: boolean) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUser/GetFriendList/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&relationship=${getRelationship(includePending)}`;
   },
 
   getOwnedGames: (steamId: string, include_sub: boolean, includeFreeGame: boolean) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}IPlayerService/GetOwnedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&include_appinfo=true&include_free_sub=${include_sub}&include_played_free_games=${includeFreeGame}`;
   },
 
   getRecentPlayedGames: (steamId: string, count: number) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}IPlayerService/GetRecentlyPlayedGames/v0001/?key=${getSteamApiKey()}&steamid=${steamId}&count=${count}`;
   },
 
   getGameGenres: (appId: string) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STORE_BASE_URL}/api/appdetails?appids=${appId}&filters=genres`;
   },
 
@@ -69,12 +49,10 @@ const EndPoints = {
   },
 
   getSchemaForGame: (appId: string) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUserStats/GetSchemaForGame/v2/?key=${getSteamApiKey()}&appid=${appId}`;
   },
 
   getNumberOfCurrentPlayers: (appId: string) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${appId}`;
   },
 
@@ -84,7 +62,6 @@ const EndPoints = {
    * `next_cursor`; '*' asks for the first page.
    */
   queryPublishedFiles: (appId: string, cursor: string, numPerPage: number) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}IPublishedFileService/QueryFiles/v1/?key=${getSteamApiKey()}&query_type=3&appid=${appId}&filetype=4&cursor=${encodeURIComponent(cursor)}&numperpage=${numPerPage}&return_short_description=true&return_previews=true`;
   },
 
@@ -94,88 +71,87 @@ const EndPoints = {
    * the required English tag keeps the panel readable. Cursor works as above.
    */
   queryPublishedGuides: (appId: string, cursor: string, numPerPage: number) => {
-    // TODO: use isBackendProvider() if backend endpoint differs
     return `${STEAM_BASE_URL}IPublishedFileService/QueryFiles/v1/?key=${getSteamApiKey()}&creator_appid=766&query_type=12&appid=${appId}&filetype=11&requiredtags[0]=English&match_all_tags=true&cursor=${encodeURIComponent(cursor)}&numperpage=${numPerPage}&return_short_description=true`;
   },
 
   getStreakByUser: () => {
-    return `${getBackendBaseUrl()}/games/streak_by_user`;
+    return `/games/streak_by_user`;
   },
 
   getStreakByGame: (appId: string) => {
-    return `${getBackendBaseUrl()}/games/streak_by_game?steam_app_id=${appId}`;
+    return `/games/streak_by_game?steam_app_id=${appId}`;
   },
 
   getPlaytimeReport: (startDate: string, endDate: string) => {
-    return `${getBackendBaseUrl()}/games/report?start_date=${startDate}&end_date=${endDate}`;
+    return `/games/report?start_date=${startDate}&end_date=${endDate}`;
   },
 
   getGenresBatch: () => {
-    return `${getBackendBaseUrl()}/games/genres_batch`;
+    return `/games/genres_batch`;
   },
 
   getPlaytimeByUser: (days: number) => {
-    return `${getBackendBaseUrl()}/games/playtime_by_user?days=${days}`;
+    return `/games/playtime_by_user?days=${days}`;
   },
 
   getGameStatus: (steamAppId?: string) => {
     if (steamAppId) {
-      return `${getBackendBaseUrl()}/games/game_status?steam_app_id=${steamAppId}`;
+      return `/games/game_status?steam_app_id=${steamAppId}`;
     }
-    return `${getBackendBaseUrl()}/games/game_status`;
+    return `/games/game_status`;
   },
 
   updateGameStatus: () => {
-    return `${getBackendBaseUrl()}/games/update_game_status`;
+    return `/games/update_game_status`;
   },
 
 
   getAuthOutcome: () => {
-    return `${getBackendBaseUrl()}/me`;
+    return `/me`;
   },
 
   getBackendHealth: () => {
-    return `${getBackendBaseUrl()}/health`;
+    return `/health`;
   },
 
   registerUser: () => {
-    return `${getBackendBaseUrl()}/users/register`;
+    return `/users/register`;
   },
 
   getUserMe: () => {
-    return `${getBackendBaseUrl()}/users/me`;
+    return `/users/me`;
   },
 
   searchUsers: (query: string) => {
-    return `${getBackendBaseUrl()}/users/search?q=${encodeURIComponent(query)}`;
+    return `/users/search?q=${encodeURIComponent(query)}`;
   },
 
   getFriendList: () => {
-    return `${getBackendBaseUrl()}/users/friend_list`;
+    return `/users/friend_list`;
   },
 
   addFriend: () => {
-    return `${getBackendBaseUrl()}/users/add_friend`;
+    return `/users/add_friend`;
   },
 
   manageFriendship: () => {
-    return `${getBackendBaseUrl()}/users/manage_friendship`;
+    return `/users/manage_friendship`;
   },
 
   getRecommendations: (friendId: string, includeTopGames: boolean = true) => {
-    return `${getBackendBaseUrl()}/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
+    return `/games/recommendations?friend=${friendId}&include_top_games=${includeTopGames}`;
   },
 
   registerDeviceToken: () => {
-    return `${getBackendBaseUrl()}/notifications/register_device`;
+    return `/notifications/register_device`;
   },
 
   unregisterDeviceToken: () => {
-    return `${getBackendBaseUrl()}/notifications/unregister_device`;
+    return `/notifications/unregister_device`;
   },
 
   getDailyReport: (startDate?: string, endDate?: string) => {
-    let url = `${getBackendBaseUrl()}/games/report`;
+    let url = `/games/report`;
     const params = new URLSearchParams();
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
@@ -184,7 +160,7 @@ const EndPoints = {
   },
 
   getCommunityGenre: (scope: CommunityScope, userId?: string) => {
-    let url = `${getBackendBaseUrl()}/community/genre?scope=${scope}`;
+    let url = `/community/genre?scope=${scope}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -195,7 +171,7 @@ const EndPoints = {
     endDate: string,
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+    let url = `/community/weekly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -206,7 +182,7 @@ const EndPoints = {
     endDate: string,
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
+    let url = `/community/monthly_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -218,7 +194,7 @@ const EndPoints = {
     reference: TopGameReference = 'community',
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    let url = `/community/weekly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
@@ -230,17 +206,16 @@ const EndPoints = {
     reference: TopGameReference = 'community',
     userId?: string
   ) => {
-    let url = `${getBackendBaseUrl()}/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
+    let url = `/community/monthly_top_game_playtime?scope=${scope}&start_date=${startDate}&end_date=${endDate}&reference=${reference}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
 
   getCommunityGameStatuses: (scope: CommunityScope, userId?: string) => {
-    let url = `${getBackendBaseUrl()}/community/game_statuses?scope=${scope}`;
+    let url = `/community/game_statuses?scope=${scope}`;
     if (userId) url += `&user_id=${userId}`;
     return url;
   },
 };
 
-export { isBackendProvider };
 export default EndPoints;

@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react-native';
 import { useProfileSetup } from '../../src/onboarding/useProfileSetup';
 import { DeviceEventEmitter } from 'react-native';
 import apiManager from '@gamelog/api-manager/apiManager';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { setSteamId, setSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
@@ -10,10 +10,12 @@ jest.mock('@gamelog/api-manager/apiManager', () => ({
 }));
 
 jest.mock('@gamelog/auth/firebaseClient', () => ({
-  auth: {
-    signOut: jest.fn(),
-  },
+  getFirebaseAuth: () => mockAuth,
 }));
+
+const mockAuth: any = {
+  signOut: jest.fn(),
+};
 
 jest.mock('@gamelog/api-manager/steamApiKey', () => ({
   setSteamId: jest.fn(),
@@ -171,13 +173,13 @@ describe('useProfileSetup', () => {
     expect(result.current.errorMsg).toBe('Failed to complete profile setup');
   });
 
-  it('calls auth.signOut on handleSignOut', () => {
+  it('calls mockAuth.signOut on handleSignOut', () => {
     const { result } = renderHook(() => useProfileSetup());
 
     act(() => {
       result.current.handleSignOut();
     });
 
-    expect(auth.signOut).toHaveBeenCalled();
+    expect(mockAuth.signOut).toHaveBeenCalled();
   });
 });

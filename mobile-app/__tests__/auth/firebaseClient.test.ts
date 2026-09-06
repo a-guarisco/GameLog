@@ -1,5 +1,10 @@
 import { Platform } from 'react-native';
 
+const mockConnectAuthEmulator = jest.fn();
+const mockResolveServiceUrl = jest.fn();
+const mockInitializeAuth = jest.fn(() => ({}));
+const mockGetAuth = jest.fn(() => ({}));
+
 jest.unmock('@gamelog/auth/firebaseClient');
 jest.unmock('../../src/auth/firebaseClient');
 
@@ -9,10 +14,14 @@ jest.mock('firebase/app', () => ({
 }));
 
 jest.mock('@firebase/auth', () => ({
-  initializeAuth: jest.fn(() => ({})),
-  getAuth: jest.fn(() => ({})),
+  initializeAuth: mockInitializeAuth,
+  getAuth: mockGetAuth,
   getReactNativePersistence: jest.fn(),
-  connectAuthEmulator: jest.fn(),
+  connectAuthEmulator: mockConnectAuthEmulator,
+}));
+
+jest.mock('@gamelog/api-manager/serviceDiscovery', () => ({
+  resolveServiceUrl: mockResolveServiceUrl,
 }));
 
 describe('firebaseClient', () => {
@@ -20,7 +29,24 @@ describe('firebaseClient', () => {
 
   beforeEach(() => {
     jest.resetModules();
+    jest.doMock('@firebase/auth', () => ({
+      initializeAuth: mockInitializeAuth,
+      getAuth: mockGetAuth,
+      getReactNativePersistence: jest.fn(),
+      connectAuthEmulator: mockConnectAuthEmulator,
+    }));
+    jest.doMock('@gamelog/api-manager/serviceDiscovery', () => ({
+      resolveServiceUrl: mockResolveServiceUrl,
+    }));
+    mockConnectAuthEmulator.mockClear();
+    mockResolveServiceUrl.mockClear();
+    mockInitializeAuth.mockClear();
+    mockGetAuth.mockClear();
     process.env = { ...originalEnv };
+
+    // Reset global state
+    const globalAny = global as any;
+    globalAny.__isAuthEmulatorConnected = false;
   });
 
   afterAll(() => {
@@ -34,6 +60,7 @@ describe('firebaseClient', () => {
     process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET = 'test-bucket';
     process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = 'test-sender';
     process.env.EXPO_PUBLIC_FIREBASE_APP_ID = 'test-app';
+    process.env.EXPO_PUBLIC_IS_DEV = 'true';
   };
 
   it('throws an error if required env var is missing', () => {
@@ -45,86 +72,99 @@ describe('firebaseClient', () => {
     });
   });
 
-  it('initializes firebase app when env vars are present', () => {
+  it('initializes firebase app when env vars are present', async () => {
     setupValidEnv();
-    const { app, auth } = require('../../src/auth/firebaseClient');
-    expect(app).toBeDefined();
-    expect(auth).toBeDefined();
+    await jest.isolateModules(async () => {
+      const client = require('../../src/auth/firebaseClient');
+      await client.setupAuthEmulator();
+      expect(mockInitializeAuth).toHaveBeenCalled();
+    });
   });
 
-  it('uses emulator by default on android', () => {
+  it('uses emulator by default on android', async () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'true';
     Platform.OS = 'android';
-    const { auth } = require('../../src/auth/firebaseClient');
-    // We mock connectAuthEmulator in jest config or it might fail if not mocked
-    // Actually firebase/auth is mocked globally usually, but if not we can just assert auth is defined
-    expect(auth).toBeDefined();
+    mockResolveServiceUrl.mockResolvedValue('http://10.0.2.2:9099');
+
+    await jest.isolateModules(async () => {
+      const client = require('../../src/auth/firebaseClient');
+      await client.setupAuthEmulator();
+      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(expect.anything(), 'http://10.0.2.2:9099', { disableWarnings: true });
+    });
   });
 
-  it('uses emulator by default on ios', () => {
+  it('uses localhost for ios emulator by default', async () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'true';
+    delete process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST;
     Platform.OS = 'ios';
-    const { auth } = require('../../src/auth/firebaseClient');
-    expect(auth).toBeDefined();
+    mockResolveServiceUrl.mockResolvedValue('http://localhost:9099');
+
+    await jest.isolateModules(async () => {
+      const client = require('../../src/auth/firebaseClient');
+      await client.setupAuthEmulator();
+      expect(mockConnectAuthEmulator).toHaveBeenCalledWith(expect.anything(), 'http://localhost:9099', { disableWarnings: true });
+    });
   });
 
-  it('skips emulator when EXPO_PUBLIC_USE_FIREBASE_EMULATOR is false', () => {
+  it('skips emulator when EXPO_PUBLIC_USE_FIREBASE_EMULATOR is false', async () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'false';
-    const { auth } = require('../../src/auth/firebaseClient');
-    expect(auth).toBeDefined();
+    
+    await jest.isolateModules(async () => {
+      const client = require('../../src/auth/firebaseClient');
+      await client.setupAuthEmulator();
+      expect(mockInitializeAuth).toHaveBeenCalled();
+      expect(mockConnectAuthEmulator).not.toHaveBeenCalled();
+    });
   });
 
-  it('falls back to getAuth if initializeAuth throws', () => {
+  it('falls back to getAuth if initializeAuth throws', async () => {
     setupValidEnv();
 
-    // Mock @firebase/auth to throw on initializeAuth
-    jest.doMock('@firebase/auth', () => {
-      return {
-        initializeAuth: () => {
-          throw new Error('Cannot init twice');
-        },
-        getAuth: jest.fn(() => 'fallback-auth'),
-        getReactNativePersistence: jest.fn(),
-        connectAuthEmulator: jest.fn(),
-      };
+    const errorInitializeAuth = jest.fn(() => {
+      throw new Error('Cannot init twice');
     });
 
-    jest.isolateModules(() => {
-      const { auth } = require('../../src/auth/firebaseClient');
-      expect(auth).toBe('fallback-auth');
+    jest.doMock('@firebase/auth', () => ({
+      initializeAuth: errorInitializeAuth,
+      getAuth: mockGetAuth,
+      getReactNativePersistence: jest.fn(),
+      connectAuthEmulator: jest.fn(),
+    }));
+
+    await jest.isolateModules(async () => {
+      const client = require('../../src/auth/firebaseClient');
+      await client.setupAuthEmulator();
+      expect(errorInitializeAuth).toHaveBeenCalled();
+      expect(mockGetAuth).toHaveBeenCalled();
     });
   });
 
   it('uses existing app if getApps() is not empty', () => {
     setupValidEnv();
+    const existingApp = { name: 'existing-app' };
     jest.doMock('firebase/app', () => ({
-      getApps: jest.fn(() => ['existing-app']),
+      getApps: jest.fn(() => [existingApp]),
       initializeApp: jest.fn(),
     }));
     jest.isolateModules(() => {
-      const { app } = require('../../src/auth/firebaseClient');
-      expect(app).toBe('existing-app');
+      const client = require('../../src/auth/firebaseClient');
+      expect(client.app).toEqual(existingApp);
     });
   });
 
-  it('uses unknown-project if EXPO_PUBLIC_FIREBASE_PROJECT_ID is missing', () => {
-    setupValidEnv();
-    delete process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
-    jest.isolateModules(() => {
-      const { app } = require('../../src/auth/firebaseClient');
-      expect(app).toBeDefined(); // Just ensuring it doesn't crash
-    });
-  });
-  it('uses custom emulator host when EXPO_PUBLIC_FIREBASE_EMULATOR_HOST is provided', () => {
+  it('does not call connectAuthEmulator twice if global is set', async () => {
     setupValidEnv();
     process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR = 'true';
-    process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST = 'http://custom.host:9099';
-    jest.isolateModules(() => {
-      const { auth } = require('../../src/auth/firebaseClient');
-      expect(auth).toBeDefined();
+    const globalAny = global as any;
+    globalAny.__isAuthEmulatorConnected = true;
+
+    await jest.isolateModules(async () => {
+      const client = require('../../src/auth/firebaseClient');
+      await client.setupAuthEmulator();
+      expect(mockConnectAuthEmulator).not.toHaveBeenCalled();
     });
   });
 });

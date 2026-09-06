@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { onIdTokenChanged, type User } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
 import {
   setSteamApiKey,
@@ -18,18 +18,28 @@ export type AuthState =
   | 'authenticated';
 
 export const useAuthSession = () => {
-  const [authState, setAuthState] = useState<AuthState>('loading');
+  const [authState, setAuthStateInternal] = useState<AuthState>('loading');
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [backendUser, setBackendUser] = useState<UserMeRead | null>(null);
 
+  const setAuthState = (state: AuthState) => {
+    console.log(`[Auth Session] State changed to: ${state}`);
+    setAuthStateInternal(state);
+  };
+
   const checkBackendRegistration = async (user: User) => {
+    console.log('[Auth Session] Checking backend registration...');
     try {
       // Fetch current user from backend
+      console.log('[Auth Session] Calling apiManager.getUserMe()...');
       const response = await apiManager.getUserMe();
+      console.log('[Auth Session] apiManager.getUserMe() succeeded.');
       setBackendUser(response);
       if (response.steam_api_key) {
+        console.log('[Auth Session] Steam API key found.');
         setSteamApiKey(response.steam_api_key);
       } else {
+        console.log('[Auth Session] No Steam API key found.');
         await initSteamApiKeyFromStorage();
       }
       if (response.steam_id) {
@@ -37,6 +47,7 @@ export const useAuthSession = () => {
       }
       setAuthState('authenticated');
     } catch (error: any) {
+      console.log('[Auth Session] apiManager.getUserMe() failed:', error?.message);
       if (
         error?.response?.status === 404 ||
         (error instanceof Error && error.message.includes('404'))
@@ -53,7 +64,7 @@ export const useAuthSession = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onIdTokenChanged(auth, async (user) => {
+    const unsubscribe = onIdTokenChanged(getFirebaseAuth(), async (user) => {
       setFirebaseUser(user);
       if (user) {
         if (!user.emailVerified && user.providerData.some((p) => p.providerId === 'password')) {
@@ -83,7 +94,7 @@ export const useAuthSession = () => {
     if (firebaseUser) {
       setAuthState('loading');
       await firebaseUser.reload();
-      const updatedUser = auth.currentUser;
+      const updatedUser = getFirebaseAuth().currentUser;
       setFirebaseUser(updatedUser);
 
       // FORZA l'aggiornamento del token Firebase.

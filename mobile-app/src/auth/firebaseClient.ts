@@ -9,6 +9,8 @@ import {
 } from '@firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { resolveServiceUrl } from '@gamelog/api-manager/serviceDiscovery';
+
 const getRequiredEnv = (value: string | undefined, name: string): string => {
   if (!value) {
     throw new Error(`Missing required env var: ${name}`);
@@ -44,25 +46,67 @@ const useEmulator = process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR !== 'false';
 const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 
 let auth: ReturnType<typeof getAuth>;
-try {
-  auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage),
-  });
 
-  if (useEmulator) {
-    const authEmulatorHost =
-      process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST ||
-      (Platform.OS === 'android' ? 'http://192.168.240.1:9099' : 'http://127.0.0.1:9099');
+const initializeFirebaseAuth = () => {
+  if (auth) return auth;
+  try {
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+  } catch {
+    auth = getAuth(app);
+  }
+  return auth;
+};
 
-    connectAuthEmulator(auth, authEmulatorHost);
+export const getFirebaseAuth = () => {
+  if (!auth) {
+    // During Metro Fast Refresh, the module is re-evaluated and `auth` becomes undefined.
+    // Since App state is preserved, setupAuthEmulator() won't be called again.
+    // We lazily re-initialize it here to survive hot reloads.
+    initializeFirebaseAuth();
+  }
+  return auth;
+};
+
+const globalAny = global as any;
+
+export const setupAuthEmulator = async () => {
+  if (!useEmulator || globalAny.__isAuthEmulatorConnected) {
+    initializeFirebaseAuth();
+    return;
+  }
+
+  try {
+    const isDev = process.env.EXPO_PUBLIC_IS_DEV === 'true';
+    const authEmulatorHost = await resolveServiceUrl(
+      process.env.EXPO_PUBLIC_FIREBASE_EMULATOR_HOST,
+      'FirebaseAuth',
+      9099,
+      '/',
+      isDev
+    );
+    
+    if (globalAny.__isAuthEmulatorConnected) return;
+    
+    // Initialize Auth IMMEDIATELY before connecting the emulator
+    // to absolutely guarantee no network requests are fired beforehand.
+    initializeFirebaseAuth();
+    
+    connectAuthEmulator(auth, authEmulatorHost, { disableWarnings: true });
+    globalAny.__isAuthEmulatorConnected = true;
     console.log(
       `[Firebase Auth] 🛠️ Mode: EMULATOR | Project: ${projectId} | Host: ${authEmulatorHost}`
     );
-  } else {
-    console.log(`[Firebase Auth] ☁️ Mode: LIVE (Cloud) | Project: ${projectId}`);
+  } catch (error) {
+    console.warn('[Firebase Auth] Failed to connect emulator:', error);
+    initializeFirebaseAuth(); // Ensure auth is initialized even on failure
   }
-} catch {
-  auth = getAuth(app);
+};
+
+if (!useEmulator) {
+  console.log(`[Firebase Auth] ☁️ Mode: LIVE (Cloud) | Project: ${projectId}`);
 }
 
-export { app, auth };
+export { app };
+

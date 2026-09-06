@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 
 jest.mock('@gamelog/auth/googleAuth', () => ({
   signInWithGoogle: jest.fn(),
@@ -18,8 +19,10 @@ jest.mock('firebase/auth', () => ({
 }));
 
 jest.mock('@gamelog/auth/firebaseClient', () => ({
-  auth: {},
+  getFirebaseAuth: () => mockAuth,
 }));
+
+const mockAuth: any = {};
 
 describe('useLogin', () => {
   beforeEach(() => {

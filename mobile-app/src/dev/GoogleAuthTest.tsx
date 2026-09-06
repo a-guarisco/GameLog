@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { type User } from 'firebase/auth';
 
 import { signInWithGoogle, signOutGoogle } from '@gamelog/auth/googleAuth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText } from '@gamelog/common/gluestack/button';
@@ -12,7 +12,7 @@ export const GoogleAuthTest = ({ className }: { className?: string }) => {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [lastUser, setLastUser] = useState<User | null>(auth.currentUser);
+  const [lastUser, setLastUser] = useState<User | null>(getFirebaseAuth().currentUser);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);

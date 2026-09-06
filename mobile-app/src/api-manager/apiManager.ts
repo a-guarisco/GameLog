@@ -1,7 +1,6 @@
-import EndPoints, { isBackendProvider } from '@gamelog/api-manager/apiEndsPoints';
-import { getApiProvider, setApiProvider } from '@gamelog/api-manager/apiProvider';
+import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 import { mergeGlobalAchievementsWithSchema } from '@gamelog/api-manager/achievementMerger';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import type {
   CurrentPlayers,
   DailyReport,
@@ -37,7 +36,15 @@ import type {
 
 
 
+import { resolveBackendUrl } from '@gamelog/api-manager/backendResolver';
+
 async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
+  let finalUrl = url;
+  if (finalUrl.startsWith('/')) {
+    const baseUrl = await resolveBackendUrl();
+    finalUrl = baseUrl + finalUrl;
+  }
+
   const options = {
     ...init,
     headers: {
@@ -45,10 +52,10 @@ async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
       ...init?.headers,
     },
   };
-  const response = await fetch(url, options);
+  const response = await fetch(finalUrl, options);
 
   if (!response.ok) {
-    let detail = `HTTP error: ${response.status}. url Called: ${url}`;
+    let detail = `HTTP error: ${response.status}. url Called: ${finalUrl}`;
     try {
       const errorData = await response.json();
       detail = errorData.detail || detail;
@@ -63,7 +70,7 @@ async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promise<T> {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await getFirebaseAuth().currentUser?.getIdToken();
 
   if (!token) {
     throw new Error(
@@ -80,7 +87,7 @@ async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promi
   });
 }
 
-export { getApiProvider, setApiProvider, isBackendProvider, fetchData, fetchAuthenticatedData };
+export { fetchData, fetchAuthenticatedData };
 export default {
   getNumberOfCurrentPlayers: (appId: string) =>
     fetchData<CurrentPlayers>(EndPoints.getNumberOfCurrentPlayers(appId)),

@@ -22,6 +22,9 @@ import {
 
 import { JetBrainsMono_400Regular } from '@expo-google-fonts/jetbrains-mono';
 
+import { useState, useEffect } from 'react';
+import { setupAuthEmulator } from '@gamelog/auth/firebaseClient';
+
 const useAppInit = () => {
   const [fontsLoaded] = useFonts({
     'DMSans-Thin': DMSans_100Thin,
@@ -46,12 +49,25 @@ const useAppInit = () => {
     'JetBrainsMono-Regular': JetBrainsMono_400Regular,
   });
 
-  //NOTE other initialization logic can go here
-  // (e.g., loading user settings, initializing analytics, etc.)
+  const [backendReady, setBackendReady] = useState(false);
+
+  useEffect(() => {
+    const initServices = async () => {
+      try {
+        await setupAuthEmulator();
+      } catch (err) {
+        console.warn('Failed to resolve services during app init', err);
+      } finally {
+        setBackendReady(true);
+      }
+    };
+    initServices();
+  }, []);
 
   return {
-    isReady: fontsLoaded,
+    isReady: fontsLoaded && backendReady,
   };
 };
 
 export default useAppInit;
+

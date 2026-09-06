@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-native';
 import { useAuthSession } from '../../src/auth/useAuthSession';
 import { onIdTokenChanged } from 'firebase/auth';
-import { auth } from '@gamelog/auth/firebaseClient';
+import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import apiManager from '@gamelog/api-manager/apiManager';
 import {
   setSteamId,
@@ -15,8 +15,11 @@ jest.mock('firebase/auth', () => ({
 }));
 
 jest.mock('@gamelog/auth/firebaseClient', () => ({
-  auth: { currentUser: null },
+  getFirebaseAuth: () => mockAuth,
 }));
+
+// We'll define a mutable mockAuth object that we can manipulate in tests.
+const mockAuth: any = { currentUser: null };
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   getUserMe: jest.fn(),
@@ -207,7 +210,7 @@ describe('useAuthSession', () => {
       const verifiedUser = getVerifiedFirebaseUser();
 
       // auth.currentUser will return verifiedUser after reload
-      (auth as any).currentUser = verifiedUser;
+      mockAuth.currentUser = verifiedUser;
 
       const { result } = renderHook(() => useAuthSession());
 
@@ -228,7 +231,7 @@ describe('useAuthSession', () => {
 
     it('stays unverified if user is still not verified', async () => {
       const unverifiedUser = getUnverifiedFirebaseUser();
-      (auth as any).currentUser = unverifiedUser; // still unverified after reload
+      mockAuth.currentUser = unverifiedUser; // still unverified after reload
 
       const { result } = renderHook(() => useAuthSession());
 
