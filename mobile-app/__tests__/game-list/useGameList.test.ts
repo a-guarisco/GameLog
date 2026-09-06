@@ -6,12 +6,17 @@ import {
   useGetGenresBatch,
   useGetUserGameStatuses,
 } from '@gamelog/api-manager/useApi';
+import { getSteamApiKey } from '@gamelog/api-manager/steamApiKey';
 
 jest.mock('@gamelog/api-manager/useApi', () => ({
   useGetOwnedGames: jest.fn(),
   useGetFullPlaytimeReport: jest.fn(),
   useGetGenresBatch: jest.fn(),
   useGetUserGameStatuses: jest.fn(),
+}));
+
+jest.mock('@gamelog/api-manager/steamApiKey', () => ({
+  getSteamApiKey: jest.fn(() => 'mock-api-key'),
 }));
 
 const mockUseGetOwnedGames = useGetOwnedGames as jest.Mock;
@@ -51,7 +56,6 @@ beforeEach(() => {
     refetchUserGameStatuses: mockRefetchUserGameStatuses,
   });
 });
-
 
 describe('useGameList hook', () => {
   it('should filter games based on search query', () => {
@@ -284,6 +288,40 @@ describe('useGameList hook', () => {
     const secondCallAppIds = mockUseGetGenresBatch.mock.calls[1][0];
     expect(firstCallAppIds).toBe(secondCallAppIds);
   });
+
+  it('maps 401 error to gamelist/steam-api-key-missing when steam API key is missing', () => {
+    (getSteamApiKey as jest.Mock).mockReturnValueOnce('');
+
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: null,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: true,
+      errorMessageOwnedGames: 'HTTP error: 401. url Called: https://api.steampowered.com/...',
+    });
+
+    const { result } = renderHook(() => useGameList('123'));
+    expect(result.current.error).toBe(true);
+    expect(result.current.errorCode).toBe('gamelist/steam-api-key-missing');
+    expect(result.current.errorMessage).toBe(
+      'Steam API key is not configured. Please add your Steam Web API Key in your profile settings.'
+    );
+    expect(result.current.errorMessage).not.toContain('url Called');
+  });
+
+  it('maps 401 error to gamelist/unauthorized when steam API key is present', () => {
+    mockUseGetOwnedGames.mockReturnValue({
+      ownedGames: null,
+      isLoadingOwnedGames: false,
+      errorOwnedGames: true,
+      errorMessageOwnedGames: 'HTTP error: 401. url Called: https://api.steampowered.com/...',
+    });
+
+    const { result } = renderHook(() => useGameList('123'));
+    expect(result.current.error).toBe(true);
+    expect(result.current.errorCode).toBe('gamelist/unauthorized');
+    expect(result.current.errorMessage).toBe(
+      'Unable to access Steam library. Your Steam API key may be invalid or unauthorized.'
+    );
+    expect(result.current.errorMessage).not.toContain('url Called');
+  });
 });
-
-
