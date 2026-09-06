@@ -10,12 +10,18 @@ import { UserAvatar } from './UserAvatar';
 import { UserCardActions } from './UserCardActions';
 import { UserCardActionHandlers } from './userCardActionHandlers';
 
-interface UserCardProps extends UserCardActionHandlers {
+export interface UserCardProps extends UserCardActionHandlers {
   item: UserSearchResult;
+  avatarUrl?: string | null;
   isActionLoading?: boolean;
 }
 
-export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...handlers }) => {
+export const UserCard: React.FC<UserCardProps> = ({
+  item,
+  avatarUrl,
+  isActionLoading,
+  ...handlers
+}) => {
   const { user, friendship } = item;
   const status = friendship?.friendship_status;
   const isFriend = status === 'accepted';
@@ -60,7 +66,12 @@ export const UserCard: React.FC<UserCardProps> = ({ item, isActionLoading, ...ha
           testID={`user-card-pressable-${user.id}`}
         >
           <HStack space="md" className="items-center flex-1">
-            <UserAvatar username={user.username} isHighlighted={isFriend} />
+            <UserAvatar
+              username={user.username}
+              avatarUrl={avatarUrl}
+              steamId={user.steam_id}
+              isHighlighted={isFriend}
+            />
 
             <VStack className="flex-1">
               <Text size="sm" className="font-bold uppercase text-typography-0" numberOfLines={1}>

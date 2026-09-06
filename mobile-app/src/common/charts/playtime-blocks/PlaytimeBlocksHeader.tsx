@@ -12,10 +12,19 @@ import {
 } from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
 
-export const ShimmerBox = ({ className, anim }: { className?: string; anim: Animated.Value }) => {
+export const ShimmerBox = ({
+  className,
+  anim,
+  testID,
+}: {
+  className?: string;
+  anim: Animated.Value;
+  testID?: string;
+}) => {
   return (
     <Box
-      className={`overflow-hidden relative bg-typography-200 dark:bg-typography-800 ${className || ''}`}
+      testID={testID}
+      className={`overflow-hidden relative bg-background-100 dark:bg-background-100 ${className || ''}`}
     >
       <Animated.View
         style={[
@@ -33,7 +42,7 @@ export const ShimmerBox = ({ className, anim }: { className?: string; anim: Anim
         ]}
       >
         <LinearGradient
-          colors={['transparent', 'rgba(255,255,255,0.4)', 'transparent']}
+          colors={['transparent', 'rgba(255,255,255,0.3)', 'transparent']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFillObject}

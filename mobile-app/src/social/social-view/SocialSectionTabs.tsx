@@ -7,7 +7,7 @@ import { SearchUsersTabContent } from './SearchUsersTabContent';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 
-interface SocialSectionTabsProps {
+export interface SocialSectionTabsProps {
   // Friends Tab Props
   isLoadingFriendList: boolean;
   errorFriendList: boolean;
@@ -23,7 +23,8 @@ interface SocialSectionTabsProps {
   errorSearch: boolean;
   errorMessageSearch?: string | null;
 
-  // Shared Action Props
+  // Shared Avatar & Action Props
+  avatarMap?: Record<string, string>;
   isActionLoading: boolean;
   actionFeedback: string | null;
   handlers: UserCardActionHandlers;
@@ -41,6 +42,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
   isLoadingSearch,
   errorSearch,
   errorMessageSearch,
+  avatarMap,
   isActionLoading,
   actionFeedback,
   handlers,
@@ -78,6 +80,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
           errorMessage={errorMessageFriendList || undefined}
           pendingRequests={pendingRequests}
           acceptedFriends={acceptedFriends}
+          avatarMap={avatarMap}
           handlers={handlers}
           isActionLoading={isActionLoading}
         />
@@ -88,6 +91,7 @@ const SocialSectionTabs: FC<SocialSectionTabsProps> = ({
           query={searchQuery}
           onQueryChange={onQueryChange}
           results={searchResults}
+          avatarMap={avatarMap}
           isLoading={isLoadingSearch}
           error={errorSearch}
           errorMessage={errorMessageSearch || undefined}

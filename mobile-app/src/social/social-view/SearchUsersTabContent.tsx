@@ -8,10 +8,11 @@ import { UserCard } from '../user-card/UserCard';
 import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 import { UserSearchInput } from './UserSearchInput';
 
-interface SearchUsersTabContentProps {
+export interface SearchUsersTabContentProps {
   query: string;
   onQueryChange: (query: string) => void;
   results: UserSearchResult[];
+  avatarMap?: Record<string, string>;
   isLoading: boolean;
   error: boolean;
   errorMessage?: string;
@@ -23,6 +24,7 @@ export const SearchUsersTabContent: React.FC<SearchUsersTabContentProps> = ({
   query,
   onQueryChange,
   results,
+  avatarMap,
   isLoading,
   error,
   errorMessage,
@@ -55,6 +57,7 @@ export const SearchUsersTabContent: React.FC<SearchUsersTabContentProps> = ({
             <UserCard
               key={item.user.id}
               item={item}
+              avatarUrl={avatarMap?.[item.user.steam_id]}
               {...handlers}
               isActionLoading={isActionLoading}
             />

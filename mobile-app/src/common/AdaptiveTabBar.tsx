@@ -1,54 +1,59 @@
 import { useCallback } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  useColorScheme,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
 import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
+import { isDevMenuEnabled } from './devMenuConfig';
+import { shouldShowNavRail, getNavRailWidth } from './navConstants';
 
 // Tab definitions with label and icons
+export const getTabConfig = (): Record<
+  string,
+  { label: string; defaultIcon: string; focusedIcon: string }
+> => {
+  const isDev = isDevMenuEnabled();
+  return {
+    GameListTab: {
+      label: 'Games',
+      defaultIcon: 'game-controller',
+      focusedIcon: 'game-controller',
+    },
+    ProfileTab: {
+      label: 'Profile',
+      defaultIcon: 'person',
+      focusedIcon: 'person',
+    },
+    SocialTab: {
+      label: 'Social',
+      defaultIcon: 'people',
+      focusedIcon: 'people',
+    },
+    DevTab: {
+      label: isDev ? 'Dev' : 'Options',
+      defaultIcon: isDev ? 'construct' : 'settings',
+      focusedIcon: isDev ? 'construct' : 'settings',
+    },
+  };
+};
+
 export const TAB_CONFIG: Record<
   string,
   { label: string; defaultIcon: string; focusedIcon: string }
-> = {
-  GameListTab: {
-    label: 'Games',
-    defaultIcon: 'game-controller',
-    focusedIcon: 'game-controller',
-  },
-  ProfileTab: {
-    label: 'Profile',
-    defaultIcon: 'person',
-    focusedIcon: 'person',
-  },
-  SocialTab: {
-    label: 'Social',
-    defaultIcon: 'people',
-    focusedIcon: 'people',
-  },
-  DevTab: {
-    label: 'Dev',
-    defaultIcon: 'construct',
-    focusedIcon: 'construct',
-  },
-};
+> = new Proxy({} as any, {
+  get: (_, prop: string) => getTabConfig()[prop],
+});
 
 /**
  * Adaptive navigation tab bar:
- * - Portrait:  Horizontal bottom bar with icons and text labels.
- * - Landscape: Absolute left rail (vertically centered items), with safe-area
- *              clearance for the camera notch / Dynamic Island.
+ * - Phone Portrait: Horizontal bottom bar with icons and text labels.
+ * - Landscape or Tablet: Absolute left rail (vertically centered items), with safe-area
+ *                        clearance for the camera notch / Dynamic Island.
  */
 export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
@@ -72,8 +77,14 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
     [navigation]
   );
 
-  if (isLandscape) {
-    const railWidth = insets.left + 74;
+  const showRail = shouldShowNavRail(isLandscape, isTablet);
+
+  if (showRail) {
+    const baseRailWidth = getNavRailWidth(isTablet);
+    const railWidth = insets.left + baseRailWidth;
+    const railItemWidth = isTablet ? 76 : 62;
+    const iconSize = isTablet ? 26 : 22;
+    const labelFontSize = isTablet ? 12 : 10;
 
     return (
       <View
@@ -89,7 +100,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
           },
         ]}
       >
-        <View style={styles.railContent}>
+        <View style={[styles.railContent, { width: baseRailWidth }]}>
           {state.routes.map((route, index) => {
             const focused = state.index === index;
             const config = TAB_CONFIG[route.name] ?? {
@@ -103,7 +114,7 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
                 key={route.key}
                 testID={route.name}
                 onPress={() => handlePress(route.name, focused)}
-                style={styles.railItem}
+                style={[styles.railItem, { width: railItemWidth }]}
                 accessibilityRole="tab"
                 accessibilityLabel={config.label}
                 accessibilityState={{ selected: focused }}
@@ -111,13 +122,14 @@ export const AdaptiveTabBar = ({ state, navigation }: BottomTabBarProps) => {
               >
                 <Ionicons
                   name={(focused ? config.focusedIcon : config.defaultIcon) as any}
-                  size={22}
+                  size={iconSize}
                   color={focused ? activeColor : inactiveColor}
                 />
                 <Text
                   style={[
                     styles.railLabel,
                     {
+                      fontSize: labelFontSize,
                       color: focused ? activeColor : inactiveColor,
                       fontWeight: focused ? '700' : '500',
                     },

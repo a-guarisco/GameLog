@@ -47,6 +47,15 @@ const ReportRetrievalCard = ({
   className = '',
   style,
 }: ReportRetrievalCardProps) => {
+  const effectiveEnd = endDate || yesterday;
+  const effectiveStart =
+    startDate ||
+    (() => {
+      const d = new Date(effectiveEnd);
+      d.setDate(d.getDate() - 13);
+      return d;
+    })();
+
   // Calculate dynamic text info
   const getDynamicInfoText = () => {
     if (!startDate && !endDate) {
@@ -62,6 +71,9 @@ const ReportRetrievalCard = ({
         return `Report starting ${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago.`;
       }
       return `Report starting ${diffDays} days ago.`;
+    }
+    if (!startDate && endDate) {
+      return 'Duration: 14 days.';
     }
     
     // Both start and end defined
@@ -97,7 +109,7 @@ const ReportRetrievalCard = ({
               From
             </Text>
             <Pressable onPress={() => setShowStart(true)} hitSlop={12} testID="report-start-date-btn">
-              <DateSelectorText>{startDate ? formatDate(startDate) : 'Select Date'}</DateSelectorText>
+              <DateSelectorText>{formatDate(effectiveStart)}</DateSelectorText>
             </Pressable>
           </VStack>
 
@@ -106,7 +118,7 @@ const ReportRetrievalCard = ({
               To
             </Text>
             <Pressable onPress={() => setShowEnd(true)} hitSlop={12} testID="report-end-date-btn">
-              <DateSelectorText>{endDate ? formatDate(endDate) : 'Select Date'}</DateSelectorText>
+              <DateSelectorText>{formatDate(effectiveEnd)}</DateSelectorText>
             </Pressable>
           </VStack>
         </HStack>
@@ -127,17 +139,17 @@ const ReportRetrievalCard = ({
 
         {showStart && (
           <DateTimePicker
-            value={startDate || yesterday}
+            value={effectiveStart}
             mode="date"
             display="default"
             onChange={onStartChange}
-            maximumDate={yesterday}
+            maximumDate={effectiveEnd}
           />
         )}
 
         {showEnd && (
           <DateTimePicker
-            value={endDate || yesterday}
+            value={effectiveEnd}
             mode="date"
             display="default"
             onChange={onEndChange}

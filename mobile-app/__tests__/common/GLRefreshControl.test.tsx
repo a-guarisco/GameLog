@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import { RefreshControl, useColorScheme } from 'react-native';
 import { GLRefreshControl } from '@gamelog/common/GLRefreshControl';

@@ -7,6 +7,7 @@ import { Animated, useColorScheme } from 'react-native';
 import GLRefreshControl from './GLRefreshControl';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getNavRailOffset } from './navConstants';
 
 type ScrollablePageProps = {
   children: React.ReactNode;
@@ -16,11 +17,17 @@ type ScrollablePageProps = {
   onRefresh?: () => void;
 };
 
-const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop, refreshing, onRefresh }: ScrollablePageProps) => {
+const ScrollablePage = ({
+  children,
+  hasBanner = true,
+  contentPaddingTop,
+  refreshing,
+  onRefresh,
+}: ScrollablePageProps) => {
   const isDark = useColorScheme() === 'dark';
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
-  const { MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO } = getDefaultBannerParams();
+  const { MIN_BANNER_HEIGHT, BANNER_HEIGHT_SCREEN_RATIO } = getDefaultBannerParams(isTablet);
   const { bannerHeight, insetsTop, notchBlurOpacity, onScroll, scrollBlurTargetRef } =
     useTopNotchBlurOverlay(
       hasBanner ? MIN_BANNER_HEIGHT : 0,
@@ -28,16 +35,20 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop, refresh
     );
 
   const paddingTop = contentPaddingTop ?? (hasBanner ? bannerHeight : insetsTop + 16);
-  const leftPadding = isLandscape ? insets.left + 74 : 0;
+  const leftPadding = getNavRailOffset({ isLandscape, isTablet, insetsLeft: insets.left });
 
-  const isLandscapeBanner = isLandscape && hasBanner;
+  const isScrollableBanner = (isLandscape || isTablet) && hasBanner;
 
   return (
-    <Box className="flex-1 relative" style={{ paddingLeft: leftPadding }}>
+    <Box
+      className="flex-1 relative"
+      style={{ paddingLeft: leftPadding }}
+      pointerEvents={isScrollableBanner ? 'box-none' : 'auto'}
+    >
       <BlurTargetView
         ref={scrollBlurTargetRef}
         className="absolute inset-0 z-40"
-        pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
+        pointerEvents={isScrollableBanner ? 'box-none' : 'auto'}
       >
         <Animated.ScrollView
           testID="scrollable-page-scroll"
@@ -48,18 +59,14 @@ const ScrollablePage = ({ children, hasBanner = true, contentPaddingTop, refresh
           }}
           scrollEventThrottle={16}
           onScroll={onScroll}
-          pointerEvents={isLandscapeBanner ? 'box-none' : 'auto'}
+          pointerEvents={isScrollableBanner ? 'box-none' : 'auto'}
           refreshControl={
             onRefresh ? (
               <GLRefreshControl refreshing={refreshing ?? false} onRefresh={onRefresh} />
             ) : undefined
           }
         >
-          {isLandscapeBanner ? (
-            <Box pointerEvents="auto">{children}</Box>
-          ) : (
-            children
-          )}
+          {isScrollableBanner ? <Box pointerEvents="auto">{children}</Box> : children}
         </Animated.ScrollView>
       </BlurTargetView>
       <TopNotchBlurOverlay

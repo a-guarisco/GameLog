@@ -1,19 +1,19 @@
-import { HEX_COLORS } from '@gamelog/theme/hexColors';
-import { useState } from 'react';
-import { Pressable, Image } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { Pressable, Animated, Easing } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Icon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from '@gamelog/common/gluestack/icon';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { WarningBox } from '@gamelog/common/feedbacks';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
-import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { ChartDateRangeText } from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate } from '@gamelog/utils/formatUtils';
-import { steamAssetUrls } from '@gamelog/api-manager/steamAssets';
+import GameCapsuleImage from '@gamelog/common/GameCapsuleImage';
 import { useOrientation } from '@gamelog/common/useOrientation';
+import { ShimmerBox } from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksHeader';
 import { useCommunityTopGames } from './useCommunityTopGames';
 import {
   useCommunityTopGamesHistogramData,
@@ -33,6 +33,7 @@ interface CommunityTopGamesHistogramChartProps {
   targetUserId?: string;
   targetUserName?: string;
   chartTitle?: string;
+  isFriend?: boolean;
 }
 
 const CommunityTopGamesHistogramChart = ({
@@ -41,6 +42,7 @@ const CommunityTopGamesHistogramChart = ({
   targetUserId,
   targetUserName,
   chartTitle,
+  isFriend = false,
 }: CommunityTopGamesHistogramChartProps) => {
   const { isLandscape } = useOrientation();
   const [periodRange, setPeriodRange] = useState<CommunityPeriodRange>('week');
@@ -54,6 +56,26 @@ const CommunityTopGamesHistogramChart = ({
     offset,
     targetUserId,
   });
+
+  const shimmerAnim = useRef(new Animated.Value(-1)).current;
+
+  useEffect(() => {
+    if (isLoading) {
+      const loop = Animated.loop(
+        Animated.timing(shimmerAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      loop.start();
+      return () => {
+        loop.stop();
+        shimmerAnim.setValue(-1);
+      };
+    }
+  }, [isLoading, shimmerAnim]);
 
   const { topGamesItems, hasData } = useCommunityTopGamesHistogramData({
     data,
@@ -83,7 +105,7 @@ const CommunityTopGamesHistogramChart = ({
           testID={`user-bar-${item.id}`}
         />
       </Box>
-      <Text size="sm" className="font-bold w-16 text-right" className="font-bold w-16 text-right text-comparison-user-500">
+      <Text size="sm" className="font-bold w-16 text-right text-comparison-user-500">
         {item.userFormatted}
       </Text>
     </HStack>
@@ -101,7 +123,7 @@ const CommunityTopGamesHistogramChart = ({
           testID={`community-bar-${item.id}`}
         />
       </Box>
-      <Text size="sm" className="font-bold w-16 text-right" className="font-bold w-16 text-right text-comparison-compare-500">
+      <Text size="sm" className="font-bold w-16 text-right text-comparison-compare-500">
         {item.communityFormatted}
       </Text>
     </HStack>
@@ -110,6 +132,8 @@ const CommunityTopGamesHistogramChart = ({
   const displayTitle =
     chartTitle || (targetUserName ? `${targetUserName}'s Top Games` : 'Top Community Games');
   const othersLabel = targetUserName || 'Others';
+  const fallbackLabel = isFriend ? 'Friend' : 'User';
+  const referenceButtonLabel = othersLabel.length > 10 ? fallbackLabel : othersLabel;
   const comparisonScopeText = targetUserName
     ? targetUserName
     : scope === 'global'
@@ -134,8 +158,8 @@ const CommunityTopGamesHistogramChart = ({
           />
         </Box>
       }
-      isLoading={isLoading}
-      error={error}
+      isLoading={false}
+      error={false}
       ErrorBehaviour={renderError}
       testID="community-top-games-histogram-chart"
     >
@@ -152,6 +176,8 @@ const CommunityTopGamesHistogramChart = ({
                 <HStack className="w-[130px] items-center rounded-full border border-outline-300 overflow-hidden">
                   <Pressable
                     onPress={() => setReference('user')}
+                    disabled={isLoading}
+                    style={{ opacity: isLoading ? 0.5 : 1 }}
                     testID="community-top-games-reference-user"
                     className={`flex-1 py-1 flex-row items-center justify-center border-r border-outline-300 ${
                       reference === 'user' ? 'bg-comparison-user-500' : 'bg-transparent'
@@ -172,6 +198,8 @@ const CommunityTopGamesHistogramChart = ({
 
                   <Pressable
                     onPress={() => setReference('community')}
+                    disabled={isLoading}
+                    style={{ opacity: isLoading ? 0.5 : 1 }}
                     testID="community-top-games-reference-community"
                     className={`flex-1 py-1 flex-row items-center justify-center ${
                       reference === 'community' ? 'bg-comparison-compare-500' : 'bg-transparent'
@@ -181,12 +209,12 @@ const CommunityTopGamesHistogramChart = ({
                       size="xs"
                       className={
                         reference === 'community'
-                          ? 'text-white font-bold'
+                          ? 'text-black font-bold'
                           : 'text-typography-300 font-medium'
                       }
                       numberOfLines={1}
                     >
-                      {othersLabel}
+                      {referenceButtonLabel}
                     </Text>
                   </Pressable>
                 </HStack>
@@ -195,6 +223,8 @@ const CommunityTopGamesHistogramChart = ({
                 <HStack space="xs" className="items-center -mr-1">
                   <Pressable
                     onPress={() => setOffset((prev) => prev - 1)}
+                    disabled={isLoading}
+                    style={{ opacity: isLoading ? 0.3 : 1 }}
                     className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
                     accessibilityLabel="Previous period"
                     testID="community-top-games-prev"
@@ -202,14 +232,22 @@ const CommunityTopGamesHistogramChart = ({
                     <Icon as={ChevronLeftIcon} className="text-typography-500" />
                   </Pressable>
 
-                  <ChartDateRangeText>
-                    {formatShortDate(startTimestamp)} - {formatShortDate(endTimestamp)}
-                  </ChartDateRangeText>
+                  {isLoading ? (
+                    <ShimmerBox
+                      className="w-24 h-5 rounded-md"
+                      anim={shimmerAnim}
+                      testID="community-top-games-date-shimmer"
+                    />
+                  ) : (
+                    <ChartDateRangeText>
+                      {formatShortDate(startTimestamp)} - {formatShortDate(endTimestamp)}
+                    </ChartDateRangeText>
+                  )}
 
                   <Pressable
                     onPress={() => setOffset((prev) => Math.min(0, prev + 1))}
-                    disabled={offset >= 0}
-                    style={{ opacity: offset >= 0 ? 0.3 : 1 }}
+                    disabled={isLoading || offset >= 0}
+                    style={{ opacity: isLoading || offset >= 0 ? 0.3 : 1 }}
                     className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
                     accessibilityLabel="Next period"
                     testID="community-top-games-next"
@@ -220,8 +258,30 @@ const CommunityTopGamesHistogramChart = ({
               </HStack>
             </VStack>
 
-            {/* Content: List of top games or empty state */}
-            {!hasData ? (
+            {/* Content: Error, Loading Spinner, or List of top games */}
+            {error ? (
+              <Box
+                style={{
+                  minHeight: isLandscape ? 240 : 200,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                }}
+              >
+                {renderError()}
+              </Box>
+            ) : isLoading ? (
+              <Box
+                style={{
+                  minHeight: isLandscape ? 240 : 200,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                }}
+              >
+                <Spinner testID="spinner" />
+              </Box>
+            ) : !hasData ? (
               <Box className="py-8 items-center justify-center w-full">
                 <Text className="text-typography-400">
                   No top community games found for this period
@@ -237,15 +297,8 @@ const CommunityTopGamesHistogramChart = ({
                       testID={`top-game-item-${item.id}`}
                     >
                       {/* Left: Capsule Image with height matching title + 2 bars */}
-                      <Image
-                        source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
-                        style={{
-                          width: 105,
-                          height: 62,
-                          borderRadius: 6,
-                          backgroundColor: HEX_COLORS.muted.divider.hex,
-                        }}
-                        resizeMode="cover"
+                      <GameCapsuleImage
+                        appId={item.id}
                         testID={`game-capsule-${item.id}`}
                       />
 
@@ -281,15 +334,8 @@ const CommunityTopGamesHistogramChart = ({
                     testID={`top-game-item-${item.id}`}
                   >
                     {/* Left: Capsule Image with height matching title + 2 bars */}
-                    <Image
-                      source={{ uri: steamAssetUrls.getGameCapsuleImage(item.id) }}
-                      style={{
-                        width: 115,
-                        height: 68,
-                        borderRadius: 6,
-                        backgroundColor: HEX_COLORS.muted.divider.hex,
-                      }}
-                      resizeMode="cover"
+                    <GameCapsuleImage
+                      appId={item.id}
                       testID={`game-capsule-${item.id}`}
                     />
 
@@ -316,41 +362,42 @@ const CommunityTopGamesHistogramChart = ({
               </VStack>
             )}
 
-            {/* Footer Caption & Legend */}
-            <HStack space="lg" className="items-center justify-center pt-2 pb-1">
-              <HStack space="xs" className="items-center">
-                <Box
-                  className="w-2.5 h-2.5 rounded-full"
-                  className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
-                />
-                <Text size="xs" className="font-bold text-primary-500">
-                  You
-                </Text>
-              </HStack>
-              <HStack space="xs" className="items-center">
-                <Box
-                  className="w-2.5 h-2.5 rounded-full"
-                  className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
-                />
-                <Text
-                  size="xs"
-                  className="font-bold "
-                  className="font-bold w-16 text-right text-comparison-compare-500"
-                >
-                  {othersLabel}
-                </Text>
-              </HStack>
-            </HStack>
+            {!error && (
+              <>
+                {/* Footer Caption & Legend */}
+                <HStack space="lg" className="items-center justify-center pt-2 pb-1">
+                  <HStack space="xs" className="items-center">
+                    <Box
+                      className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
+                    />
+                    <Text size="xs" className="font-bold text-primary-500">
+                      You
+                    </Text>
+                  </HStack>
+                  <HStack space="xs" className="items-center">
+                    <Box
+                      className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
+                    />
+                    <Text
+                      size="xs"
+                      className="font-bold text-comparison-compare-500"
+                    >
+                      {othersLabel}
+                    </Text>
+                  </HStack>
+                </HStack>
 
-            <Text size="xs" className="text-typography-300 text-center">
-              {reference === 'user'
-                ? targetUserName
-                  ? `Comparing your top played games against ${targetUserName}'s averages.`
-                  : `Comparing your top played games against ${comparisonScopeText} averages.`
-                : targetUserName
-                  ? `Comparing ${targetUserName}'s top played games with your playtime.`
-                  : `Comparing community trending titles in ${comparisonScopeText} with your playtime.`}
-            </Text>
+                <Text size="xs" className="text-typography-300 text-center">
+                  {reference === 'user'
+                    ? targetUserName
+                      ? `Comparing your top played games against ${targetUserName}'s averages.`
+                      : `Comparing your top played games against ${comparisonScopeText} averages.`
+                    : targetUserName
+                      ? `Comparing ${targetUserName}'s top played games with your playtime.`
+                      : `Comparing community trending titles in ${comparisonScopeText} with your playtime.`}
+                </Text>
+              </>
+            )}
           </VStack>
         );
       }}

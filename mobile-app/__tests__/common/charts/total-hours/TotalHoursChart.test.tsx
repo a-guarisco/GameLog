@@ -47,8 +47,9 @@ beforeEach(() => {
 
 describe('TotalHoursChart', () => {
   it('renders game list when data is available', () => {
-    const { getByText } = render(<TotalHoursChart ownedGames={null} />);
+    const { getByText, getByTestId } = render(<TotalHoursChart ownedGames={null} />);
     expect(getByText('Game A')).toBeTruthy();
+    expect(getByTestId('game-capsule-42')).toBeTruthy();
   });
 
   it('navigates to Game screen with the correct appid and name when game is pressed', () => {

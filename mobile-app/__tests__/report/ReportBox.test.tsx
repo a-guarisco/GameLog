@@ -338,12 +338,11 @@ describe('ReportBox', () => {
       handleClearDates: mockHandleClearDates,
     });
 
-    const { getAllByText, UNSAFE_getAllByType } = renderComponent();
+    const { getByTestId, UNSAFE_getAllByType } = renderComponent();
 
-    // There are two "Select Date" buttons (From and To)
-    const dateButtons = getAllByText('Select Date');
-    fireEvent.press(dateButtons[0]); // First one is From
-    fireEvent.press(dateButtons[1]); // Second one is To
+    // Open date pickers for From and To
+    fireEvent.press(getByTestId('report-start-date-btn'));
+    fireEvent.press(getByTestId('report-end-date-btn'));
 
     const pickers = UNSAFE_getAllByType(require('@react-native-community/datetimepicker'));
     expect(pickers.length).toBeGreaterThan(1);

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import SocialView from '@gamelog/social/social-view/SocialView';
 import {
@@ -8,6 +7,7 @@ import {
   useGetUserMe,
 } from '@gamelog/api-manager/useApi';
 import ApiManager from '@gamelog/api-manager/apiManager';
+import { clearSteamAvatarCache } from '@gamelog/social/steamAvatarCache';
 
 jest.mock('@gamelog/api-manager/useApi');
 jest.mock('@gamelog/api-manager/apiManager');
@@ -47,6 +47,13 @@ describe('SocialView', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    clearSteamAvatarCache();
+
+    mockApiManager.getPlayersInfo.mockResolvedValue({
+      response: {
+        players: [],
+      },
+    } as any);
 
     mockUseGetUserMe.mockReturnValue({
       currentUser: { id: 'current-user-id', username: 'Me', steam_id: '0000' },

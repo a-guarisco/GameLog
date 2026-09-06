@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import { GameListCardExpandedDetails } from '@gamelog/game-list/GameListCardExpandedDetails';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';

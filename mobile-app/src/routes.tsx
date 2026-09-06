@@ -17,6 +17,8 @@ import {
   PaletteView,
   FontsView,
 } from '@gamelog/dev';
+import { OptionsView } from '@gamelog/options';
+import { isDevMenuEnabled } from '@gamelog/common/devMenuConfig';
 
 import LoginScreen from '@gamelog/onboarding/LoginScreen';
 import ProfileSetupScreen from '@gamelog/onboarding/ProfileSetupScreen';
@@ -94,6 +96,17 @@ export const DevStack = createNativeStackNavigator({
   },
 });
 
+export const OptionsStack = createNativeStackNavigator({
+  screens: {
+    OptionsMain: {
+      screen: OptionsView,
+      options: { headerShown: false },
+    },
+  },
+});
+
+const devMenuEnabled = isDevMenuEnabled();
+
 export const RootTabs = createBottomTabNavigator({
   tabBar: (props) => <AdaptiveTabBar {...props} />,
   screens: {
@@ -132,11 +145,16 @@ export const RootTabs = createBottomTabNavigator({
       },
     },
     DevTab: {
-      screen: DevStack,
+      screen: devMenuEnabled ? DevStack : OptionsStack,
       options: {
-        title: 'Dev',
+        title: devMenuEnabled ? 'Dev' : 'Options',
+        headerShown: false,
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons name="construct" size={size} color={color} />
+          <Ionicons
+            name={devMenuEnabled ? 'construct' : 'settings'}
+            size={size}
+            color={color}
+          />
         ),
       },
     },

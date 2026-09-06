@@ -10,13 +10,17 @@ import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 import { UserAvatar } from '../../user-card/UserAvatar';
 
-interface ActiveFriendBannerProps {
+export interface ActiveFriendBannerProps {
   friendName: string;
+  steamId?: string;
+  avatarUrl?: string;
   onChangeFriend: () => void;
 }
 
 export const ActiveFriendBanner: React.FC<ActiveFriendBannerProps> = ({
   friendName,
+  steamId,
+  avatarUrl,
   onChangeFriend,
 }) => {
   return (
@@ -27,7 +31,12 @@ export const ActiveFriendBanner: React.FC<ActiveFriendBannerProps> = ({
       >
         <HStack space="md" className="items-center justify-between">
           <HStack space="md" className="items-center flex-1 pr-2">
-            <UserAvatar username={friendName} isHighlighted={true} />
+            <UserAvatar
+              username={friendName}
+              steamId={steamId}
+              avatarUrl={avatarUrl}
+              isHighlighted={true}
+            />
             <VStack className="flex-1">
               <Text size="xs" className="font-medium text-typography-400">
                 Active Friend

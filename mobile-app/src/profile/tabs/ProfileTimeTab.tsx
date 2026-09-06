@@ -14,13 +14,15 @@ interface ProfileTimeTabProps {
 }
 
 const ProfileTimeTab = ({ ownedGames, playtimeByUser }: ProfileTimeTabProps) => {
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const [doughnutHeight, setDoughnutHeight] = useState<number | undefined>(undefined);
 
+  const isTwoColumn = isLandscape || isTablet;
+
   return (
-    <VStack space={isLandscape ? 'xl' : 'md'} className="w-full items-center">
+    <VStack space={isTwoColumn ? 'xl' : 'md'} className="w-full items-center">
       <PlaytimeBlocksChart playtimeByUser={playtimeByUser} />
-      {!isLandscape ? (
+      {!isTwoColumn ? (
         <>
           <Box className="w-full">
             <TotalHoursChart ownedGames={ownedGames} />
@@ -33,6 +35,7 @@ const ProfileTimeTab = ({ ownedGames, playtimeByUser }: ProfileTimeTabProps) => 
             <TotalHoursChart ownedGames={ownedGames} targetHeight={doughnutHeight} />
           </Box>
           <Box
+            testID="total-hours-split-doughnut-box"
             className="w-[60%] flex-1"
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;

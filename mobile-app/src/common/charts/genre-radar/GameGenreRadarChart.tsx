@@ -16,6 +16,8 @@ interface GameGenreRadarChartProps {
   style?: ViewStyle;
 }
 
+export const MAX_RADAR_SIZE = 400;
+
 const GameGenreRadarChart = ({ ownedGames, targetHeight, style }: GameGenreRadarChartProps) => {
   const { values, labels, isLoadingGenres } = useGenreRadarChart(ownedGames);
   const { isLandscape, height } = useOrientation();
@@ -42,8 +44,8 @@ const GameGenreRadarChart = ({ ownedGames, targetHeight, style }: GameGenreRadar
         }
 
         const targetSize = isLandscape
-          ? Math.min(Math.round(height * 0.60), cardWidth ? cardWidth - radarPadding : 260)
-          : (cardWidth ? cardWidth - radarPadding : 320);
+          ? Math.min(Math.round(height * 0.60), cardWidth ? cardWidth - radarPadding : 260, MAX_RADAR_SIZE)
+          : Math.min(cardWidth ? cardWidth - radarPadding : 320, MAX_RADAR_SIZE);
 
         return (
           <Box

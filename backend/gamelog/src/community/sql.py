@@ -104,3 +104,53 @@ def get_community_game_totals_and_players(db: Session, target_user_ids: list[uui
         players[app_id] = int(row[2] or 0)
         
     return totals, players
+
+
+def get_community_genre_totals(db: Session, target_user_ids: list[uuid.UUID]) -> list[tuple[str, str, int]]:
+    if not target_user_ids:
+        return []
+
+    sql = text("""
+        WITH ranked_playtimes AS (
+            SELECT 
+                user_id,
+                steam_app_id,
+                last_day_playtime,
+                ROW_NUMBER() OVER (
+                    PARTITION BY user_id, steam_app_id 
+                    ORDER BY created_at DESC
+                ) AS rn
+            FROM steamrollingtime
+            WHERE user_id IN :target_ids
+        ),
+        latest_playtimes AS (
+            SELECT 
+                steam_app_id,
+                last_day_playtime
+            FROM ranked_playtimes
+            WHERE rn = 1 AND last_day_playtime > 0
+        ),
+        game_totals AS (
+            SELECT 
+                steam_app_id,
+                SUM(last_day_playtime) AS total_playtime
+            FROM latest_playtimes
+            GROUP BY steam_app_id
+        )
+        SELECT 
+            g.id AS genre_id,
+            g.description AS genre_description,
+            SUM(gt.total_playtime) AS genre_playtime
+        FROM game_totals gt
+        JOIN game gm ON gm.steam_app_id = gt.steam_app_id
+        JOIN gamegenrelink ggl ON ggl.game_id = gm.id
+        JOIN genre g ON g.id = ggl.genre_id
+        GROUP BY g.id, g.description
+        ORDER BY genre_playtime DESC
+    """).bindparams(bindparam("target_ids", expanding=True))
+
+    results = db.execute(sql, {
+        "target_ids": [uid.hex for uid in target_user_ids],
+    }).fetchall()
+
+    return [(str(row[0]), str(row[1]), int(row[2] or 0)) for row in results]

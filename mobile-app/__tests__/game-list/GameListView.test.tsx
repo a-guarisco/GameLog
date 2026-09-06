@@ -3,6 +3,7 @@ import { FlatList } from 'react-native';
 import GameListView from '@gamelog/game-list/GameListView';
 import { useGameList } from '@gamelog/game-list/useGameList';
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
+import * as OrientationHook from '@gamelog/common/useOrientation';
 
 jest.mock('@gamelog/game-list/useGameList');
 jest.mock('@gamelog/api-manager/steamApiKey', () => ({
@@ -138,5 +139,86 @@ describe('GameListView Component', () => {
     });
 
     expect(mockRefetchAll).toHaveBeenCalledTimes(1);
+  });
+
+  describe('Responsive grid layout and alignment', () => {
+    const mockGames = [{ appid: 1, name: 'Portal', playtime_forever: 10 }];
+
+    beforeEach(() => {
+      mockUseGameList.mockReturnValue({
+        isLoading: false,
+        processedGames: mockGames,
+        allAvailableGenres: [],
+        dateRangeFilter: { from: undefined, to: undefined },
+      });
+    });
+
+    it('configures 2 columns with flex-start for phone in portrait', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: false,
+        isTablet: false,
+        width: 390,
+        height: 844,
+      });
+
+      const { UNSAFE_getByType } = render(<GameListView route={{}} />);
+      const flatList = UNSAFE_getByType(FlatList);
+
+      expect(flatList.props.numColumns).toBe(2);
+      expect(flatList.props.columnWrapperStyle).toEqual({ justifyContent: 'flex-start' });
+      const rendered = flatList.props.renderItem({ item: mockGames[0] });
+      expect(rendered.props.className).toBe('w-1/2 p-1');
+    });
+
+    it('configures 3 columns with flex-start for phone in landscape', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: true,
+        isTablet: false,
+        width: 844,
+        height: 390,
+      });
+
+      const { UNSAFE_getByType } = render(<GameListView route={{}} />);
+      const flatList = UNSAFE_getByType(FlatList);
+
+      expect(flatList.props.numColumns).toBe(3);
+      expect(flatList.props.columnWrapperStyle).toEqual({ justifyContent: 'flex-start' });
+      const rendered = flatList.props.renderItem({ item: mockGames[0] });
+      expect(rendered.props.className).toBe('w-1/3 p-1');
+    });
+
+    it('configures 3 columns with flex-start for tablet in portrait', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: false,
+        isTablet: true,
+        width: 768,
+        height: 1024,
+      });
+
+      const { UNSAFE_getByType } = render(<GameListView route={{}} />);
+      const flatList = UNSAFE_getByType(FlatList);
+
+      expect(flatList.props.numColumns).toBe(3);
+      expect(flatList.props.columnWrapperStyle).toEqual({ justifyContent: 'flex-start' });
+      const rendered = flatList.props.renderItem({ item: mockGames[0] });
+      expect(rendered.props.className).toBe('w-1/3 p-1');
+    });
+
+    it('configures 4 columns with flex-start for tablet in landscape', () => {
+      jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+        isLandscape: true,
+        isTablet: true,
+        width: 1024,
+        height: 768,
+      });
+
+      const { UNSAFE_getByType } = render(<GameListView route={{}} />);
+      const flatList = UNSAFE_getByType(FlatList);
+
+      expect(flatList.props.numColumns).toBe(4);
+      expect(flatList.props.columnWrapperStyle).toEqual({ justifyContent: 'flex-start' });
+      const rendered = flatList.props.renderItem({ item: mockGames[0] });
+      expect(rendered.props.className).toBe('w-1/4 p-1');
+    });
   });
 });

@@ -5,6 +5,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import Banner from '@gamelog/common/Banner';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getNavRailOffset } from './navConstants';
 
 interface HeaderGameImageProps {
   appid?: string;
@@ -14,6 +15,7 @@ interface HeaderGameImageProps {
   style?: StyleProp<ViewStyle>;
   height?: number;
   scrollable?: boolean;
+  alignTop?: boolean;
 }
 
 const HeaderGameImage = ({
@@ -24,14 +26,16 @@ const HeaderGameImage = ({
   style,
   height,
   scrollable = false,
+  alignTop = false,
 }: HeaderGameImageProps) => {
   const gameHeaderImage = appid ? steamAssetUrls.getGameHeaderImage(appid) : undefined;
   const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
-  const leftOffset = isLandscape ? insets.left + 74 : 0;
+  const leftOffset = getNavRailOffset({ isLandscape, isTablet, insetsLeft: insets.left });
 
   const minHeight = isTablet ? 260 : compact ? 100 : 140;
   const heightPercentage = isTablet ? 26 : compact ? 12 : 18;
+  const isScrollable = scrollable || isTablet;
 
   if (contained) {
     return (
@@ -46,7 +50,8 @@ const HeaderGameImage = ({
             minHeight={minHeight}
             heightPercentage={heightPercentage}
             height={height}
-            scrollable={scrollable}
+            scrollable={isScrollable}
+            alignTop={alignTop}
           />
         </Box>
       </Card>
@@ -65,7 +70,8 @@ const HeaderGameImage = ({
           minHeight={minHeight}
           heightPercentage={heightPercentage}
           height={height}
-          scrollable={scrollable}
+          scrollable={isScrollable}
+          alignTop={alignTop}
         />
       </Box>
     </Card>

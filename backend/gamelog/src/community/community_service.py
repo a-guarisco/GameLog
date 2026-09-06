@@ -18,7 +18,11 @@ from src.community.schemas import (
     CommunityWeeklyTopGameResponse,
     TopGameReference,
 )
-from src.community.sql import get_community_daily_totals, get_community_game_totals_and_players
+from src.community.sql import (
+    get_community_daily_totals,
+    get_community_game_totals_and_players,
+    get_community_genre_totals,
+)
 from src.games import game_service
 from src.games.schemas import DayByDayPlaytime
 from src.models import (
@@ -419,47 +423,21 @@ def _get_friend_user_ids(db: Session, user_id: uuid.UUID) -> list[uuid.UUID]:
 
 
 def _calculate_genre_percentages(db: Session, target_user_ids: list[uuid.UUID]) -> list[CommunityGenreHour]:
-    rolling_records = db.exec(
-        select(SteamRollingTime).where(col(SteamRollingTime.user_id).in_(target_user_ids)).order_by(col(SteamRollingTime.created_at).desc())
-    ).all()
-
-    latest_by_user_game: dict[tuple[uuid.UUID, str], int] = {}
-    for record in rolling_records:
-        key = (record.user_id, record.steam_app_id)
-        if key not in latest_by_user_game:
-            latest_by_user_game[key] = record.last_day_playtime
-
-    app_playtimes: dict[str, int] = defaultdict(int)
-    for (_, app_id), playtime in latest_by_user_game.items():
-        if playtime > 0:
-            app_playtimes[app_id] += playtime
-
-    if not app_playtimes:
+    genre_totals = get_community_genre_totals(db, target_user_ids)
+    if not genre_totals:
         return []
 
-    played_app_ids = list(app_playtimes.keys())
-    games = db.exec(select(Game).where(col(Game.steam_app_id).in_(played_app_ids))).all()
-
-    genre_playtime_minutes: dict[str, int] = defaultdict(int)
-    genre_descriptions: dict[str, str] = {}
-
-    for game in games:
-        game_time = app_playtimes.get(game.steam_app_id, 0)
-        for genre in game.genres:
-            genre_playtime_minutes[genre.id] += game_time
-            genre_descriptions[genre.id] = genre.description
-
-    total_minutes_across_genres = sum(genre_playtime_minutes.values())
+    total_minutes_across_genres = sum(minutes for _, _, minutes in genre_totals)
     if total_minutes_across_genres == 0:
         return []
 
     result = [
         CommunityGenreHour(
             id=genre_id,
-            description=genre_descriptions[genre_id],
+            description=description,
             percentage=round((minutes / total_minutes_across_genres) * 100.0, 2),
         )
-        for genre_id, minutes in genre_playtime_minutes.items()
+        for genre_id, description, minutes in genre_totals
         if minutes > 0
     ]
 

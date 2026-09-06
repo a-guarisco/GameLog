@@ -10,15 +10,16 @@ import { ErrorBox, LoadingBox, InfoBox, WarningBox } from '@gamelog/common/feedb
 import { GameListControls } from './GameListControls';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getNavRailOffset } from '@gamelog/common/navConstants';
 
 import { getSteamId } from '@gamelog/api-manager/steamApiKey';
 
 const GameListView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const playerID = getSteamId();
-  const { isLandscape } = useOrientation();
+  const { isLandscape, isTablet } = useOrientation();
   const insets = useSafeAreaInsets();
-  const leftPadding = isLandscape ? insets.left + 74 : 0;
+  const leftPadding = getNavRailOffset({ isLandscape, isTablet, insetsLeft: insets.left });
 
   const {
     processedGames,
@@ -54,6 +55,10 @@ const GameListView = () => {
     }
   }, [refetchAll]);
 
+  const numColumns = isTablet ? (isLandscape ? 4 : 3) : isLandscape ? 3 : 2;
+  const itemWidthClass =
+    numColumns === 4 ? 'w-1/4 p-1' : numColumns === 3 ? 'w-1/3 p-1' : 'w-1/2 p-1';
+
   return (
     <Box className="flex-1" style={{ paddingLeft: leftPadding }}>
       <GameListControls
@@ -83,7 +88,7 @@ const GameListView = () => {
         <FlatList
           data={processedGames}
           renderItem={({ item }) => (
-            <Box className={isLandscape ? 'w-1/3 p-1' : 'w-1/2 p-1'}>
+            <Box className={itemWidthClass}>
               <GameListCard
                 gameItem={item}
                 sortBy={sortBy}
@@ -93,13 +98,11 @@ const GameListView = () => {
             </Box>
           )}
           keyExtractor={(item) => item.appid.toString()}
-          key={isLandscape ? 'grid-3' : 'grid-2'}
-          numColumns={isLandscape ? 3 : 2}
+          key={`grid-${numColumns}`}
+          numColumns={numColumns}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 20 }}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-          refreshControl={
-            <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
+          columnWrapperStyle={{ justifyContent: 'flex-start' }}
+          refreshControl={<GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
           refreshing={refreshing}
           onRefresh={handleRefresh}
         />

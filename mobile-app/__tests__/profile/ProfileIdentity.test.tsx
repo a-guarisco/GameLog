@@ -55,4 +55,11 @@ describe('ProfileIdentity', () => {
     expect(screen.queryByLabelText('filopixel avatar')).toBeNull();
     expect(screen.getByText('filopixel')).toBeTruthy();
   });
+
+  it('renders correctly when isLandscape is true', () => {
+    render(<ProfileIdentity {...PROPS} isLandscape={true} />);
+
+    expect(screen.getByText('filopixel')).toBeTruthy();
+    expect(screen.getByLabelText('filopixel avatar')).toBeTruthy();
+  });
 });

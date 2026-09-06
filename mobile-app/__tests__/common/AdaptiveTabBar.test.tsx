@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
 import { AdaptiveTabBar } from '@gamelog/common/AdaptiveTabBar';
 import * as OrientationHook from '@gamelog/common/useOrientation';
@@ -5,6 +6,9 @@ import * as OrientationHook from '@gamelog/common/useOrientation';
 jest.mock('@react-native-vector-icons/ionicons', () => 'Ionicons');
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: jest.fn(() => ({ top: 0, bottom: 0, left: 0, right: 0 })),
+}));
+jest.mock('@gamelog/common/devMenuConfig', () => ({
+  isDevMenuEnabled: jest.fn(() => true),
 }));
 
 describe('AdaptiveTabBar', () => {
@@ -32,6 +36,8 @@ describe('AdaptiveTabBar', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    const devMenuConfig = require('@gamelog/common/devMenuConfig');
+    jest.spyOn(devMenuConfig, 'isDevMenuEnabled').mockReturnValue(true);
   });
 
   it('renders bottom tab bar in portrait mode with labels and handles tab press', () => {
@@ -87,5 +93,81 @@ describe('AdaptiveTabBar', () => {
       expect.objectContaining({ type: 'tabPress', target: 'SocialTab' })
     );
     expect(mockNavigation.navigate).toHaveBeenCalledWith('SocialTab');
+  });
+
+  it('renders "Options" label when dev menu is disabled', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: false,
+      width: 390,
+      height: 844,
+    });
+    const devMenuConfig = require('@gamelog/common/devMenuConfig');
+    jest.spyOn(devMenuConfig, 'isDevMenuEnabled').mockReturnValue(false);
+
+    const { getByText, queryByText } = render(<AdaptiveTabBar {...defaultProps} />);
+
+    expect(getByText('Options')).toBeTruthy();
+    expect(queryByText('Dev')).toBeNull();
+
+    const tabConfig = require('@gamelog/common/AdaptiveTabBar').getTabConfig();
+    expect(tabConfig.DevTab.defaultIcon).toBe('settings');
+    expect(tabConfig.DevTab.focusedIcon).toBe('settings');
+  });
+
+  it('uses construct icon for DevTab when dev menu is enabled', () => {
+    const devMenuConfig = require('@gamelog/common/devMenuConfig');
+    jest.spyOn(devMenuConfig, 'isDevMenuEnabled').mockReturnValue(true);
+
+    const tabConfig = require('@gamelog/common/AdaptiveTabBar').getTabConfig();
+    expect(tabConfig.DevTab.defaultIcon).toBe('construct');
+    expect(tabConfig.DevTab.focusedIcon).toBe('construct');
+  });
+
+  it('renders bottom tab bar on tablet in portrait mode', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: true,
+      width: 768,
+      height: 1024,
+    });
+
+    const { getByLabelText, getByText } = render(<AdaptiveTabBar {...defaultProps} />);
+
+    expect(getByText('Games')).toBeTruthy();
+    expect(getByText('Profile')).toBeTruthy();
+    expect(getByText('Social')).toBeTruthy();
+    expect(getByText('Dev')).toBeTruthy();
+
+    const gamesTab = getByLabelText('Games');
+    expect(gamesTab).toBeTruthy();
+
+    const profileTab = getByLabelText('Profile');
+    fireEvent.press(profileTab);
+    expect(mockNavigation.emit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'tabPress', target: 'ProfileTab' })
+    );
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('ProfileTab');
+  });
+
+  it('renders left rail with tablet dimensions in tablet landscape mode', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      isTablet: true,
+      width: 1024,
+      height: 768,
+    });
+
+    const { getByLabelText, getByText } = render(<AdaptiveTabBar {...defaultProps} />);
+
+    const gamesTab = getByLabelText('Games');
+    expect(StyleSheet.flatten(gamesTab.props.style)).toEqual(
+      expect.objectContaining({ width: 76 })
+    );
+
+    const gamesLabel = getByText('Games');
+    expect(StyleSheet.flatten(gamesLabel.props.style)).toEqual(
+      expect.objectContaining({ fontSize: 12 })
+    );
   });
 });

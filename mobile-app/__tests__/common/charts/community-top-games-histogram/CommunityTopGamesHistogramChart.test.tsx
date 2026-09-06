@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import CommunityTopGamesHistogramChart from '@gamelog/common/charts/community-top-games-histogram/CommunityTopGamesHistogramChart';
 import ApiManager from '@gamelog/api-manager/apiManager';
 
@@ -129,7 +129,11 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     render(<CommunityTopGamesHistogramChart scope="global" />);
 
-    const prevBtn = await waitFor(() => screen.getByTestId('community-top-games-prev'));
+    await waitFor(() => {
+      expect(screen.getByTestId('top-game-item-1245620')).toBeTruthy();
+    });
+
+    const prevBtn = screen.getByTestId('community-top-games-prev');
     fireEvent.press(prevBtn);
 
     await waitFor(() => {
@@ -137,7 +141,7 @@ describe('CommunityTopGamesHistogramChart', () => {
     });
   });
 
-  it('renders warning error box when request fails with 400 error', async () => {
+  it('renders warning error box when request fails with 400 error while keeping header controls intact', async () => {
     (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockRejectedValue(
       new Error('User region is not set')
     );
@@ -146,6 +150,46 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     await waitFor(() => {
       expect(screen.getByText('User region is not set')).toBeTruthy();
+      expect(screen.getByTestId('community-top-games-prev')).toBeTruthy();
+      expect(screen.getByTestId('community-top-games-reference-community')).toBeTruthy();
+    });
+  });
+
+  it('renders date skeleton and in-place spinner while loading, with disabled header controls', async () => {
+    let resolveFetch: (value: any) => void;
+    const fetchPromise = new Promise((resolve) => {
+      resolveFetch = resolve;
+    });
+
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockReturnValue(fetchPromise);
+    (ApiManager.getGameBasicInfo as jest.Mock).mockResolvedValue({
+      '1245620': { data: { name: 'Elden Ring' } },
+    });
+
+    render(<CommunityTopGamesHistogramChart scope="global" />);
+
+    // While loading:
+    // 1. Date skeleton is visible
+    expect(screen.getByTestId('community-top-games-date-shimmer')).toBeTruthy();
+    // 2. Others/You buttons and prev chevron are visible and disabled
+    expect(screen.getByTestId('community-top-games-reference-community')).toBeDisabled();
+    expect(screen.getByTestId('community-top-games-reference-user')).toBeDisabled();
+    expect(screen.getByTestId('community-top-games-prev')).toBeDisabled();
+    // 3. Content area shows spinner
+    expect(screen.getByTestId('spinner')).toBeTruthy();
+
+    // Resolve fetch
+    await act(async () => {
+      resolveFetch!([
+        { id: '1245620', user_playtime: 10, community_playtime: 5 },
+      ]);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('community-top-games-date-shimmer')).toBeNull();
+      expect(screen.queryByTestId('spinner')).toBeNull();
+      expect(screen.getByTestId('community-top-games-reference-community')).not.toBeDisabled();
+      expect(screen.getByTestId('top-game-item-1245620')).toBeTruthy();
     });
   });
 
@@ -190,6 +234,70 @@ describe('CommunityTopGamesHistogramChart', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No top community games found for this period')).toBeTruthy();
+    });
+  });
+
+  it('displays "User" on the comparison button when targetUserName is longer than 10 characters and isFriend is false/pending/blocked', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
+
+    render(
+      <CommunityTopGamesHistogramChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="DeadSkorpioProGamerMC"
+        isFriend={false}
+      />
+    );
+
+    await waitFor(() => {
+      const button = screen.getByTestId('community-top-games-reference-community');
+      expect(button).toBeTruthy();
+      // Button should display "User" because "DeadSkorpioProGamerMC".length > 10 and not friend
+      expect(screen.getByText('User')).toBeTruthy();
+      // Legend / caption should still have the full username
+      expect(screen.getByText('DeadSkorpioProGamerMC')).toBeTruthy();
+    });
+  });
+
+  it('displays "Friend" on the comparison button when targetUserName is longer than 10 characters and isFriend is true', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
+
+    render(
+      <CommunityTopGamesHistogramChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="DeadSkorpioProGamerMC"
+        isFriend={true}
+      />
+    );
+
+    await waitFor(() => {
+      const button = screen.getByTestId('community-top-games-reference-community');
+      expect(button).toBeTruthy();
+      // Button should display "Friend" because "DeadSkorpioProGamerMC".length > 10 and isFriend is true
+      expect(screen.getByText('Friend')).toBeTruthy();
+      // Legend / caption should still have the full username
+      expect(screen.getByText('DeadSkorpioProGamerMC')).toBeTruthy();
+    });
+  });
+
+  it('displays the actual name on the comparison button when targetUserName is 10 characters or less even if friend', async () => {
+    (ApiManager.getCommunityWeeklyTopGames as jest.Mock).mockResolvedValue([]);
+
+    render(
+      <CommunityTopGamesHistogramChart
+        scope="user"
+        targetUserId="user-123"
+        targetUserName="ShortUser"
+        isFriend={true}
+      />
+    );
+
+    await waitFor(() => {
+      const button = screen.getByTestId('community-top-games-reference-community');
+      expect(button).toBeTruthy();
+      // Button and legend should display "ShortUser"
+      expect(screen.getAllByText('ShortUser').length).toBeGreaterThanOrEqual(1);
     });
   });
 });

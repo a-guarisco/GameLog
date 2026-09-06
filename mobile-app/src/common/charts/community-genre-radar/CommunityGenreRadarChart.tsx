@@ -10,7 +10,6 @@ import { VStack } from '@gamelog/common/gluestack/vstack';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import { WarningBox } from '@gamelog/common/feedbacks';
 import ProgressTrack from '@gamelog/common/ProgressTrack';
-import { brand, tailwindColors } from '@gamelog/theme/theme';
 import { parseRGB } from '../chartsHelpers';
 import { useCommunityGenreRadarChart } from './useCommunityGenreRadarChart';
 import { useOrientation } from '@gamelog/common/useOrientation';
@@ -34,6 +33,8 @@ const SCOPE_OPTIONS: GLSegmentOption<CommunityScope>[] = [
   { id: 'friends', label: 'Friends', testID: 'community-radar-scope-friends' },
 ];
 
+export const MAX_RADAR_SIZE = 400;
+
 interface MemoizedCommunityRadarProps {
   targetSize?: number;
   cardWidth?: number;
@@ -45,16 +46,8 @@ interface MemoizedCommunityRadarProps {
 }
 
 const MemoizedCommunityRadar = memo(
-  ({
-    targetSize,
-    cardWidth,
-    radarPadding,
-    dataSet,
-    labels,
-    maxValue,
-    theme,
-  }: MemoizedCommunityRadarProps) => {
-    const size = targetSize ?? (cardWidth ? cardWidth - (radarPadding ?? 16) : 320);
+  ({ targetSize, cardWidth, radarPadding, dataSet, labels, maxValue, theme }: MemoizedCommunityRadarProps) => {
+    const size = targetSize ?? Math.min(cardWidth ? cardWidth - (radarPadding ?? 16) : 320, MAX_RADAR_SIZE);
     return (
       <Box
         className="items-center justify-center w-full"
@@ -181,10 +174,8 @@ const CommunityGenreRadarChart = ({
         }
 
         const targetSize = isLandscape
-          ? Math.min(Math.round(height * 0.55), cardWidth ? cardWidth - radarPadding : 240)
-          : cardWidth
-            ? cardWidth - radarPadding
-            : 320;
+          ? Math.min(Math.round(height * 0.55), cardWidth ? cardWidth - radarPadding : 240, MAX_RADAR_SIZE)
+          : Math.min(cardWidth ? cardWidth - radarPadding : 320, MAX_RADAR_SIZE);
 
         return (
           <VStack className="w-full items-center" space="md">
@@ -203,19 +194,17 @@ const CommunityGenreRadarChart = ({
             <HStack space="lg" className="items-center justify-center pt-1 pb-1">
               <HStack space="xs" className="items-center">
                 <Box
-                  className="w-2.5 h-2.5 rounded-full"
                   className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
                 />
                 <Text size="xs" className="font-bold text-primary-500">
                   You (%)
                 </Text>
               </HStack>
-              <HStack space="xs" className="items-center">
+              <HStack space="xs" className="items-center max-w-[50%]">
                 <Box
-                  className="w-2.5 h-2.5 rounded-full"
-                  className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-comparison-compare-500"
                 />
-                <Text size="xs" className="font-bold text-comparison-compare-500">
+                <Text size="xs" className="font-bold text-comparison-compare-500" numberOfLines={2}>
                   {othersLabel}
                 </Text>
               </HStack>

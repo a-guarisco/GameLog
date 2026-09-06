@@ -1,18 +1,18 @@
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 import { useState, memo, useRef, useEffect } from 'react';
-import { useColorScheme, Pressable } from 'react-native';
+import { useColorScheme, Pressable, Animated, Easing } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Icon, ChevronLeftIcon, ChevronRightIcon } from '@gamelog/common/gluestack/icon';
+import { Spinner } from '@gamelog/common/gluestack/spinner';
 import { WarningBox } from '@gamelog/common/feedbacks';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import { BarChart } from 'react-native-gifted-charts';
 import { parseRGB } from '@gamelog/common/charts/chartsHelpers';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
-import { brand, tailwindColors } from '@gamelog/theme/theme';
 import {
   ChartAxisText,
   ChartDateRangeText,
@@ -20,6 +20,7 @@ import {
 } from '@gamelog/common/typography/ChartTypography';
 import { formatShortDate, formatMinutesToHoursShort } from '@gamelog/utils/formatUtils';
 import { useOrientation } from '@gamelog/common/useOrientation';
+import { ShimmerBox } from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksHeader';
 import { useCommunityPlaytime, CommunityPeriodRange } from './useCommunityPlaytime';
 import { useCommunityPlaytimeHistogramData } from './useCommunityPlaytimeHistogramData';
 import type { CommunityScope } from '@gamelog/api-manager/dto';
@@ -105,6 +106,35 @@ const CommunityPlaytimeHistogramChart = ({
     targetUserId,
   });
 
+  const hasLoadedOnce = useRef(false);
+  const shimmerAnim = useRef(new Animated.Value(-1)).current;
+
+  useEffect(() => {
+    if (!isLoading && !error && data) {
+      hasLoadedOnce.current = true;
+    }
+  }, [isLoading, error, data]);
+
+  const isInitialLoading = isLoading && !hasLoadedOnce.current;
+
+  useEffect(() => {
+    if (isLoading) {
+      const loop = Animated.loop(
+        Animated.timing(shimmerAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      loop.start();
+      return () => {
+        loop.stop();
+        shimmerAnim.setValue(-1);
+      };
+    }
+  }, [isLoading, shimmerAnim]);
+
   const {
     userTotalLabel,
     communityTotalLabel,
@@ -162,9 +192,8 @@ const CommunityPlaytimeHistogramChart = ({
           />
         </Box>
       }
-      isLoading={isLoading}
-      error={error}
-      ErrorBehaviour={renderError}
+      isLoading={false}
+      error={false}
       testID="community-playtime-histogram-chart"
     >
       {({ cardWidth }) => {
@@ -214,22 +243,45 @@ const CommunityPlaytimeHistogramChart = ({
                 <HStack className="w-full justify-between items-center flex-wrap">
                   {/* Left: Summary totals in blue and compareColor with separator */}
                   <HStack space="xs" className="items-baseline">
-                    <ChartSummaryText className="text-primary-500">
-                      {userTotalLabel}
-                    </ChartSummaryText>
-                    <Text size="lg" className="text-typography-400 font-bold">
-                      {' '}
-                      ·{' '}
-                    </Text>
-                    <ChartSummaryText className="text-comparison-compare-500">
-                      {communityTotalLabel}
-                    </ChartSummaryText>
+                    {isLoading ? (
+                      <>
+                        <ShimmerBox
+                          className="w-14 h-7 rounded-md"
+                          anim={shimmerAnim}
+                          testID="community-histogram-total-user-shimmer"
+                        />
+                        <Text size="lg" className="text-typography-400 font-bold">
+                          {' '}
+                          ·{' '}
+                        </Text>
+                        <ShimmerBox
+                          className="w-14 h-7 rounded-md"
+                          anim={shimmerAnim}
+                          testID="community-histogram-total-community-shimmer"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <ChartSummaryText className="text-primary-500">
+                          {userTotalLabel}
+                        </ChartSummaryText>
+                        <Text size="lg" className="text-typography-400 font-bold">
+                          {' '}
+                          ·{' '}
+                        </Text>
+                        <ChartSummaryText className="text-comparison-compare-500">
+                          {communityTotalLabel}
+                        </ChartSummaryText>
+                      </>
+                    )}
                   </HStack>
 
                   {/* Right: Date navigation positioned below the range selector */}
                   <HStack space="xs" className="items-center -mr-1">
                     <Pressable
                       onPress={() => setOffset((prev) => prev - 1)}
+                      disabled={isLoading}
+                      style={{ opacity: isLoading ? 0.3 : 1 }}
                       className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
                       accessibilityLabel="Previous period"
                       testID="community-histogram-prev"
@@ -237,16 +289,24 @@ const CommunityPlaytimeHistogramChart = ({
                       <Icon as={ChevronLeftIcon} className="text-typography-500" />
                     </Pressable>
 
-                    <ChartDateRangeText>
-                      {periodRange === 'year'
-                        ? `${new Date(startTimestamp * 1000).getFullYear()}`
-                        : `${formatShortDate(startTimestamp)} - ${formatShortDate(endTimestamp)}`}
-                    </ChartDateRangeText>
+                    {isInitialLoading ? (
+                      <ShimmerBox
+                        className="w-24 h-5 rounded-md"
+                        anim={shimmerAnim}
+                        testID="community-histogram-date-shimmer"
+                      />
+                    ) : (
+                      <ChartDateRangeText>
+                        {periodRange === 'year'
+                          ? `${new Date(startTimestamp * 1000).getFullYear()}`
+                          : `${formatShortDate(startTimestamp)} - ${formatShortDate(endTimestamp)}`}
+                      </ChartDateRangeText>
+                    )}
 
                     <Pressable
                       onPress={() => setOffset((prev) => Math.min(0, prev + 1))}
-                      disabled={offset >= 0}
-                      style={{ opacity: offset >= 0 ? 0.3 : 1 }}
+                      disabled={isLoading || offset >= 0}
+                      style={{ opacity: isLoading || offset >= 0 ? 0.3 : 1 }}
                       className="w-7 h-7 items-center justify-center rounded-full active:bg-background-100"
                       accessibilityLabel="Next period"
                       testID="community-histogram-next"
@@ -257,134 +317,162 @@ const CommunityPlaytimeHistogramChart = ({
                 </HStack>
               </VStack>
 
-              {/* Chart Container */}
-              <Box
-                style={{
-                  overflow: 'hidden',
-                  width: exactTotalWidth,
-                  height: containerHeight,
-                  position: 'relative',
-                  alignItems: 'center',
-                }}
-              >
-                {!hasPlaytime && (
-                  <Box
-                    className="absolute inset-0 z-10 justify-center items-center"
-                    style={{ top: -20 }}
-                  >
-                    <Text className="text-typography-400 font-medium">
-                      No playtime for the selected{' '}
-                      {periodRange === 'week'
-                        ? 'week'
-                        : periodRange === 'twoWeeks'
-                          ? '2-week period'
-                          : periodRange === 'year'
-                            ? 'year'
-                            : 'period'}
-                    </Text>
-                  </Box>
-                )}
-
-                {/* Left Y-axis labels */}
+              {/* Chart Container or Error / Loading State */}
+              {error ? (
                 <Box
-                  className="absolute left-1 w-11 z-10 pointer-events-none"
-                  style={{ top: -4, bottom: 22 }}
+                  style={{
+                    overflow: 'hidden',
+                    width: exactTotalWidth,
+                    height: containerHeight,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
                 >
-                  {maxVisibleHours > 0 && (
-                    <ChartAxisText
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        color: parseRGB(theme['--color-typography-400']),
-                      }}
-                    >
-                      {formatMinutesToHoursShort(Math.round(maxVisibleHours * 60)) || '0h'}
-                    </ChartAxisText>
-                  )}
-
-                  {minVisibleHours > 0 && maxVisibleHours > 0 && (
-                    <ChartAxisText
-                      style={{
-                        position: 'absolute',
-                        bottom: `${(minVisibleHours / chartMaxValue) * 100}%`,
-                        right: 0,
-                        transform: [{ translateY: 5 }],
-                        color: parseRGB(theme['--color-typography-400']),
-                      }}
-                    >
-                      {formatMinutesToHoursShort(Math.round(minVisibleHours * 60))}
-                    </ChartAxisText>
-                  )}
-
-                  <ChartAxisText
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      right: 0,
-                      color: parseRGB(theme['--color-typography-400']),
-                    }}
-                  >
-                    0h
-                  </ChartAxisText>
+                  {renderError()}
                 </Box>
+              ) : isLoading ? (
+                <Box
+                  style={{
+                    overflow: 'hidden',
+                    width: exactTotalWidth,
+                    height: containerHeight,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Spinner testID="spinner" />
+                </Box>
+              ) : (
+                <Box
+                  style={{
+                    overflow: 'hidden',
+                    width: exactTotalWidth,
+                    height: containerHeight,
+                    position: 'relative',
+                    alignItems: 'center',
+                  }}
+                >
+                  {!hasPlaytime && (
+                    <Box
+                      className="absolute inset-0 z-10 justify-center items-center"
+                      style={{ top: -20 }}
+                    >
+                      <Text className="text-typography-400 font-medium">
+                        No playtime for the selected{' '}
+                        {periodRange === 'week'
+                          ? 'week'
+                          : periodRange === 'twoWeeks'
+                            ? '2-week period'
+                            : periodRange === 'year'
+                              ? 'year'
+                              : 'period'}
+                      </Text>
+                    </Box>
+                  )}
 
-                <MemoizedBarChart
-                  key={`${periodRange}-${offset}-${scope}-${isLandscape}`}
-                  data={finalBarData}
-                  width={exactTotalWidth}
-                  spacing={groupSpacing}
-                  initialSpacing={initialSpacing}
-                  maxValue={chartMaxValue}
-                  barWidth={barWidth}
-                  height={barChartHeight}
-                  yAxisThickness={0}
-                  xAxisThickness={0}
-                  hideRules
-                  noOfSections={1}
-                  hideYAxisText
-                  yAxisLabelWidth={44}
-                  showFractionalValues={false}
-                  xAxisColor={axisColor}
-                  disableScroll
-                  dashWidth={0}
-                  scrollAnimation={false}
-                  roundedTop
-                  roundedBottom
-                  topRadius={4}
-                  bottomRadius={4}
-                />
-              </Box>
-
-              {/* Caption / Legend colored as in communityGenreRadar */}
-              <HStack space="lg" className="items-center justify-center pt-2 pb-1">
-                <HStack space="xs" className="items-center">
+                  {/* Left Y-axis labels */}
                   <Box
-                    className="w-2.5 h-2.5 rounded-full"
-                    className="bg-comparison-user-500"
-                  />
-                  <Text size="xs" className="font-bold text-primary-500">
-                    You
-                  </Text>
-                </HStack>
-                <HStack space="xs" className="items-center">
-                  <Box
-                    className="w-2.5 h-2.5 rounded-full"
-                    className="bg-comparison-compare-500"
-                  />
-                  <Text size="xs" className="font-bold text-comparison-compare-500">
-                    {othersLabel}
-                  </Text>
-                </HStack>
-              </HStack>
+                    className="absolute left-1 w-11 z-10 pointer-events-none"
+                    style={{ top: -4, bottom: 22 }}
+                  >
+                    {maxVisibleHours > 0 && (
+                      <ChartAxisText
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          color: parseRGB(theme['--color-typography-400']),
+                        }}
+                      >
+                        {formatMinutesToHoursShort(Math.round(maxVisibleHours * 60)) || '0h'}
+                      </ChartAxisText>
+                    )}
 
-              <Text
-                size="xs"
-                className="text-typography-300 text-center"
-                testID="community-playtime-scope-caption"
-              >
-                Comparing your hours with {comparisonScopeText}.
-              </Text>
+                    {minVisibleHours > 0 && maxVisibleHours > 0 && (
+                      <ChartAxisText
+                        style={{
+                          position: 'absolute',
+                          bottom: `${(minVisibleHours / chartMaxValue) * 100}%`,
+                          right: 0,
+                          transform: [{ translateY: 5 }],
+                          color: parseRGB(theme['--color-typography-400']),
+                        }}
+                      >
+                        {formatMinutesToHoursShort(Math.round(minVisibleHours * 60))}
+                      </ChartAxisText>
+                    )}
+
+                    <ChartAxisText
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0,
+                        color: parseRGB(theme['--color-typography-400']),
+                      }}
+                    >
+                      0h
+                    </ChartAxisText>
+                  </Box>
+
+                  <MemoizedBarChart
+                    key={`${periodRange}-${offset}-${scope}-${isLandscape}`}
+                    data={finalBarData}
+                    width={exactTotalWidth}
+                    spacing={groupSpacing}
+                    initialSpacing={initialSpacing}
+                    maxValue={chartMaxValue}
+                    barWidth={barWidth}
+                    height={barChartHeight}
+                    yAxisThickness={0}
+                    xAxisThickness={0}
+                    hideRules
+                    noOfSections={1}
+                    hideYAxisText
+                    yAxisLabelWidth={44}
+                    showFractionalValues={false}
+                    xAxisColor={axisColor}
+                    disableScroll
+                    dashWidth={0}
+                    scrollAnimation={false}
+                    roundedTop
+                    roundedBottom
+                    topRadius={4}
+                    bottomRadius={4}
+                  />
+                </Box>
+              )}
+
+              {!error && (
+                <>
+                  {/* Caption / Legend colored as in communityGenreRadar */}
+                  <HStack space="lg" className="items-center justify-center pt-2 pb-1">
+                    <HStack space="xs" className="items-center">
+                      <Box
+                        className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
+                      />
+                      <Text size="xs" className="font-bold text-primary-500">
+                        You
+                      </Text>
+                    </HStack>
+                    <HStack space="xs" className="items-center">
+                      <Box
+                        className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
+                      />
+                      <Text size="xs" className="font-bold text-comparison-compare-500">
+                        {othersLabel}
+                      </Text>
+                    </HStack>
+                  </HStack>
+
+                  <Text
+                    size="xs"
+                    className="text-typography-300 text-center"
+                    testID="community-playtime-scope-caption"
+                  >
+                    Comparing your hours with {comparisonScopeText}.
+                  </Text>
+                </>
+              )}
             </VStack>
           </VStack>
         );

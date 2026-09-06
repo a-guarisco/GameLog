@@ -7,12 +7,13 @@ import { CardTitleText } from '@gamelog/common/typography/CardTypography';
 import { UserCard } from '../user-card/UserCard';
 import { UserCardActionHandlers } from '../user-card/userCardActionHandlers';
 
-interface FriendsTabContentProps {
+export interface FriendsTabContentProps {
   isLoading: boolean;
   error: boolean;
   errorMessage?: string;
   pendingRequests: UserSearchResult[];
   acceptedFriends: UserSearchResult[];
+  avatarMap?: Record<string, string>;
   handlers: UserCardActionHandlers;
   isActionLoading?: boolean;
 }
@@ -23,6 +24,7 @@ export const FriendsTabContent: React.FC<FriendsTabContentProps> = ({
   errorMessage,
   pendingRequests,
   acceptedFriends,
+  avatarMap,
   handlers,
   isActionLoading,
 }) => {
@@ -46,6 +48,7 @@ export const FriendsTabContent: React.FC<FriendsTabContentProps> = ({
               <UserCard
                 key={item.user.id}
                 item={item}
+                avatarUrl={avatarMap?.[item.user.steam_id]}
                 {...handlers}
                 isActionLoading={isActionLoading}
               />
@@ -69,6 +72,7 @@ export const FriendsTabContent: React.FC<FriendsTabContentProps> = ({
               <UserCard
                 key={item.user.id}
                 item={item}
+                avatarUrl={avatarMap?.[item.user.steam_id]}
                 {...handlers}
                 isActionLoading={isActionLoading}
               />

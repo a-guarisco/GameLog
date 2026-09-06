@@ -12,20 +12,26 @@ interface ProfileGenresTabProps {
 }
 
 const ProfileGenresTab = ({ ownedGames }: ProfileGenresTabProps) => {
-  const { isLandscape, height } = useOrientation();
+  const { isLandscape, isTablet, height } = useOrientation();
   const [isCommunityExpanded, setIsCommunityExpanded] = useState(false);
   const isExpandedRef = useRef(false);
   const hasMeasuredRef = useRef(false);
 
-  const initialClosedHeight = isLandscape ? Math.round(height * 0.55) + 110 : undefined;
+  const isTwoColumn = isLandscape || isTablet;
+
+  const initialClosedHeight = isLandscape
+    ? Math.round(height * 0.55) + 110
+    : isTablet
+    ? Math.min(Math.round(height * 0.45), 520)
+    : undefined;
   const [closedHeight, setClosedHeight] = useState<number | undefined>(initialClosedHeight);
 
   useEffect(() => {
     hasMeasuredRef.current = false;
     setClosedHeight(initialClosedHeight);
-  }, [isLandscape, height]);
+  }, [isLandscape, isTablet, height]);
 
-  if (!isLandscape) {
+  if (!isTwoColumn) {
     return (
       <VStack space="md" className="w-full">
         <GameGenreRadarChart ownedGames={ownedGames} />
@@ -68,9 +74,9 @@ const ProfileGenresTab = ({ ownedGames }: ProfileGenresTabProps) => {
             return;
           }
           const h = e.nativeEvent.layout.height;
-          // Discard measurements that represent loading spinners (<65%) or expanded cards (>125%)
+          // Discard measurements that represent loading spinners (<65%) or expanded cards (>135%)
           const minValidHeight = (initialClosedHeight ?? 200) * 0.65;
-          const maxValidClosedHeight = (initialClosedHeight ?? 400) * 1.25;
+          const maxValidClosedHeight = (initialClosedHeight ?? 400) * 1.35;
           if (h >= minValidHeight && h <= maxValidClosedHeight) {
             hasMeasuredRef.current = true;
             if (h !== closedHeight) {

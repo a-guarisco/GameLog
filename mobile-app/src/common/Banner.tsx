@@ -11,6 +11,7 @@ interface BannerProps {
   imageUrl?: string;
   height?: number;
   scrollable?: boolean;
+  alignTop?: boolean;
 }
 
 export default function Banner({
@@ -20,6 +21,7 @@ export default function Banner({
   imageUrl,
   height,
   scrollable = false,
+  alignTop = false,
 }: BannerProps) {
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const calculatedHeight = height ?? Math.max((screenHeight * heightPercentage) / 100, minHeight);
@@ -35,7 +37,7 @@ export default function Banner({
   const minScaledHeight = scrollable ? Math.max(naturalImageHeight, Math.round(calculatedHeight * 1.35)) : naturalImageHeight;
   const imageScaledHeight = Math.max(minScaledHeight, calculatedHeight);
   const maxScroll = Math.max(0, imageScaledHeight - calculatedHeight);
-  const initialOffset = -Math.round(maxScroll / 2);
+  const initialOffset = alignTop ? 0 : -Math.round(maxScroll / 2);
 
   const translateY = useRef(new Animated.Value(initialOffset)).current;
   const currentY = useRef(initialOffset);
@@ -46,10 +48,10 @@ export default function Banner({
   scrollableRef.current = scrollable;
 
   useEffect(() => {
-    const defaultY = -Math.round(maxScroll / 2);
+    const defaultY = alignTop ? 0 : -Math.round(maxScroll / 2);
     currentY.current = defaultY;
     translateY.setValue(defaultY);
-  }, [maxScroll, translateY]);
+  }, [maxScroll, translateY, alignTop]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -97,7 +99,7 @@ export default function Banner({
     >
       {imageUrl && (
         <>
-          {scrollable ? (
+          {scrollable || alignTop ? (
             <Animated.View
               style={{
                 width: '100%',
