@@ -9,6 +9,7 @@ import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { UserAvatar } from './UserAvatar';
 import { UserCardActions } from './UserCardActions';
 import { UserCardActionHandlers } from './userCardActionHandlers';
+import { getFriendshipStatusStyle } from './friendshipStatus';
 
 export interface UserCardProps extends UserCardActionHandlers {
   item: UserSearchResult;
@@ -25,27 +26,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   const { user, friendship } = item;
   const status = friendship?.friendship_status;
   const isFriend = status === 'accepted';
-  const isPending = status === 'pending_incoming';
-  const isPendingOutgoing = status === 'pending_outgoing';
-  const isBlocked = status === 'blocked';
-
-  const statusLabel = isFriend
-    ? 'Friend'
-    : isPending
-      ? 'Pending'
-      : isPendingOutgoing
-        ? 'Requested'
-        : isBlocked
-          ? 'Blocked'
-          : 'Player';
-
-  const statusColorClass = isFriend
-    ? 'text-primary-500 dark:text-primary-400'
-    : isPending || isPendingOutgoing
-      ? 'text-warning-500 dark:text-warning-400'
-      : isBlocked
-        ? 'text-red-400 dark:text-red-400'
-        : 'text-typography-300 dark:text-typography-400';
+  const statusStyle = getFriendshipStatusStyle(status);
 
   const handleCardPress = () => {
     if (handlers.onSelectUser) {
@@ -78,8 +59,8 @@ export const UserCard: React.FC<UserCardProps> = ({
                 {user.username}
               </Text>
               <Text size="xs" className="font-medium text-typography-200 mt-0.5" numberOfLines={1}>
-                <Text size="xs" className={`font-bold ${statusColorClass}`}>
-                  {statusLabel}
+                <Text size="xs" className={`font-bold ${statusStyle.textClass}`}>
+                  {statusStyle.label}
                 </Text>
               </Text>
             </VStack>

@@ -8,7 +8,7 @@ import { Text } from '@gamelog/common/gluestack/text';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
-import { WarningBox } from '@gamelog/common/feedbacks';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 import ProgressTrack from '@gamelog/common/ProgressTrack';
 import { parseRGB } from '../chartsHelpers';
 import { useCommunityGenreRadarChart } from './useCommunityGenreRadarChart';
@@ -132,8 +132,9 @@ const CommunityGenreRadarChart = ({
 
   const renderError = () => (
     <Box className="py-6 items-center justify-center w-full">
-      <WarningBox
-        message={errorMessageCommunity || 'Unable to load community genre data.'}
+      <ErrorBox
+        errorMessage={errorMessageCommunity || 'Unable to load community genre data.'}
+        variant="icon-top"
         className="w-full"
       />
     </Box>
@@ -168,7 +169,9 @@ const CommunityGenreRadarChart = ({
         if (dataSet.length === 0 || labels.length === 0) {
           return (
             <Box className="py-8 items-center justify-center w-full">
-              <Text className="text-typography-400">No community genre data found</Text>
+              <Text className="text-typography-400 font-medium text-center">
+                No community genre data found
+              </Text>
             </Box>
           );
         }

@@ -1,6 +1,5 @@
 import { ComponentType } from 'react';
-import { Box } from '@gamelog/common/gluestack/box';
-import { Text } from '@gamelog/common/gluestack/text';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 
 interface ChartErrorHandlingProps {
   ErrorBehaviour?: ComponentType;
@@ -8,9 +7,7 @@ interface ChartErrorHandlingProps {
 
 const ChartErrorHandler = ({ ErrorBehaviour }: ChartErrorHandlingProps) => {
   const FallbackError: ComponentType = () => (
-    <Box className="py-8 items-center justify-center w-full">
-      <Text className="text-typography-400">Error loading chart</Text>
-    </Box>
+    <ErrorBox errorMessage="Error loading chart" variant="icon-top" />
   );
 
   const ErrorComponent = ErrorBehaviour || FallbackError;

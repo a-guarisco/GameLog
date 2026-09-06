@@ -7,7 +7,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Icon, ChevronLeftIcon, ChevronRightIcon } from '@gamelog/common/gluestack/icon';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
-import { WarningBox } from '@gamelog/common/feedbacks';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import { BarChart } from 'react-native-gifted-charts';
@@ -157,8 +157,9 @@ const CommunityPlaytimeHistogramChart = ({
 
   const renderError = () => (
     <Box className="py-6 items-center justify-center w-full">
-      <WarningBox
-        message={errorMessage || 'Unable to load community playtime history.'}
+      <ErrorBox
+        errorMessage={errorMessage || 'Unable to load community playtime history.'}
+        variant="icon-top"
         className="w-full"
       />
     </Box>

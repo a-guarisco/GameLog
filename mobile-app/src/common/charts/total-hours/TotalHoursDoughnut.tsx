@@ -187,7 +187,7 @@ const TotalHoursDoughnut = ({ ownedGames }: TotalHoursDoughnutProps) => {
         if (pieData.length === 0) {
           return (
             <Box className="py-8 items-center justify-center w-full">
-              <Text className="text-typography-400">No games found</Text>
+              <Text className="text-typography-400 font-medium text-center">No games found</Text>
             </Box>
           );
         }

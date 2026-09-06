@@ -176,6 +176,7 @@ export const useGetGameGenreChartData = (
 };
 
 export const useGetGenresBatch = (appIds: string[]) => {
+  const appIdsKey = appIds.join(',');
   const fetchFunc = useCallback(async () => {
     if (!appIds || appIds.length === 0) return null;
     const res = await ApiManager.getGenresBatch(appIds);
@@ -188,7 +189,7 @@ export const useGetGenresBatch = (appIds: string[]) => {
       return map;
     }
     return res;
-  }, [appIds]);
+  }, [appIdsKey]);
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
@@ -200,10 +201,12 @@ export const useGetGenresBatch = (appIds: string[]) => {
   };
 };
 
+const EMPTY_GAME_STATUSES: Record<string, GameStatus> = {};
+
 export const useGetUserGameStatuses = () => {
   const fetchFunc = useCallback(async () => {
     const res = await ApiManager.getUserGameStatuses();
-    if (!res) return {};
+    if (!res) return EMPTY_GAME_STATUSES;
     if (Array.isArray(res)) {
       const map: Record<string, GameStatus> = {};
       for (const item of res) {
@@ -214,11 +217,9 @@ export const useGetUserGameStatuses = () => {
     return res;
   }, []);
 
-
-
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
   return {
-    userGameStatuses: data ?? {},
+    userGameStatuses: data ?? EMPTY_GAME_STATUSES,
     isLoadingUserGameStatuses: isLoading,
     errorUserGameStatuses: error,
     errorMessageUserGameStatuses: errorMessage,

@@ -9,6 +9,7 @@ import { CHART_PALETTE } from '@gamelog/theme/hexColors';
 import type { PlatformSplit } from './selectPlatformSplit';
 
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 
 const RAMP = [
   { hex: CHART_PALETTE[0] },
@@ -33,8 +34,12 @@ const PlatformSplitChart = ({ split, hasError = false }: ProfilePlatformSplitPro
     isLoading={false}
     error={hasError}
     ErrorBehaviour={() => (
-      <Box className="py-8 items-center justify-center w-full">
-        <Text className="text-typography-400">Could not load platform playtime</Text>
+      <Box className="py-6 items-center justify-center w-full">
+        <ErrorBox
+          errorMessage="Could not load platform playtime"
+          variant="icon-top"
+          className="w-full"
+        />
       </Box>
     )}
   >
@@ -42,7 +47,9 @@ const PlatformSplitChart = ({ split, hasError = false }: ProfilePlatformSplitPro
       if (!split.hasPlaytime) {
         return (
           <Box className="py-8 items-center justify-center w-full">
-            <Text className="text-typography-400">No platform playtime recorded yet</Text>
+            <Text className="text-typography-400 font-medium text-center">
+              No platform playtime recorded yet
+            </Text>
           </Box>
         );
       }

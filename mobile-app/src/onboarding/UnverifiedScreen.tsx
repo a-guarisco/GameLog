@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
@@ -22,7 +22,10 @@ export default function UnverifiedScreen() {
   } = useUnverifiedScreen();
 
   return (
-    <View className="flex-1 bg-background-50 dark:bg-background-0 items-center justify-center p-6">
+    <ScrollView
+      className="flex-1 bg-background-0 dark:bg-background-0"
+      contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}
+    >
       <Box className="w-full max-w-[400px] items-center">
         <Ionicons
           name="mail-unread-outline"
@@ -31,13 +34,13 @@ export default function UnverifiedScreen() {
           className="mb-4"
         />
 
-        <Text size="2xl" bold className="text-center mb-2">
+        <Text size="2xl" bold className="text-center text-typography-0 mb-2">
           Verify your Email
         </Text>
 
-        <Text className="text-center text-typography-600 mb-8">
+        <Text className="text-center text-typography-200 mb-8">
           We sent a verification link to{' '}
-          <Text bold className="text-typography-900">
+          <Text bold className="text-typography-0 font-bold">
             {firebaseUser?.email}
           </Text>
           . Click the link to activate your account and start using GameLog.
@@ -69,6 +72,6 @@ export default function UnverifiedScreen() {
           {successMsg ? <SuccessBox message={successMsg} /> : null}
         </Box>
       </Box>
-    </View>
+    </ScrollView>
   );
 }

@@ -62,4 +62,16 @@ describe('SectionCard', () => {
     expect(titleElement.props.numberOfLines).toBe(2);
     expect(screen.getByTestId('header-right-action')).toBeTruthy();
   });
+
+  it('handles flex-1 className and passes style prop to Card', () => {
+    render(
+      <SectionCard className="flex-1" style={{ minHeight: 200 }} testID="card">
+        <Text>Content</Text>
+      </SectionCard>
+    );
+
+    const card = screen.getByTestId('card');
+    expect(card.props.className).toContain('flex-1');
+    expect(card.props.style).toEqual(expect.objectContaining({ minHeight: 200 }));
+  });
 });

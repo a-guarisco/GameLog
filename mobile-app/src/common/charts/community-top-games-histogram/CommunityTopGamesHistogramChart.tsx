@@ -6,7 +6,7 @@ import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Icon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from '@gamelog/common/gluestack/icon';
 import { Spinner } from '@gamelog/common/gluestack/spinner';
-import { WarningBox } from '@gamelog/common/feedbacks';
+import { ErrorBox } from '@gamelog/common/feedbacks';
 import { GLSegmentedControl, GLSegmentOption } from '@gamelog/common/GLSegmentedControl';
 import ChartWrapperCard from '@gamelog/common/charts/ChartWrapperCard';
 import { ChartDateRangeText } from '@gamelog/common/typography/ChartTypography';
@@ -86,8 +86,9 @@ const CommunityTopGamesHistogramChart = ({
 
   const renderError = () => (
     <Box className="py-6 items-center justify-center w-full">
-      <WarningBox
-        message={errorMessage || 'Unable to load top community games.'}
+      <ErrorBox
+        errorMessage={errorMessage || 'Unable to load top community games.'}
+        variant="icon-top"
         className="w-full"
       />
     </Box>
@@ -283,7 +284,7 @@ const CommunityTopGamesHistogramChart = ({
               </Box>
             ) : !hasData ? (
               <Box className="py-8 items-center justify-center w-full">
-                <Text className="text-typography-400">
+                <Text className="text-typography-400 font-medium text-center">
                   No top community games found for this period
                 </Text>
               </Box>
