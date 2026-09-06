@@ -5,7 +5,7 @@ import { Card } from '@gamelog/common/gluestack/card';
 import { Text } from '@gamelog/common/gluestack/text';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { LoadingBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 import { UserSearchResult } from '@gamelog/api-manager/dto';
 import { CardTitleText } from '@gamelog/common/typography/CardTypography';
@@ -44,10 +44,7 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
   if (error) {
     return (
       <Box className="px-4">
-        <ErrorBox
-          errorMessage={errorMessage || 'Failed to load friends list.'}
-          className="py-8"
-        />
+        <ErrorBox errorMessage={errorMessage || 'Failed to load friends list.'} className="py-8" />
       </Box>
     );
   }
@@ -83,10 +80,7 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
 
         {filteredFriends.length === 0 ? (
           <Box className="py-2">
-            <InfoBox
-              message={`No friends found matching "${searchQuery}".`}
-              className="py-4"
-            />
+            <InfoBox message={`No friends found matching "${searchQuery}".`} className="py-4" />
           </Box>
         ) : (
           <VStack space="sm">
@@ -125,6 +119,7 @@ export const FriendRecommendationsSearcher: React.FC<FriendRecommendationsSearch
                       size="xs"
                       variant="solid"
                       action="primary"
+                      isOnCard
                       onPress={() => onSelectFriend(item)}
                       testID={`compare-friend-btn-${item.user.id}`}
                     >

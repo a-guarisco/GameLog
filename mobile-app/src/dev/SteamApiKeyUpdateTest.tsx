@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box } from '@gamelog/common/gluestack/box';
-import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText, ButtonSpinner } from '@gamelog/common/button';
 import { GLTextInput } from '@gamelog/common/GLTextInput';
 import { ErrorBox, SuccessBox } from '@gamelog/common/feedbacks';
 import apiManager from '@gamelog/api-manager/apiManager';
@@ -53,7 +53,7 @@ export const SteamApiKeyUpdateTest = () => {
         onChangeText={setApiKey}
         autoCapitalize="none"
       />
-      <Button onPress={handleUpdate} isDisabled={loading}>
+      <Button isOnCard variant="solid" action="primary" onPress={handleUpdate} isDisabled={loading}>
         {loading && <ButtonSpinner color="currentColor" />}
         <ButtonText>Update Steam API Key</ButtonText>
       </Button>

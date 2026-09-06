@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
 import EndPoints from '@gamelog/api-manager/apiEndsPoints';
 
@@ -54,9 +54,17 @@ export const BackendHealthCheck = ({ className }: BackendHealthCheckProps) => {
 
   return (
     <>
-      <Button onPress={checkBackendHealth} isDisabled={isHealthLoading} className={className}>
+      <Button
+        isOnCard
+        variant="solid"
+        action="primary"
+        onPress={checkBackendHealth}
+        isDisabled={isHealthLoading}
+        className={className}
+      >
         <ButtonText>Check Backend Health</ButtonText>
       </Button>
+
       {isHealthLoading ? <LoadingBox message="Checking backend health..." /> : null}
       {healthStatus ? (
         <SuccessBox

@@ -5,7 +5,15 @@ import { useColorScheme } from 'nativewind';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Card } from '@gamelog/common/gluestack/card';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { HStack } from '@gamelog/common/gluestack/hstack';
+import {
+  Button,
+  ButtonText,
+  ReportCtaButton,
+  ModalConfirmButton,
+  ModalCancelButton,
+  SocialActionButton,
+} from '@gamelog/common/button';
 import { ErrorBox, InfoBox, LoadingBox, SuccessBox, WarningBox } from '@gamelog/common/feedbacks';
 
 export const DevAestheticsView = () => {
@@ -93,6 +101,83 @@ export const DevAestheticsView = () => {
             <InfoBox variant="icon-top" message="Sample info message" />
             <WarningBox variant="icon-top" message="Sample warning message" />
           </Box>
+        </Card>
+
+        {/* Button Component Sandbox */}
+        <Card
+          variant="elevated"
+          className="w-full max-w-[640px] self-center p-3.5 gap-3 rounded-md"
+        >
+          <Text className="text-sm font-semibold text-typography-0">
+            Button Component Sandbox (Variants & Wrappers)
+          </Text>
+
+          {/* Solid Variants */}
+          <Text className="text-xs font-semibold text-typography-400 mt-1">Solid (Default)</Text>
+          <HStack space="xs" className="flex-wrap gap-2">
+            <Button size="xs" variant="solid" action="primary" isOnCard>
+              <ButtonText>Primary</ButtonText>
+            </Button>
+            <Button size="xs" variant="solid" action="secondary" isOnCard>
+              <ButtonText>Secondary</ButtonText>
+            </Button>
+            <Button size="xs" variant="solid" action="positive" isOnCard>
+              <ButtonText>Positive</ButtonText>
+            </Button>
+            <Button size="xs" variant="solid" action="negative" isOnCard>
+              <ButtonText>Negative</ButtonText>
+            </Button>
+          </HStack>
+
+          {/* Outline Variants */}
+          <Text className="text-xs font-semibold text-typography-400 mt-1">Outlined / Outline</Text>
+          <HStack space="xs" className="flex-wrap gap-2">
+            <Button size="xs" variant="outline" action="primary" isOnCard>
+              <ButtonText>Primary</ButtonText>
+            </Button>
+            <Button size="xs" variant="outline" action="secondary" isOnCard>
+              <ButtonText>Secondary</ButtonText>
+            </Button>
+            <Button size="xs" variant="outline" action="positive" isOnCard>
+              <ButtonText>Positive</ButtonText>
+            </Button>
+            <Button size="xs" variant="outline" action="negative" isOnCard>
+              <ButtonText>Negative</ButtonText>
+            </Button>
+          </HStack>
+
+          {/* Ghost Variants */}
+          <Text className="text-xs font-semibold text-typography-400 mt-1">Ghost</Text>
+          <HStack space="xs" className="flex-wrap gap-2">
+            <Button size="xs" variant="ghost" action="primary" isOnCard>
+              <ButtonText>Primary</ButtonText>
+            </Button>
+            <Button size="xs" variant="ghost" action="secondary" isOnCard>
+              <ButtonText>Secondary</ButtonText>
+            </Button>
+            <Button size="xs" variant="ghost" action="positive" isOnCard>
+              <ButtonText>Positive</ButtonText>
+            </Button>
+            <Button size="xs" variant="ghost" action="negative" isOnCard>
+              <ButtonText>Negative</ButtonText>
+            </Button>
+          </HStack>
+
+          {/* Specialized Wrappers */}
+          <Text className="text-xs font-semibold text-typography-400 mt-1">
+            Specialized Wrappers
+          </Text>
+          <ReportCtaButton onPress={() => {}} label="Generate Report" />
+          <HStack space="xs" className="justify-center items-center gap-2">
+            <ModalCancelButton onPress={() => {}} />
+            <ModalConfirmButton onPress={() => {}} variant="destructive" />
+            <ModalConfirmButton onPress={() => {}} variant="primary" label="Save" />
+          </HStack>
+          <HStack space="xs" className="justify-center items-center gap-2">
+            <SocialActionButton actionType="add" onPress={() => {}} />
+            <SocialActionButton actionType="accept" onPress={() => {}} />
+            <SocialActionButton actionType="refuse" onPress={() => {}} />
+          </HStack>
         </Card>
       </Box>
     </ScrollView>

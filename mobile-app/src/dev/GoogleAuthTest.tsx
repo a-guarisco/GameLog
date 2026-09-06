@@ -5,7 +5,7 @@ import { signInWithGoogle, signOutGoogle } from '@gamelog/auth/googleAuth';
 import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { SuccessBox, ErrorBox, InfoBox } from '@gamelog/common/feedbacks';
 
 export const GoogleAuthTest = ({ className }: { className?: string }) => {
@@ -67,7 +67,14 @@ export const GoogleAuthTest = ({ className }: { className?: string }) => {
         </Box>
       ) : null}
 
-      <Button onPress={handleGoogleSignIn} isDisabled={loading} className="w-full">
+      <Button
+        isOnCard
+        variant="solid"
+        action="primary"
+        onPress={handleGoogleSignIn}
+        isDisabled={loading}
+        className="w-full"
+      >
         <ButtonText>
           {loading ? 'Signing in with Google...' : 'Sign In with Google (OAuth2)'}
         </ButtonText>
@@ -75,9 +82,11 @@ export const GoogleAuthTest = ({ className }: { className?: string }) => {
 
       {lastUser ? (
         <Button
+          isOnCard
+          variant="outline"
+          action="negative"
           onPress={handleGoogleSignOut}
           isDisabled={loading}
-          variant="outline"
           className="w-full"
         >
           <ButtonText>Sign Out Google Account</ButtonText>

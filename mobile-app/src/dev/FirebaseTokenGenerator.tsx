@@ -1,7 +1,7 @@
 import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Box } from '@gamelog/common/gluestack/box';
 import { ErrorBox, LoadingBox, SuccessBox } from '@gamelog/common/feedbacks';
@@ -47,7 +47,13 @@ export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProp
 
   return (
     <Box className={`w-full max-w-[320px] gap-2 self-center ${className ?? ''}`}>
-      <Button isOnCard onPress={generateToken} isDisabled={isLoading}>
+      <Button
+        isOnCard
+        variant="solid"
+        action="primary"
+        onPress={generateToken}
+        isDisabled={isLoading}
+      >
         <ButtonText>Generate Firebase Token</ButtonText>
       </Button>
 
@@ -56,9 +62,15 @@ export const FirebaseTokenGenerator = ({ className }: FirebaseTokenGeneratorProp
       {idToken ? (
         <>
           <SuccessBox message="Firebase token generated successfully!" />
-          <Button isOnCard onPress={() => setShowToken(!showToken)}>
+          <Button
+            isOnCard
+            variant="outline"
+            action="secondary"
+            onPress={() => setShowToken(!showToken)}
+          >
             <ButtonText>{showToken ? 'Hide Token' : 'Show Token'}</ButtonText>
           </Button>
+
           {showToken ? (
             <Text className="break-all text-xs font-mono text-typography-100">{idToken}</Text>
           ) : null}

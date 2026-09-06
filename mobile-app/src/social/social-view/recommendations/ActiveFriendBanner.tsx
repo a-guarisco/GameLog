@@ -4,7 +4,7 @@ import { Card } from '@gamelog/common/gluestack/card';
 import { Text } from '@gamelog/common/gluestack/text';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { VStack } from '@gamelog/common/gluestack/vstack';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText } from '@gamelog/common/button';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
@@ -41,11 +41,7 @@ export const ActiveFriendBanner: React.FC<ActiveFriendBannerProps> = ({
               <Text size="xs" className="font-medium text-typography-400">
                 Active Friend
               </Text>
-              <Text
-                size="sm"
-                className="font-bold uppercase text-primary-700"
-                numberOfLines={1}
-              >
+              <Text size="sm" className="font-bold uppercase text-primary-700" numberOfLines={1}>
                 {friendName}
               </Text>
             </VStack>
@@ -55,6 +51,7 @@ export const ActiveFriendBanner: React.FC<ActiveFriendBannerProps> = ({
             size="xs"
             variant="outline"
             action="primary"
+            isOnCard
             onPress={onChangeFriend}
             testID="search-another-friend-btn"
           >

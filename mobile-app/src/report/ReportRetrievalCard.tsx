@@ -1,9 +1,9 @@
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { VStack } from '@gamelog/common/gluestack/vstack';
 import { HStack } from '@gamelog/common/gluestack/hstack';
 import { Text } from '@gamelog/common/gluestack/text';
-import { Button, ButtonText } from '@gamelog/common/gluestack/button';
+import { Button, ButtonText, ReportCtaButton } from '@gamelog/common/button';
 import SectionCard from '@gamelog/common/SectionCard';
 import { DateSelectorText, ContextText } from '@gamelog/common/typography/CardTypography';
 import { LoadingBox, ErrorBox } from '@gamelog/common/feedbacks';
@@ -75,7 +75,7 @@ const ReportRetrievalCard = ({
     if (!startDate && endDate) {
       return 'Duration: 14 days.';
     }
-    
+
     // Both start and end defined
     if (startDate && endDate) {
       const diffDays = Math.max(
@@ -84,7 +84,7 @@ const ReportRetrievalCard = ({
       );
       return `Duration: ${diffDays} days.`;
     }
-    
+
     return 'Custom range selected.';
   };
 
@@ -97,10 +97,16 @@ const ReportRetrievalCard = ({
       className={className}
       style={style}
       headerRight={
-        (!!startDate || !!endDate || hasReport) ? (
-          <Pressable onPress={handleClearDates} hitSlop={12} testID="report-reset-btn">
-            <Text className="text-sm font-bold text-primary-500">Reset</Text>
-          </Pressable>
+        !!startDate || !!endDate || hasReport ? (
+          <Button
+            variant="ghost"
+            action="primary"
+            size="xs"
+            onPress={handleClearDates}
+            testID="report-reset-btn"
+          >
+            <ButtonText className="text-sm font-bold text-primary-500">Reset</ButtonText>
+          </Button>
         ) : null
       }
     >
@@ -110,7 +116,11 @@ const ReportRetrievalCard = ({
             <Text size="xs" className="font-medium text-typography-400">
               From
             </Text>
-            <Pressable onPress={() => setShowStart(true)} hitSlop={12} testID="report-start-date-btn">
+            <Pressable
+              onPress={() => setShowStart(true)}
+              hitSlop={12}
+              testID="report-start-date-btn"
+            >
               <DateSelectorText>{formatDate(effectiveStart)}</DateSelectorText>
             </Pressable>
           </VStack>
@@ -125,19 +135,14 @@ const ReportRetrievalCard = ({
           </VStack>
         </HStack>
 
-        <Button
-          onPress={() => handleFetchReport()}
-          isDisabled={loading}
-          isOnCard
-          className="bg-background-0 self-center mt-2"
+        <ReportCtaButton
+          onPress={handleFetchReport}
+          isLoading={loading}
+          className="mt-2"
           testID="generate-report-btn"
-        >
-          <ButtonText>Generate Report</ButtonText>
-        </Button>
+        />
 
-        <ContextText className="text-center mt-2">
-          {getDynamicInfoText()}
-        </ContextText>
+        <ContextText className="text-center mt-2">{getDynamicInfoText()}</ContextText>
 
         {showStart && (
           <DateTimePicker
