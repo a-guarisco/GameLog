@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { UserCard } from '@gamelog/social/user-card/UserCard';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';

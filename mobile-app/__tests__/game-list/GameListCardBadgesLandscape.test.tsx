@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import { GameListCardBadges } from '@gamelog/game-list/GameListCardBadges';
 import { GameListItemData } from '@gamelog/game-list/useGameList';

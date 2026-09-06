@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import OtherUserIdentity from '@gamelog/social/other-user-profile/OtherUserIdentity';
 

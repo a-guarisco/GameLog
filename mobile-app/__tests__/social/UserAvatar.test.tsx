@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import { UserAvatar } from '@gamelog/social/user-card/UserAvatar';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';

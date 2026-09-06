@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import GameStatusSelectorChip from '@gamelog/game/GameStatusSelectorChip';
 import { useGetGameStatus, useUpdateGameStatus } from '@gamelog/api-manager/useApi';

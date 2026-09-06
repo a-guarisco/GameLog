@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { PlatformFilter } from '@gamelog/game-list/filters/PlatformFilter';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';

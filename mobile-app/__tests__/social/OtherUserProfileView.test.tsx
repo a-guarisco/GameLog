@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import OtherUserProfileView from '@gamelog/social/other-user-profile/OtherUserProfileView';
 import ApiManager from '@gamelog/api-manager/apiManager';
