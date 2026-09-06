@@ -207,8 +207,17 @@ test: test-backend test-mobile
 test-backend:
 	@make -C backend test-local
 
-test-mobile:
-	@npm --prefix mobile-app test -- --watchAll=false
+test-backend-integration:
+	@echo "🧪 Running Backend Integration Tests..."
+	@uv run --project backend/gamelog pytest backend/gamelog/tests/integration
+
+test-contracts:
+	@echo "📦 Exporting latest OpenAPI spec..."
+	@uv run --project backend/gamelog python backend/scripts/export_openapi.py
+	@echo "🧪 Running Mobile App Contract Tests..."
+	@npm --prefix mobile-app run test:contracts
+
+test-all: test-backend test-contracts test-mobile
 
 lint: lint-backend lint-mobile
 
