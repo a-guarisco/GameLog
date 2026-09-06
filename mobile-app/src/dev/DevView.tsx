@@ -8,6 +8,7 @@ import { Box } from '@gamelog/common/gluestack/box';
 import { Text } from '@gamelog/common/gluestack/text';
 import { Card } from '@gamelog/common/gluestack/card';
 import { HStack } from '@gamelog/common/gluestack/hstack';
+import { DevScreenWrapper } from './DevScreenWrapper';
 
 interface DevMenuSection {
   id: string;
@@ -42,35 +43,39 @@ export const DevView = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <Box className="flex-1 justify-start gap-3 px-4 py-4">
-        {/* Header */}
-        <Box className="mb-1">
-          <Text className="text-2xl font-bold text-typography-0">Developer Dashboard</Text>
-        </Box>
+    <DevScreenWrapper testID="dev-view-screen">
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Box className="flex-1 justify-start gap-3 px-4 py-4">
+          {/* Header */}
+          <Box className="mb-1">
+            <Text className="text-2xl font-bold text-typography-0">Developer Dashboard</Text>
+          </Box>
 
-        {/* Generous Padding Cards with Tiny Gap Between Cards */}
-        <Box className="gap-1 w-full max-w-[640px] self-center">
-          {SECTIONS.map((section) => (
-            <Pressable
-              key={section.id}
-              testID={`dev-menu-item-${section.id}`}
-              onPress={() => navigation.navigate(section.route)}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.8 : 1.0,
-                transform: [{ scale: pressed ? 0.98 : 1.0 }],
-              })}
-            >
-              <Card variant="elevated" className="w-full py-5 px-5  rounded-md">
-                <HStack className="items-center justify-between">
-                  <Text className="text-base font-semibold text-typography-0">{section.title}</Text>
-                  <Ionicons name="chevron-forward-outline" size={20} color="#94A3B8" />
-                </HStack>
-              </Card>
-            </Pressable>
-          ))}
+          {/* Generous Padding Cards with Tiny Gap Between Cards */}
+          <Box className="gap-1 w-full max-w-[640px] self-center">
+            {SECTIONS.map((section) => (
+              <Pressable
+                key={section.id}
+                testID={`dev-menu-item-${section.id}`}
+                onPress={() => navigation.navigate(section.route)}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.8 : 1.0,
+                  transform: [{ scale: pressed ? 0.98 : 1.0 }],
+                })}
+              >
+                <Card variant="elevated" className="w-full py-5 px-5  rounded-md">
+                  <HStack className="items-center justify-between">
+                    <Text className="text-base font-semibold text-typography-0">
+                      {section.title}
+                    </Text>
+                    <Ionicons name="chevron-forward-outline" size={20} color="#94A3B8" />
+                  </HStack>
+                </Card>
+              </Pressable>
+            ))}
+          </Box>
         </Box>
-      </Box>
-    </ScrollView>
+      </ScrollView>
+    </DevScreenWrapper>
   );
 };

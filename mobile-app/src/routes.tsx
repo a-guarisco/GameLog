@@ -16,7 +16,9 @@ import {
   DevAuthView,
   PaletteView,
   FontsView,
+  DevHeader,
 } from '@gamelog/dev';
+
 import { OptionsView } from '@gamelog/options';
 import { isDevMenuEnabled } from '@gamelog/common/devMenuConfig';
 
@@ -64,11 +66,15 @@ export const SocialStack = createNativeStackNavigator({
 });
 
 export const DevStack = createNativeStackNavigator({
+  screenOptions: {
+    header: (props) => <DevHeader {...props} />,
+  },
   screens: {
     TestingMain: {
       screen: DevView,
       options: { headerShown: false },
     },
+
     DevEnv: {
       screen: DevEnvView,
       options: { title: 'Environment Variables', headerShown: true },
@@ -116,11 +122,7 @@ export const RootTabs = createBottomTabNavigator({
         headerShown: false,
         title: 'Games',
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons
-            name="game-controller"
-            size={size}
-            color={color}
-          />
+          <Ionicons name="game-controller" size={size} color={color} />
         ),
       },
     },
