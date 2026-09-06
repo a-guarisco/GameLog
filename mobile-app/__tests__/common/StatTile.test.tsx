@@ -29,9 +29,7 @@ describe('StatTile', () => {
   });
 
   it('updates font size on layout change', () => {
-    const { getByText, getByTestId, UNSAFE_getAllByType } = renderWithProvider(
-      <StatTile value="85%" label="COMPLETION" />
-    );
+    const { getByText } = renderWithProvider(<StatTile value="85%" label="COMPLETION" />);
 
     const valElement = getByText('85%');
     // Simulate layout event with width 200

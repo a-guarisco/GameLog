@@ -8,10 +8,9 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('StatusFilter', () => {
   it('renders Status chip with current selection', () => {
-    const { getByText } = render(
-      <StatusFilter statusFilter="All" setStatusFilter={jest.fn()} />,
-      { wrapper }
-    );
+    const { getByText } = render(<StatusFilter statusFilter="All" setStatusFilter={jest.fn()} />, {
+      wrapper,
+    });
     expect(getByText('Status', { exact: false })).toBeTruthy();
     expect(getByText('All')).toBeTruthy();
   });

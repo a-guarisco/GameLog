@@ -18,7 +18,9 @@ export const parseFriendshipDate = (sinceStr?: string | null): Date | null => {
   return isNaN(d.getTime()) ? null : d;
 };
 
-export const formatRelationshipSince = (friendship?: FriendshipInfo | null): { label: string; value: string } => {
+export const formatRelationshipSince = (
+  friendship?: FriendshipInfo | null
+): { label: string; value: string } => {
   const status = friendship?.friendship_status;
   const sinceStr = friendship?.since;
 
@@ -56,10 +58,7 @@ export interface OtherUserStatsProps {
   friendship?: FriendshipInfo | null;
 }
 
-export const OtherUserStats: React.FC<OtherUserStatsProps> = ({
-  ownedGames,
-  friendship,
-}) => {
+export const OtherUserStats: React.FC<OtherUserStatsProps> = ({ ownedGames, friendship }) => {
   const games = ownedGames?.response?.games ?? [];
   const ownedCount = ownedGames?.response?.game_count ?? games.length;
   const totalHours = Math.floor(

@@ -22,8 +22,8 @@ const ProfileGenresTab = ({ ownedGames }: ProfileGenresTabProps) => {
   const initialClosedHeight = isLandscape
     ? Math.round(height * 0.55) + 110
     : isTablet
-    ? Math.min(Math.round(height * 0.45), 520)
-    : undefined;
+      ? Math.min(Math.round(height * 0.45), 520)
+      : undefined;
   const [closedHeight, setClosedHeight] = useState<number | undefined>(initialClosedHeight);
 
   useEffect(() => {
@@ -48,11 +48,7 @@ const ProfileGenresTab = ({ ownedGames }: ProfileGenresTabProps) => {
   };
 
   return (
-    <HStack
-      space="md"
-      className="w-full items-start"
-      style={{ alignItems: 'flex-start' }}
-    >
+    <HStack space="md" className="w-full items-start" style={{ alignItems: 'flex-start' }}>
       <Box
         className="flex-1 items-start"
         style={
@@ -61,10 +57,7 @@ const ProfileGenresTab = ({ ownedGames }: ProfileGenresTabProps) => {
             : { alignSelf: 'flex-start' }
         }
       >
-        <GameGenreRadarChart
-          ownedGames={ownedGames}
-          targetHeight={effectiveHeight}
-        />
+        <GameGenreRadarChart ownedGames={ownedGames} targetHeight={effectiveHeight} />
       </Box>
       <Box
         className="flex-1"
@@ -96,5 +89,3 @@ const ProfileGenresTab = ({ ownedGames }: ProfileGenresTabProps) => {
 };
 
 export default ProfileGenresTab;
-
-

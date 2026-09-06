@@ -1,9 +1,5 @@
-﻿import React from 'react';
-import {
-  RefreshControl,
-  RefreshControlProps,
-  useColorScheme,
-} from 'react-native';
+import React from 'react';
+import { RefreshControl, RefreshControlProps, useColorScheme } from 'react-native';
 import { brand } from '@gamelog/theme/theme';
 import { toHex } from '@gamelog/theme/themeHelpers';
 

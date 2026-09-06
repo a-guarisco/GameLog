@@ -1,7 +1,13 @@
 import { contractValidator } from '../../contracts/contractValidator';
-import type { CommunityGameStatusResponse, CommunityGenreHour } from '../../src/api-manager/dto/community';
+import type {
+  CommunityGameStatusResponse,
+  CommunityGenreHour,
+} from '../../src/api-manager/dto/community';
 import type { DailyReport } from '../../src/api-manager/dto/report';
-import type { RecommendationResponse, UserSearchResult } from '../../src/api-manager/dto/userSocial';
+import type {
+  RecommendationResponse,
+  UserSearchResult,
+} from '../../src/api-manager/dto/userSocial';
 
 describe('Cross-Boundary / OpenAPI Contract Validation Tests', () => {
   describe('Community Endpoint Contracts', () => {

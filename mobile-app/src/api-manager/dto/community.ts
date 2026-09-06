@@ -1,3 +1,5 @@
+import type { GameStatus } from './gameStatus';
+
 export type CommunityScope = 'global' | 'region' | 'friends' | 'user';
 
 export interface CommunityGenreHour {
@@ -17,8 +19,6 @@ export interface CommunityTopGame {
   community_playtime: number;
 }
 export type TopGameReference = 'community' | 'user';
-
-import type { GameStatus } from './gameStatus';
 
 export interface CommunityGameStatusItem {
   status: GameStatus;

@@ -24,7 +24,13 @@ jest.mock('@gamelog/common/charts/community-game-status/useCommunityGameStatus',
 
 jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
   const { View } = jest.requireActual('react-native');
-  const MockChartWrapperCard = ({ children, headerRight, isLoading, error, ErrorBehaviour }: any) => (
+  const MockChartWrapperCard = ({
+    children,
+    headerRight,
+    isLoading,
+    error,
+    ErrorBehaviour,
+  }: any) => (
     <View testID="chart-wrapper">
       {headerRight}
       {error && ErrorBehaviour ? (

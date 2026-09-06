@@ -19,7 +19,9 @@ describe('ProfileIdentity', () => {
   it('shows the streak in the accent chip', () => {
     render(<ProfileIdentity {...PROPS} />);
 
-    expect(screen.getByTestId('profile-streak-chip').props.className).toContain('bg-semantic-dayStreak-100');
+    expect(screen.getByTestId('profile-streak-chip').props.className).toContain(
+      'bg-semantic-dayStreak-100'
+    );
     expect(screen.getByText('12 Days Streak')).toBeTruthy();
   });
 

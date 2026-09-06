@@ -20,12 +20,7 @@ interface GameStatusChipsProps {
  * Live player count and streak, sitting under the banner title. On the page background
  * rather than over the artwork, so the tokens resolve in both light and dark mode.
  */
-const GameStatusChips = ({
-  livePlayers,
-  appId,
-  status,
-  onStatusChange,
-}: GameStatusChipsProps) => (
+const GameStatusChips = ({ livePlayers, appId, status, onStatusChange }: GameStatusChipsProps) => (
   <HStack space="xs" className="flex-wrap items-center justify-center">
     {/* Solid fill rather than a tint: white on primary-500 holds its contrast in either theme. */}
     <Chip className="bg-primary-500">
@@ -34,7 +29,6 @@ const GameStatusChips = ({
         {formatThousands(livePlayers)} playing now
       </Text>
     </Chip>
-
 
     {appId && (
       <GameStatusSelectorChip

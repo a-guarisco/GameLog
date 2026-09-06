@@ -43,7 +43,9 @@ class ContractValidator {
     const isValid = Boolean(validator(data));
     const errors = validator.errors || null;
     const errorSummary = errors
-      ? errors.map((e) => `${e.instancePath || '/'} ${e.message} (${JSON.stringify(e.params)})`).join('; ')
+      ? errors
+          .map((e) => `${e.instancePath || '/'} ${e.message} (${JSON.stringify(e.params)})`)
+          .join('; ')
       : '';
 
     return {
@@ -71,17 +73,23 @@ class ContractValidator {
 
     const operation = pathItem[method.toLowerCase()];
     if (!operation) {
-      throw new Error(`Method '${method.toUpperCase()}' not found for path '${path}' in OpenAPI spec.`);
+      throw new Error(
+        `Method '${method.toUpperCase()}' not found for path '${path}' in OpenAPI spec.`
+      );
     }
 
     const response = operation.responses?.[String(statusCode)];
     if (!response) {
-      throw new Error(`Response status '${statusCode}' not defined for ${method.toUpperCase()} ${path}.`);
+      throw new Error(
+        `Response status '${statusCode}' not defined for ${method.toUpperCase()} ${path}.`
+      );
     }
 
     const jsonContent = response.content?.['application/json'];
     if (!jsonContent || !jsonContent.schema) {
-      throw new Error(`No JSON schema defined for ${method.toUpperCase()} ${path} status ${statusCode}.`);
+      throw new Error(
+        `No JSON schema defined for ${method.toUpperCase()} ${path} status ${statusCode}.`
+      );
     }
 
     const schema = jsonContent.schema;
@@ -89,7 +97,9 @@ class ContractValidator {
     const isValid = Boolean(validate(body));
     const errors = validate.errors || null;
     const errorSummary = errors
-      ? errors.map((e) => `${e.instancePath || '/'} ${e.message} (${JSON.stringify(e.params)})`).join('; ')
+      ? errors
+          .map((e) => `${e.instancePath || '/'} ${e.message} (${JSON.stringify(e.params)})`)
+          .join('; ')
       : '';
 
     return {

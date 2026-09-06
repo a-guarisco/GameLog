@@ -62,21 +62,21 @@ const CompactGameList = ({
           },
           ...(game.days_played_count !== undefined
             ? [
-              {
-                label: 'Days played:',
-                value: String(game.days_played_count),
-                valueClassName: 'text-typography-100',
-              },
-            ]
+                {
+                  label: 'Days played:',
+                  value: String(game.days_played_count),
+                  valueClassName: 'text-typography-100',
+                },
+              ]
             : []),
           ...(game.max_playtime_per_day !== undefined
             ? [
-              {
-                label: 'Max/day:',
-                value: formatMinutesToHoursShort(game.max_playtime_per_day),
-                valueClassName: 'text-typography-100',
-              },
-            ]
+                {
+                  label: 'Max/day:',
+                  value: formatMinutesToHoursShort(game.max_playtime_per_day),
+                  valueClassName: 'text-typography-100',
+                },
+              ]
             : []),
         ];
 

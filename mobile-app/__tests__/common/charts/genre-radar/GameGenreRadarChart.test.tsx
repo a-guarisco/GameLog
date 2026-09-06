@@ -114,9 +114,7 @@ describe('GameGenreRadarChart', () => {
 
     render(<GameGenreRadarChart ownedGames={null} targetHeight={380} />);
     const wrapper = screen.getByTestId('chart-wrapper');
-    expect(wrapper.props.style).toEqual(
-      expect.objectContaining({ minHeight: 380 })
-    );
+    expect(wrapper.props.style).toEqual(expect.objectContaining({ minHeight: 380 }));
   });
 
   it('caps chartSize at MAX_RADAR_SIZE (400) when cardWidth is large', () => {
@@ -125,11 +123,8 @@ describe('GameGenreRadarChart', () => {
       labels: ['Action\n600m', 'RPG\n300m'],
     });
 
-    const { UNSAFE_getByType } = render(
-      <GameGenreRadarChart ownedGames={null} />
-    );
+    const { UNSAFE_getByType } = render(<GameGenreRadarChart ownedGames={null} />);
     const radarChart = UNSAFE_getByType('RadarChart' as any);
     expect(radarChart.props.chartSize).toBeLessThanOrEqual(400);
   });
 });
-

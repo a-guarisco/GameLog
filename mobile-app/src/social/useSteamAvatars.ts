@@ -1,9 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import {
-  getAvatarFromCache,
-  fetchSteamAvatars,
-  subscribeToAvatarCache,
-} from './steamAvatarCache';
+import { getAvatarFromCache, fetchSteamAvatars, subscribeToAvatarCache } from './steamAvatarCache';
 
 export const useSteamAvatars = (steamIds: (string | undefined | null)[]) => {
   const rawKey = useMemo(() => {
@@ -103,9 +99,7 @@ export const useSteamAvatars = (steamIds: (string | undefined | null)[]) => {
 };
 
 export const useSteamAvatar = (steamId?: string | null, autoFetch = false) => {
-  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(() =>
-    getAvatarFromCache(steamId)
-  );
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(() => getAvatarFromCache(steamId));
   const isMountedRef = useRef(true);
 
   useEffect(() => {

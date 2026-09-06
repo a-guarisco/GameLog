@@ -31,7 +31,9 @@ const Image = React.forwardRef<
   return (
     <UIImage
       className={imageStyle({ size, class: className })}
-      style={Platform.OS === 'web' ? [{ height: 'revert-layer', width: 'revert-layer' }, style] : style}
+      style={
+        Platform.OS === 'web' ? [{ height: 'revert-layer', width: 'revert-layer' }, style] : style
+      }
       {...props}
       ref={ref}
     />

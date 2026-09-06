@@ -87,10 +87,15 @@ describe('useAsyncFetch', () => {
     let resolveFirst: (v: string) => void;
     let resolveSecond: (v: string) => void;
 
-    const firstCall = new Promise<string>((r) => { resolveFirst = r; });
-    const secondCall = new Promise<string>((r) => { resolveSecond = r; });
+    const firstCall = new Promise<string>((r) => {
+      resolveFirst = r;
+    });
+    const secondCall = new Promise<string>((r) => {
+      resolveSecond = r;
+    });
 
-    const mockFn = jest.fn()
+    const mockFn = jest
+      .fn()
       .mockReturnValueOnce(Promise.resolve('initial'))
       .mockReturnValueOnce(firstCall)
       .mockReturnValueOnce(secondCall);

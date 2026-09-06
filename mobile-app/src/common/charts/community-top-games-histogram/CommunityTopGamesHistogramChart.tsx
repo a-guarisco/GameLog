@@ -298,10 +298,7 @@ const CommunityTopGamesHistogramChart = ({
                       testID={`top-game-item-${item.id}`}
                     >
                       {/* Left: Capsule Image with height matching title + 2 bars */}
-                      <GameCapsuleImage
-                        appId={item.id}
-                        testID={`game-capsule-${item.id}`}
-                      />
+                      <GameCapsuleImage appId={item.id} testID={`game-capsule-${item.id}`} />
 
                       {/* Right: Title and Dual Bars */}
                       <VStack className="flex-1" space="xs">
@@ -335,10 +332,7 @@ const CommunityTopGamesHistogramChart = ({
                     testID={`top-game-item-${item.id}`}
                   >
                     {/* Left: Capsule Image with height matching title + 2 bars */}
-                    <GameCapsuleImage
-                      appId={item.id}
-                      testID={`game-capsule-${item.id}`}
-                    />
+                    <GameCapsuleImage appId={item.id} testID={`game-capsule-${item.id}`} />
 
                     {/* Right: Title and Dual Bars */}
                     <VStack className="flex-1" space="xs">
@@ -368,21 +362,14 @@ const CommunityTopGamesHistogramChart = ({
                 {/* Footer Caption & Legend */}
                 <HStack space="lg" className="items-center justify-center pt-2 pb-1">
                   <HStack space="xs" className="items-center">
-                    <Box
-                      className="w-2.5 h-2.5 rounded-full bg-comparison-user-500"
-                    />
+                    <Box className="w-2.5 h-2.5 rounded-full bg-comparison-user-500" />
                     <Text size="xs" className="font-bold text-primary-500">
                       You
                     </Text>
                   </HStack>
                   <HStack space="xs" className="items-center">
-                    <Box
-                      className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500"
-                    />
-                    <Text
-                      size="xs"
-                      className="font-bold text-comparison-compare-500"
-                    >
+                    <Box className="w-2.5 h-2.5 rounded-full bg-comparison-compare-500" />
+                    <Text size="xs" className="font-bold text-comparison-compare-500">
                       {othersLabel}
                     </Text>
                   </HStack>

@@ -108,5 +108,3 @@ describe('FriendRecommendationsContent', () => {
     expect(getByText('Counter-Strike 2')).toBeTruthy();
   });
 });
-
-

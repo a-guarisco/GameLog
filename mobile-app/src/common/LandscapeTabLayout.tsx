@@ -5,8 +5,8 @@ import {
   StyleSheet,
   SafeAreaView,
   Platform,
+  useColorScheme,
 } from 'react-native';
-import { useColorScheme } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { useOrientation } from '@gamelog/common/useOrientation';
 import { rawConfig } from '@gamelog/common/gluestack/gluestack-ui-provider/config';
@@ -33,12 +33,7 @@ interface LandscapeTabLayoutProps {
  * In landscape the component renders its own shell; in portrait it renders
  * nothing extra so React Navigation's bottom tab bar takes over normally.
  */
-const LandscapeTabLayout = ({
-  tabs,
-  activeKey,
-  onTabPress,
-  children,
-}: LandscapeTabLayoutProps) => {
+const LandscapeTabLayout = ({ tabs, activeKey, onTabPress, children }: LandscapeTabLayoutProps) => {
   const { isLandscape } = useOrientation();
   const isDark = useColorScheme() === 'dark';
   const theme = isDark ? rawConfig.dark : rawConfig.light;
@@ -65,7 +60,9 @@ const LandscapeTabLayout = ({
   return (
     <View style={[styles.landscapeRoot, { backgroundColor: bg }]}>
       {/* Left navigation rail */}
-      <SafeAreaView style={[styles.rail, { backgroundColor: railBg, borderRightColor: borderColor }]}>
+      <SafeAreaView
+        style={[styles.rail, { backgroundColor: railBg, borderRightColor: borderColor }]}
+      >
         {tabs.map((tab) => {
           const focused = tab.key === activeKey;
           return (

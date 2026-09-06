@@ -7,7 +7,6 @@ import { ModalTitle } from '@gamelog/common/CommonTypography';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { HEX_COLORS } from '@gamelog/theme/hexColors';
 
-
 export interface FilterModalWrapperProps {
   isVisible: boolean;
   onClose: () => void;

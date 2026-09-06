@@ -37,4 +37,3 @@ describe('SeeAllLink', () => {
     expect(screen.getByText('See all')).toBeTruthy();
   });
 });
-

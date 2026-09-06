@@ -49,7 +49,7 @@ describe('useReportStats', () => {
       maxPlaytimePerDay: 0,
       totalGames: 3,
       totalPlaytime: 210,
-      topGameName: 'Zelda'
+      topGameName: 'Zelda',
     });
   });
 

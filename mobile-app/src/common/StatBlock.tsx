@@ -41,10 +41,7 @@ const StatBlock = ({
   }
 
   return (
-    <VStack
-      className="flex-1 justify-between px-3 py-3 items-center"
-      space="xs"
-    >
+    <VStack className="flex-1 justify-between px-3 py-3 items-center" space="xs">
       <StatLabelText className="text-center">{label}</StatLabelText>
       <StatValueText className={`text-center ${valueClassName}`}>{value}</StatValueText>
     </VStack>

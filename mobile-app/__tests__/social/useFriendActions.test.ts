@@ -106,7 +106,7 @@ describe('useFriendActions', () => {
     await act(async () => {
       await actionPromiseError;
     });
-    
+
     expect(result.current.actionFeedback).toBe('Accept error');
   });
 
@@ -138,7 +138,7 @@ describe('useFriendActions', () => {
     await act(async () => {
       await actionPromiseError;
     });
-    
+
     expect(result.current.actionFeedback).toBe('Refuse error');
   });
 

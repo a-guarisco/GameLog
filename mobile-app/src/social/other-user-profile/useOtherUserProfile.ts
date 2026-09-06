@@ -135,23 +135,26 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
     }
   }, []);
 
-  const handleBlockFriend = useCallback(async (friendshipIdOrUserId: string) => {
-    setIsActionLoading(true);
-    try {
-      const res = await ApiManager.manageFriendship('BLOCK', friendshipIdOrUserId, user.id);
-      setFriendship((prev) => ({
-        ...prev,
-        friendship_status: 'blocked',
-        friendship_id: res.friendship_id ?? prev?.friendship_id,
-        since: new Date().toISOString(),
-      }));
-      DeviceEventEmitter.emit('friendListChanged');
-    } catch {
-      // Keep state
-    } finally {
-      setIsActionLoading(false);
-    }
-  }, [user.id]);
+  const handleBlockFriend = useCallback(
+    async (friendshipIdOrUserId: string) => {
+      setIsActionLoading(true);
+      try {
+        const res = await ApiManager.manageFriendship('BLOCK', friendshipIdOrUserId, user.id);
+        setFriendship((prev) => ({
+          ...prev,
+          friendship_status: 'blocked',
+          friendship_id: res.friendship_id ?? prev?.friendship_id,
+          since: new Date().toISOString(),
+        }));
+        DeviceEventEmitter.emit('friendListChanged');
+      } catch {
+        // Keep state
+      } finally {
+        setIsActionLoading(false);
+      }
+    },
+    [user.id]
+  );
 
   const handleRemoveFriend = useCallback(async (friendshipId: string) => {
     setIsActionLoading(true);
@@ -193,11 +196,7 @@ export const useOtherUserProfile = ({ user, initialFriendship }: UseOtherUserPro
   }, []);
 
   const refetchAll = useCallback(async () => {
-    await Promise.all([
-      refetchPlayerInfo(),
-      refetchTargetGames(),
-      refetchCurrentUserGames(),
-    ]);
+    await Promise.all([refetchPlayerInfo(), refetchTargetGames(), refetchCurrentUserGames()]);
   }, [refetchPlayerInfo, refetchTargetGames, refetchCurrentUserGames]);
 
   return {

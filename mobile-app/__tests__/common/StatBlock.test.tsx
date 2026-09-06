@@ -8,7 +8,7 @@ describe('StatBlock', () => {
 
   it('renders value and label correctly', () => {
     const { getByText } = renderWithProvider(<StatBlock value="10h" label="PLAYTIME" />);
-    
+
     expect(getByText('10h')).toBeTruthy();
     expect(getByText('PLAYTIME')).toBeTruthy();
   });

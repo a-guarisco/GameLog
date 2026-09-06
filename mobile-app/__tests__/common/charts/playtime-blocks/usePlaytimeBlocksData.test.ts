@@ -12,7 +12,10 @@ describe('usePlaytimeBlocksData', () => {
   };
 
   const theme = { '--color-primary-200': '1,1,1', '--color-background-100': '0,0,0' };
-  const mockPlaytime = [{ date: "2023-10-15", playtime_minutes: 120 }, { date: "2023-10-14", playtime_minutes: 60 }];
+  const mockPlaytime = [
+    { date: '2023-10-15', playtime_minutes: 120 },
+    { date: '2023-10-14', playtime_minutes: 60 },
+  ];
 
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(MOCK_TODAY);

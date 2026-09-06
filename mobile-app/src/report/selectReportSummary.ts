@@ -39,12 +39,12 @@ export const selectReportSummary = (
 
   const totalGames = report.game_reports.length;
   const finalEndDate = appliedEndDate || new Date();
-  
+
   // compute days difference. 'to' date is exclusive, so diffDays is simply (end - start)
   const diffTime = Math.abs(finalEndDate.getTime() - appliedStartDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-  const formatDate = (d: Date) => 
+  const formatDate = (d: Date) =>
     d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
   const rangeText = `${formatDate(appliedStartDate)} — ${formatDate(finalEndDate)} · ${diffDays} day${diffDays === 1 ? '' : 's'}`;
@@ -57,12 +57,12 @@ export const selectReportSummary = (
     { value: topGameName, label: 'Top Game' },
   ];
 
-  return { 
-    stats, 
+  return {
+    stats,
     rangeText,
     totalPlaytime,
     totalGames,
     topGameName,
-    maxPlaytimePerDay
+    maxPlaytimePerDay,
   };
 };

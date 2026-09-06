@@ -182,9 +182,7 @@ const GameView = () => {
         contentContainerStyle={{ flex: 1, flexDirection: 'row' }}
         nestedScrollEnabled={true}
         testID="game-view-landscape-scroll"
-        refreshControl={
-          <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
       >
         {/* Left Column (~40% width - Master Overview) */}
         <Box

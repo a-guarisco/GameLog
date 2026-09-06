@@ -103,7 +103,6 @@ jest.mock('firebase/auth', () => ({
   sendEmailVerification: jest.fn(),
 }));
 
-
 jest.mock('@react-native-google-signin/google-signin', () => ({
   GoogleSignin: {
     configure: jest.fn(),

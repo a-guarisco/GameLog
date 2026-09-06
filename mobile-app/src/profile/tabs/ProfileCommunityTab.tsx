@@ -35,4 +35,3 @@ const ProfileCommunityTab = ({ ownedGames }: ProfileCommunityTabProps) => {
 };
 
 export default ProfileCommunityTab;
-

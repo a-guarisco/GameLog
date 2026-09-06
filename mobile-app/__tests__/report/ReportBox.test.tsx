@@ -485,9 +485,7 @@ describe('ReportBox', () => {
 
     // The minHeight is on the wrapper Box (parent of the retrieval card)
     const retrievalWrapper = getByTestId('retrieval-wrapper');
-    expect(retrievalWrapper.props.style).toEqual(
-      expect.objectContaining({ minHeight: 260 })
-    );
+    expect(retrievalWrapper.props.style).toEqual(expect.objectContaining({ minHeight: 260 }));
 
     // Expand breakdown
     fireEvent.press(getByText('Show game breakdown'));
@@ -498,9 +496,7 @@ describe('ReportBox', () => {
     });
 
     // Height remains locked to 260
-    expect(retrievalWrapper.props.style).toEqual(
-      expect.objectContaining({ minHeight: 260 })
-    );
+    expect(retrievalWrapper.props.style).toEqual(expect.objectContaining({ minHeight: 260 }));
 
     // Press Reset button
     const clearButton = getByText('Reset');

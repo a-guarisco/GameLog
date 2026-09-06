@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import { GLSegmentedControl } from '../../src/common/GLSegmentedControl';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 describe('GLSegmentedControl', () => {
   const options = [

@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import { Animated } from 'react-native';
-import { PlaytimeBlocksHeader, ShimmerBox } from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksHeader';
+import { PlaytimeBlocksHeader } from '@gamelog/common/charts/playtime-blocks/PlaytimeBlocksHeader';
 import { GluestackUIProvider } from '@gamelog/common/gluestack/gluestack-ui-provider';
 
 describe('PlaytimeBlocksHeader', () => {
@@ -40,11 +40,7 @@ describe('PlaytimeBlocksHeader', () => {
   it('handles week offset navigation correctly', () => {
     const setWeekOffset = jest.fn();
     const { getByTestId } = renderWithProvider(
-      <PlaytimeBlocksHeader
-        {...defaultProps}
-        weekOffset={-1}
-        setWeekOffset={setWeekOffset}
-      />
+      <PlaytimeBlocksHeader {...defaultProps} weekOffset={-1} setWeekOffset={setWeekOffset} />
     );
 
     const prevBtn = getByTestId('playtime-blocks-prev-week-btn');
@@ -88,5 +84,3 @@ describe('PlaytimeBlocksHeader', () => {
     expect(queryByTestId('playtime-blocks-next-week-btn')).toBeNull();
   });
 });
-
-

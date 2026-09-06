@@ -51,7 +51,9 @@ describe('steamApiKey', () => {
     });
 
     it('clears API key from memory and secure storage when clearSteamApiKey is called', async () => {
-      const deleteSecureSpy = jest.spyOn(secureStorage, 'deleteSecureSteamApiKey').mockResolvedValue();
+      const deleteSecureSpy = jest
+        .spyOn(secureStorage, 'deleteSecureSteamApiKey')
+        .mockResolvedValue();
       setSteamApiKey('key_to_delete', false);
       await clearSteamApiKey();
       expect(getSteamApiKey()).toBe('');
@@ -62,12 +64,16 @@ describe('steamApiKey', () => {
     it('warns and returns empty string if API key is not set', () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
       expect(getSteamApiKey()).toBe('');
-      expect(warnSpy).toHaveBeenCalledWith('STEAM API key is not set. Please update your profile or sign in.');
+      expect(warnSpy).toHaveBeenCalledWith(
+        'STEAM API key is not set. Please update your profile or sign in.'
+      );
       warnSpy.mockRestore();
     });
 
     it('initializes API key from secure storage if present', async () => {
-      jest.spyOn(secureStorage, 'getSecureSteamApiKey').mockResolvedValueOnce('persisted_secret_key');
+      jest
+        .spyOn(secureStorage, 'getSecureSteamApiKey')
+        .mockResolvedValueOnce('persisted_secret_key');
       const loaded = await initSteamApiKeyFromStorage();
       expect(loaded).toBe('persisted_secret_key');
       expect(getSteamApiKey()).toBe('persisted_secret_key');
@@ -81,7 +87,9 @@ describe('steamApiKey', () => {
 
     it('handles error in initSteamApiKeyFromStorage gracefully', async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
-      jest.spyOn(secureStorage, 'getSecureSteamApiKey').mockRejectedValueOnce(new Error('Storage failure'));
+      jest
+        .spyOn(secureStorage, 'getSecureSteamApiKey')
+        .mockRejectedValueOnce(new Error('Storage failure'));
       const loaded = await initSteamApiKeyFromStorage();
       expect(loaded).toBeNull();
       expect(warnSpy).toHaveBeenCalled();

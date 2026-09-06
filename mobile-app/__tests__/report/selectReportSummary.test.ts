@@ -41,12 +41,7 @@ describe('selectReportSummary', () => {
     const startDate = new Date('2026-08-01');
     const endDate = new Date('2026-08-05');
 
-    const result = selectReportSummary(
-      report,
-      startDate,
-      endDate,
-      { '730': 'Counter-Strike 2' }
-    );
+    const result = selectReportSummary(report, startDate, endDate, { '730': 'Counter-Strike 2' });
 
     expect(result).not.toBeNull();
     expect(result?.totalPlaytime).toBe(360);

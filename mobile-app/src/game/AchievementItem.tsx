@@ -98,4 +98,3 @@ const AchievementItem = ({
 };
 
 export default AchievementItem;
-

@@ -98,4 +98,3 @@ describe('SearchUsersTabContent', () => {
     expect(onQueryChange).toHaveBeenCalledWith('Alex2');
   });
 });
-

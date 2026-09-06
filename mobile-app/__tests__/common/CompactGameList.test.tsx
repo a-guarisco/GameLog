@@ -54,17 +54,12 @@ describe('CompactGameList', () => {
     ];
 
     const { getByText, getByTestId } = renderWithProvider(
-      <CompactGameList
-        items={mockItems}
-        gameNames={{}}
-        handleGamePress={handleGamePress}
-      />
+      <CompactGameList items={mockItems} gameNames={{}} handleGamePress={handleGamePress} />
     );
 
     expect(getByText('App ID: 730')).toBeTruthy();
     expect(getByText(/Custom Label:/)).toBeTruthy();
     expect(getByText('Custom Value')).toBeTruthy();
-
 
     fireEvent.press(getByTestId('custom-item-730'));
     expect(handleGamePress).toHaveBeenCalledWith('730', 90);

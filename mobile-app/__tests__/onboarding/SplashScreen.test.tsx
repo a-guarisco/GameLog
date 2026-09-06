@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react-native';
 import SplashScreen from '../../src/onboarding/SplashScreen';
 

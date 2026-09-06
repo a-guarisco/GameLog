@@ -34,9 +34,7 @@ describe('GLRefreshControl', () => {
   it('renders with dark surface progressBackgroundColor in dark mode', () => {
     (useColorScheme as jest.Mock).mockReturnValue('dark');
 
-    const { UNSAFE_getByType } = render(
-      <GLRefreshControl refreshing={true} />
-    );
+    const { UNSAFE_getByType } = render(<GLRefreshControl refreshing={true} />);
 
     const refreshControl = UNSAFE_getByType(RefreshControl);
     expect(refreshControl.props.tintColor).toBe(primaryColor);

@@ -1,6 +1,6 @@
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { GLTextInput } from '../../src/common/GLTextInput';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 
 describe('GLTextInput', () => {
   const MockIcon = (props: any) => (

@@ -291,10 +291,12 @@ const CommunityGameStatusChart = ({
                     </Text>
                   </HStack>
                   <HStack space="xs" className="items-center max-w-[50%]">
-                    <Box
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-comparison-compare-500"
-                    />
-                    <Text size={isTablet ? 'sm' : 'xs'} className="font-bold text-comparison-compare-500" numberOfLines={2}>
+                    <Box className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-comparison-compare-500" />
+                    <Text
+                      size={isTablet ? 'sm' : 'xs'}
+                      className="font-bold text-comparison-compare-500"
+                      numberOfLines={2}
+                    >
                       {othersLabel}
                     </Text>
                   </HStack>

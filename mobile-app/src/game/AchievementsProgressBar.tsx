@@ -34,4 +34,3 @@ const AchievementsProgressBar = ({
 };
 
 export default AchievementsProgressBar;
-

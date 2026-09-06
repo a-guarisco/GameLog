@@ -18,7 +18,6 @@ import {
 } from '@gamelog/api-manager/useApi';
 import { renderHook, act } from '@testing-library/react-native';
 
-
 jest.mock('@gamelog/api-manager/apiManager');
 jest.mock('@gamelog/common/useAsyncFetch');
 
@@ -417,8 +416,6 @@ describe('useGetFriendRecommendations', () => {
   });
 });
 
-
-
 describe('useGetUserGameStatuses', () => {
   useTestApiHook({
     useHook: useGetUserGameStatuses,
@@ -445,7 +442,6 @@ describe('useGetUserGameStatuses', () => {
     expect(mapped).toEqual({ '730': 'playing', '570': 'played' });
   });
 });
-
 
 describe('useGetGameStatus', () => {
   useTestApiHook({
@@ -512,4 +508,3 @@ describe('useUpdateGameStatus', () => {
     expect(result.current.updateGameStatusError).toBe('Failed to update game status');
   });
 });
-

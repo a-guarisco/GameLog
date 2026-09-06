@@ -1,10 +1,10 @@
 import { forwardRef, ComponentRef, ComponentProps } from 'react';
-'use client';
 import { ActivityIndicator } from 'react-native';
 
 import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import { cssInterop } from 'nativewind';
 import { brand } from '@gamelog/theme/theme';
+('use client');
 
 cssInterop(ActivityIndicator, {
   className: { target: 'style', nativeStyleToProp: { color: true } },

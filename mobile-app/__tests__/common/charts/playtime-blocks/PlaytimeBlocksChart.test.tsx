@@ -12,7 +12,10 @@ jest.mock('@gamelog/common/charts/ChartWrapperCard', () => {
       return (
         <View testID={testID}>
           {headerRight}
-          {children({ cardWidth: 350, theme: { '--color-typography-200': '0,0,0', '--color-primary-500': '255,0,0' } })}
+          {children({
+            cardWidth: 350,
+            theme: { '--color-typography-200': '0,0,0', '--color-primary-500': '255,0,0' },
+          })}
         </View>
       );
     },
@@ -23,10 +26,7 @@ jest.mock('react-native-gifted-charts', () => {
   const { View } = jest.requireActual('react-native');
   return {
     BarChart: ({ onScroll }: any) => (
-      <View
-        testID="mock-bar-chart"
-        onScroll={(e: any) => onScroll && onScroll(e)}
-      />
+      <View testID="mock-bar-chart" onScroll={(e: any) => onScroll && onScroll(e)} />
     ),
   };
 });
@@ -42,13 +42,10 @@ jest.mock('@gamelog/common/charts/playtime-blocks/useChartScrollShimmer', () => 
 describe('PlaytimeBlocksChart', () => {
   const MOCK_TODAY = new Date('2023-10-15T12:00:00Z');
 
-  const getOffsetDateString = (offsetDays: number) => {
-    const d = new Date(MOCK_TODAY);
-    d.setDate(d.getDate() + offsetDays);
-    return toIsoDate(d);
-  };
-
-  const mockPlaytimeByUser = [{ date: "2023-10-15", playtime_minutes: 120 }, { date: "2023-10-14", playtime_minutes: 60 }];
+  const mockPlaytimeByUser = [
+    { date: '2023-10-15', playtime_minutes: 120 },
+    { date: '2023-10-14', playtime_minutes: 60 },
+  ];
 
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(MOCK_TODAY);

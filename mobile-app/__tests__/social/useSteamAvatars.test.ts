@@ -1,10 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { useSteamAvatars, useSteamAvatar } from '@gamelog/social/useSteamAvatars';
 import ApiManager from '@gamelog/api-manager/apiManager';
-import {
-  clearSteamAvatarCache,
-  cachePlayerAvatars,
-} from '@gamelog/social/steamAvatarCache';
+import { clearSteamAvatarCache, cachePlayerAvatars } from '@gamelog/social/steamAvatarCache';
 
 jest.mock('@gamelog/api-manager/apiManager');
 

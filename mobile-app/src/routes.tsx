@@ -152,11 +152,7 @@ export const RootTabs = createBottomTabNavigator({
         title: devMenuEnabled ? 'Dev' : 'Options',
         headerShown: false,
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons
-            name={devMenuEnabled ? 'construct' : 'settings'}
-            size={size}
-            color={color}
-          />
+          <Ionicons name={devMenuEnabled ? 'construct' : 'settings'} size={size} color={color} />
         ),
       },
     },

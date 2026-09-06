@@ -25,7 +25,6 @@ export const GameListCardExpandedDetails = ({
 }: GameListCardExpandedDetailsProps) => {
   return (
     <VStack space="xs" className="p-3 border-t border-outline-100 bg-background-50">
-      
       {/* LAST PLAYED */}
       <HStack space="sm" className="items-center">
         <Ionicons name="calendar-clear" size={16} color={HEX_COLORS.lastPlayed.hex} />
@@ -34,11 +33,11 @@ export const GameListCardExpandedDetails = ({
         </Text>
       </HStack>
       <Text size="sm" className="text-typography-100 ml-6">
-        {gameItem.rtime_last_played > 0 
-          ? `${exactDateString} (${lastPlayedText === 'Today' ? 'Today' : `${lastPlayedText} ago`})` 
+        {gameItem.rtime_last_played > 0
+          ? `${exactDateString} (${lastPlayedText === 'Today' ? 'Today' : `${lastPlayedText} ago`})`
           : 'Never'}
       </Text>
-      
+
       <Box className="mt-2" />
 
       {/* STREAK */}
@@ -62,7 +61,9 @@ export const GameListCardExpandedDetails = ({
         </Text>
       </HStack>
       <Text size="sm" className="text-typography-100 ml-6">
-        {gameItem.maxPlaytimePerDay > 0 ? formatMinutesToHoursShort(gameItem.maxPlaytimePerDay) : 'None'}
+        {gameItem.maxPlaytimePerDay > 0
+          ? formatMinutesToHoursShort(gameItem.maxPlaytimePerDay)
+          : 'None'}
       </Text>
 
       <Box className="mt-2" />
@@ -82,7 +83,15 @@ export const GameListCardExpandedDetails = ({
 
       {/* STATUS */}
       <HStack space="sm" className="items-center">
-        <Ionicons name="bookmark" size={16} color={gameItem.gameStatus ? HEX_COLORS.gameStatus[gameItem.gameStatus].hex : HEX_COLORS.muted.icon.hex} />
+        <Ionicons
+          name="bookmark"
+          size={16}
+          color={
+            gameItem.gameStatus
+              ? HEX_COLORS.gameStatus[gameItem.gameStatus].hex
+              : HEX_COLORS.muted.icon.hex
+          }
+        />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Status
         </Text>
@@ -95,7 +104,6 @@ export const GameListCardExpandedDetails = ({
 
       {/* PLATFORMS */}
       <HStack space="sm" className="items-center mb-1">
-
         <Ionicons name="hardware-chip" size={16} color={HEX_COLORS.topPlatform.hex} />
         <Text size="xs" className="font-bold text-typography-300 uppercase">
           Platform Split

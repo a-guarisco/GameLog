@@ -39,10 +39,7 @@ const ChartWrapperCard = ({
   const theme = useChartTheme();
 
   const isStretched = Boolean(
-    style &&
-      ('height' in (style as any) ||
-        'minHeight' in (style as any) ||
-        (style as any).flex)
+    style && ('height' in (style as any) || 'minHeight' in (style as any) || (style as any).flex)
   );
 
   const hasFlex = Boolean(style && (style as any).flex);

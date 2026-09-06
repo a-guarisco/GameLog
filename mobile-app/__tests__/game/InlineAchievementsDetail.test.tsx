@@ -102,9 +102,7 @@ describe('InlineAchievementsDetail', () => {
       />
     );
 
-    expect(
-      screen.getByText('Failed to load achievements, please try again later.')
-    ).toBeTruthy();
+    expect(screen.getByText('Failed to load achievements, please try again later.')).toBeTruthy();
   });
 
   it('renders info box when no achievements are found', () => {

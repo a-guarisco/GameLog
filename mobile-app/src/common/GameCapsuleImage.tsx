@@ -117,7 +117,10 @@ export const GameCapsuleImage: React.FC<GameCapsuleImageProps> = ({
       {/* Fallback Game Controller Icon on missing image or error */}
       {showFallbackIcon && (
         <View
-          style={[StyleSheet.absoluteFillObject, { alignItems: 'center', justifyContent: 'center' }]}
+          style={[
+            StyleSheet.absoluteFillObject,
+            { alignItems: 'center', justifyContent: 'center' },
+          ]}
           testID={resolvedTestID ? `${resolvedTestID}-fallback-icon` : 'game-capsule-fallback-icon'}
         >
           <Ionicons name="game-controller" size={iconSize} color={iconColor} />

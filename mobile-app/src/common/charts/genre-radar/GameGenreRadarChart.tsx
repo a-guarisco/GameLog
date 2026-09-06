@@ -44,7 +44,11 @@ const GameGenreRadarChart = ({ ownedGames, targetHeight, style }: GameGenreRadar
         }
 
         const targetSize = isLandscape
-          ? Math.min(Math.round(height * 0.60), cardWidth ? cardWidth - radarPadding : 260, MAX_RADAR_SIZE)
+          ? Math.min(
+              Math.round(height * 0.6),
+              cardWidth ? cardWidth - radarPadding : 260,
+              MAX_RADAR_SIZE
+            )
           : Math.min(cardWidth ? cardWidth - radarPadding : 320, MAX_RADAR_SIZE);
 
         return (

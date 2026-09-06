@@ -17,7 +17,6 @@ describe('apiEndsPoints', () => {
     } else {
       process.env.EXPO_PUBLIC_BACKEND_BASE_URL = originalBackendBaseUrl;
     }
-
   });
 
   describe('Steam endpoints', () => {
@@ -87,27 +86,19 @@ describe('apiEndsPoints', () => {
         'https://store.steampowered.com/api/appdetails?appids=440&filters=basic'
       );
       expect(EndPoints.getStreakByUser()).toBe('/games/streak_by_user');
-      expect(EndPoints.getStreakByGame('440')).toBe(
-        '/games/streak_by_game?steam_app_id=440'
-      );
+      expect(EndPoints.getStreakByGame('440')).toBe('/games/streak_by_game?steam_app_id=440');
       expect(EndPoints.getGenresBatch()).toBe('/games/genres_batch');
       expect(EndPoints.getAuthOutcome()).toBe('/me');
       expect(EndPoints.getBackendHealth()).toBe('/health');
       expect(EndPoints.registerUser()).toBe('/users/register');
       expect(EndPoints.getUserMe()).toBe('/users/me');
-      expect(EndPoints.registerDeviceToken()).toBe(
-        '/notifications/register_device'
-      );
-      expect(EndPoints.unregisterDeviceToken()).toBe(
-        '/notifications/unregister_device'
-      );
+      expect(EndPoints.registerDeviceToken()).toBe('/notifications/register_device');
+      expect(EndPoints.unregisterDeviceToken()).toBe('/notifications/unregister_device');
     });
 
     it('builds daily report endpoint with optional parameters', () => {
       expect(EndPoints.getDailyReport()).toBe('/games/report');
-      expect(EndPoints.getDailyReport('2026-08-01')).toBe(
-        '/games/report?start_date=2026-08-01'
-      );
+      expect(EndPoints.getDailyReport('2026-08-01')).toBe('/games/report?start_date=2026-08-01');
       expect(EndPoints.getDailyReport(undefined, '2026-08-10')).toBe(
         '/games/report?end_date=2026-08-10'
       );
@@ -117,9 +108,7 @@ describe('apiEndsPoints', () => {
     });
 
     it('builds community endpoints correctly', () => {
-      expect(EndPoints.getCommunityGenre('global')).toBe(
-        '/community/genre?scope=global'
-      );
+      expect(EndPoints.getCommunityGenre('global')).toBe('/community/genre?scope=global');
       expect(EndPoints.getCommunityWeeklyPlaytime('friends', '2026-08-01', '2026-08-07')).toBe(
         '/community/weekly_playtime?scope=friends&start_date=2026-08-01&end_date=2026-08-07'
       );
@@ -142,9 +131,7 @@ describe('apiEndsPoints', () => {
     });
 
     it('builds the game_status endpoint with and without steam_app_id', () => {
-      expect(EndPoints.getGameStatus('730')).toBe(
-        '/games/game_status?steam_app_id=730'
-      );
+      expect(EndPoints.getGameStatus('730')).toBe('/games/game_status?steam_app_id=730');
       expect(EndPoints.getGameStatus()).toBe('/games/game_status');
     });
 

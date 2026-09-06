@@ -43,5 +43,3 @@ describe('AchievementIcon', () => {
     expect(flattenedStyle.color).toBe(toHex(brand.primary['400']));
   });
 });
-
-

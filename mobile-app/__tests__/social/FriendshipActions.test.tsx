@@ -43,5 +43,4 @@ describe('FriendshipActions', () => {
     fireEvent.press(getByTestId('refuse-btn-u1'));
     expect(onRefuse).toHaveBeenCalledWith('f1');
   });
-
 });

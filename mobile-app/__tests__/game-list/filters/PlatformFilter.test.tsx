@@ -22,7 +22,7 @@ describe('PlatformFilter', () => {
       <PlatformFilter platformFilter="All" setPlatformFilter={setPlatformFilter} />,
       { wrapper }
     );
-    
+
     expect(queryByText('Filter by Platform')).toBeNull();
 
     fireEvent.press(getByText('Platform', { exact: false }));

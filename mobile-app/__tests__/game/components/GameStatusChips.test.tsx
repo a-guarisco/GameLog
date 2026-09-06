@@ -25,7 +25,6 @@ describe('GameStatusChips', () => {
     expect(screen.getByText('412,249 playing now')).toBeTruthy();
   });
 
-
   it('renders GameStatusSelectorChip when appId is provided', () => {
     render(<GameStatusChips {...defaultProps} appId="730" status="playing" />);
 

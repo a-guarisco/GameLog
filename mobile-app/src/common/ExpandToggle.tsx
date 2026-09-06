@@ -23,8 +23,8 @@ const ExpandToggle = ({
   className = 'self-start mt-2',
 }: ExpandToggleProps) => {
   const isDark = useColorScheme() === 'dark';
-  const chevronColor = isDark 
-    ? toHex(brand.typographyDark['300']) 
+  const chevronColor = isDark
+    ? toHex(brand.typographyDark['300'])
     : toHex(brand.typographyLight['300']);
 
   return (
