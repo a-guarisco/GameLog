@@ -47,7 +47,7 @@ const GameGenreRadarChart = ({ ownedGames, targetHeight, style }: GameGenreRadar
 
         return (
           <Box
-            className="items-center justify-center w-full flex-1"
+            className="items-center justify-center w-full"
             style={{ marginTop: isLandscape ? -5 : -25, marginBottom: 0 }}
           >
             <RadarChart

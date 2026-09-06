@@ -1,11 +1,13 @@
 import { fireEvent, render, screen, waitFor, act } from '@testing-library/react-native';
 import AchievementsListView from '@gamelog/game/AchievementsListView';
 import ApiManager from '@gamelog/api-manager/apiManager';
+import * as OrientationHook from '@gamelog/common/useOrientation';
 
 const mockGoBack = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ goBack: mockGoBack, navigate: jest.fn() }),
+  useNavigation: () => ({ goBack: mockGoBack, navigate: mockNavigate }),
 }));
 
 jest.mock('@gamelog/common', () => jest.requireActual('@gamelog/utils/testUtils').commonGLMocks);
@@ -38,6 +40,12 @@ describe('AchievementsListView', () => {
   });
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: false,
+      isTablet: false,
+      width: 390,
+      height: 844,
+    });
   });
 
   it('renders without crashing', async () => {
@@ -119,4 +127,48 @@ describe('AchievementsListView', () => {
 
     expect((ApiManager.getAllPlayerAchievementsPerApp as jest.Mock).mock.calls.length).toBeGreaterThan(initialCalls);
   });
+
+  it('navigates to Game with showAchievements: true and resolved gameItem when orientation is landscape', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      isTablet: false,
+      width: 844,
+      height: 390,
+    });
+
+    const { toJSON } = render(<AchievementsListView route={mockRoute} />);
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'Game',
+      expect.objectContaining({
+        gameItem: expect.objectContaining({ appid: 123 }),
+        showAchievements: true,
+      })
+    );
+    expect(toJSON()).toBeNull();
+  });
+
+  it('navigates to Game preserving gameItem when route params includes gameItem', () => {
+    jest.spyOn(OrientationHook, 'useOrientation').mockReturnValue({
+      isLandscape: true,
+      isTablet: false,
+      width: 844,
+      height: 390,
+    });
+
+    const routeWithGameItem = {
+      params: {
+        ...mockRoute.params,
+        gameItem: { appid: 123, name: 'Custom Game Name' },
+      },
+    };
+
+    render(<AchievementsListView route={routeWithGameItem} />);
+
+    expect(mockNavigate).toHaveBeenCalledWith('Game', {
+      gameItem: { appid: 123, name: 'Custom Game Name' },
+      showAchievements: true,
+    });
+  });
 });
+
