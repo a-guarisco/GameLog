@@ -1,8 +1,7 @@
 appId: com.gamelog.app
 ---
+- tapOn: "Options"
+- tapOn: "Log Out"
 - tapOn:
-    id: "DevTab"
-- tapOn:
-    id: "dev-menu-item-auth"
-- tapOn:
-    id: "signout-clear-storage-btn"
+    text: "Log Out"
+    index: -1

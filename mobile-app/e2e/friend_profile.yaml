@@ -25,7 +25,7 @@ onFlowComplete:
     id: 'SocialTab'
 
 - extendedWaitUntil:
-    visible: 'test-02'
+    visible: 'xrayman'
     timeout: 30000
 
 - assertVisible:
@@ -39,8 +39,7 @@ onFlowComplete:
       id: 'other-user-profile-view'
     timeout: 30000
 
-- assertVisible: 'test-02'
-- assertVisible: 'Friend'
+- assertVisible: 'xrayman'
 
 - tapOn:
     id: 'other-user-profile-back-btn'

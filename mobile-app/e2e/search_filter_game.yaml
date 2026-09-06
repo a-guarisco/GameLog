@@ -43,5 +43,5 @@ onFlowComplete:
 - eraseText: 30
 - extendedWaitUntil:
     visible:
-      id: 'game-list-card-press-730'
+      id: 'game-list-card-press-236850'
     timeout: 10000

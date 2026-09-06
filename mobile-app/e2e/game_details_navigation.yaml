@@ -22,7 +22,7 @@ onFlowComplete:
     timeout: 100000
 
 - tapOn:
-    id: 'game-list-card-press-730'
+    id: 'game-list-card-press-236850'
 
 - extendedWaitUntil:
     visible:
@@ -38,8 +38,12 @@ onFlowComplete:
     timeout: 5000
 - swipe:
     direction: UP
+- swipe:
+    direction: UP
 - assertVisible:
     id: 'see-all-news-button'
+- swipe:
+    direction: DOWN
 - swipe:
     direction: DOWN
 
