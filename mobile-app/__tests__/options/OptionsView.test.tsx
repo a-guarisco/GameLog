@@ -31,6 +31,20 @@ jest.mock('@gamelog/auth/firebaseClient', () => ({
   })),
 }));
 
+jest.mock('@gamelog/notifications', () => ({
+  getStoredRegistration: jest.fn(() => Promise.resolve({ token: null, userId: null })),
+  requestAndRegisterPushToken: jest.fn(() =>
+    Promise.resolve({ success: true, token: 'mock-token' })
+  ),
+  unregisterPushToken: jest.fn(() => Promise.resolve({ success: true })),
+  clearStoredRegistration: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock('expo-notifications', () => ({
+  getPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'undetermined' })),
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+}));
+
 describe('OptionsView Component', () => {
   const mockSetColorScheme = jest.fn();
 
@@ -48,15 +62,18 @@ describe('OptionsView Component', () => {
     });
   });
 
-  it('renders Header, Theme Mode card, and Account card', () => {
+  it('renders Header, Theme Mode card, and Account card', async () => {
     const { getByText, getByTestId } = render(<OptionsView />);
 
-    expect(getByText('Options')).toBeTruthy();
-    expect(getByText('Theme Mode')).toBeTruthy();
-    expect(getByText('Account')).toBeTruthy();
-    expect(getByText('Toggle Theme: Light')).toBeTruthy();
-    expect(getByTestId('options-theme-toggle-btn')).toBeTruthy();
-    expect(getByTestId('options-logout-btn')).toBeTruthy();
+    await waitFor(() => {
+      expect(getByText('Options')).toBeTruthy();
+      expect(getByText('Theme Mode')).toBeTruthy();
+      expect(getByText('Push Notifications')).toBeTruthy();
+      expect(getByText('Account')).toBeTruthy();
+      expect(getByText('Toggle Theme: Light')).toBeTruthy();
+      expect(getByTestId('options-theme-toggle-btn')).toBeTruthy();
+      expect(getByTestId('options-logout-btn')).toBeTruthy();
+    });
   });
 
   it('toggles theme when the theme button is pressed', () => {
@@ -164,5 +181,28 @@ describe('OptionsView Component', () => {
     const { getByText } = render(<OptionsView />);
     const title = getByText('Options');
     expect(title.props.className).toContain('text-center');
+  });
+
+  it('renders Push Notifications card and toggles notifications', async () => {
+    const { getByTestId, getByText } = render(<OptionsView />);
+
+    expect(getByTestId('options-notifications-card')).toBeTruthy();
+    expect(getByText('Push Notifications')).toBeTruthy();
+
+    const notifBtn = getByTestId('options-notifications-toggle-btn');
+    expect(getByText('Enable Notifications')).toBeTruthy();
+
+    fireEvent.press(notifBtn);
+
+    await waitFor(() => {
+      expect(getByText('Disable Notifications')).toBeTruthy();
+    });
+
+    // Press again to disable
+    fireEvent.press(notifBtn);
+
+    await waitFor(() => {
+      expect(getByText('Enable Notifications')).toBeTruthy();
+    });
   });
 });

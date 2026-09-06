@@ -79,9 +79,13 @@ export const resolveServiceUrl = async (
 
   if (!isDev) {
     if (!parsedEnvUrl) {
-      throw new Error(`[Service Discovery: ${serviceName}] Production build requires ${serviceName} base URL in environment variables.`);
+      throw new Error(
+        `[Service Discovery: ${serviceName}] Production build requires ${serviceName} base URL in environment variables.`
+      );
     }
-    console.log(`[Service Discovery: ${serviceName}] ☁️ PRODUCTION MODE: using exact ENV URL: ${parsedEnvUrl}`);
+    console.log(
+      `[Service Discovery: ${serviceName}] ☁️ PRODUCTION MODE: using exact ENV URL: ${parsedEnvUrl}`
+    );
     return parsedEnvUrl;
   }
 
@@ -89,21 +93,27 @@ export const resolveServiceUrl = async (
   if (parsedEnvUrl) {
     try {
       await checkHealth(parsedEnvUrl, healthPath, FAST_TIMEOUT_MS);
-      console.log(`[Service Discovery: ${serviceName}] 🛠️ DEV MODE: Bound to ENV backend: ${parsedEnvUrl}`);
+      console.log(
+        `[Service Discovery: ${serviceName}] 🛠️ DEV MODE: Bound to ENV backend: ${parsedEnvUrl}`
+      );
       return parsedEnvUrl;
     } catch {
-      console.warn(`[Service Discovery: ${serviceName}] ❌ ENV VALUE FAILED: ${parsedEnvUrl} is unreachable. Falling back to candidates...`);
+      console.warn(
+        `[Service Discovery: ${serviceName}] ❌ ENV VALUE FAILED: ${parsedEnvUrl} is unreachable. Falling back to candidates...`
+      );
     }
   }
 
   const os = Platform.OS;
   const rawCandidates = DEFAULT_FALLBACK_MAP[os] || DEFAULT_FALLBACK_MAP.web;
-  const candidates = rawCandidates.map(c => `${c}:${port}`);
+  const candidates = rawCandidates.map((c) => `${c}:${port}`);
 
   // 2. Fast pass for all candidates in parallel
   let resolved = await resolveWithTimeout(candidates, healthPath, FAST_TIMEOUT_MS, serviceName);
   if (resolved) {
-    console.log(`[Service Discovery: ${serviceName}] Bound to fallback backend (Fast Pass): ${resolved}`);
+    console.log(
+      `[Service Discovery: ${serviceName}] Bound to fallback backend (Fast Pass): ${resolved}`
+    );
     return resolved;
   }
 
@@ -111,7 +121,9 @@ export const resolveServiceUrl = async (
   console.log(`[Service Discovery: ${serviceName}] Fast pass failed. Attempting slow pass...`);
   resolved = await resolveWithTimeout(candidates, healthPath, SLOW_TIMEOUT_MS, serviceName);
   if (resolved) {
-    console.log(`[Service Discovery: ${serviceName}] Bound to fallback backend (Slow Pass): ${resolved}`);
+    console.log(
+      `[Service Discovery: ${serviceName}] Bound to fallback backend (Slow Pass): ${resolved}`
+    );
     return resolved;
   }
 

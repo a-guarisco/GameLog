@@ -86,13 +86,13 @@ export const setupAuthEmulator = async () => {
       '/',
       isDev
     );
-    
+
     if (globalAny.__isAuthEmulatorConnected) return;
-    
+
     // Initialize Auth IMMEDIATELY before connecting the emulator
     // to absolutely guarantee no network requests are fired beforehand.
     initializeFirebaseAuth();
-    
+
     connectAuthEmulator(auth, authEmulatorHost, { disableWarnings: true });
     globalAny.__isAuthEmulatorConnected = true;
     console.log(
@@ -109,4 +109,3 @@ if (!useEmulator) {
 }
 
 export { app };
-

@@ -101,6 +101,7 @@ export const FeedbackBox = ({
 
 // Legacy Wrappers
 interface LegacyFeedbackProps extends ViewProps {
+  title?: string;
   message?: string;
   errorMessage?: string | null;
   className?: string;
@@ -108,8 +109,8 @@ interface LegacyFeedbackProps extends ViewProps {
   variant?: FeedbackVariant;
 }
 
-export const ErrorBox = ({ errorMessage, message, ...props }: LegacyFeedbackProps) => (
-  <FeedbackBox type="error" message={errorMessage || message || null} {...props} />
+export const ErrorBox = ({ errorMessage, message, title, ...props }: LegacyFeedbackProps) => (
+  <FeedbackBox type="error" title={title} message={errorMessage || message || null} {...props} />
 );
 
 export const SuccessBox = ({ message, ...props }: LegacyFeedbackProps) => (

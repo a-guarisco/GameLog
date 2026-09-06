@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { DeviceEventEmitter } from 'react-native';
 import { signInWithGoogle } from '@gamelog/auth/googleAuth';
 import {
   signInWithEmailAndPassword,
@@ -18,6 +19,14 @@ export function useLogin() {
   const [authMode, setAuthMode] = useState<AuthMode>('signin');
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener('backendConnectionError', () => {
+      setErrorCode('auth/backend-unreachable');
+      setLoading(false);
+    });
+    return () => sub.remove();
+  }, []);
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setErrorCode(null);
@@ -26,6 +35,7 @@ export function useLogin() {
       // App state will automatically pick this up via onAuthStateChanged
     } catch (err: any) {
       setErrorCode(err.code || 'auth/google-sign-in-failed');
+    } finally {
       setLoading(false);
     }
   };

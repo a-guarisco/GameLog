@@ -2,8 +2,9 @@ import { renderHook, act } from '@testing-library/react-native';
 import { useProfileSetup } from '../../src/onboarding/useProfileSetup';
 import { DeviceEventEmitter } from 'react-native';
 import apiManager from '@gamelog/api-manager/apiManager';
-import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 import { setSteamId, setSteamApiKey } from '@gamelog/api-manager/steamApiKey';
+
+import { requestAndRegisterPushToken } from '../../src/notifications/pushNotificationService';
 
 jest.mock('@gamelog/api-manager/apiManager', () => ({
   registerUser: jest.fn(),
@@ -20,6 +21,10 @@ const mockAuth: any = {
 jest.mock('@gamelog/api-manager/steamApiKey', () => ({
   setSteamId: jest.fn(),
   setSteamApiKey: jest.fn(),
+}));
+
+jest.mock('../../src/notifications/pushNotificationService', () => ({
+  requestAndRegisterPushToken: jest.fn(() => Promise.resolve({ success: true, token: 'fcm-123' })),
 }));
 
 describe('useProfileSetup', () => {
@@ -77,7 +82,10 @@ describe('useProfileSetup', () => {
       result.current.setSteamApiKey('APIKEY123');
     });
 
-    (apiManager.registerUser as jest.Mock).mockResolvedValueOnce({ steam_api_key: 'APIKEY123' });
+    (apiManager.registerUser as jest.Mock).mockResolvedValueOnce({
+      id: 'registered-user-id',
+      steam_api_key: 'APIKEY123',
+    });
 
     await act(async () => {
       await result.current.handleRegister();
@@ -90,6 +98,7 @@ describe('useProfileSetup', () => {
     });
     expect(setSteamId).toHaveBeenCalledWith('123456');
     expect(setSteamApiKey).toHaveBeenCalledWith('APIKEY123');
+    expect(requestAndRegisterPushToken).toHaveBeenCalledWith('registered-user-id');
     expect(emitSpy).toHaveBeenCalledWith('registrationSuccess');
     expect(result.current.loading).toBe(true); // Should remain true or we might not care since unmount happens
   });

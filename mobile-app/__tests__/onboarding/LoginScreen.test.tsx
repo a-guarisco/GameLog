@@ -35,7 +35,9 @@ describe('LoginScreen', () => {
   });
 
   it('renders correctly in signin mode', () => {
-    const { getByText, queryByText, getByPlaceholderText, queryByPlaceholderText } = render(<LoginScreen />);
+    const { getByText, queryByText, getByPlaceholderText, queryByPlaceholderText } = render(
+      <LoginScreen />
+    );
 
     expect(getByText('GameLog')).toBeTruthy();
     expect(getByPlaceholderText('Email')).toBeTruthy();

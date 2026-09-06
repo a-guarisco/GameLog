@@ -5,7 +5,6 @@ import { buildGenreChartData } from '@gamelog/common/charts/genre-radar/buildGen
 import { toIsoDate } from '@gamelog/utils/formatUtils';
 import { Streak, GameStatus } from './dto';
 
-
 export const useGetPlayerAchievementsPerApp = (gameID: string, playerID: string) => {
   const fetchFunc = useCallback(
     () => ApiManager.getAllPlayerAchievementsPerApp(gameID, playerID),
@@ -267,7 +266,6 @@ export const useUpdateGameStatus = () => {
 };
 
 export const useGetFriendList = () => {
-
   const fetchFunc = useCallback(() => ApiManager.getFriendList(), []);
 
   const { data, isLoading, error, errorMessage, refetch } = useAsyncFetch(fetchFunc);
@@ -372,4 +370,3 @@ export const useGetUserMe = () => {
     refetchUserMe: refetch,
   };
 };
-

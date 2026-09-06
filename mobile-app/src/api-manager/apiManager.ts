@@ -19,7 +19,6 @@ import type {
   RecentPlayedGames,
   SteamNews,
   Streak,
-  UserRead,
   UserMeRead,
   UserRegisterRequest,
   UserSearchResult,
@@ -34,42 +33,94 @@ import type {
   CommunityGameStatusResponse,
 } from '@gamelog/api-manager/dto';
 
+import { resolveBackendUrl, clearCachedBackendUrl } from '@gamelog/api-manager/backendResolver';
 
+const DEFAULT_AUTH_TIMEOUT_MS = 8000;
 
-import { resolveBackendUrl } from '@gamelog/api-manager/backendResolver';
-
-async function fetchData<T>(url: string, init?: RequestInit): Promise<T> {
+async function fetchData<T>(url: string, init?: RequestInit, timeoutMs?: number): Promise<T> {
   let finalUrl = url;
   if (finalUrl.startsWith('/')) {
     const baseUrl = await resolveBackendUrl();
     finalUrl = baseUrl + finalUrl;
   }
 
-  const options = {
+  const options: RequestInit = {
     ...init,
     headers: {
       'Content-Type': 'application/json',
       ...init?.headers,
     },
   };
-  const response = await fetch(finalUrl, options);
 
-  if (!response.ok) {
-    let detail = `HTTP error: ${response.status}. url Called: ${finalUrl}`;
-    try {
-      const errorData = await response.json();
-      detail = errorData.detail || detail;
-    } catch (e) {
-      // Ignore JSON parse error
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise =
+    timeoutMs && timeoutMs > 0
+      ? new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            const timeoutError: any = new Error(
+              `Request timed out after ${timeoutMs}ms. url Called: ${finalUrl}`
+            );
+            timeoutError.name = 'AbortError';
+            timeoutError.code = 'ETIMEDOUT';
+            reject(timeoutError);
+          }, timeoutMs);
+        })
+      : null;
+
+  try {
+    const fetchPromise = (async () => {
+      const response = await fetch(finalUrl, options);
+
+      if (!response.ok) {
+        let detail = `HTTP error: ${response.status}. url Called: ${finalUrl}`;
+        try {
+          const errorData = await response.json();
+          detail = errorData.detail || detail;
+        } catch {
+          // Ignore JSON parse error
+        }
+        const error: any = new Error(detail);
+        error.response = { data: { detail }, status: response.status };
+        throw error;
+      }
+
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      try {
+        return await response.json();
+      } catch (jsonErr: any) {
+        if (
+          jsonErr?.message?.includes('Unexpected end of') ||
+          jsonErr?.message?.includes('JSON Parse error')
+        ) {
+          return undefined as T;
+        }
+        throw jsonErr;
+      }
+    })();
+
+    return timeoutPromise ? await Promise.race([fetchPromise, timeoutPromise]) : await fetchPromise;
+  } catch (error: any) {
+    if (error?.code === 'ETIMEDOUT' || error?.name === 'AbortError') {
+      if (typeof clearCachedBackendUrl === 'function') {
+        clearCachedBackendUrl();
+      }
     }
-    const error: any = new Error(detail);
-    error.response = { data: { detail }, status: response.status };
     throw error;
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
   }
-  return response.json();
 }
 
-async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promise<T> {
+async function fetchAuthenticatedData<T>(
+  url: string,
+  init?: RequestInit,
+  timeoutMs?: number
+): Promise<T> {
   const token = await getFirebaseAuth().currentUser?.getIdToken();
 
   if (!token) {
@@ -78,13 +129,17 @@ async function fetchAuthenticatedData<T>(url: string, init?: RequestInit): Promi
     );
   }
 
-  return fetchData<T>(url, {
-    ...init,
-    headers: {
-      ...init?.headers,
-      Authorization: `Bearer ${token}`,
+  return fetchData<T>(
+    url,
+    {
+      ...init,
+      headers: {
+        ...init?.headers,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+    timeoutMs
+  );
 }
 
 export { fetchData, fetchAuthenticatedData };
@@ -164,21 +219,23 @@ export default {
   getUserGameStatuses: () =>
     fetchAuthenticatedData<GameStatusesResponse[]>(EndPoints.getGameStatus()),
 
-
-
-
   searchUsers: (query: string) =>
     fetchAuthenticatedData<UserSearchResult[]>(EndPoints.searchUsers(query)),
   getFriendList: () => fetchAuthenticatedData<UserSearchResult[]>(EndPoints.getFriendList()),
-  getUserMe: () => fetchAuthenticatedData<UserMeRead>(EndPoints.getUserMe()),
-  registerUser: (data: UserRegisterRequest) =>
-    fetchAuthenticatedData<UserMeRead>(EndPoints.registerUser(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    }),
+  getUserMe: (timeoutMs: number = DEFAULT_AUTH_TIMEOUT_MS) =>
+    fetchAuthenticatedData<UserMeRead>(EndPoints.getUserMe(), undefined, timeoutMs),
+  registerUser: (data: UserRegisterRequest, timeoutMs: number = DEFAULT_AUTH_TIMEOUT_MS) =>
+    fetchAuthenticatedData<UserMeRead>(
+      EndPoints.registerUser(),
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      },
+      timeoutMs
+    ),
   updateSteamApiKey: (apiKey: string) =>
-    fetchAuthenticatedData<UserMeRead>(`${EndPoints.getUserMe()}/steam-api-key`, {
+    fetchAuthenticatedData<UserMeRead>(EndPoints.updateSteamApiKey(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ steam_api_key: apiKey }),
@@ -194,15 +251,18 @@ export default {
     friendshipId?: string,
     targetUserId?: string
   ) =>
-    fetchAuthenticatedData<{ message: string; friendship_id?: string }>(EndPoints.manageFriendship(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action,
-        friendship_id: friendshipId || undefined,
-        target_user_id: targetUserId || undefined,
-      }),
-    }),
+    fetchAuthenticatedData<{ message: string; friendship_id?: string }>(
+      EndPoints.manageFriendship(),
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          friendship_id: friendshipId || undefined,
+          target_user_id: targetUserId || undefined,
+        }),
+      }
+    ),
   getRecommendations: (friendId: string) =>
     fetchAuthenticatedData<RecommendationResponse>(EndPoints.getRecommendations(friendId)),
   registerDeviceToken: (token: string, deviceType: string = 'android') =>

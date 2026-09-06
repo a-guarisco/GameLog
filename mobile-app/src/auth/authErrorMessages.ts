@@ -12,14 +12,15 @@ export const getAuthErrorMessage = (errorCode: string | null | undefined): strin
     'auth/unverified-email': 'Please verify your email before signing in.',
     'auth/too-many-requests': 'Too many attempts. Please try again later.',
     'auth/network-request-failed': 'Network error. Please check your connection.',
+    'auth/backend-unreachable': 'Unable to connect to GameLog server. The backend may be offline.',
     'auth/operation-not-allowed': 'This sign-in method is not enabled.',
-    
+
     // External Providers (Google, Facebook, Github)
     'auth/google-sign-in-failed': 'Google sign-in failed or was cancelled.',
     'auth/facebook-sign-in-failed': 'Facebook sign-in failed or was cancelled.',
     'auth/github-sign-in-failed': 'GitHub sign-in failed or was cancelled.',
     'auth/provider-setup-pending': 'Sign-in provider setup is pending.',
-    
+
     // Custom Validation Errors (Frontend)
     'validation/missing-fields': 'Email and password are required.',
     'validation/password-mismatch': 'Passwords do not match.',

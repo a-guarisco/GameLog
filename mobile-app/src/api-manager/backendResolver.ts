@@ -19,3 +19,7 @@ export const resolveBackendUrl = async (): Promise<string> => {
 
   return cachedResolvedUrl;
 };
+
+export const clearCachedBackendUrl = (): void => {
+  cachedResolvedUrl = null;
+};

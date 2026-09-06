@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react-native';
+import { DeviceEventEmitter } from 'react-native';
 import { useLogin } from '../../src/onboarding/useLogin';
 import { signInWithGoogle } from '@gamelog/auth/googleAuth';
 import {
@@ -6,7 +7,6 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
-import { getFirebaseAuth } from '@gamelog/auth/firebaseClient';
 
 jest.mock('@gamelog/auth/googleAuth', () => ({
   signInWithGoogle: jest.fn(),
@@ -264,6 +264,17 @@ describe('useLogin', () => {
       });
 
       expect(result.current.errorCode).toBe('auth/network-request-failed');
+    });
+
+    it('sets auth/backend-unreachable and stops loading on backendConnectionError event', () => {
+      const { result } = renderHook(() => useLogin());
+
+      act(() => {
+        DeviceEventEmitter.emit('backendConnectionError', {});
+      });
+
+      expect(result.current.errorCode).toBe('auth/backend-unreachable');
+      expect(result.current.loading).toBe(false);
     });
   });
 });
