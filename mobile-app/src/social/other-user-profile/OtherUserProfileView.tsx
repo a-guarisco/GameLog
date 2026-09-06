@@ -1,6 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { ScrollView } from 'react-native';
-import GLRefreshControl from '@gamelog/common/GLRefreshControl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Box } from '@gamelog/common/gluestack/box';
@@ -41,10 +39,9 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
   const initialFriendship =
     propFriendship ?? propItem?.friendship ?? routeItem?.friendship ?? route.params?.friendship;
 
-  const { isLandscape, isTablet } = useOrientation();
+  const { vspaceHeight } = useProfileSpacing();
+  const { isLandscape } = useOrientation();
   const insets = useSafeAreaInsets();
-  const bannerHeight = isLandscape ? (isTablet ? 280 : 120) : undefined;
-  const { vspaceHeight } = useProfileSpacing({ bannerHeight });
   const horizontalPadding = isLandscape ? 'px-8' : 'px-4';
 
   const {
@@ -63,7 +60,13 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
     handleRemovePending,
     handleUnblockFriend,
   } = useOtherUserProfile({
-    user: user || { id: '', firebase_uid: '', username: 'User', steam_id: '', has_steam_api_key: false },
+    user: user || {
+      id: '',
+      firebase_uid: '',
+      username: 'User',
+      steam_id: '',
+      has_steam_api_key: false,
+    },
     initialFriendship,
   });
 
@@ -102,128 +105,9 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
     onAcceptFriend: handleAcceptFriend,
     onRefuseFriend: handleRefuseFriend,
   });
-  const statsPaddingTop = hasActionButtons ? 'pt-20' : 'pt-6';
+  const statsPaddingTop = hasActionButtons ? 116 : 60;
 
-  if (isLandscape) {
-    const leftRailOffset = insets.left + 74;
-    const bannerHeight = isTablet ? 280 : 120;
-
-    return (
-      <Box
-        className="flex-1 bg-background-0 relative"
-        style={{
-          paddingLeft: leftRailOffset,
-          paddingRight: insets.right,
-          paddingBottom: insets.bottom,
-        }}
-        testID="other-user-profile-view"
-      >
-        {/* Banner: absolute at z-0, stays fixed while content scrolls over it */}
-        <Box
-          className="absolute"
-          style={{ top: 0, left: leftRailOffset, right: insets.right, height: bannerHeight, zIndex: 0 }}
-        >
-          <HeaderGameImage
-            appid={mostPlayedGame?.appid}
-            compact={!isTablet}
-            contained
-            height={bannerHeight}
-            scrollable
-            alignTop
-          />
-        </Box>
-
-        {/* BackButton: z-20, always visible above banner and scroll content */}
-        <BackButton
-          onPress={handleBack}
-          testID="other-user-profile-back-btn"
-          style={{ top: Math.max(insets.top, 8), left: 12, zIndex: 20, position: 'absolute' }}
-        />
-
-        {/* ScrollView: z-10, content begins at bannerHeight, slides over the banner on scroll-up */}
-        <ScrollView
-          className="flex-1"
-          style={{ zIndex: 10 }}
-          contentContainerStyle={{ paddingTop: bannerHeight, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={true}
-          refreshControl={
-            <GLRefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
-        >
-          <VSpace size={vspaceHeight} testID="other-user-vspace" />
-          <OtherUserIdentity
-            user={user}
-            player={player}
-            friendship={friendship}
-            isActionLoading={isActionLoading}
-            onAddFriend={handleAddFriend}
-            onAcceptFriend={handleAcceptFriend}
-            onRefuseFriend={handleRefuseFriend}
-            onBlockFriend={handleBlockFriend}
-            onRemoveFriend={handleRemoveFriend}
-            onRemovePending={handleRemovePending}
-            onUnblockFriend={handleUnblockFriend}
-          />
-
-          <Box className="bg-background-0 pb-10">
-            <VStack space="xl" className={statsPaddingTop}>
-              <Box className={horizontalPadding}>
-                <OtherUserStats
-                  ownedGames={targetOwnedGames}
-                  friendship={friendship}
-                />
-              </Box>
-
-              {/* 4 Comparison charts in order */}
-              <Box className={horizontalPadding}>
-                <VStack space="lg" className="w-full" key={`charts-${refreshKey}`}>
-                  {/* 1. Community Playtime with friend scope */}
-                  <CommunityPlaytimeHistogramChart
-                    key={`playtime-${refreshKey}`}
-                    scope="user"
-                    targetUserId={user.id}
-                    targetUserName={username}
-                    chartTitle={`${username}'s Playtime`}
-                  />
-
-                  {/* 2. Top Community Games with friend scope */}
-                  <CommunityTopGamesHistogramChart
-                    key={`topgames-${refreshKey}`}
-                    scope="user"
-                    targetUserId={user.id}
-                    targetUserName={username}
-                    chartTitle={`${username}'s Top Games`}
-                    ownedGames={currentUserOwnedGames}
-                    isFriend={isFriend}
-                  />
-
-                  {/* 3. Library Status Breakdown with friend scope */}
-                  <CommunityGameStatusChart
-                    key={`gamestatus-${refreshKey}`}
-                    scope="user"
-                    targetUserId={user.id}
-                    targetUserName={username}
-                    chartTitle="Library Status Breakdown"
-                  />
-
-                  {/* 4. Community Radar with friend scope and selector hidden */}
-                  <CommunityGenreRadarChart
-                    key={`radar-${refreshKey}`}
-                    scope="user"
-                    targetUserId={user.id}
-                    targetUserName={username}
-                    chartTitle={`${username}'s Radar`}
-                    hideScopeSelector
-                    ownedGames={currentUserOwnedGames}
-                  />
-                </VStack>
-              </Box>
-            </VStack>
-          </Box>
-        </ScrollView>
-      </Box>
-    );
-  }
+  const leftRailOffset = insets.left + 74;
 
   return (
     <Box className="relative flex-1 bg-background-0" testID="other-user-profile-view">
@@ -246,13 +130,10 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
           onUnblockFriend={handleUnblockFriend}
         />
 
-        <Box className="bg-background-0 pb-10">
-          <VStack space="xl" className={statsPaddingTop}>
+        <Box className="bg-background-0 pb-10" style={{ marginTop: -36 }}>
+          <VStack space="xl" style={{ paddingTop: statsPaddingTop }}>
             <Box className={horizontalPadding}>
-              <OtherUserStats
-                ownedGames={targetOwnedGames}
-                friendship={friendship}
-              />
+              <OtherUserStats ownedGames={targetOwnedGames} friendship={friendship} />
             </Box>
 
             {/* 4 Comparison charts in order */}
@@ -303,7 +184,11 @@ export const OtherUserProfileView: React.FC<OtherUserProfileViewProps> = ({
         </Box>
       </ScrollablePage>
 
-      <BackButton onPress={handleBack} testID="other-user-profile-back-btn" />
+      <BackButton
+        onPress={handleBack}
+        testID="other-user-profile-back-btn"
+        style={isLandscape ? { left: leftRailOffset + 12 } : undefined}
+      />
     </Box>
   );
 };

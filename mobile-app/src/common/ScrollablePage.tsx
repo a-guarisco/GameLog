@@ -37,7 +37,7 @@ const ScrollablePage = ({
   const paddingTop = contentPaddingTop ?? (hasBanner ? bannerHeight : insetsTop + 16);
   const leftPadding = getNavRailOffset({ isLandscape, isTablet, insetsLeft: insets.left });
 
-  const isScrollableBanner = (isLandscape || isTablet) && hasBanner;
+  const isScrollableBanner = !isLandscape && isTablet && hasBanner;
 
   return (
     <Box
