@@ -1,5 +1,7 @@
 from unittest.mock import patch
+
 from fastapi import status
+
 from src.auth.schemas import AuthenticatedUser
 
 

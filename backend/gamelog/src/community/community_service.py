@@ -28,7 +28,6 @@ from src.games.schemas import DayByDayPlaytime
 from src.models import (
     Friendship,
     FriendshipStatus,
-    Game,
     GameStatus,
     Shelving,
     SteamRollingTime,
@@ -73,7 +72,7 @@ def get_community_weekly_playtime(
     user_hours = [round(user_daily_map.get(d, 0) / 60.0, 2) for d in week_dates]
 
     community_daily_map = get_community_daily_totals(db, target_user_ids, start_date, end_date)
-    
+
     community_daily_totals = [community_daily_map.get(d, 0) for d in week_dates]
 
     num_target_users = len(target_user_ids)
@@ -252,10 +251,7 @@ def _compute_community_top_games_for_dates(
 
     # Use SQL helper to get all community top games in one fast query
     community_game_totals, community_game_player_counts = get_community_game_totals_and_players(
-        db, 
-        target_user_ids, 
-        start_date=min(dates), 
-        end_date=max(dates)
+        db, target_user_ids, start_date=min(dates), end_date=max(dates)
     )
 
     all_game_ids = set(user_game_totals.keys()) | set(community_game_totals.keys())

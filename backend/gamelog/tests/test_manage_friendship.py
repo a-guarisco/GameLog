@@ -1,5 +1,5 @@
 import os
-import uuid
+
 import pytest
 from fastapi import HTTPException
 
@@ -13,7 +13,7 @@ from sqlmodel import select
 
 from src.models import Friendship, FriendshipStatus
 from src.users.schemas import FriendshipManageAction, FriendshipManageRequest
-from src.users.user_service import manage_friendship, send_friend_request, search_users_by_username
+from src.users.user_service import manage_friendship, search_users_by_username, send_friend_request
 from tests.conftest import make_user
 
 

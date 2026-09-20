@@ -1,5 +1,5 @@
-from datetime import date
 from fastapi import status
+
 from src.models import FriendshipStatus, GameStatus
 
 

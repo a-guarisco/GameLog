@@ -1,15 +1,16 @@
 import uuid
-from collections import defaultdict
 from datetime import date, timedelta
+
+from sqlalchemy import bindparam, text
 from sqlmodel import Session
-from sqlalchemy import text, bindparam
+
 
 def get_community_daily_totals(db: Session, target_user_ids: list[uuid.UUID], start_date: date, end_date: date) -> dict[date, int]:
     if not target_user_ids:
         return {}
 
     query_start = start_date - timedelta(days=1)
-    
+
     sql = text("""
         WITH daily_deltas AS (
             SELECT 
@@ -31,30 +32,29 @@ def get_community_daily_totals(db: Session, target_user_ids: list[uuid.UUID], st
         WHERE created_at >= :start_date
         GROUP BY created_at
     """).bindparams(bindparam("target_ids", expanding=True))
-    
-    results = db.execute(sql, {
-        "target_ids": [uid.hex for uid in target_user_ids],
-        "query_start": query_start,
-        "start_date": start_date,
-        "end_date": end_date
-    }).fetchall()
-    
+
+    results = db.execute(
+        sql, {"target_ids": [uid.hex for uid in target_user_ids], "query_start": query_start, "start_date": start_date, "end_date": end_date}
+    ).fetchall()
+
     parsed_results = {}
     for row in results:
         d = row[0]
         if isinstance(d, str):
-            from datetime import datetime
-            d = datetime.strptime(d, "%Y-%m-%d").date()
+            d = date.fromisoformat(d)
         parsed_results[d] = int(row[1] or 0)
-        
+
     return parsed_results
 
-def get_community_game_totals_and_players(db: Session, target_user_ids: list[uuid.UUID], start_date: date, end_date: date) -> tuple[dict[str, int], dict[str, int]]:
+
+def get_community_game_totals_and_players(
+    db: Session, target_user_ids: list[uuid.UUID], start_date: date, end_date: date
+) -> tuple[dict[str, int], dict[str, int]]:
     if not target_user_ids:
         return {}, {}
-        
+
     query_start = start_date - timedelta(days=1)
-    
+
     sql = text("""
         WITH daily_deltas AS (
             SELECT 
@@ -88,21 +88,18 @@ def get_community_game_totals_and_players(db: Session, target_user_ids: list[uui
         WHERE total_playtime > 0
         GROUP BY steam_app_id
     """).bindparams(bindparam("target_ids", expanding=True))
-    
-    results = db.execute(sql, {
-        "target_ids": [uid.hex for uid in target_user_ids],
-        "query_start": query_start,
-        "start_date": start_date,
-        "end_date": end_date
-    }).fetchall()
-    
+
+    results = db.execute(
+        sql, {"target_ids": [uid.hex for uid in target_user_ids], "query_start": query_start, "start_date": start_date, "end_date": end_date}
+    ).fetchall()
+
     totals = {}
     players = {}
     for row in results:
         app_id = row[0]
         totals[app_id] = int(row[1] or 0)
         players[app_id] = int(row[2] or 0)
-        
+
     return totals, players
 
 
@@ -149,8 +146,11 @@ def get_community_genre_totals(db: Session, target_user_ids: list[uuid.UUID]) ->
         ORDER BY genre_playtime DESC
     """).bindparams(bindparam("target_ids", expanding=True))
 
-    results = db.execute(sql, {
-        "target_ids": [uid.hex for uid in target_user_ids],
-    }).fetchall()
+    results = db.execute(
+        sql,
+        {
+            "target_ids": [uid.hex for uid in target_user_ids],
+        },
+    ).fetchall()
 
     return [(str(row[0]), str(row[1]), int(row[2] or 0)) for row in results]

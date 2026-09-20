@@ -10,7 +10,6 @@ from sqlmodel import Session, col, select
 from src.games import steam_fetcher_service
 from src.games.schemas import DailyGameReport, DailyReport, DayByDayPlaytime, GameStatusesResponse, SteamGame
 from src.models import Game, GameStatus, Genre, Shelving, SteamRollingTime, User
-
 from src.users import user_service
 
 
@@ -61,6 +60,7 @@ def get_playtime_by_game(session: Session, user_id: str, steam_app_id: str, days
     steam_rolling_times = _get_steam_rolling_by_user(session, user_id, steam_app_id)
     return _compute_daily_playtimes(steam_rolling_times, days)
 
+
 def get_game_status(session: Session, user_id: str, steam_app_id: str) -> GameStatus:
     """
     Return the status of the specified game for the specified user.
@@ -82,14 +82,9 @@ def get_user_game_statuses(session: Session, user_id: str) -> list[GameStatusesR
     user = user_service.get_user_by_firebase_uid(session, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
-    statement = (
-        select(Game.steam_app_id, Shelving.status)
-        .join(Shelving, col(Shelving.game_id) == Game.id)
-        .where(col(Shelving.owner_id) == user.id)
-    )
+    statement = select(Game.steam_app_id, Shelving.status).join(Shelving, col(Shelving.game_id) == Game.id).where(col(Shelving.owner_id) == user.id)
     results = session.exec(statement).all()
     return [GameStatusesResponse(app_id=steam_app_id, status=status) for steam_app_id, status in results]
-
 
 
 def get_streak(session: Session, user_id: str, steam_app_id: str | None, target_date: date | None = None) -> int:
@@ -287,8 +282,7 @@ def compute_daily_playtimes(
             # Sanity check: a single game cannot be played more than 24 hours in a day.
             # This handles massive jumps from mock data mismatches or Steam syncing years of offline play.
             max_possible_playtime = delta_days * 1440
-            if delta_playtime > max_possible_playtime:
-                delta_playtime = max_possible_playtime
+            delta_playtime = min(delta_playtime, max_possible_playtime)
 
             daily_avg = delta_playtime // delta_days
             remainder = delta_playtime % delta_days
@@ -325,19 +319,16 @@ def compute_daily_playtimes(
     result = []
     for i in range(num_days):
         target_d = start_date + timedelta(days=i)
-        
+
         games_playtime = []
         if target_d in daily_games:
             from src.games.schemas import GamePlaytime
+
             for g_app_id, mins in daily_games[target_d].items():
                 if mins > 0:
                     games_playtime.append(GamePlaytime(app_id=g_app_id, playtime_minutes=mins))
-                    
-        result.append(DayByDayPlaytime(
-            date=target_d, 
-            playtime_minutes=daily_totals.get(target_d, 0),
-            games=games_playtime
-        ))
+
+        result.append(DayByDayPlaytime(date=target_d, playtime_minutes=daily_totals.get(target_d, 0), games=games_playtime))
 
     return result
 
@@ -360,35 +351,28 @@ def get_genres_for_apps(session: Session, app_ids: list[str]) -> dict[str, list[
     Returns a mapping of steam_app_id to a list of genre descriptions for the requested app_ids.
     It checks both Game and TopGame tables.
     """
-    from src.models import Game, TopGame
     from sqlalchemy.orm import selectinload
     from sqlmodel import col
-    
+
+    from src.models import Game, TopGame
+
     result = {}
-    
+
     if not app_ids:
         return result
 
     # Check Game table
-    query_games = (
-        select(Game)
-        .where(col(Game.steam_app_id).in_(app_ids))
-        .options(selectinload(Game.genres))
-    )
+    query_games = select(Game).where(col(Game.steam_app_id).in_(app_ids)).options(selectinload(Game.genres))
     games = session.exec(query_games).all()
     for game in games:
         result[game.steam_app_id] = [g.description for g in game.genres]
-        
+
     # Check TopGame table for the remaining ones
     missing_app_ids = [app_id for app_id in app_ids if app_id not in result]
     if missing_app_ids:
-        query_top = (
-            select(TopGame)
-            .where(col(TopGame.steam_app_id).in_(missing_app_ids))
-            .options(selectinload(TopGame.genres))
-        )
+        query_top = select(TopGame).where(col(TopGame.steam_app_id).in_(missing_app_ids)).options(selectinload(TopGame.genres))
         top_games = session.exec(query_top).all()
         for tg in top_games:
             result[tg.steam_app_id] = [g.description for g in tg.genres]
-            
+
     return result

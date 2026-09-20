@@ -26,7 +26,6 @@ os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 
 from src.models import User
-from src.users import UserRead
 from src.users.user_service import get_user_by_firebase_uid
 from tests.conftest import make_user
 

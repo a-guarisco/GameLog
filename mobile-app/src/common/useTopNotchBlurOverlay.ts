@@ -9,10 +9,9 @@ const useTopNotchBlurOverlay = (minBannerHeight: number, bannerHeightScreenRatio
   const insets = useSafeAreaInsets();
   const scrollBlurTargetRef = useRef<View | null>(null);
 
+  const calculatedBannerHeight = useGetBannerHeight(minBannerHeight, bannerHeightScreenRatio);
   const bannerHeight =
-    minBannerHeight > 0 || bannerHeightScreenRatio > 0
-      ? useGetBannerHeight(minBannerHeight, bannerHeightScreenRatio)
-      : 0;
+    minBannerHeight > 0 || bannerHeightScreenRatio > 0 ? calculatedBannerHeight : 0;
   const blurThreshold = bannerHeight > 0 ? bannerHeight - insets.top : 0;
 
   const scrollY = useRef(new Animated.Value(0)).current;

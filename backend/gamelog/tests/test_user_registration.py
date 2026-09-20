@@ -11,9 +11,7 @@ from src.models import User
 
 
 def test_register_user_success(client: TestClient, session: Session):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="new-firebase-uid", email="newuser@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid", email="newuser@test.com", email_verified=True)
     payload = {
         "username": "new_user_1",
         "steam_id": "76561198999000001",
@@ -47,9 +45,7 @@ def test_register_user_success(client: TestClient, session: Session):
 
 
 def test_register_user_without_steam_api_key_success(client: TestClient, session: Session):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="new-firebase-uid-2", email="newuser2@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid-2", email="newuser2@test.com", email_verified=True)
     payload = {
         "username": "new_user_2",
         "steam_id": "76561198999000002",
@@ -76,9 +72,7 @@ def test_register_user_without_steam_api_key_success(client: TestClient, session
 
 
 def test_register_user_without_country_in_steam_defaults_to_none(client: TestClient, session: Session):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="new-firebase-uid-3", email="newuser3@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid-3", email="newuser3@test.com", email_verified=True)
     payload = {
         "username": "new_user_3",
         "steam_id": "76561198999000003",
@@ -103,9 +97,7 @@ def test_register_user_without_country_in_steam_defaults_to_none(client: TestCli
 
 
 def test_register_user_invalid_steam_credentials_with_api_key(client: TestClient):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="new-firebase-uid", email="newuser@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid", email="newuser@test.com", email_verified=True)
     payload = {
         "username": "new_user_1",
         "steam_id": "76561198999000001",
@@ -122,9 +114,7 @@ def test_register_user_invalid_steam_credentials_with_api_key(client: TestClient
 
 
 def test_register_user_invalid_steam_id_without_api_key(client: TestClient):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="new-firebase-uid", email="newuser@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="new-firebase-uid", email="newuser@test.com", email_verified=True)
     payload = {
         "username": "new_user_1",
         "steam_id": "invalid_steam_id",
@@ -141,9 +131,7 @@ def test_register_user_invalid_steam_id_without_api_key(client: TestClient):
 
 
 def test_register_user_unverified_email_raises_403(client: TestClient):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="unverified-uid", email="unverified@test.com", email_verified=False
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="unverified-uid", email="unverified@test.com", email_verified=False)
     payload = {
         "username": "unverified_user",
         "steam_id": "76561198999000099",
@@ -167,9 +155,7 @@ def test_register_user_duplicate_username(client: TestClient, session: Session):
     session.add(existing_user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="brand-new-uid", email="another@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="brand-new-uid", email="another@test.com", email_verified=True)
     payload = {
         "username": "taken_username",
         "steam_id": "76561198999000003",
@@ -193,9 +179,7 @@ def test_register_user_duplicate_steam_id(client: TestClient, session: Session):
     session.add(existing_user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="brand-new-uid-2", email="user3@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="brand-new-uid-2", email="user3@test.com", email_verified=True)
     payload = {
         "username": "user_3",
         "steam_id": "76561198999000002",
@@ -219,9 +203,7 @@ def test_register_user_already_registered_firebase_uid(client: TestClient, sessi
     session.add(existing_user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="uid-already-reg", email="reg@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="uid-already-reg", email="reg@test.com", email_verified=True)
     payload = {
         "username": "different_username",
         "steam_id": "76561198999000011",
@@ -235,9 +217,7 @@ def test_register_user_already_registered_firebase_uid(client: TestClient, sessi
 
 
 def test_register_user_missing_required_fields_raises_422(client: TestClient):
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="valid-uid", email="valid@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="valid-uid", email="valid@test.com", email_verified=True)
     # Missing steam_id
     payload = {"username": "incomplete_user"}
 
@@ -264,9 +244,7 @@ def test_get_current_user_profile_success(client: TestClient, session: Session):
     session.add(user)
     session.commit()
 
-    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(
-        uid="uid-profile-test", email="profile@test.com", email_verified=True
-    )
+    app.dependency_overrides[get_current_user] = lambda: AuthenticatedUser(uid="uid-profile-test", email="profile@test.com", email_verified=True)
     response = client.get("/users/me")
 
     assert response.status_code == 200

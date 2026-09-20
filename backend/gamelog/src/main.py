@@ -41,7 +41,7 @@ def healthcheck(response: Response, db: Session = Depends(get_db)):
             "status": "unhealthy",
             "app": settings.app_name,
             "version": settings.app_version,
-            "database": f"error: {str(e)}",
+            "database": f"error: {e!s}",
         }
     return {
         "status": "ok",
