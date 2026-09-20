@@ -29,7 +29,6 @@ os.environ.setdefault("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
 from src.games.schemas import DayByDayPlaytime, GameStatusesResponse
 from tests.conftest import make_user
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -389,9 +388,6 @@ class TestGetGameStatusEndpoint:
             {"app_id": "730", "status": "shelved"},
         ]
 
-
-
-
     def test_propagates_404_from_service(self, client, session):
         make_user(session)
         with patch(
@@ -400,7 +396,6 @@ class TestGetGameStatusEndpoint:
         ):
             response = client.get(self.ENDPOINT, params={"steam_app_id": "570"})
         assert response.status_code == 404
-
 
 
 # ---------------------------------------------------------------------------
@@ -449,6 +444,3 @@ class TestGenresBatchEndpoint:
         response = client.post(self.ENDPOINT, json={"app_ids": too_many})
         assert response.status_code == 400
         assert "Too many app_ids requested" in response.json()["detail"]
-
-
-

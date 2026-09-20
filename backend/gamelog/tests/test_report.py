@@ -1,6 +1,7 @@
 from datetime import date, timedelta
-from fastapi import HTTPException
+
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 

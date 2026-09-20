@@ -11,6 +11,7 @@ from src.users.schemas import GetFriendListResponse, SteamFriend
 
 DEFAULT_STEAM_API_KEY = "4C67D2313547027F4ECB151CD10E76EC"
 
+
 async def get_owned_games_from_steam_async(
     user: User,
     client: httpx.AsyncClient | None = None,
@@ -43,10 +44,8 @@ async def get_friend_list_from_steam_async(
         friends=[SteamFriend(**friend) for friend in friends_list.get("friends", [])],
     )
 
-async def get_user_region(
-    steam_id: str,
-    steam_api_key: str | None
-) -> str|None:
+
+async def get_user_region(steam_id: str, steam_api_key: str | None) -> str | None:
     if not steam_api_key:
         warnings.warn("Using default steam api key")
         steam_api_key = DEFAULT_STEAM_API_KEY
@@ -59,6 +58,7 @@ async def get_user_region(
         return player_summaries[0].get("loccountrycode", "Unknown")
     else:
         return None
+
 
 async def _get_steam_api_response(
     url: str,

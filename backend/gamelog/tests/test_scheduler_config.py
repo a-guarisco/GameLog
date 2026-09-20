@@ -58,8 +58,10 @@ async def test_lifespan_scheduler_disabled():
 
 @pytest.mark.anyio
 async def test_weekly_top_games_429_backoff(engine):
-    import httpx
     from unittest.mock import AsyncMock, MagicMock
+
+    import httpx
+
     from src.core.scheduler import _run_weekly_top_games_job_async
     from src.games.schemas import SteamTopGame
 

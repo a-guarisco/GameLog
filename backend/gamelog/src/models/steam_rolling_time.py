@@ -16,10 +16,9 @@ class SteamRollingTimeBase(SQLModel):
 
 from sqlalchemy import Index
 
+
 class SteamRollingTime(SteamRollingTimeBase, table=True):
-    __table_args__ = (
-        Index("idx_steam_rolling_time_user_id_created_at", "user_id", "created_at"),
-    )
+    __table_args__ = (Index("idx_steam_rolling_time_user_id_created_at", "user_id", "created_at"),)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", index=True)

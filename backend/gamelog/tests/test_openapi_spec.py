@@ -3,7 +3,7 @@ import os
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_openapi.db")
 os.environ.setdefault("USE_FIREBASE_EMULATOR", "true")
 
-from src.main import app  # noqa: E402
+from src.main import app
 
 
 def test_openapi_schema_generation():

@@ -10,7 +10,7 @@ from src.users import (
     UserSearchResult,
     user_service,
 )
-from src.users.schemas import UserRead, UserMeRead, UserRegisterRequest, SteamApiKeyUpdateRequest
+from src.users.schemas import SteamApiKeyUpdateRequest, UserMeRead, UserRead, UserRegisterRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

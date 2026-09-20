@@ -10,8 +10,8 @@ from src.users import FriendshipInfo, UserSearchResult, notifications_service
 from src.users.schemas import (
     FriendshipManageAction,
     FriendshipManageRequest,
-    UserRead,
     UserMeRead,
+    UserRead,
     UserRegisterRequest,
 )
 from src.users.schemas import FriendshipStatus as APIFriendshipStatus
@@ -30,6 +30,7 @@ def get_user_by_firebase_uid(session: Session, firebase_uid: str) -> User:
         raise HTTPException(status_code=500, detail="User Steam ID not found")
 
     return user
+
 
 def register_user(
     session: Session,
@@ -65,7 +66,7 @@ def register_user(
 
     from src.games.steam_fetcher_service import get_steam_player_summary_sync
 
-    player_summary = get_steam_player_summary_sync(register_data.steam_id, register_data.steam_api_key or None )
+    player_summary = get_steam_player_summary_sync(register_data.steam_id, register_data.steam_api_key or None)
     if not player_summary:
         detail = "Invalid Steam ID or Steam API Key" if register_data.steam_api_key else "Invalid Steam ID"
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
@@ -83,6 +84,7 @@ def register_user(
     session.refresh(new_user)
     return UserRead.model_validate(new_user)
 
+
 def update_steam_api_key(session: Session, firebase_uid: str, steam_api_key: str) -> UserMeRead:
     statement = select(User).where(User.firebase_uid == firebase_uid)
     user = session.exec(statement).first()
@@ -90,6 +92,7 @@ def update_steam_api_key(session: Session, firebase_uid: str, steam_api_key: str
         raise HTTPException(status_code=404, detail="User not found")
 
     from src.games.steam_fetcher_service import validate_steam_credentials_sync
+
     is_valid = validate_steam_credentials_sync(user.steam_id, steam_api_key)
     if not is_valid:
         raise HTTPException(
@@ -273,17 +276,13 @@ def manage_friendship(
             # Check if the provided friendship_id was actually a target_user_id
             target_user = session.get(User, payload.friendship_id)
             if target_user:
-                friendship = session.exec(
-                    select(Friendship).where(_friendship_between_clause(current_user.id, target_user.id))
-                ).first()
+                friendship = session.exec(select(Friendship).where(_friendship_between_clause(current_user.id, target_user.id))).first()
                 if not friendship and payload.action != FriendshipManageAction.BLOCK:
                     raise HTTPException(status_code=404, detail="Friendship not found")
             else:
                 raise HTTPException(status_code=404, detail="Friendship not found")
     elif payload.target_user_id:
-        friendship = session.exec(
-            select(Friendship).where(_friendship_between_clause(current_user.id, payload.target_user_id))
-        ).first()
+        friendship = session.exec(select(Friendship).where(_friendship_between_clause(current_user.id, payload.target_user_id))).first()
     else:
         raise HTTPException(status_code=400, detail="Either friendship_id or target_user_id must be provided")
 
@@ -354,9 +353,7 @@ def manage_friendship(
                     else:
                         raise HTTPException(status_code=403, detail="Cannot interact with this user")
 
-                other_user_id = (
-                    friendship.addressee_id if friendship.requester_id == current_user.id else friendship.requester_id
-                )
+                other_user_id = friendship.addressee_id if friendship.requester_id == current_user.id else friendship.requester_id
                 friendship.requester_id = current_user.id
                 friendship.addressee_id = other_user_id
                 friendship.status = FriendshipStatus.BLOCKED

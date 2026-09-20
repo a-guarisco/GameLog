@@ -129,7 +129,9 @@ async def _run_weekly_top_games_job_async() -> None:
                                 break
                             except httpx.HTTPStatusError as e:
                                 if e.response.status_code == 429:
-                                    print(f"429 Too Many Requests hit for {steam_app_id}. Waiting {retry_delay} seconds before retrying...", flush=True)
+                                    print(
+                                        f"429 Too Many Requests hit for {steam_app_id}. Waiting {retry_delay} seconds before retrying...", flush=True
+                                    )
                                     await asyncio.sleep(retry_delay)
                                     retry_delay *= 2
                                     continue

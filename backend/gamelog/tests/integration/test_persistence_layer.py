@@ -1,13 +1,11 @@
 from datetime import date, timedelta
+
 import pytest
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, select, func
+from sqlmodel import Session, func, select
 
 from src.models import (
     DeviceToken,
-    Friendship,
-    FriendshipStatus,
-    Game,
     GameGenreLink,
     GameStatus,
     Genre,
@@ -74,9 +72,7 @@ class TestPersistenceLayer:
 
         # Query genres linked to game
         genre_links = session.exec(
-            select(Genre)
-            .join(GameGenreLink, GameGenreLink.genre_id == Genre.id)
-            .where(GameGenreLink.game_id == game.id)
+            select(Genre).join(GameGenreLink, GameGenreLink.genre_id == Genre.id).where(GameGenreLink.game_id == game.id)
         ).all()
 
         genre_descriptions = {g.description for g in genre_links}
@@ -168,9 +164,7 @@ class TestPersistenceLayer:
         seed_helpers.create_rolling_history(user, "730", days=1, daily_minutes=90, end_date=today - timedelta(days=1))
 
         # Query total playtime sum for user
-        total_playtime = session.exec(
-            select(func.sum(SteamRollingTime.last_day_playtime)).where(SteamRollingTime.user_id == user.id)
-        ).one()
+        total_playtime = session.exec(select(func.sum(SteamRollingTime.last_day_playtime)).where(SteamRollingTime.user_id == user.id)).one()
         assert total_playtime == 270
 
         # Query playtime grouped by date
@@ -183,5 +177,5 @@ class TestPersistenceLayer:
 
         assert len(daily_sums) == 3
         assert daily_sums[0][1] == 180  # Today
-        assert daily_sums[1][1] == 90   # Yesterday
-        assert daily_sums[2][1] == 0    # Baseline
+        assert daily_sums[1][1] == 90  # Yesterday
+        assert daily_sums[2][1] == 0  # Baseline

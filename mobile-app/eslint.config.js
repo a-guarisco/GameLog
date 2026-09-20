@@ -33,4 +33,10 @@ module.exports = defineConfig([
       'import/no-unresolved': 'off',
     },
   },
+  {
+    files: ['**/__tests__/**/*.{js,jsx,ts,tsx}', '**/*.test.{js,jsx,ts,tsx}'],
+    rules: {
+      'react/display-name': 'off',
+    },
+  },
 ]);

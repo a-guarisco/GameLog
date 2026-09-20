@@ -9,9 +9,8 @@ from fastapi import HTTPException
 from sqlmodel import Session
 
 from src.games import game_service, steam_fetcher_service
-from src.games.schemas import DayByDayPlaytime, GameStatusesResponse
+from src.games.schemas import DayByDayPlaytime
 from src.models import Game, GameStatus, Shelving, SteamRollingTime, User
-
 from src.users import UserRead
 
 # ---------------------------------------------------------------------------
@@ -822,11 +821,11 @@ class TestUpdateGameStatus:
         user = make_user(session)
         # Should not raise exception, but dynamically create game and shelving
         game_service.update_game_status(session, user.firebase_uid, "99999", GameStatus.PLAYING)
-        
+
         # Verify game is cached
         game = game_service._get_cached_game(session, "99999")
         assert game is not None
-        
+
         # Verify shelving is created
         shelving = game_service._get_game_player_shelve(session, game.id, user.id)
         assert shelving is not None
@@ -837,7 +836,7 @@ class TestUpdateGameStatus:
         game = make_game(session, steam_app_id="570")  # game is cached, but user hasn't shelved it
         # Should not raise exception, but dynamically create shelving
         game_service.update_game_status(session, user.firebase_uid, "570", GameStatus.PLAYING)
-        
+
         # Verify shelving is created
         shelving = game_service._get_game_player_shelve(session, game.id, user.id)
         assert shelving is not None
@@ -905,13 +904,8 @@ class TestGetUserGameStatuses:
         result = game_service.get_user_game_statuses(session, user.firebase_uid)
         assert result == []
 
-
-
     def test_get_user_game_statuses_user_not_found(self, session):
         with pytest.raises(HTTPException) as exc_info:
             game_service.get_user_game_statuses(session, "nonexistent-uid")
         assert exc_info.value.status_code == 404
         assert "User not found" in exc_info.value.detail
-
-
-

@@ -11,7 +11,6 @@ from src.games import game_service, recommendations_service
 from src.games.schemas import DailyReport, GameGenres, GameStatusesResponse, GenresBatchRequest, RecommendationResponse, UpdateStatus
 from src.models import GameStatus
 
-
 router = APIRouter(prefix="/games", tags=["games"])
 
 
@@ -103,6 +102,7 @@ def get_daily_report(
     """
     return game_service.get_daily_report(session=db, user_id=auth_user.uid, start_date=start_date, end_date=end_date)
 
+
 @router.post(
     "/update_game_status",
     summary="Update user game status",
@@ -131,7 +131,6 @@ def get_game_status(
     auth_user: AuthenticatedUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> GameStatus | list[GameStatusesResponse]:
-
     """
     Get the status of a game for the current user, or all game statuses if steam_app_id is not provided.
     """
@@ -158,4 +157,3 @@ def get_genres_batch(
         raise HTTPException(status_code=400, detail="Too many app_ids requested. Max 1000.")
     genres_map = game_service.get_genres_for_apps(session=db, app_ids=payload.app_ids)
     return [GameGenres(app_id=app_id, genres=genres) for app_id, genres in genres_map.items()]
-

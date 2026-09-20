@@ -81,8 +81,6 @@ class FriendshipRequest(BaseModel):
     addressee_id: uuid.UUID
 
 
-
-
 class FriendshipManageAction(str, Enum):
     ACCEPT = "ACCEPT"
     REJECT = "REJECT"
