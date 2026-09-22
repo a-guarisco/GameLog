@@ -15,6 +15,7 @@ RUN mkdir -p /home/app/.cache/uv \
 ENV HOME=/home/app
 ENV XDG_CACHE_HOME=/home/app/.cache
 ENV UV_CACHE_DIR=/home/app/.cache/uv
+ENV UV_LINK_MODE=copy
 
 USER app
 

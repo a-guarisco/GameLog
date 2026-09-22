@@ -39,7 +39,12 @@ serviceAccountKey.json
 # Documentation
 docs/
 
-# Python Coverage Reports
+# Python Cache & Coverage Reports
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 .agents/

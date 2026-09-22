@@ -23,8 +23,20 @@ def initialize_firebase_app(settings: Settings) -> None:
     credential_file = Path(credentials_path).expanduser() if credentials_path else None
     has_valid_credentials = credential_file is not None and credential_file.is_file()
 
+    cred = None
+    if has_valid_credentials:
+        try:
+            cred = credentials.Certificate(str(credential_file))
+        except Exception as err:
+            if not settings.use_firebase_emulator:
+                raise
+            print(
+                f"[Firebase Admin] ⚠️ Certificate at '{credential_file}' could not be parsed ({err}). Falling back to mock credentials for Emulator.",
+                flush=True,
+            )
+
     # 1. Mode: Emulator without Service Account Key (Mock Credentials)
-    if settings.use_firebase_emulator and not has_valid_credentials:
+    if settings.use_firebase_emulator and cred is None:
         firebase_admin.initialize_app(options={"projectId": settings.firebase_project_id})
         print(
             f"[Firebase Admin] 🛠️ Mode: EMULATOR (Mock Creds) | Project: {settings.firebase_project_id} | Host: {settings.firebase_auth_emulator_host}",
@@ -33,14 +45,13 @@ def initialize_firebase_app(settings: Settings) -> None:
         return
 
     # 2. Mode: Production (or specified file) without valid key file
-    if not has_valid_credentials:
+    if cred is None:
         missing_path_msg = f": '{credential_file}'" if credential_file else " (path not configured)"
         raise FileNotFoundError(
-            f"Firebase service account key file not found{missing_path_msg}. "
+            f"Firebase service account key file not found or invalid{missing_path_msg}. "
             "To run without a service account key file, set USE_FIREBASE_EMULATOR=true in your environment."
         )
 
-    cred = credentials.Certificate(str(credential_file))
     firebase_admin.initialize_app(cred)
 
     project_id = cred.project_id

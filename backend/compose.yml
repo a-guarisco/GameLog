@@ -15,6 +15,7 @@ services:
       - FIREBASE_AUTH_EMULATOR_HOST=${FIREBASE_AUTH_EMULATOR_HOST:-host.docker.internal:9099}
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-gamelog-40e10}
       - RUN_SCHEDULER=${RUN_SCHEDULER:-true}
+      - UV_LINK_MODE=copy
     secrets:
       - source: firebase_service_account
         target: firebase-service-account.json
@@ -57,4 +58,4 @@ volumes:
 
 secrets:
   firebase_service_account:
-    file: ${GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH}
+    file: ${GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH:-./dummy-service-account.json}
