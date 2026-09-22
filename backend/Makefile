@@ -1,4 +1,4 @@
-include .env
+-include .env
 export
 export UV_LINK_MODE=copy
 
@@ -7,7 +7,6 @@ SERVICE ?=
 SNAPSHOT_DIR ?= postgres/snapshots
 RUN_SCHEDULER ?= false
 
-# Cross-platform Python resolver
 ifeq ($(OS),Windows_NT)
   PYTHON ?= python
 else
@@ -20,60 +19,41 @@ endif
 
 export RUN_SCHEDULER
 
-.PHONY: help prod down restart logs rebuild rebuild-gamelog rebuild-backend rebuild-no-cache rebuild-gamelog-no-cache rebuild-backend-no-cache setup db-reset db-fresh-baseline migrate revision downgrade seed seed-firebase test test-local lint db-shell db-clean db-snapshot db-restore
+.PHONY: help prod up down restart logs rebuild rebuild-no-cache db-reset migrate revision downgrade seed crawl-steam seed-firebase test lint db-shell
 
 prod:
 	@:
 
 help:
-	@echo "GameLog backend Docker commands"
-	@echo ""
-	@echo "Testing & Code Quality:"
-	@echo "  make test                - Run pytest test suite in Docker container"
-	@echo "  make test-local          - Run pytest test suite locally on host"
-	@echo "  make lint                - Run ruff linter and code formatter on local files"
+	@echo "GameLog Backend Development Commands"
 	@echo ""
 	@echo "Lifecycle:"
-	@echo "  make up                  - Start all services with background scheduler disabled (RUN_SCHEDULER=false)"
-	@echo "  make up prod             - Start all services with background scheduler enabled (RUN_SCHEDULER=true)"
-	@echo "  make down                - Stop and remove containers"
-	@echo "  make restart             - Restart all running services"
-	@echo "  make logs                - Follow all service logs"
-	@echo "  make logs SERVICE=gamelog- Follow logs for a specific service (gamelog or db)"
+	@echo "  make up                  - Start backend Docker containers in background"
+	@echo "  make down                - Stop and remove backend containers"
+	@echo "  make restart             - Restart all backend containers"
+	@echo "  make logs                - Follow container logs (optional: SERVICE=gamelog)"
+	@echo "  make rebuild             - Rebuild and recreate backend containers"
+	@echo "  make rebuild-no-cache    - Rebuild containers without cache"
 	@echo ""
-	@echo "Rebuilds:"
-	@echo "  make rebuild             - Rebuild and recreate all services"
-	@echo "  make rebuild-gamelog     - Rebuild and recreate only the API container"
-	@echo "  make rebuild-no-cache    - Rebuild all services without cache"
-	@echo "  make rebuild-gamelog-no-cache - Rebuild only the API container without cache"
+	@echo "Database & Migrations:"
+	@echo "  make db-reset            - Reset PostgreSQL database volume, migrate, and seed"
+	@echo "  make migrate             - Apply pending Alembic migrations"
+	@echo "  make revision m=\"...\"    - Autogenerate a new Alembic migration"
+	@echo "  make downgrade           - Roll back the latest migration"
+	@echo "  make seed                - Seed PostgreSQL database with sample data"
+	@echo "  make crawl-steam         - Run Steam crawler to refresh seed_data_users.json"
+	@echo "  make db-shell            - Open an interactive psql shell inside db container"
 	@echo ""
-	@echo "Database Workflows & Setup:"
-	@echo "  make setup               - Initial setup: start services, migrate DB, insert seed data"
-	@echo "  make db-reset            - Reset DB volume, apply migrations and seed data in one step"
-	@echo "  make db-fresh-baseline   - Wipe old migration files, clean DB, create fresh baseline revision"
-	@echo ""
-	@echo "Database Migrations & Seed:"
-	@echo "  make migrate             - Apply pending Alembic migrations to DB"
-	@echo "  make revision m=\"...\"    - Autogenerate an Alembic migration script"
-	@echo "  make downgrade           - Roll back the last Alembic migration"
-	@echo "  make seed                - Load demo data into PostgreSQL database (auto-runs crawler if data is missing)"
-	@echo "  make crawl-steam         - Run the Steam crawler to generate seed_data_users.json"
-	@echo "  make seed-firebase       - Seed/authenticate Firebase Auth test users & display Bearer tokens"
-	@echo "                             (Supports ARGS=\"--cloud\", ARGS=\"--emulator\", or ARGS=\"email@test.com\")"
-	@echo ""
-	@echo "Database Utilities & Snapshots:"
-	@echo "  make db-shell            - Open a psql shell in the database container"
-	@echo "  make db-clean            - Clean DB volume and recreate empty schema"
-	@echo "  make db-snapshot         - Create a SQL dump of current DB state"
-	@echo "  make db-restore          - Restore DB from latest snapshot"
+	@echo "Auth & Quality:"
+	@echo "  make seed-firebase       - Seed test users in Firebase Auth and print tokens"
+	@echo "  make test                - Run pytest suite locally via uv"
+	@echo "  make lint                - Run ruff linter & formatter on backend"
 
-# ==============================================================================
-# 🐳 LIFECYCLE & SERVICES
-# ==============================================================================
-
+# ------------------------------------------------------------------------------
+# 🐳 Lifecycle
+# ------------------------------------------------------------------------------
 up:
 	$(COMPOSE) up -d
-
 
 down:
 	$(COMPOSE) down
@@ -84,113 +64,63 @@ restart:
 logs:
 	$(COMPOSE) logs -f $(SERVICE)
 
-# ==============================================================================
-# 🛠️ REBUILDS
-# ==============================================================================
-
 rebuild:
 	$(COMPOSE) up -d --build --force-recreate
 
-rebuild-gamelog:
-	$(COMPOSE) up -d --build --force-recreate gamelog
-
-rebuild-backend: rebuild-gamelog
-
 rebuild-no-cache:
-	$(COMPOSE) build --no-cache
-	$(COMPOSE) up -d --force-recreate
+	$(COMPOSE) build --no-cache && $(COMPOSE) up -d --force-recreate
 
-rebuild-gamelog-no-cache:
-	$(COMPOSE) build --no-cache gamelog
-	$(COMPOSE) up -d --force-recreate gamelog
-
-rebuild-backend-no-cache: rebuild-gamelog-no-cache
-
-# ==============================================================================
-# 🚀 DATABASE WORKFLOWS & SETUP
-# ==============================================================================
-
-setup: up migrate seed
-
-db-reset: db-clean migrate seed
-	$(COMPOSE) up -d
-
-db-fresh-baseline:
-	@$(PYTHON) -c "import sys; ans = input('⚠️  WARNING: This command will delete ALL migrations in alembic/versions/ and reset the DB! Continue? [y/N]: '); sys.exit(0 if ans.strip().lower() in ['y', 'yes'] else 1)" || (echo "❌ Operation cancelled." && exit 1)
-	@echo "🗑️ Deleting old migrations in alembic/versions/..."
-	rm -f gamelog/alembic/versions/*.py
-	$(MAKE) db-clean
-	$(MAKE) revision m="$(if $(m),$(m),initial_schema)"
-	@echo "✅ New baseline migration created successfully! Run 'make db-reset' to apply and populate the DB."
-	@echo "⚠️  MEMO: Make sure to update 'seed.py' to support any new tables before running 'make db-reset'!"
-
-# ==============================================================================
-# 🗄️ DATABASE MIGRATIONS & SEED
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 🗄️ Database & Migrations
+# ------------------------------------------------------------------------------
+db-reset:
+	@echo "🛑 Stopping containers and purging DB volume..."
+	$(COMPOSE) down -v
+	@echo "🚀 Starting database container..."
+	$(COMPOSE) up -d db
+	@echo "⏳ Waiting for PostgreSQL to accept connections..."
+	@until $(COMPOSE) exec -T db pg_isready -U $(POSTGRES_USER) -d $(POSTGRES_DB) >/dev/null 2>&1; do sleep 1; done
+	@echo "🚀 Starting API service..."
+	$(COMPOSE) up -d gamelog
+	@echo "📦 Running database migrations..."
+	$(COMPOSE) exec gamelog uv run alembic upgrade head
+	@$(PYTHON) ../scripts/crawl_steam.py $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
+	@echo "🌱 Seeding demo data..."
+	$(COMPOSE) exec gamelog uv run python -m src.core.seed $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
+	@echo "✅ Database reset and seeded successfully!"
 
 migrate:
-	$(COMPOSE) run --rm gamelog uv run alembic upgrade head
+	$(COMPOSE) exec gamelog uv run alembic upgrade head
 
 revision:
 ifndef m
-	$(error ❌ Error: Please provide migration message. Usage: make revision m="Create users table")
+	$(error ❌ Error: Migration description required. Usage: make revision m="add_feature")
 endif
-	$(COMPOSE) run --rm gamelog uv run alembic revision --autogenerate -m "$(m)"
+	$(COMPOSE) exec gamelog uv run alembic revision --autogenerate -m "$(m)"
 
 downgrade:
-	$(COMPOSE) run --rm gamelog uv run alembic downgrade -1
+	$(COMPOSE) exec gamelog uv run alembic downgrade -1
 
 seed:
-	@if [ ! -f gamelog/src/core/seed_data_users.json ]; then \
-		echo "⚠️ Missing seed_data_users.json. Running crawl-steam first..."; \
-		$(MAKE) crawl-steam; \
-	fi
-	$(COMPOSE) run --rm gamelog uv run python -m src.core.seed $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
+	@$(PYTHON) ../scripts/crawl_steam.py $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
+	$(COMPOSE) exec gamelog uv run python -m src.core.seed $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
 
 crawl-steam:
-	@cd gamelog && uv run python ../scripts/crawl_steam_users.py $(if $(MOCK_USERS),--mock-users $(MOCK_USERS))
+	@$(PYTHON) ../scripts/crawl_steam.py --override $(if $(MOCK_USERS),--mock-users $(MOCK_USERS)) $(or $(ARGS),$(args))
 
-seed-firebase:
-	@cd gamelog && uv run python ../scripts/seed_firebase_users.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
-
-
-# ==============================================================================
-# 🧪 TESTING & CODE QUALITY
-# ==============================================================================
-
-test:
-	$(COMPOSE) exec -e RUN_SCHEDULER=false gamelog uv run --group dev python -m pytest
-
-test-local:
-	@cd gamelog && uv run --group dev python -m pytest
-
-lint:
-	-@cd gamelog && uv run --group dev ruff format .
-	-@cd gamelog && uv run --group dev ruff check . --fix
-
-# ==============================================================================
-# 🛠️ DATABASE UTILITIES & SNAPSHOTS
-# ==============================================================================
 
 db-shell:
 	$(COMPOSE) exec db psql -U $(POSTGRES_USER) -d $(POSTGRES_DB)
 
-db-clean:
-	$(COMPOSE) down -v
-	$(COMPOSE) up -d db
-	@$(PYTHON) -c "import time; time.sleep(3)"
-	@echo "✅ Database cleaned and recreated"
+# ------------------------------------------------------------------------------
+# 🧪 Testing, Linting & Auth
+# ------------------------------------------------------------------------------
+test:
+	@uv run --project gamelog pytest gamelog/tests
 
-db-snapshot:
-	@mkdir -p $(SNAPSHOT_DIR)
-	@ts=$$(date +%Y%m%d_%H%M%S); \
-	$(COMPOSE) exec db pg_dump -U $(POSTGRES_USER) $(POSTGRES_DB) > $(SNAPSHOT_DIR)/snapshot_$$ts.sql; \
-	ln -sf snapshot_$$ts.sql $(SNAPSHOT_DIR)/snapshot_latest.sql
-	@echo "✅ Snapshot created and linked as snapshot_latest.sql"
+lint:
+	@uv run --project gamelog ruff check gamelog --fix
+	@uv run --project gamelog ruff format gamelog
 
-db-restore:
-	$(COMPOSE) down -v
-	$(COMPOSE) up -d
-	@$(PYTHON) -c "import time; time.sleep(3)"
-	$(COMPOSE) exec -T db psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(SNAPSHOT_DIR)/snapshot_latest.sql
-	@echo "✅ Database restored from snapshot"
+seed-firebase:
+	@$(PYTHON) ../scripts/seed_firebase.py $(if $(filter true 1 yes,$(USE_FIREBASE_EMULATOR)),--emulator,$(if $(filter false 0 no,$(USE_FIREBASE_EMULATOR)),--cloud,)) $(ARGS)
