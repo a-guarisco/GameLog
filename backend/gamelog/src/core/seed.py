@@ -12,10 +12,11 @@ import json
 import os
 import random
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from uuid import UUID, uuid4
 
 from rich.progress import track
-from sqlalchemy import delete
+from sqlalchemy import delete, insert
 from sqlmodel import Session, select
 
 from src.core.database import engine
@@ -170,18 +171,28 @@ TOP_GAMES_DATA = [
 ]
 
 
-def load_crawled_users() -> list[dict]:
-    try:
-        with open("src/core/seed_data_users.json", "r") as f:
-            return json.load(f)
-    except Exception:
-        return []
+def load_crawled_users(target_count: int = 50) -> list[dict]:
+    seed_path = Path("src/core/seed_data_users.json")
+    if seed_path.exists():
+        try:
+            with open(seed_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if data:
+                    return data[:target_count]
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    raise FileNotFoundError(
+        f"❌ '{seed_path}' non trovato.\n"
+        "💡 Il crawler deve essere eseguito sull'host prima del seeding nel container.\n"
+        "👉 Esegui sull'host: make crawl-steam"
+    )
 
 
 def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
     users = []
 
-    # Fetch API Keys from Env
+    # Retrieve Steam Web API credentials from environment variables
     default_api_key = os.getenv("DEFAULT_STEAM_API_KEY") or ""
     if not default_api_key:
         print("WARNING: DEFAULT_STEAM_API_KEY is not set. API calls to Steam may fail if user-specific keys are also missing.")
@@ -190,14 +201,14 @@ def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
     xrayman_api_key = os.getenv("XRAYMAN_STEAM_API_KEY") or default_api_key
     slaitroc_api_key = os.getenv("SLAITROC_STEAM_API_KEY") or default_api_key
 
-    # We want these specific users with real steam IDs
+    # Deterministic mapping of primary development accounts to known 64-bit Steam IDs
     fixed_steam_ids = {
         DEMO_USER_1_ID: "76561198077919169",  # dedepivot
         DEMO_USER_2_ID: "76561198159652025",  # xrayman
         DEMO_USER_6_ID: "76561198248779666",  # slaitroc
     }
 
-    # Create the 3 main users
+    # Instantiate primary development accounts
     users.append(
         User(
             id=DEMO_USER_1_ID,
@@ -231,7 +242,7 @@ def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
 
     exclude_ids = set(fixed_steam_ids.values())
 
-    # We want 5 specific test users mapped to the next 5 crawled profiles
+    # Map deterministic secondary test accounts to available crawled profiles
     test_uids = [
         ("test-01", "test011234567890abcdefghijkl", DEMO_USER_3_ID),
         ("test-02", "test021234567890abcdefghijkl", DEMO_USER_4_ID),
@@ -262,8 +273,8 @@ def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
             test_idx += 1
         crawled_idx += 1
 
-    # Now add the rest of the mock users up to `mock_users`
-    added_mock = len(users)  # count how many we have so far
+    # Populate the remaining user quota with crawled profiles
+    added_mock = len(users)
     while added_mock < mock_users and crawled_idx < len(crawled_users):
         c_user = crawled_users[crawled_idx]
         s_id = c_user["steam_id"]
@@ -287,9 +298,10 @@ def _users(crawled_users: list[dict], mock_users: int = 50) -> list[User]:
 
 def generate_user_playtime(user_id: UUID, games_targets: list[tuple[str, int]], history_days: int = 365) -> list[SteamRollingTime]:
     """
-    Generates realistic historical playtime curves for a user's games.
-    Uses realistic gaps (sparsity) and random distributions.
-    Low total playtime implies adopting GameLog recently and generating playtime sporadically from 0 baseline.
+    Simulates historical daily playtime curves leading up to cumulative playtime targets.
+
+    Generates realistic playtime progression over a given observation window, accounting for
+    baseline playtime prior to tracking and stochastic daily gaming sessions.
     """
     records = []
     today = date.today()
@@ -308,8 +320,8 @@ def generate_user_playtime(user_id: UUID, games_targets: list[tuple[str, int]], 
                 )
             continue
 
-        # If total playtime is very low (< 30 hours / 1800 mins), assume they didn't have a baseline before GameLog.
-        # So we distribute 100% of the playtime over time. Otherwise, we assume 50% baseline.
+        # For small playtime totals (< 30 hours), assume all playtime accrued within the tracking window.
+        # Otherwise, assume 50% accrued prior to the start of the window.
         if final_target < 1800:
             baseline = 0
         else:
@@ -319,13 +331,12 @@ def generate_user_playtime(user_id: UUID, games_targets: list[tuple[str, int]], 
         increments = [0] * (history_days + 1)
 
         if remaining > 0:
-            # We don't pre-pick active days. We just keep adding "gaming sessions"
-            # (e.g. 30 mins to 5 hours) to random days until the remaining time is depleted.
+            # Distribute discrete gaming sessions (30 to 240 minutes) across the tracking period
+            # until the remaining playtime quota is exhausted.
             while remaining > 0:
                 day_idx = random.randint(0, history_days - 1)
 
-                # A realistic gaming session is between 30 minutes and 4 hours (240 mins)
-                # Or whatever is left if it's smaller.
+                # Bound session length between 30 and 240 minutes, clamped to remaining quota
                 session_len = random.randint(30, 240)
                 session_len = min(session_len, remaining)
 
@@ -352,15 +363,11 @@ def generate_user_playtime(user_id: UUID, games_targets: list[tuple[str, int]], 
 
 def generate_shelvings(rolling_times: list[SteamRollingTime], users: list[User]) -> list[Shelving]:
     """
-    Infers GameStatus (Shelving) from the generated playtime.
+    Derives game shelving statuses from cumulative and recent playtime metrics.
     """
     shelvings = []
 
-    # Aggregate data by (user_id, app_id)
-    # We need to know:
-    # 1. Total Playtime
-    # 2. Playtime in the last 14 days
-
+    # Aggregate cumulative and recent (14-day window) playtime metrics per (user_id, app_id)
     stats = {}
     today = date.today()
     for rt in rolling_times:
@@ -368,16 +375,14 @@ def generate_shelvings(rolling_times: list[SteamRollingTime], users: list[User])
         if key not in stats:
             stats[key] = {"total": 0, "recent": 0}
 
-        # The rolling time records represent the cumulative playtime up to that day.
-        # We can just look at the delta between today and 14 days ago.
-        # But iterating all records is fine, we just update total to the latest day's playtime.
+        # Track total playtime and baseline playtime recorded exactly 14 days ago
         days_ago = (today - rt.created_at).days
         stats[key]["total"] = max(stats[key]["total"], rt.last_day_playtime)
 
         if days_ago == 14:
             stats[key]["14_days_ago"] = rt.last_day_playtime
 
-    # Resolve Games map
+    # Evaluate shelving status based on engagement thresholds
     for (user_id, app_id), data in stats.items():
         total = data["total"]
         playtime_14_days_ago = data.get("14_days_ago", 0)
@@ -389,13 +394,14 @@ def generate_shelvings(rolling_times: list[SteamRollingTime], users: list[User])
         elif recent_playtime > 0:
             status = GameStatus.PLAYING
         else:
-            # Played in the past but not recently
-            if total > 600:  # > 10 hours
+            # Titles with historical engagement but no recent activity
+            if total > 600:  # Cumulative playtime exceeds 10 hours
                 status = random.choice([GameStatus.PLATINATO, GameStatus.SHELVED])
             else:
                 status = GameStatus.SHELVED
 
-        # Resolve a deterministic UUID for the game based on steam_app_id
+        # Derive a deterministic UUID for the game entity from steam_app_id
+        # NOTE this deterministic approach is adopted here only (not exploited in the backend)
         game_id = UUID(int=int(app_id) * 1000)
 
         shelvings.append(Shelving(owner_id=user_id, game_id=game_id, status=status))
@@ -404,7 +410,7 @@ def generate_shelvings(rolling_times: list[SteamRollingTime], users: list[User])
 
 
 def seed_database(mock_users: int = 50) -> None:
-    """Reset demo data and insert a consistent sample dataset using SQLModel models."""
+    """Purges existing database records and seeds a comprehensive demonstration dataset."""
     with Session(engine) as session:
         session.exec(delete(SteamRollingTime))
         session.exec(delete(Shelving))
@@ -420,14 +426,11 @@ def seed_database(mock_users: int = 50) -> None:
         session.exec(delete(Config))
         session.flush()
 
-        genre_instances = {}
-        for gd in GENRES_DATA:
-            g = Genre(id=gd["id"], description=gd["description"])
-            session.add(g)
-            genre_instances[gd["id"]] = g
+        session.execute(insert(Genre), GENRES_DATA)
         session.flush()
+        genre_instances = {g.id: g for g in session.exec(select(Genre)).all()}
 
-        # Seed realistic Top Games (used for both TopGame and standard Games)
+        # Seed catalog with top Steam games and associate them with existing genres
         for tg in TOP_GAMES_DATA:
             tg_genres: list[str] = tg["genres"]
             top_game = TopGame(
@@ -437,7 +440,7 @@ def seed_database(mock_users: int = 50) -> None:
             )
             session.add(top_game)
 
-            # Add to Game table to support Shelvings
+            # Synchronize Game entities to satisfy foreign key constraints for Shelvings
             game_id = UUID(int=int(tg["steam_app_id"]) * 1000)
             game = Game(
                 id=game_id,
@@ -447,7 +450,7 @@ def seed_database(mock_users: int = 50) -> None:
             session.add(game)
         session.flush()
 
-        crawled_users_data = load_crawled_users()
+        crawled_users_data = load_crawled_users(mock_users)
         users = _users(crawled_users_data, mock_users)
         for user in users:
             session.add(user)
@@ -455,13 +458,13 @@ def seed_database(mock_users: int = 50) -> None:
 
         rolling_times = []
 
-        # Build a lookup for owned games
+        # Map user Steam IDs to their respective owned game collections
         owned_games_map = {cu["steam_id"]: cu.get("owned_games", []) for cu in crawled_users_data}
 
         for user in track(users, description="Generating mock playtimes..."):
             targets = []
 
-            # Get real owned games if available
+            # Extract verified library records for the current user
             real_games = owned_games_map.get(user.steam_id, [])
 
             if real_games:
@@ -470,40 +473,53 @@ def seed_database(mock_users: int = 50) -> None:
                     playtime = g["playtime_forever"]
                     targets.append((app_id, playtime))
 
-                    # Ensure game exists in DB
+                    # Ensure referenced Game record is persisted in the database
                     game_id = UUID(int=int(app_id) * 1000)
                     if not session.get(Game, game_id):
                         session.add(Game(id=game_id, steam_app_id=app_id))
-            else:
-                # Fallback if no real games (shouldn't happen with the new json, but just in case)
-                top_app_ids = [tg["steam_app_id"] for tg in TOP_GAMES_DATA]
-                num_games = random.randint(3, 8)
-                user_games = random.sample(top_app_ids, num_games)
-                for app_id in user_games:
-                    playtime = int(random.expovariate(1 / 5000))
-                    targets.append((app_id, playtime))
 
             rolling_times.extend(generate_user_playtime(user.id, targets, 365))
 
-        for rt in track(rolling_times, description="Inserting RollingTimes into DB..."):
-            session.add(rt)
+        # Bulk insert rolling times in chunks to eliminate ORM identity map tracking overhead
+        chunk_size = 10_000
+        if rolling_times:
+            rolling_dicts = [
+                {
+                    "id": rt.id,
+                    "user_id": rt.user_id,
+                    "steam_app_id": rt.steam_app_id,
+                    "last_day_playtime": rt.last_day_playtime,
+                    "created_at": rt.created_at,
+                }
+                for rt in rolling_times
+            ]
+            for i in track(range(0, len(rolling_dicts), chunk_size), description="Bulk inserting RollingTimes..."):
+                session.execute(insert(SteamRollingTime), rolling_dicts[i : i + chunk_size])
 
-        # Dynamically generate shelvings based on the 730-day playtime history
+        # Generate shelving entries inferred from the rolling playtime records
         shelvings = generate_shelvings(rolling_times, users)
-        for s in track(shelvings, description="Inserting Shelvings into DB..."):
-            session.add(s)
-        # Commit all the massive data first to avoid autoflush hanging later
-        print("💾 Committing massive data to database... (this may take up to a minute, please wait)")
+        if shelvings:
+            shelving_dicts = [
+                {
+                    "owner_id": s.owner_id,
+                    "game_id": s.game_id,
+                    "status": s.status,
+                }
+                for s in shelvings
+            ]
+            for i in track(range(0, len(shelving_dicts), chunk_size), description="Bulk inserting Shelvings..."):
+                session.execute(insert(Shelving), shelving_dicts[i : i + chunk_size])
+        # Commit core entities and historical times in batch to reduce autoflush overhead
+        print("💾 Persisting seeded records to the database...")
         session.commit()
 
-        # Generate some random friendships among users
-        # For each user, generate ~10 friends, 5 pending, 2 blocked (if possible)
+        # Synthesize friendship relations across users (accepted, pending, and blocked)
         all_user_ids = [u.id for u in users]
 
         for user in track(users, description="Generating friendships..."):
             possible_friends = [uid for uid in all_user_ids if uid != user.id]
 
-            if len(possible_friends) >= 17:  # Need at least 17 to do 10 + 5 + 2
+            if len(possible_friends) >= 17:  # Standard distribution threshold (10 accepted, 5 pending, 2 blocked)
                 chosen = random.sample(possible_friends, 17)
                 accepted = chosen[:10]
                 pending = chosen[10:15]
@@ -528,7 +544,7 @@ def seed_database(mock_users: int = 50) -> None:
                     ):
                         session.add(Friendship(requester_id=user.id, addressee_id=f_id, status=FriendshipStatus.BLOCKED))
             else:
-                # Fallback for small mock_users count
+                # Handle smaller cohorts with scaled friendship allocations
                 num_to_pick = min(len(possible_friends), 5)
                 if num_to_pick > 0:
                     for f_id in random.sample(possible_friends, num_to_pick):
@@ -546,6 +562,7 @@ def seed_database(mock_users: int = 50) -> None:
                                 )
                             )
 
+        # Record seed timestamp in system configuration table
         yesterday_iso = (datetime.now(UTC) - timedelta(days=1)).isoformat()
         session.merge(Config(key="last_update", value=yesterday_iso))
 
