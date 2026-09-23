@@ -42,9 +42,29 @@ except ImportError:
         print("💡 Please run using uv: uv run --project backend/gamelog python scripts/seed_firebase.py")
         sys.exit(1)
 
-CLOUD_WEB_API_KEY = os.environ.get("FIREBASE_WEB_API_KEY", "AIzaSyAVGPT6CKyiS_HmeGg_i0K7GH8qzSGpCWc")
+def load_env() -> None:
+    """Auto-load variables from .env files if present."""
+    for env_path in [
+        REPO_ROOT / "backend" / ".env",
+        REPO_ROOT / "backend" / "gamelog" / ".env",
+        REPO_ROOT / "mobile-app" / ".env",
+    ]:
+        if env_path.exists():
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        os.environ.setdefault(k.strip(), v.strip())
+
+
+def get_cloud_web_api_key() -> str | None:
+    return os.environ.get("FIREBASE_WEB_API_KEY") or os.environ.get("EXPO_PUBLIC_FIREBASE_API_KEY")
+
+
 EMULATOR_PORT = 9099
 EMULATOR_URL = "http://localhost:9099"
+
 
 TEST_USERS = [
     {
@@ -131,6 +151,8 @@ def setup_firebase_app(use_emulator: bool):
 
 
 def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = False, force_emulator: bool = False):
+    load_env()
+
     env_emulator = os.environ.get("USE_FIREBASE_EMULATOR", "").lower() in ("true", "1", "yes")
     env_cloud = os.environ.get("USE_FIREBASE_EMULATOR", "").lower() in ("false", "0", "no")
 
@@ -148,7 +170,13 @@ def seed_and_get_tokens(target_email: str | None = None, force_cloud: bool = Fal
         signin_url = f"{EMULATOR_URL}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-api-key"
     else:
         print("☁️ Mode: FIREBASE CLOUD CONSOLE (gamelog-40e10)\n")
-        signin_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={CLOUD_WEB_API_KEY}"
+        cloud_api_key = get_cloud_web_api_key()
+        if not cloud_api_key:
+            print("❌ Error: A Firebase Web API Key is required for Cloud mode.")
+            print("💡 Please set FIREBASE_WEB_API_KEY in backend/.env or EXPO_PUBLIC_FIREBASE_API_KEY in mobile-app/.env.")
+            sys.exit(1)
+        signin_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={cloud_api_key}"
+
 
     users_to_process = TEST_USERS
     if target_email:
